@@ -18,16 +18,20 @@ interface RealtimeTabProps {
 }
 
 export default function RealtimeTab({ alerts }: RealtimeTabProps) {
-  // Fluctuating Simulated Sensors state
+  // Fluctuating Simulated Sensors state.
+  // kind drives both the live tick range and the status thresholds:
+  //   chiller  - sushi-grade neta display case (~3°C)
+  //   freezer  - ultra-low tuna freezer (~-54°C)
+  //   warmer   - shari rice warmer (~37°C) / sanitation tank (~82°C)
   const [sensors, setSensors] = useState([
-    { name: 'Cold-Storage Freezy-01', temp: -18.4, status: 'Normal', suffix: '°C' },
-    { name: 'Seafood Deep Chamber', temp: -12.1, status: 'Warning', suffix: '°C' },
-    { name: 'Glacier Double Oven', temp: 185.2, status: 'Normal', suffix: '°C' },
-    { name: 'Dishwasher Rinsing Tank', temp: 82.5, status: 'Normal', suffix: '°C' }
+    { name: 'Neta Display Chiller-01', kind: 'chiller', temp: 3.4, status: 'Normal', suffix: '°C' },
+    { name: 'Tuna Deep Freezer (-60)', kind: 'freezer', temp: -54.1, status: 'Warning', suffix: '°C' },
+    { name: 'Shari Rice Warmer Line B', kind: 'warmer', temp: 37.2, status: 'Normal', suffix: '°C' },
+    { name: 'Hand-wash Sanitation Tank', kind: 'warmer', temp: 82.5, status: 'Normal', suffix: '°C' }
   ]);
 
   // Low latency prompt state
-  const [lowLatencyCmd, setLowLatencyCmd] = useState('warn skipper seafood temp warning');
+  const [lowLatencyCmd, setLowLatencyCmd] = useState('warn skipper the tuna freezer temp is climbing');
   const [copilotReply, setCopilotReply] = useState('');
   const [loadingCopilot, setLoadingCopilot] = useState(false);
 
@@ -35,16 +39,14 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       setSensors(prev => prev.map(s => {
-        const delta = (Math.random() - 0.5) * 0.4;
-        let newTemp = parseFloat((s.temp + delta).toFixed(1));
-        if (s.name.includes('Oven')) {
-          newTemp = parseFloat((s.temp + (Math.random() - 0.5) * 1.5).toFixed(1));
-        }
+        const swing = s.kind === 'warmer' ? 1.5 : 0.4;
+        const newTemp = parseFloat((s.temp + (Math.random() - 0.5) * swing).toFixed(1));
         let status = 'Normal';
-        if (s.name.includes('Seafood') && newTemp > -12.5) {
+        if (s.kind === 'chiller' && newTemp > 5) {
+          // Sushi-grade fish must stay cold; warm display is a food-safety risk
+          status = newTemp > 8 ? 'Critical' : 'Warning';
+        } else if (s.kind === 'freezer' && newTemp > -45) {
           status = 'Warning';
-        } else if (newTemp > 0 && !s.name.includes('Oven') && !s.name.includes('Dishwasher')) {
-          status = 'Critical';
         }
         return { ...s, temp: newTemp, status };
       }));
@@ -116,7 +118,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
                     ● {s.status}
                   </span>
                   <div className="text-[9px] text-slate-400 font-mono mt-2">
-                    {s.name.includes('Cold') || s.name.includes('Deep') ? 'Freezer Probe' : 'Heating Element'}
+                    {s.kind === 'chiller' ? 'Chiller Probe' : s.kind === 'freezer' ? 'Freezer Probe' : 'Heating Element'}
                   </div>
                 </div>
               </div>

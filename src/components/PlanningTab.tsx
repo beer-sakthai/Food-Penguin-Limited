@@ -18,7 +18,7 @@ interface PlanningTabProps {
 
 export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabProps) {
   // Search Grounding states
-  const [procurementQuery, setProcurementQuery] = useState('Current wholesale bulk price of wild cold-water Alaskan Cod slabs, and general ocean shipment bottlenecks.');
+  const [procurementQuery, setProcurementQuery] = useState('Current wholesale bulk price of sushi-grade bluefin tuna and Norwegian salmon, plus Koshihikari rice and nori supply bottlenecks.');
   const [groundedInsights, setGroundedInsights] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
 
@@ -129,7 +129,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
         </div>
 
         <p className="text-xs text-slate-500 leading-relaxed font-sans">
-          This feature implements active <span className="text-sky-600 font-bold">Google Search Grounding</span>. Before purchasing bulk shipments of flour, fish, or packaging, use the live search grounder to scan global wholesale trends:
+          This feature implements active <span className="text-sky-600 font-bold">Google Search Grounding</span>. Before purchasing bulk shipments of sushi-grade fish, rice, or nori, use the live search grounder to scan global wholesale trends:
         </p>
 
         <div>

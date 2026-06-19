@@ -36,7 +36,7 @@ interface OverviewTabProps {
 
 export default function OverviewTab({ metrics, onNavigateTab, targets, userRole, onUpdateMetrics }: OverviewTabProps) {
   const [strategicPrompt, setStrategicPrompt] = useState(
-    "Synthesize an optimization plan for Food Penguin to reduce fish shipment transportation costs by 12% while keeping kitchen waste indexes below 4% under rainy weather conditions."
+    "Synthesize an optimization plan for Food Penguin to reduce sushi-grade fish shipment costs by 12% while keeping fish-trim waste below 4% and maintaining neta freshness during peak dinner service."
   );
   const [advisorResponse, setAdvisorResponse] = useState<string>("");
   const [thinkingProcess, setThinkingProcess] = useState<string>("");
@@ -127,7 +127,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             Welcome Back, Skipper
           </h1>
           <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-            Food Penguin Limited is currently executing at <span className="text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Cooking goals are on target, and waste reports show an improvement of <span className="text-emerald-400 font-semibold">18.2% vs last Friday</span>.
+            Food Penguin Limited is currently executing at <span className="text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Sushi plating goals are on target, and fish-waste reports show an improvement of <span className="text-emerald-400 font-semibold">18.2% vs last Friday</span>.
           </p>
         </div>
       </div>

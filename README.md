@@ -1,20 +1,20 @@
-# Food Penguin Limited - Corporate Dashboard
+# Food Penguin Limited - Sushi Operations Dashboard
 
-A comprehensive, unified corporate dashboard built for Food Penguin Limited. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, role-based access control, data visualizations, and embedded AI analytics for efficient restaurant management.
+A comprehensive, unified corporate dashboard built for Food Penguin Limited, a premium sushi production company. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, role-based access control, data visualizations, and embedded AI analytics for efficient sushi bar and cold-chain seafood management.
 
 ## 🌟 Features
 
 * **Role-Based Access Control (RBAC):** Distinct permission levels and module access configurations for Admin, Manager, and Staff roles.
 * **Intelligent Dashboarding & Visualizations:** Interactive analytics powered by `recharts` providing visual overviews seamlessly.
-  * **Sell Module:** Track active POS sales, transaction ledgers, margins, and revenue bar charts.
-  * **Production Module:** Kitchen throughput monitoring, task queuing, recipe formulation, and chef workflows.
-  * **Waste Module:** Financial leakage tracking with interactive pie chart distributions and safety allowance thresholds.
-  * **Hours Module:** Workforce scheduling, clocked-in time tracking versus scheduled hours, and visual utilization rates.
+  * **Sell Module:** Track active POS sushi sales (nigiri, maki, sashimi), transaction ledgers, margins, and revenue bar charts.
+  * **Production Module:** Sushi counter throughput monitoring, plating queues, recipe formulation, and itamae (sushi chef) workflows.
+  * **Waste Module:** Fish-trim and seafood leakage tracking with interactive pie chart distributions and safety allowance thresholds.
+  * **Hours Module:** Itamae and crew scheduling, clocked-in time tracking versus scheduled hours, and visual utilization rates.
   * **Target Module:** Corporate-wide milestone tracking, completion bar charts, progress validations, and AI-optimized targets.
 * **Embedded AI Integrations:**
-  * **Deep Strategic Advisor:** Built-in multi-layered logic solver using advanced reasoning.
-  * **AI Banner Illustrator:** Automated marketing asset generation with specific focal points and aspect ratios.
-  * **Waste Investigator & Recipe Generator:** Automated photo-based insights and production aids.
+  * **Deep Strategic Advisor:** Built-in multi-layered logic solver for sushi operations using advanced reasoning.
+  * **AI Banner Illustrator:** Automated sushi marketing asset generation with specific focal points and aspect ratios.
+  * **Sushi Quality Auditor & Repurpose Generator:** Automated photo-based neta/plating insights and waste-salvage aids.
 
 ## 🛠 Tech Stack
 
