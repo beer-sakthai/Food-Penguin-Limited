@@ -96,10 +96,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
 
       {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
 
         {/* Dynamic Allowance Index and Chart Split */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -216,7 +216,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
       </div>
 
       {/* RIGHT SIDE ASPECT: WASTE LOG BUILDER & AI OPTIMIZER */}
-      <div className="space-y-6">
+      <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
 
         {/* Scraps Spoilage Log Creator */}
         <div className="bg-white rounded-xl border border-slate-150 p-5 shadow-sm">

@@ -78,10 +78,10 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
 
       {/* LEFT ASPECT: TELEMETRY INTERFACES & GAUGES */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
 
         {/* Live Flashing Header Sensors */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
@@ -157,7 +157,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
       </div>
 
       {/* RIGHT ASPECT SIDEBAR: LOW-LATENCY COPILOT CHAT */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[500px] flex flex-col justify-between">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 min-h-0 overflow-y-auto scrollbar-hide flex flex-col justify-between">
         
         <div className="space-y-3">
           <div className="flex items-center justify-between">

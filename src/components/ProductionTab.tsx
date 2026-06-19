@@ -122,10 +122,10 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+
       {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
         
         {/* Active Cooking Grid */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
@@ -234,7 +234,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
       </div>
 
       {/* RIGHT SIDE: KITCHEN CONTROLLER & CULINARY QUALITY SCANNER */}
-      <div className="space-y-6">
+      <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
         
         {/* Create task inline */}
         <div className="bg-white rounded-xl border border-slate-150 p-5 shadow-sm">

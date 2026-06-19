@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+/* Lock the app to the viewport so individual dashboard pages fit in one
+   screen and the page itself never scrolls. */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Allow inherently-growing regions (ledgers, tables, alert feeds, AI output)
+   to scroll internally without ever showing a scrollbar. */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

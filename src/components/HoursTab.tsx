@@ -50,10 +50,10 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
 
       {/* LEFT ASPECT: EMPLOYEES DIRECTORY & SIMULATORS */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
 
         {/* Shift Roster Summary metrics */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
@@ -146,7 +146,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
       </div>
 
       {/* RIGHT ASPECT SIDEBAR: SHIFT SWAP AI CONSULTANT */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[550px]">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Contact className="w-4 h-4 text-sky-600" />
