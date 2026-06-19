@@ -30,12 +30,12 @@ export const ASPECT_RATIOS = [
 export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   // New Order Form state
   const [newItem, setNewItem] = useState('');
-  const [newCategory, setNewCategory] = useState('Arctic Burgers');
+  const [newCategory, setNewCategory] = useState('Nigiri');
   const [newQty, setNewQty] = useState(1);
   const [newPrice, setNewPrice] = useState(12.50);
 
   // AI Menu Banner Maker state
-  const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium Alaskan Cod fish burgers on ice, side of seaweed fries, high-end catalog style');
+  const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium salmon and bluefin tuna nigiri with a signature dragon roll on a slate board, garnished with wasabi and pickled ginger, high-end catalog style');
   const [selectedRatio, setSelectedRatio] = useState('16:9');
   const [generatedImg, setGeneratedImg] = useState<string>('');
   const [loadingImage, setLoadingImage] = useState(false);
@@ -113,15 +113,15 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         {/* Quick Menu Overview */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <h2 className="text-sans font-bold text-slate-900">Food Penguin Limited Specialties</h2>
-          <p className="text-xs text-slate-400 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary cold-chain product groups</p>
-          
+          <p className="text-xs text-slate-400 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary sushi product groups</p>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'Arctic Burgers', price: '$12.90', margin: '68% margin' },
-              { name: 'Glacier Pizzas', price: '$18.50', margin: '72% margin' },
-              { name: 'Cold Desserts', price: '$6.50', margin: '80% margin' },
-              { name: 'Glacier Drinks', price: '$5.80', margin: '85% margin' },
-              { name: 'Marine Platters', price: '$24.90', margin: '65% margin' }
+              { name: 'Nigiri Sets', price: '$12.90', margin: '68% margin' },
+              { name: 'Maki Rolls', price: '$8.50', margin: '74% margin' },
+              { name: 'Sashimi Platters', price: '$24.90', margin: '65% margin' },
+              { name: 'Signature Rolls', price: '$16.50', margin: '70% margin' },
+              { name: 'Sides & Drinks', price: '$5.80', margin: '85% margin' }
             ].map((cat, idx) => (
               <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-white hover:shadow-sm hover:border-orange-200">
                 <span className="text-xs font-bold text-slate-700">{cat.name}</span>
@@ -213,7 +213,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
-                placeholder="e.g. Glacier Cod burger Double"
+                placeholder="e.g. Glacier Salmon Nigiri (8pc)"
                 className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
@@ -226,11 +226,11 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
                 >
-                  <option>Arctic Burgers</option>
-                  <option>Glacier Pizzas</option>
-                  <option>Desserts</option>
-                  <option>Glacier Drinks</option>
-                  <option>Arctic Platters</option>
+                  <option>Nigiri</option>
+                  <option>Maki Rolls</option>
+                  <option>Signature Rolls</option>
+                  <option>Sashimi</option>
+                  <option>Sides & Drinks</option>
                 </select>
               </div>
 

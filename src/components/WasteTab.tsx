@@ -233,7 +233,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
-                placeholder="e.g. Broken cod batter, Soggy lettuce"
+                placeholder="e.g. Oxidized tuna trim, Dried nori sheets"
                 className="w-full mt-1 p-2 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none"
               />
             </div>
@@ -247,10 +247,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                   className="w-full mt-1 p-2 text-xs border border-slate-200 bg-white rounded focus:ring-1 focus:ring-sky-500 focus:outline-none"
                 >
                   <option>Seafood</option>
-                  <option>Bakery</option>
-                  <option>Dairy</option>
+                  <option>Rice</option>
+                  <option>Seaweed</option>
                   <option>Produce</option>
-                  <option>Packaging</option>
+                  <option>Condiments</option>
                 </select>
               </div>
 
@@ -329,10 +329,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 onChange={(e) => setHelpCat(e.target.value)}
                 className="w-full mt-1 p-2 text-xs border border-slate-250 bg-white rounded focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
-                <option value="Seafood">Seafood Scraps (cod, salmon cuts)</option>
-                <option value="Bakery">Bakery Overshoot (buns, crusts)</option>
-                <option value="Dairy">Dairy Leftovers (custard mixes, milks)</option>
-                <option value="Produce">Produce Trimmings (lettuce stalks, lemon skins)</option>
+                <option value="Seafood">Seafood Scraps (tuna/salmon trim, belly cuts)</option>
+                <option value="Rice">Sushi Rice Overshoot (over-seasoned shari)</option>
+                <option value="Seaweed">Nori Offcuts (dried or damp sheets)</option>
+                <option value="Produce">Produce Trimmings (avocado, cucumber ends)</option>
               </select>
             </div>
 

@@ -20,7 +20,7 @@ interface HoursTabProps {
 export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
   // Roster AI analyzer states
   const [schedulerPrompt, setSchedulerPrompt] = useState(
-    "Junior Chef Private is scheduled to open tomorrow (08:00) but requires swap with Kitchen Aide Rico, who is scheduled for the night closing. Kowalski is supervisor. Review viability."
+    "Junior Itamae Private is scheduled to open the sushi counter tomorrow (08:00) but requires a swap with Prep Aide Rico, who is scheduled for the night closing. Itamae Kowalski is supervisor. Review viability and fish-handling certification coverage."
   );
   const [schedulingResult, setSchedulingResult] = useState('');
   const [complianceLoading, setComplianceLoading] = useState(false);

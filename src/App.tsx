@@ -377,7 +377,7 @@ export default function App() {
               {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
             </h2>
             <span className="text-[10px] bg-slate-100 text-slate-500 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
-              Food chain ops portal
+              Sushi ops portal
             </span>
           </div>
 

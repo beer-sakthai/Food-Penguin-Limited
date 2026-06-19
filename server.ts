@@ -49,8 +49,8 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
     const ai = getAiClient();
     if (process.env.GEMINI_API_KEY === undefined || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
       return res.json({
-        text: "💡 [Simulation Mode] Since GEMINI_API_KEY is not configured yet, here is some simulated advice: Keep waste minimal by matching production targets to high-traffic rain hours, and shift Chef Skipper to peak times. Set up your actual key in Settings > Secrets to unleash deep system thinking capabilities!",
-        thinking: "Simulating high-reasoning tree for Food Penguin Limited..."
+        text: "💡 [Simulation Mode] Since GEMINI_API_KEY is not configured yet, here is some simulated advice: Keep waste minimal by matching nigiri and roll production to peak dinner-rush hours, rotate sushi-grade tuna stock FIFO to protect freshness, and shift Itamae Skipper to the omakase counter at peak times. Set up your actual key in Settings > Secrets to unleash deep system thinking capabilities!",
+        thinking: "Simulating high-reasoning tree for Food Penguin Limited sushi operations..."
       });
     }
 
@@ -58,7 +58,7 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
       model: "gemini-3.1-pro-preview",
       contents: prompt,
       config: {
-        systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite cold-chain and premium ocean-to-table food corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies. Break down complex operational problems regarding sales, waste minimization, logistics, and labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
+        systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite premium sushi production and cold-chain seafood corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies for a high-volume sushi operation. Break down complex operational problems regarding sushi sales, fish freshness and waste minimization, sushi-grade seafood logistics and sourcing, and itamae labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
         thinkingConfig: {
           thinkingLevel: ThinkingLevel.HIGH
         }
@@ -89,7 +89,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
     const ai = getAiClient();
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
       return res.json({
-        text: `⚡ [Lite Simulation Mode] Processing: "${command}". Rapid Response suggests Swapping Chef Kowalski to dinner shift, increasing Arctic Burger margins by 3%, and scheduling refrigeration defrosters. Configure a real API key for sub-second live replies!`
+        text: `⚡ [Lite Simulation Mode] Processing: "${command}". Rapid Response suggests swapping Itamae Kowalski to the dinner sushi rush, raising Dragon Roll margins by 3%, and re-icing the neta display case. Configure a real API key for sub-second live replies!`
       });
     }
 
@@ -97,7 +97,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
       model: "gemini-3.1-flash-lite",
       contents: command,
       config: {
-        systemInstruction: "You are the rapid action-response dispatcher for Food Penguin kitchen managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the floor leads with quick, direct answers."
+        systemInstruction: "You are the rapid action-response dispatcher for Food Penguin sushi bar managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the itamae and floor leads with quick, direct answers about sushi prep, neta freshness, and service."
       }
     });
 
@@ -131,7 +131,7 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-image",
       contents: {
-        parts: [{ text: `A clean, commercial studio foods advertisement banner for Food Penguin Limited. ${prompt}` }]
+        parts: [{ text: `A clean, commercial studio sushi advertisement banner for Food Penguin Limited, a premium sushi brand. Emphasize fresh nigiri, maki rolls and sashimi with appetizing styling. ${prompt}` }]
       },
       config: {
         imageConfig: {
@@ -177,7 +177,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
     const ai = getAiClient();
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
       return res.json({
-        analysis: "🔍 [Photo Audit Simulation] Your dish photo was received! It displays outstanding plating. Cod thickness appears uniform (approx. 2.4cm). Asparagus is well-steamed and color index is healthy. Estimated portion weight is 320g. Waste assessment: Negligible (<5% scrap). Configure your Gemini key to get the live, multi-spectrometer analysis!"
+        analysis: "🔍 [Photo Audit Simulation] Your sushi photo was received! It displays outstanding plating. Salmon neta slices appear uniform (approx. 0.8cm, clean 45° angle cut). Rice ball (shari) density looks consistent and the nori is crisp, not damp. Estimated portion weight is 180g. Freshness markers strong, no oxidation banding on the fish. Waste assessment: Negligible (<5% trim). Configure your Gemini key to get the live, multi-spectrometer analysis!"
       });
     }
 
@@ -189,7 +189,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
     };
 
     const promptPart = {
-      text: "Perform a rigorous culinary audit on this dish or ingredient delivery photo. Critique the presentation/plating, estimate the volume/weight where applicable, assess the quality/freshness markers, and estimate potential waste or trim percentages. Give actionable suggestions on how to improve kitchen margins or prevent food spoilage."
+      text: "Perform a rigorous sushi culinary audit on this sushi dish or fish delivery photo. Critique the neta slice cuts, rice (shari) shaping and density, nori crispness, and overall plating. Estimate the volume/weight where applicable, assess sushi-grade freshness markers (color, sheen, oxidation), and estimate potential waste or trim percentages on the fish. Give actionable suggestions on how to improve sushi bar margins or prevent seafood spoilage."
     };
 
     const response = await ai.models.generateContent({
@@ -220,7 +220,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
     const ai = getAiClient();
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
       return res.json({
-        text: `🌐 [Search Grounding Simulation] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Cold-water species like Atlantic Salmon and Halibut keep a high premium, up 4.1% MoM. Plant-based ocean substitutes gain popularity in urban regions. Commodity rates for bulk packaging plastics are up due to freight climbs.`
+        text: `🌐 [Search Grounding Simulation] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Sushi-grade Bluefin Tuna and Norwegian Salmon hold a high premium, up 4.1% MoM amid tightening quotas. Demand for Koshihikari sushi rice and nori is rising as sushi consumption grows in urban regions. Bulk wasabi and rice-vinegar rates are up slightly due to freight climbs.`
       });
     }
 
@@ -228,7 +228,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
       model: "gemini-3.5-flash",
       contents: query,
       config: {
-        systemInstruction: "You are active business intelligence for Food Penguin procurement department. Answer the user's research questions accurately using the search grounding tool.",
+        systemInstruction: "You are active business intelligence for the Food Penguin sushi procurement department. Answer the user's research questions accurately using the search grounding tool, focusing on sushi-grade seafood, rice, nori and condiment markets.",
         tools: [{ googleSearch: {} }]
       }
     });
