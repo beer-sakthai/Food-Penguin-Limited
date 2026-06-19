@@ -93,10 +93,10 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+
       {/* TARGET PROGRESS & PERFORMANCE OVERVIEW */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
 
         {/* Global Progress Chart Overview */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
@@ -230,7 +230,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
       </div>
 
       {/* FORM: TARGET BUILDER */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm max-h-[550px]">
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm min-h-0 overflow-y-auto scrollbar-hide">
         <div className="flex items-center gap-2 pb-4 border-b border-slate-100 mb-4 animate-fade-in">
           <Target className="w-5 h-5 text-orange-500" />
           <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Target Formulary Board</span>

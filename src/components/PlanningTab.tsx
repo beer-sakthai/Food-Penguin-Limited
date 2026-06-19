@@ -55,10 +55,10 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
 
       {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
 
         {/* Stock Level Matrix */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
@@ -117,7 +117,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
       </div>
 
       {/* RIGHT SIDEBAR: COMMODITY PROCUREMENT GROUNDING WITH gemini-3.5-flash */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[580px]">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-sky-600 animate-pulse" />
@@ -163,7 +163,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
         </button>
 
         {groundedInsights && (
-          <div className="bg-white border border-slate-200/95 rounded-lg p-4 shadow-inner space-y-2 overflow-y-auto max-h-[220px]">
+          <div className="bg-white border border-slate-200/95 rounded-lg p-4 shadow-inner space-y-2 overflow-y-auto scrollbar-hide max-h-[220px]">
             <span className="text-[10px] uppercase font-mono tracking-wider text-sky-600 font-extrabold flex items-center gap-1">
               <Globe className="w-3.5 h-3.5" /> Grounded Search Findings (2026):
             </span>

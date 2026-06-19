@@ -112,9 +112,9 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
   };
 
   return (
-    <div id="overview-viewport" className="space-y-6">
+    <div id="overview-viewport" className="h-full space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
       {/* Header Banner with Premium ambient bento design */}
-      <div className="bg-slate-900 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-md border border-slate-800">
+      <div className="bg-slate-900 rounded-3xl p-5 md:p-6 text-white relative overflow-hidden shadow-md border border-slate-800">
         <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl" />
         <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl" />
         
@@ -123,7 +123,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             <Sparkles className="w-3 h-3 animate-pulse" />
             2026 Core Intelligence Active
           </div>
-          <h1 className="text-3xl md:text-4xl font-sans font-extrabold tracking-tight text-white mb-2">
+          <h1 className="text-2xl md:text-3xl font-sans font-extrabold tracking-tight text-white mb-2">
             Welcome Back, Skipper
           </h1>
           <p className="text-slate-300 text-sm md:text-base leading-relaxed">
@@ -133,7 +133,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
       </div>
 
       {/* KPI Bento Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Sell Today */}
         <div 
           onClick={() => onNavigateTab('Sell')}
@@ -230,7 +230,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
       </div>
 
       {/* Main Stats Charts & Active Targets */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Interactive Production & Revenue Chart (Bento Orange Custom Area) */}
         <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-2">
@@ -249,7 +249,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
               </div>
             </div>
           </div>
-          <div className="h-72 w-full">
+          <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={hourlyData} margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                 <defs>
@@ -292,7 +292,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             </button>
           </div>
 
-          <div className="space-y-4 flex-1 overflow-y-auto max-h-72 pr-1">
+          <div className="space-y-4 flex-1 overflow-y-auto scrollbar-hide max-h-56 pr-1">
             {targets.slice(0, 4).map((target) => {
               const pct = Math.min((target.currentValue / target.targetValue) * 100, 100);
               const isHours = target.category === 'Hours';
@@ -436,7 +436,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
           <textarea
             value={strategicPrompt}
             onChange={(e) => setStrategicPrompt(e.target.value)}
-            className="w-full h-24 p-3 border border-slate-200 bg-white rounded-2xl text-sm text-slate-800 shadow-inner focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 font-sans"
+            className="w-full h-20 p-3 border border-slate-200 bg-white rounded-2xl text-sm text-slate-800 shadow-inner focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 font-sans"
             placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
           />
 

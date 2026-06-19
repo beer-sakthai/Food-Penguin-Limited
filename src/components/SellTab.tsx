@@ -105,10 +105,10 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      
+    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+
       {/* LEFT & CENTER: LIVE SALES & TRANSACTION TERMINAL */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
         
         {/* Quick Menu Overview */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
@@ -196,7 +196,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
       </div>
 
       {/* RIGHT SIDEBAR: ORDER CREATOR & BANNER GENERATOR */}
-      <div className="space-y-6">
+      <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
         
         {/* Mock POS Order Creator */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">

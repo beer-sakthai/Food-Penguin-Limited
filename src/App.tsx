@@ -289,7 +289,7 @@ export default function App() {
   };
 
   return (
-    <div id="app-workspace" className="min-h-screen bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800 antialiased selection:bg-orange-100">
+    <div id="app-workspace" className="h-screen overflow-hidden bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800 antialiased selection:bg-orange-100">
       
       {/* SIDEBAR: NAVIGATION */}
       <aside className="w-full md:w-64 bg-slate-900 text-slate-100 flex flex-col shrink-0 border-r border-slate-950 shadow-lg">
@@ -397,8 +397,8 @@ export default function App() {
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto bg-slate-50/50">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 min-h-0 p-4 overflow-hidden bg-slate-50/50">
+          <div className="max-w-7xl mx-auto h-full">
             {renderActiveView()}
           </div>
         </main>
