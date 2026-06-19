@@ -1,0 +1,6 @@
+{
+  "name": "Food Penguin Limited Dashboard",
+  "description": "Executive and operational control platform for Food Penguin Limited, featuring Sales, Targets, Production, Waste, Hours, Planning, and Real-time performance metrics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
