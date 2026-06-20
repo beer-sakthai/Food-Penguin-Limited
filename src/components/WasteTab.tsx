@@ -106,7 +106,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
           <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h2 className="text-base font-sans font-semibold text-slate-900">Food Waste Cost Summary</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Food Waste Cost Summary</h2>
                 <p className="subtitle text-xs text-slate-500">Corporate daily financial leakage benchmarks</p>
               </div>
               
@@ -140,7 +140,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm h-48 md:h-auto min-h-[220px] flex flex-col">
-            <h2 className="text-base font-sans font-semibold text-slate-900">Leakage Proportions</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Leakage Proportions</h2>
             <p className="text-xs text-slate-500">Cost value breakdown by incident reason</p>
             <div className="flex-1 mt-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -180,7 +180,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
         {/* Active Waste Ledger */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="pb-4">
-            <h2 className="text-base font-sans font-semibold text-slate-900">Daily Spoilage & Scrap Ledger</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Daily Spoilage & Scrap Ledger</h2>
             <p className="text-xs text-slate-500">Documented items removed from active inventory</p>
           </div>
 

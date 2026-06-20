@@ -131,7 +131,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-sans font-semibold text-slate-900">Kitchen Thru-rate Monitoring</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Kitchen Thru-rate Monitoring</h2>
               <p className="text-xs text-slate-500">Active chef workflows and queue states</p>
             </div>
             <span className="p-1 px-3 text-[10px] rounded-full bg-emerald-50 text-emerald-700 font-mono font-bold border border-emerald-100">
@@ -206,7 +206,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
 
         {/* Master Recipes Catalogue */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
-          <h2 className="text-base font-sans font-semibold text-slate-900 pb-1">Ocean-to-Plate Recipe Standard</h2>
+          <h2 className="text-lg font-semibold text-slate-900 pb-1">Ocean-to-Plate Recipe Standard</h2>
           <p className="text-xs text-slate-500 pb-4">Approved corporate dish compositions and prep profiles</p>
 
           <div className="space-y-3">

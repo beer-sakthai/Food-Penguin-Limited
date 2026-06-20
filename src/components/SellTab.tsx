@@ -112,7 +112,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         
         {/* Quick Menu Overview */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
-          <h2 className="text-sans font-bold text-slate-900">Food Penguin Limited Specialties</h2>
+          <h2 className="text-xl font-bold text-slate-900">Food Penguin Limited Specialties</h2>
           <p className="text-xs text-slate-400 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary sushi product groups</p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -138,7 +138,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-sans font-bold text-slate-900">Active Order Ledger</h2>
+              <h2 className="text-xl font-bold text-slate-900">Active Order Ledger</h2>
               <p className="text-xs text-slate-500">Live POS sales tracked since midnight</p>
             </div>
             <span className="bg-orange-50 text-orange-700 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-orange-100 self-start">

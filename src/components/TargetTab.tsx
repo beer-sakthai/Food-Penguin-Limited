@@ -102,7 +102,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="pb-4 border-b border-slate-100 flex justify-between items-center">
             <div>
-              <h2 className="text-sans font-bold text-slate-900">Completion Status</h2>
+              <h2 className="text-xl font-bold text-slate-900">Completion Status</h2>
               <p className="text-xs text-slate-500">Corporate-wide metric completions visualized</p>
             </div>
           </div>

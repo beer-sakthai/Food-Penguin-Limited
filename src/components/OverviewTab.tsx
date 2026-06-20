@@ -123,7 +123,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             <Sparkles className="w-3 h-3 animate-pulse" />
             2026 Core Intelligence Active
           </div>
-          <h1 className="text-2xl md:text-3xl font-sans font-extrabold tracking-tight text-white mb-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
             Welcome Back, Skipper
           </h1>
           <p className="text-slate-300 text-sm md:text-base leading-relaxed">
@@ -141,7 +141,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-slate-400 text-[10px] font-mono uppercase tracking-widest font-bold">Gross Revenue Today</p>
+              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Gross Revenue Today</p>
               <h3 className="text-3xl font-sans font-black text-slate-900 mt-2">
                 ${metrics.salesToday.toLocaleString()}
               </h3>
@@ -164,7 +164,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-slate-400 text-[10px] font-mono uppercase tracking-widest font-bold">Kitchen Throughput</p>
+              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Kitchen Throughput</p>
               <h3 className="text-3xl font-sans font-black text-slate-900 mt-2">
                 {metrics.productionItems.toLocaleString()} <span className="text-xs text-slate-400 font-normal">/ {metrics.productionTarget.toLocaleString()} pcs</span>
               </h3>
@@ -189,7 +189,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-slate-400 text-[10px] font-mono uppercase tracking-widest font-bold">Food Waste Cost</p>
+              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Food Waste Cost</p>
               <h3 className="text-3xl font-sans font-black text-slate-900 mt-2">
                 ${metrics.wasteCost.toFixed(2)}
               </h3>
@@ -212,7 +212,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-slate-400 text-[10px] font-mono uppercase tracking-widest font-bold">Rostered Man-hours</p>
+              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Rostered Man-hours</p>
               <h3 className="text-3xl font-sans font-black text-white mt-2">
                 {metrics.hoursScheduled} hrs
               </h3>
