@@ -59,7 +59,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-sans font-bold text-slate-900">Weekly Labor Allocation</h2>
+              <h2 className="text-xl font-bold text-slate-900">Weekly Labor Allocation</h2>
               <p className="subtitle text-xs text-slate-500">Live operational hours logged vs scheduled</p>
             </div>
 
@@ -99,7 +99,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
         {/* Employee Roster List */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <div className="pb-4">
-            <h2 className="text-base font-sans font-semibold text-slate-900">Current Crew Roll-Call</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Current Crew Roll-Call</h2>
             <p className="text-xs text-slate-500">Click actions to simulate live clocking and work register shifts</p>
           </div>
 

@@ -63,7 +63,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
         {/* Stock Level Matrix */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="pb-4">
-            <h2 className="text-base font-sans font-semibold text-slate-900">Cold Chain Inventory Planning</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Cold Chain Inventory Planning</h2>
             <p className="text-xs text-slate-500">Documented levels of fresh ingredients & freezer raw materials</p>
           </div>
 

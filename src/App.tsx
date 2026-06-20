@@ -300,8 +300,8 @@ export default function App() {
             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-slate-950 animate-pulse" />
           </div>
           <div>
-            <h1 className="text-sm font-bold font-sans tracking-tight text-white leading-tight">Food Penguin</h1>
-            <span className="text-[10px] font-mono tracking-wider text-slate-500 uppercase leading-none block mt-0.5">Limited</span>
+            <h1 className="text-base font-extrabold tracking-tight text-white leading-tight">Food Penguin</h1>
+            <span className="text-[11px] font-mono tracking-[0.2em] text-slate-500 uppercase leading-none block mt-0.5">Limited</span>
           </div>
         </div>
 
@@ -313,7 +313,7 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-all duration-200 ${
+                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all duration-200 ${
                   isActive
                     ? 'bg-slate-800 text-white font-bold shadow-inner'
                     : 'text-slate-400 hover:bg-slate-800/40 hover:text-white'
@@ -373,7 +373,7 @@ export default function App() {
         {/* Global Toolbar */}
         <header className="bg-white h-16 border-b border-slate-200/80 px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-sans font-bold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900">
               {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
             </h2>
             <span className="text-[10px] bg-slate-100 text-slate-500 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">

@@ -89,7 +89,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="flex items-center justify-between pb-6">
             <div>
-              <h2 className="text-base font-sans font-semibold text-slate-900 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
@@ -130,7 +130,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="flex justify-between items-center pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-sans font-semibold text-slate-900">Live Sensory Alarms & Events</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Live Sensory Alarms & Events</h2>
               <p className="text-xs text-slate-500">Real-time chronos logs of food kitchen probes</p>
             </div>
             <Activity className="w-5 h-5 text-sky-500 animate-pulse" />

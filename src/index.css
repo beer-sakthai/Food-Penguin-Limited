@@ -1,12 +1,40 @@
 @import "tailwindcss";
 
-/* Lock the app to the viewport so individual dashboard pages fit in one
-   screen and the page itself never scrolls. */
-html,
-body,
-#root {
-  height: 100%;
-  overflow: hidden;
+/* ── Typography system ───────────────────────────────────────────────
+   Display : Sora              → headings + big stat numbers
+   Body    : Plus Jakarta Sans → everything else
+   Mono    : JetBrains Mono    → labels, codes, metrics                */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Sora", "Plus Jakarta Sans", sans-serif;
+}
+
+/* Nudge the whole UI a touch larger and crisper. */
+html {
+  font-size: 16.5px;
+}
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
+}
+
+/* Unlayered (beats Tailwind's layered `font-sans` utility): every heading
+   renders in the Sora display face with tightened tracking, so titles and
+   KPI numbers read distinctly larger and more premium without per-component
+   edits. Mono headings (rare) can opt back out with `font-mono`. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+}
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
 }
 
 /* Allow inherently-growing regions (ledgers, tables, alert feeds, AI output)
@@ -17,4 +45,13 @@ body,
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Lock the app to the viewport so individual dashboard pages fit in one
+   screen and the page itself never scrolls. */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
 }
