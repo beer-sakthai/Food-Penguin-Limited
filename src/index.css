@@ -68,7 +68,7 @@ body,
 .dark .bg-white,
 .dark .bg-white\/50,
 .dark [className*="bg-white"] {
-  background-color: #09090b !important; /* Zinc-950 for cards */
+  background-color: #000000 !important; /* True black for cards */
   border-color: #27272a !important; /* Zinc-800 border */
   color: #f8fafc !important;
 }
@@ -96,7 +96,7 @@ body,
 .dark .bg-slate-50,
 .dark .bg-slate-50\/50,
 .dark .bg-slate-100 {
-  background-color: #09090b !important;
+  background-color: #000000 !important; /* True black */
   border-color: #27272a !important;
 }
 
