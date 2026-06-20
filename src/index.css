@@ -55,3 +55,81 @@ body,
   height: 100%;
   overflow: hidden;
 }
+
+/* ── Super Dark Mode Custom Style Overrides ────────────────────────── */
+.dark body,
+.dark #app-workspace,
+.dark main {
+  background-color: #030712 !important; /* True black background */
+  color: #f8fafc !important;
+}
+
+/* Override all white card containers in dark mode */
+.dark .bg-white,
+.dark .bg-white\/50,
+.dark [className*="bg-white"] {
+  background-color: #090d16 !important; /* Slate-950/900 card background */
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Table rows and list item hover effects */
+.dark tr:hover,
+.dark tr:hover td,
+.dark .hover\:bg-slate-50\/50:hover {
+  background-color: #0f172a !important;
+}
+
+/* Override borders to sleek dark borders */
+.dark .border,
+.dark .border-slate-100,
+.dark .border-slate-150,
+.dark .border-slate-200,
+.dark .border-slate-205,
+.dark .border-slate-250,
+.dark .border-slate-300,
+.dark .border-slate-200\/80 {
+  border-color: #1e293b !important;
+}
+
+/* Slate background zones to dark mode backgrounds */
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-100 {
+  background-color: #0d111d !important;
+  border-color: #1e293b !important;
+}
+
+/* Input fields, select forms, and textarea overrides */
+.dark input,
+.dark select,
+.dark textarea,
+.dark .bg-slate-950\/50 {
+  background-color: #040710 !important;
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Text color overrides */
+.dark .text-slate-900,
+.dark .text-slate-905,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-500,
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Chart text labels */
+.dark .recharts-cartesian-grid-horizontal line,
+.dark .recharts-cartesian-grid-vertical line {
+  stroke: #1e293b !important;
+}
+.dark .recharts-text {
+  fill: #94a3b8 !important;
+}
+
