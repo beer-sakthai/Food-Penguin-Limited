@@ -1,7 +1,8 @@
-import express from "express";
+
+import express, { Request, Response } from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, ThinkingLevel, GenerateContentResponse, GenerateContentRequest } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel, GenerateContentResponse } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -42,9 +43,9 @@ interface GeminiHandlerConfig {
   model: string;
   validator: (body: any) => string | null;
   simulationResponse: (body: any) => object;
-  buildContents: (body: any) => GenerateContentRequest['contents'];
-  buildConfig?: (body: any) => GenerateContentRequest['config'];
-  processResponse: (response: GenerateContentResponse, body: any) => object;
+  buildContents: (body: any) => any;
+  buildConfig?: (body: any) => any;
+  processResponse: (response: any, body: any) => object;
 }
 
 /**
@@ -69,7 +70,7 @@ function createGeminiHandler(config: GeminiHandlerConfig) {
       const contents = config.buildContents(req.body);
       const modelConfig = config.buildConfig ? config.buildConfig(req.body) : {};
 
-      const response = await ai.models.generateContent({
+      const response: GenerateContentResponse = await ai.models.generateContent({
         model: config.model,
         contents,
         config: modelConfig,
@@ -172,7 +173,9 @@ app.post("/api/gemini/search-trends", createGeminiHandler({
   model: "gemini-3.5-flash",
   validator: (body) => body.query ? null : "Query is required",
   simulationResponse: (body) => ({
-    text: `🌐 [Search Grounding Simulation] Searching for: "${body.query}" in 2026 indexes...\n\nAccording to mock 2026 data: Sushi-grade Bluefin Tuna and Norwegian Salmon hold a high premium, up 4.1% MoM amid tightening quotas. Demand for Koshihikari sushi rice and nori is rising as sushi consumption grows in urban regions. Bulk wasabi and rice-vinegar rates are up slightly due to freight climbs.`
+    text: `🌐 [Search Grounding Simulation] Searching for: "${body.query}" in 2026 indexes...
+
+According to mock 2026 data: Sushi-grade Bluefin Tuna and Norwegian Salmon hold a high premium, up 4.1% MoM amid tightening quotas. Demand for Koshihikari sushi rice and nori is rising as sushi consumption grows in urban regions. Bulk wasabi and rice-vinegar rates are up slightly due to freight climbs.`
   }),
   buildContents: (body) => body.query,
   buildConfig: () => ({
@@ -190,7 +193,9 @@ app.post("/api/gemini/summarize-sales", createGeminiHandler({
     summary: "📈 [Sales Summary Simulation] Analysis of today's sales data reveals strong performance in 'Nigiri' and 'Signature Rolls' categories, contributing to over 60% of total revenue. A significant sales spike was observed around 19:00 UTC. Recommendation: Increase prep for Dragon Rolls during the evening rush. Configure your API key for a live, detailed breakdown."
   }),
   buildContents: (body) => {
-    const prompt = `Please analyze the following daily sales data (JSON format) and provide a summary:\n\n${JSON.stringify(body.orders, null, 2)}`;
+    const prompt = `Please analyze the following daily sales data (JSON format) and provide a summary:
+
+${JSON.stringify(body.orders, null, 2)}`;
     return prompt;
   },
   buildConfig: () => ({
@@ -206,6 +211,7 @@ const startServer = async () => {
   try {
     if (process.env.NODE_ENV !== "production") {
       const vite = await createViteServer({
+.
         server: { middlewareMode: true },
         appType: "spa",
       });
