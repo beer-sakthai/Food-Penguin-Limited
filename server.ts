@@ -207,16 +207,15 @@ ${JSON.stringify(body.orders, null, 2)}`;
 }));
 
 // Serve static compiled UI or route to Vite dev-server (SPA mode)
-const startServer = async () => {
+export const startServer = async () => {
   try {
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV === "development") {
       const vite = await createViteServer({
-.
         server: { middlewareMode: true },
         appType: "spa",
       });
       app.use(vite.middlewares);
-    } else {
+    } else if (process.env.NODE_ENV === "production") {
       const distPath = path.join(process.cwd(), 'dist');
       app.use(express.static(distPath));
       app.get('*', (req, res) => {
@@ -224,9 +223,11 @@ const startServer = async () => {
       });
     }
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
+      });
+    }
   } catch (err: any) {
     console.error("Failed to start server:", err);
     process.exit(1);
@@ -234,3 +235,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+export { app };
