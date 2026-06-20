@@ -76,7 +76,51 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
 });
 
 // ==========================================
-// 2. LOW LATENCY COPILOT
+// 2. WASTE REDUCTION ADVISOR
+// Model: gemini-3.1-pro-preview
+// ==========================================
+app.post("/api/gemini/waste-reduction-advisor", async (req, res) => {
+  try {
+    const { wasteRecords } = req.body;
+    if (!wasteRecords || !Array.isArray(wasteRecords)) {
+      return res.status(400).json({ error: "Waste records are required" });
+    }
+
+    const ai = getAiClient();
+    if (process.env.GEMINI_API_KEY === undefined || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+      return res.json({
+        text: "📈 [Simulation Mode] Based on your waste data, Food Penguin's AI advisor suggests the following to reduce waste:\n\n1.  **Reduce Tuna Overproduction:** Your data shows consistent Tuna wastage on Wednesdays. Consider reducing Tuna prep by 15% on this day.\n2.  **Optimize Rice Cooking:** Rice is frequently marked as 'Overproduced'. Try making smaller batches of rice more frequently during peak hours.\n3.  **Conduct a Quality Audit:** 'Quality Issue' is a common reason for vegetable waste. Review your vegetable supplier's quality or improve storage conditions.\n\nConfigure your Gemini API key to get live, data-driven insights."
+      });
+    }
+
+    const prompt = `
+      As the Chief AI Strategy Officer for 'Food Penguin Limited', analyze the following food waste data and provide a strategic waste reduction plan. The data is a JSON array of waste records for the past day.
+
+      Data:
+      ${JSON.stringify(wasteRecords, null, 2)}
+
+      Your task is to identify key patterns and root causes of waste and provide 3-5 concrete, actionable recommendations for a high-volume sushi operation. Focus on high-impact changes that can be implemented quickly. For each recommendation, briefly explain the reasoning based on the data.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.1-pro-preview",
+      contents: prompt,
+      config: {
+        systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite premium sushi production and cold-chain seafood corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies for a high-volume sushi operation. Your current task is to analyze waste data and provide a clear, actionable waste reduction plan.",
+      }
+    });
+
+    res.json({
+      text: response.text || "No response text generated."
+    });
+  } catch (err: any) {
+    console.error("Waste Reduction Advisor error: ", err);
+    res.status(500).json({ error: err.message || "An error occurred with the waste reduction AI advisor." });
+  }
+});
+
+// ==========================================
+// 3. LOW LATENCY COPILOT
 // Model: gemini-3.1-flash-lite
 // ==========================================
 app.post("/api/gemini/low-latency-cmd", async (req, res) => {

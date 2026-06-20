@@ -96,9 +96,9 @@ export default function App() {
     updateBranchData(selectedBranch, prev => {
       const newOrders = [fullOrder, ...prev.orders];
       const newMetrics = { ...prev.metrics, salesToday: prev.metrics.salesToday + fullOrder.amount };
-      const newTargets = prev.targets.map(tgt => 
-        tgt.category === 'Sell' && tgt.metric.includes('Sales') 
-          ? { ...tgt, currentValue: tgt.currentValue + fullOrder.amount } 
+      const newTargets = prev.targets.map(tgt =>
+        tgt.category === 'Sell' && tgt.metric.includes('Sales')
+          ? { ...tgt, currentValue: tgt.currentValue + fullOrder.amount }
           : tgt
       );
       return { ...prev, orders: newOrders, metrics: newMetrics, targets: newTargets };
@@ -125,12 +125,12 @@ export default function App() {
     updateBranchData(selectedBranch, prev => {
       let newMetrics = { ...prev.metrics };
       let newTargets = [...prev.targets];
-      
+
       const newTasks = prev.tasks.map(t => {
         if (t.id === taskId) {
           if (newStatus === 'Prepared' && t.status !== 'Prepared') {
             newMetrics.productionItems += t.quantity;
-            newTargets = newTargets.map(tgt => 
+            newTargets = newTargets.map(tgt =>
               tgt.category === 'Production' && tgt.metric.toLowerCase().includes('cook')
                 ? { ...tgt, currentValue: tgt.currentValue + t.quantity }
                 : tgt
@@ -151,7 +151,7 @@ export default function App() {
 
     updateBranchData(selectedBranch, prev => {
       const newWasteRecords = [fullWaste, ...prev.wasteRecords];
-      const newTargets = prev.targets.map(tgt => 
+      const newTargets = prev.targets.map(tgt =>
         tgt.category === 'Waste' && tgt.metric.toLowerCase().includes('waste')
           ? { ...tgt, currentValue: tgt.currentValue + fullWaste.cost }
           : tgt
@@ -218,7 +218,7 @@ export default function App() {
     switch (activeTab) {
       case 'Overview':
         return (
-          <OverviewTab 
+          <OverviewTab
             branchesData={branchesData}
             selectedBranch={selectedBranch}
             onSelectBranch={setSelectedBranch}
@@ -232,25 +232,25 @@ export default function App() {
         return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
       case 'Production':
         return (
-          <ProductionTab 
-            recipes={recipes} 
-            tasks={tasks} 
-            onAddTask={handleAddTask} 
+          <ProductionTab
+            recipes={recipes}
+            tasks={tasks}
+            onAddTask={handleAddTask}
             onUpdateTaskStatus={handleUpdateTaskStatus}
           />
         );
       case 'Waste':
         return (
-          <WasteTab 
-            wasteRecords={wasteRecords} 
-            onAddWaste={handleAddWaste} 
+          <WasteTab
+            wasteRecords={wasteRecords}
+            onAddWaste={handleAddWaste}
             totalCostToday={totalWasteCost}
           />
         );
       case 'Hours':
         return (
-          <HoursTab 
-            hoursData={hoursData} 
+          <HoursTab
+            hoursData={hoursData}
             onToggleClockStatus={handleToggleClockStatus}
             totalHoursScheduled={totalHours}
           />
@@ -261,7 +261,7 @@ export default function App() {
         return <DataInputTab onSyncData={handleSyncData} branchesData={branchesData} />;
       default:
         return (
-          <OverviewTab 
+          <OverviewTab
             branchesData={branchesData}
             selectedBranch={selectedBranch}
             onSelectBranch={setSelectedBranch}
@@ -273,119 +273,117 @@ export default function App() {
   return (
     <div className={darkMode ? 'dark' : ''}>
       <div id="app-workspace" className="h-screen overflow-hidden bg-slate-50 dark:bg-black flex flex-col md:flex-row font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-orange-100">
-      
-      {/* SIDEBAR: NAVIGATION */}
-      <aside className="w-full md:w-64 bg-black dark:bg-black text-slate-100 flex flex-col shrink-0 border-r border-slate-950 dark:border-amber-500/20 shadow-lg z-40 relative">
-        {/* Brand Header */}
-        <div className="p-6 border-b border-slate-800/80 dark:border-amber-500/20 flex items-center gap-3">
-          <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group shrink-0">
-            <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-slate-950 animate-pulse" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-base font-extrabold tracking-tight text-white leading-tight truncate">Food Penguin</h1>
-            <span className="text-[11px] font-mono tracking-[0.2em] text-slate-500 uppercase leading-none block mt-0.5 truncate">Limited</span>
-          </div>
-        </div>
 
-        {/* Global Branch Selector for non-Overview tabs */}
-        {activeTab !== 'Overview' && activeTab !== 'KPI Business' && activeTab !== 'Data Input' && (
-          <div className="p-4 border-b border-slate-800/80 bg-slate-900">
-            <p className="text-[10px] text-slate-500 uppercase font-mono font-bold tracking-wider mb-2">Location Context</p>
-            <select
-              value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value as BranchId)}
-              className="w-full bg-slate-800 text-sm font-semibold text-slate-200 border border-slate-700 rounded-lg p-2 focus:ring-2 focus:ring-orange-500 outline-none"
-            >
-              {BRANCHES.map(b => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Navigation Actions */}
-        <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
-          {tabMeta.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all duration-200 ${
-                  isActive
-                    ? 'bg-slate-800 dark:bg-slate-900 text-white font-bold shadow-inner'
-                    : 'text-slate-400 hover:bg-slate-800/40 hover:text-white'
-                }`}
-              >
-                <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
-                  isActive 
-                    ? tab.id === 'Data Input' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125' 
-                    : 'bg-transparent border border-slate-600'
-                }`} />
-                <span className="flex-1 flex items-center gap-2">
-                  <span className={isActive ? 'text-orange-400' : 'text-slate-400'}>{tab.icon}</span>
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Footer info links */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 static mt-auto">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-slate-800/80 border border-slate-700/50 flex flex-col items-center justify-center text-slate-300 relative shrink-0">
-              <User className="w-4 h-4" />
-              <span className="w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border border-slate-900" />
+        {/* SIDEBAR: NAVIGATION */}
+        <aside className="w-full md:w-64 bg-black dark:bg-black text-slate-100 flex flex-col shrink-0 border-r border-slate-950 dark:border-amber-500/20 shadow-lg z-40 relative">
+          {/* Brand Header */}
+          <div className="p-6 border-b border-slate-800/80 dark:border-amber-500/20 flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group shrink-0">
+              <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-slate-950 animate-pulse" />
             </div>
-            <div className="text-[11px] leading-tight flex-1">
-              <p className="font-semibold text-white">Skipper Koala</p>
-              <select 
-                value={userRole} 
-                onChange={(e) => setUserRole(e.target.value as any)}
-                className="mt-0.5 bg-transparent text-slate-400 font-mono text-[10px] uppercase cursor-pointer hover:text-slate-300 focus:outline-none appearance-none w-full"
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base font-extrabold tracking-tight text-white leading-tight truncate">Food Penguin</h1>
+              <span className="text-[11px] font-mono tracking-[0.2em] text-slate-500 uppercase leading-none block mt-0.5 truncate">Limited</span>
+            </div>
+          </div>
+
+          {/* Global Branch Selector for non-Overview tabs */}
+          {activeTab !== 'Overview' && activeTab !== 'KPI Business' && activeTab !== 'Data Input' && (
+            <div className="p-4 border-b border-slate-800/80 bg-slate-900">
+              <p className="text-[10px] text-slate-500 uppercase font-mono font-bold tracking-wider mb-2">Location Context</p>
+              <select
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value as BranchId)}
+                className="w-full bg-slate-800 text-sm font-semibold text-slate-200 border border-slate-700 rounded-lg p-2 focus:ring-2 focus:ring-orange-500 outline-none"
               >
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="Staff">Staff</option>
+                {BRANCHES.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
               </select>
             </div>
-          </div>
-        </div>
-      </aside>
+          )}
 
-      {/* MAIN CONTAINER CONTENT VIEWPORT */}
-      <div className="flex-1 flex flex-col min-w-0">
-        
-        {/* Global Toolbar */}
-        <header className="bg-white dark:bg-black h-16 border-b border-slate-200/80 dark:border-slate-800/80 px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
-          <div className="flex items-center gap-3">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">
-              {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
-            </h2>
-            <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
-              Sushi ops portal
-            </span>
-          </div>
+          {/* Navigation Actions */}
+          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
+            {tabMeta.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all duration-200 ${isActive
+                      ? 'bg-slate-800 dark:bg-slate-900 text-white font-bold shadow-inner'
+                      : 'text-slate-400 hover:bg-slate-800/40 hover:text-white'
+                    }`}
+                >
+                  <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${isActive
+                      ? tab.id === 'Data Input' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125'
+                      : 'bg-transparent border border-slate-600'
+                    }`} />
+                  <span className="flex-1 flex items-center gap-2">
+                    <span className={isActive ? 'text-orange-400' : 'text-slate-400'}>{tab.icon}</span>
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
 
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Local time</span>
-              <span className="text-sm font-mono font-bold text-slate-700 dark:text-slate-300 block mt-1">
-                {new Date().toISOString().split('T')[0]} 14:13 UTC
-              </span>
+          {/* Footer info links */}
+          <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 static mt-auto">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-slate-800/80 border border-slate-700/50 flex flex-col items-center justify-center text-slate-300 relative shrink-0">
+                <User className="w-4 h-4" />
+                <span className="w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border border-slate-900" />
+              </div>
+              <div className="text-[11px] leading-tight flex-1">
+                <p className="font-semibold text-white">Skipper Koala</p>
+                <select
+                  value={userRole}
+                  onChange={(e) => setUserRole(e.target.value as any)}
+                  className="mt-0.5 bg-transparent text-slate-400 font-mono text-[10px] uppercase cursor-pointer hover:text-slate-300 focus:outline-none appearance-none w-full"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Staff">Staff</option>
+                </select>
+              </div>
             </div>
           </div>
-        </header>
+        </aside>
 
-        {/* Active view port rendering */}
-        <main className="flex-1 min-h-0 p-4 overflow-hidden bg-slate-50/50 dark:bg-black">
-          <div className="max-w-7xl mx-auto h-full overflow-y-auto pr-2 pb-20">
-            {renderActiveView()}
-          </div>
-        </main>
-      </div>
+        {/* MAIN CONTAINER CONTENT VIEWPORT */}
+        <div className="flex-1 flex flex-col min-w-0">
+
+          {/* Global Toolbar */}
+          <header className="bg-white dark:bg-slate-900 h-16 border-b border-slate-200/80 dark:border-slate-800/80 px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
+              </h2>
+              <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+                Sushi ops portal
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Local time</span>
+                <span className="text-sm font-mono font-bold text-slate-700 dark:text-slate-300 block mt-1">
+                  {new Date().toISOString().split('T')[0]} 14:13 UTC
+                </span>
+              </div>
+            </div>
+          </header>
+
+          {/* Active view port rendering */}
+          <main className="flex-1 min-h-0 p-4 overflow-hidden bg-slate-50/50 dark:bg-slate-950">
+            <div className="max-w-7xl mx-auto h-full overflow-y-auto pr-2 pb-20">
+              {renderActiveView()}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

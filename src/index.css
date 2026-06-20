@@ -14,6 +14,7 @@
 html {
   font-size: 16.5px;
 }
+
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -32,6 +33,7 @@ h3 {
   font-family: var(--font-display);
   letter-spacing: -0.025em;
 }
+
 h4 {
   font-family: var(--font-display);
   letter-spacing: -0.015em;
@@ -43,6 +45,7 @@ h4 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -60,7 +63,8 @@ body,
 .dark body,
 .dark #app-workspace,
 .dark main {
-  background-color: #000000 !important; /* True black background */
+  background-color: #000000 !important;
+  /* True black background */
   color: #f8fafc !important;
 }
 
@@ -68,8 +72,10 @@ body,
 .dark .bg-white,
 .dark .bg-white\/50,
 .dark [className*="bg-white"] {
-  background-color: #000000 !important; /* True black for cards */
-  border-color: #27272a !important; /* Zinc-800 border */
+  background-color: #000000 !important;
+  /* True black for cards */
+  border-color: #27272a !important;
+  /* Zinc-800 border */
   color: #f8fafc !important;
 }
 
@@ -96,7 +102,7 @@ body,
 .dark .bg-slate-50,
 .dark .bg-slate-50\/50,
 .dark .bg-slate-100 {
-  background-color: #000000 !important; /* True black */
+  background-color: #09090b !important;
   border-color: #27272a !important;
 }
 
@@ -129,7 +135,7 @@ body,
 .dark .recharts-cartesian-grid-vertical line {
   stroke: #27272a !important;
 }
+
 .dark .recharts-text {
   fill: #94a3b8 !important;
 }
-

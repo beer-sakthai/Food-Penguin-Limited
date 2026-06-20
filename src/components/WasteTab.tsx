@@ -30,6 +30,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
   const [repurposeStrategy, setRepurposeStrategy] = useState('');
   const [strategyLoading, setStrategyLoading] = useState(false);
 
+  // AI waste reduction advisor states
+  const [reductionAnalysis, setReductionAnalysis] = useState('');
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+
   // Compute Data for Pie Chart
   const reasonData = wasteRecords.reduce((acc: any, rec) => {
     if (!acc[rec.reason]) acc[rec.reason] = 0;
