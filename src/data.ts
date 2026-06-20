@@ -33,9 +33,9 @@ export const initialOrders: SalesOrder[] = [
 ];
 
 export const initialTargets: CompanyTarget[] = [
-  { id: 'T-1', name: 'Daily Revenue Marker', metric: 'Total Sales ($)', targetValue: 15000, currentValue: 14820, unit: '$', category: 'Sell', deadline: 'Today, 22:00' },
+  { id: 'T-1', name: 'Daily Revenue Marker', metric: 'Total Sales (€)', targetValue: 15000, currentValue: 14820, unit: '€', category: 'Sell', deadline: 'Today, 22:00' },
   { id: 'T-2', name: 'Sushi Plating Threshold', metric: 'Pieces Plated', targetValue: 11500, currentValue: 11240, unit: 'pcs', category: 'Production', deadline: 'Today, 21:00' },
-  { id: 'T-3', name: 'Daily Waste Minimizer', metric: 'Food Waste Cost', targetValue: 500, currentValue: 412.50, unit: '$', category: 'Waste', deadline: 'Today, 22:00' },
+  { id: 'T-3', name: 'Daily Waste Minimizer', metric: 'Food Waste Cost', targetValue: 500, currentValue: 412.50, unit: '€', category: 'Waste', deadline: 'Today, 22:00' },
   { id: 'T-4', name: 'Hourly Roster Precision', metric: 'Overtime Margin', targetValue: 2, currentValue: 0, unit: 'hrs', category: 'Hours', deadline: 'End of Shift' },
   { id: 'T-5', name: 'Weekly Organic Reach', metric: 'Social Promos Run', targetValue: 10, currentValue: 8, unit: 'times', category: 'Sell', deadline: 'Sunday, 18:00' }
 ];

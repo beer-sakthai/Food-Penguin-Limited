@@ -117,11 +117,11 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'Nigiri Sets', price: '$12.90', margin: '68% margin' },
-              { name: 'Maki Rolls', price: '$8.50', margin: '74% margin' },
-              { name: 'Sashimi Platters', price: '$24.90', margin: '65% margin' },
-              { name: 'Signature Rolls', price: '$16.50', margin: '70% margin' },
-              { name: 'Sides & Drinks', price: '$5.80', margin: '85% margin' }
+              { name: 'Nigiri Sets', price: '€12.90', margin: '68% margin' },
+              { name: 'Maki Rolls', price: '€8.50', margin: '74% margin' },
+              { name: 'Sashimi Platters', price: '€24.90', margin: '65% margin' },
+              { name: 'Signature Rolls', price: '€16.50', margin: '70% margin' },
+              { name: 'Sides & Drinks', price: '€5.80', margin: '85% margin' }
             ].map((cat, idx) => (
               <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-white hover:shadow-sm hover:border-orange-200">
                 <span className="text-xs font-bold text-slate-700">{cat.name}</span>
@@ -151,7 +151,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               <BarChart data={barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={(val) => `$${val}`} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={(val) => `€${val}`} />
                 <Tooltip 
                   cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
@@ -186,7 +186,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                     <td className="py-3 px-4 font-medium text-slate-800">{order.item}</td>
                     <td className="py-3 px-4 text-slate-500">{order.category}</td>
                     <td className="py-3 px-4 text-center font-mono">{order.quantity}</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">${order.amount.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">€{order.amount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -235,7 +235,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               </div>
 
               <div>
-                <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Unit Price ($)</label>
+                <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Unit Price (€)</label>
                 <input
                   type="number"
                   step="0.10"

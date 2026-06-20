@@ -256,7 +256,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
               required
               value={metric}
               onChange={(e) => setMetric(e.target.value)}
-              placeholder="e.g. Sales ($)"
+              placeholder="e.g. Sales (€)"
               className="w-full mt-1.5 p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
             />
           </div>
@@ -279,7 +279,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
                 required
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                placeholder="pcs, $, kg"
+                placeholder="pcs, €, kg"
                 className="w-full mt-1.5 p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
               />
             </div>

@@ -117,7 +117,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 <div>
                   <span className="text-[10px] uppercase font-mono text-rose-500 font-bold tracking-wide">Leakage Today</span>
                   <span className="text-lg font-sans font-bold text-slate-905 block -mt-1">
-                    ${totalCostToday.toFixed(2)}
+                    €{totalCostToday.toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 />
               </div>
               <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-2">
-                <span>Safety Limit Target: $500.00 Max</span>
+                <span>Safety Limit Target: €500.00 Max</span>
                 <span className="font-bold text-rose-600">
                   {((totalCostToday / 500) * 100).toFixed(1)}% of allowance consumed
                 </span>
@@ -148,7 +148,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
                     itemStyle={{ fontWeight: 'bold' }}
-                    formatter={(value: number) => `$${value.toFixed(2)}`}
+                    formatter={(value: number) => `€${value.toFixed(2)}`}
                   />
                   <Pie
                     data={pieData}
@@ -206,7 +206,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                         {rec.reason}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-rose-600">-${rec.cost.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-rose-600">-€{rec.cost.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -269,7 +269,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] font-mono text-slate-400 uppercase">Estimated loss ($)</label>
+                <label className="text-[10px] font-mono text-slate-400 uppercase">Estimated loss (€)</label>
                 <input
                   type="number"
                   step="0.1"

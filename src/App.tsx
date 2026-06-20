@@ -45,7 +45,9 @@ import {
   User,
   Power,
   Cpu,
-  GlassWater
+  GlassWater,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
@@ -58,6 +60,19 @@ export default function App() {
   // App States
   const [activeTab, setActiveTab] = useState<string>('Overview');
   const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff'>('Admin');
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', darkMode.toString());
+  }, [darkMode]);
+
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
   const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
   const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
@@ -287,12 +302,11 @@ export default function App() {
         );
     }
   };
-
-  return (
-    <div id="app-workspace" className="h-screen overflow-hidden bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800 antialiased selection:bg-orange-100">
+  return (
+    <div id="app-workspace" className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-orange-100">
       
       {/* SIDEBAR: NAVIGATION */}
-      <aside className="w-full md:w-64 bg-slate-900 text-slate-100 flex flex-col shrink-0 border-r border-slate-950 shadow-lg">
+      <aside className="w-full md:w-64 bg-slate-900 dark:bg-slate-950 text-slate-100 flex flex-col shrink-0 border-r border-slate-950 dark:border-slate-900/60 shadow-lg">
         {/* Brand Header */}
         <div className="p-6 border-b border-slate-800/80 flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group">
@@ -315,7 +329,7 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full text-left py-2.5 px-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all duration-200 ${
                   isActive
-                    ? 'bg-slate-800 text-white font-bold shadow-inner'
+                    ? 'bg-slate-800 dark:bg-slate-900 text-white font-bold shadow-inner'
                     : 'text-slate-400 hover:bg-slate-800/40 hover:text-white'
                 }`}
               >
@@ -356,7 +370,7 @@ export default function App() {
               <select 
                 value={userRole} 
                 onChange={(e) => setUserRole(e.target.value as any)}
-                className="mt-0.5 bg-transparent text-slate-400 font-mono text-[10px] uppercase cursor-pointer hover:text-slate-300 focus:outline-none appearance-none"
+                className="mt-0.5 bg-transparent text-slate-400 font-mono text-[10px] uppercase cursor-pointer hover:text-slate-300 focus:outline-none appearance-none w-full"
               >
                 <option value="Admin">Admin</option>
                 <option value="Manager">Manager</option>
@@ -371,33 +385,42 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Global Toolbar */}
-        <header className="bg-white h-16 border-b border-slate-200/80 px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
+        <header className="bg-white dark:bg-slate-900 h-16 border-b border-slate-200/80 dark:border-slate-800/80 px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <h2 className="text-base font-bold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
               {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
             </h2>
-            <span className="text-[10px] bg-slate-100 text-slate-500 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+            <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
               Sushi ops portal
             </span>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block leading-none">Local time</span>
-              <span className="text-sm font-mono font-bold text-slate-700 block mt-1">
+              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Local time</span>
+              <span className="text-sm font-mono font-bold text-slate-700 dark:text-slate-300 block mt-1">
                 {new Date().toISOString().split('T')[0]} 14:13 UTC
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 text-slate-500 hover:text-slate-750 dark:text-slate-400 dark:hover:text-slate-250 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700/80 rounded-full transition-all duration-200 shadow-sm"
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {darkMode ? <Sun className="w-4 h-4 text-orange-500" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            </button>
+
+            <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700/80">
               <Cpu className="w-3.5 h-3.5 text-orange-500" />
-              <span className="text-[11px] font-mono text-slate-600 font-bold">Gemini-3 Unified Intel</span>
+              <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 font-bold">Gemini-3 Unified Intel</span>
             </div>
           </div>
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 min-h-0 p-4 overflow-hidden bg-slate-50/50">
+        <main className="flex-1 min-h-0 p-4 overflow-hidden bg-slate-50/50 dark:bg-slate-950">
           <div className="max-w-7xl mx-auto h-full">
             {renderActiveView()}
           </div>
@@ -407,3 +430,4 @@ export default function App() {
     </div>
   );
 }
+

@@ -142,8 +142,8 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
           <div className="flex justify-between items-start">
             <div>
               <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Gross Revenue Today</p>
-              <h3 className="text-3xl font-sans font-black text-slate-900 mt-2">
-                ${metrics.salesToday.toLocaleString()}
+              <h3 className="text-3xl font-sans font-black text-slate-900 dark:text-white mt-2">
+                €{metrics.salesToday.toLocaleString()}
               </h3>
               <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-semibold mt-2">
                 <TrendingUp className="w-3 h-3" />
@@ -190,8 +190,8 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
           <div className="flex justify-between items-start">
             <div>
               <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Food Waste Cost</p>
-              <h3 className="text-3xl font-sans font-black text-slate-900 mt-2">
-                ${metrics.wasteCost.toFixed(2)}
+              <h3 className="text-3xl font-sans font-black text-slate-900 dark:text-white mt-2">
+                €{metrics.wasteCost.toFixed(2)}
               </h3>
               <span className="inline-flex items-center gap-0.5 text-emerald-600 text-xs font-semibold mt-2">
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -355,7 +355,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
 
           <form onSubmit={handleSaveManualMetrics} className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 z-10 relative">
             <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Gross Revenue ($)</label>
+              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Gross Revenue (€)</label>
               <input
                 type="number"
                 step="0.01"
@@ -376,7 +376,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
               />
             </div>
             <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Waste Cost ($)</label>
+              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Waste Cost (€)</label>
               <input
                 type="number"
                 step="0.01"
