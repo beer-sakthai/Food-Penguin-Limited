@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel, GenerateContentResponse, GenerateContentRequest } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -34,156 +34,109 @@ function getAiClient(): GoogleGenAI {
   return aiClient;
 }
 
-// ==========================================
-// 1. STRATEGIC EXECUTIVE THINKER
-// Model: gemini-3.1-pro-preview
-// Mode: ThinkingLevel.HIGH
-// ==========================================
-app.post("/api/gemini/strategic-advisor", async (req, res) => {
-  try {
-    const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
-    }
+/**
+ * Configuration for a generic Gemini API handler.
+ */
+interface GeminiHandlerConfig {
+  endpointName: string;
+  model: string;
+  validator: (body: any) => string | null;
+  simulationResponse: (body: any) => object;
+  buildContents: (body: any) => GenerateContentRequest['contents'];
+  buildConfig?: (body: any) => GenerateContentRequest['config'];
+  processResponse: (response: GenerateContentResponse, body: any) => object;
+}
 
-    const ai = getAiClient();
-    if (process.env.GEMINI_API_KEY === undefined || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
-      return res.json({
-        text: "💡 [Simulation Mode] Since GEMINI_API_KEY is not configured yet, here is some simulated advice: Keep waste minimal by matching nigiri and roll production to peak dinner-rush hours, rotate sushi-grade tuna stock FIFO to protect freshness, and shift Itamae Skipper to the omakase counter at peak times. Set up your actual key in Settings > Secrets to unleash deep system thinking capabilities!",
-        thinking: "Simulating high-reasoning tree for Food Penguin Limited sushi operations..."
+/**
+ * A higher-order function that creates an Express request handler for a Gemini API endpoint.
+ * It abstracts away validation, simulation mode, error handling, and the core API call.
+ * @param config - The specific configuration for this Gemini endpoint.
+ * @returns An async Express request handler.
+ */
+function createGeminiHandler(config: GeminiHandlerConfig) {
+  return async (req: Request, res: Response) => {
+    try {
+      const validationError = config.validator(req.body);
+      if (validationError) {
+        return res.status(400).json({ error: validationError });
+      }
+
+      if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+        return res.json(config.simulationResponse(req.body));
+      }
+
+      const ai = getAiClient();
+      const contents = config.buildContents(req.body);
+      const modelConfig = config.buildConfig ? config.buildConfig(req.body) : {};
+
+      const response = await ai.models.generateContent({
+        model: config.model,
+        contents,
+        config: modelConfig,
       });
+
+      const finalResponse = config.processResponse(response, req.body);
+      res.json(finalResponse);
+
+    } catch (err: any) {
+      console.error(`${config.endpointName} error: `, err);
+      res.status(500).json({ error: err.message || `An error occurred with the ${config.endpointName}.` });
     }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: prompt,
-      config: {
-        systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite premium sushi production and cold-chain seafood corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies for a high-volume sushi operation. Break down complex operational problems regarding sushi sales, fish freshness and waste minimization, sushi-grade seafood logistics and sourcing, and itamae labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.HIGH
-        }
-      }
-    });
-
-    res.json({
-      text: response.text || "No response text generated.",
-      thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
-    });
-  } catch (err: any) {
-    console.error("Strategic Advisor error: ", err);
-    res.status(500).json({ error: err.message || "An error occurred with the strategic AI advisor." });
-  }
-});
+  };
+}
 
 // ==========================================
-// 2. WASTE REDUCTION ADVISOR
-// Model: gemini-3.1-pro-preview
+// API Endpoint Definitions
 // ==========================================
-app.post("/api/gemini/waste-reduction-advisor", async (req, res) => {
-  try {
-    const { wasteRecords } = req.body;
-    if (!wasteRecords || !Array.isArray(wasteRecords)) {
-      return res.status(400).json({ error: "Waste records are required" });
-    }
 
-    const ai = getAiClient();
-    if (process.env.GEMINI_API_KEY === undefined || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
-      return res.json({
-        text: "📈 [Simulation Mode] Based on your waste data, Food Penguin's AI advisor suggests the following to reduce waste:\n\n1.  **Reduce Tuna Overproduction:** Your data shows consistent Tuna wastage on Wednesdays. Consider reducing Tuna prep by 15% on this day.\n2.  **Optimize Rice Cooking:** Rice is frequently marked as 'Overproduced'. Try making smaller batches of rice more frequently during peak hours.\n3.  **Conduct a Quality Audit:** 'Quality Issue' is a common reason for vegetable waste. Review your vegetable supplier's quality or improve storage conditions.\n\nConfigure your Gemini API key to get live, data-driven insights."
-      });
-    }
+app.post("/api/gemini/strategic-advisor", createGeminiHandler({
+  endpointName: "Strategic Advisor",
+  model: "gemini-3.1-pro-preview",
+  validator: (body) => body.prompt ? null : "Prompt is required",
+  simulationResponse: () => ({
+    text: "💡 [Simulation Mode] Since GEMINI_API_KEY is not configured yet, here is some simulated advice: Keep waste minimal by matching nigiri and roll production to peak dinner-rush hours, rotate sushi-grade tuna stock FIFO to protect freshness, and shift Itamae Skipper to the omakase counter at peak times. Set up your actual key in Settings > Secrets to unleash deep system thinking capabilities!",
+    thinking: "Simulating high-reasoning tree for Food Penguin Limited sushi operations..."
+  }),
+  buildContents: (body) => body.prompt,
+  buildConfig: () => ({
+    systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite premium sushi production and cold-chain seafood corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies for a high-volume sushi operation. Break down complex operational problems regarding sushi sales, fish freshness and waste minimization, sushi-grade seafood logistics and sourcing, and itamae labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
+    thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+  }),
+  processResponse: (response) => ({
+    text: response.text || "No response text generated.",
+    thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
+  }),
+}));
 
-    const prompt = `
-      As the Chief AI Strategy Officer for 'Food Penguin Limited', analyze the following food waste data and provide a strategic waste reduction plan. The data is a JSON array of waste records for the past day.
+app.post("/api/gemini/low-latency-cmd", createGeminiHandler({
+  endpointName: "Low-Latency Copilot",
+  model: "gemini-3.1-flash-lite",
+  validator: (body) => body.command ? null : "Command query is required",
+  simulationResponse: (body) => ({
+    text: `⚡ [Lite Simulation Mode] Processing: "${body.command}". Rapid Response suggests swapping Itamae Kowalski to the dinner sushi rush, raising Dragon Roll margins by 3%, and re-icing the neta display case. Configure a real API key for sub-second live replies!`
+  }),
+  buildContents: (body) => body.command,
+  buildConfig: () => ({
+    systemInstruction: "You are the rapid action-response dispatcher for Food Penguin sushi bar managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the itamae and floor leads with quick, direct answers about sushi prep, neta freshness, and service."
+  }),
+  processResponse: (response) => ({ text: response.text || "No response received." }),
+}));
 
-      Data:
-      ${JSON.stringify(wasteRecords, null, 2)}
-
-      Your task is to identify key patterns and root causes of waste and provide 3-5 concrete, actionable recommendations for a high-volume sushi operation. Focus on high-impact changes that can be implemented quickly. For each recommendation, briefly explain the reasoning based on the data.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: prompt,
-      config: {
-        systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite premium sushi production and cold-chain seafood corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies for a high-volume sushi operation. Your current task is to analyze waste data and provide a clear, actionable waste reduction plan.",
-      }
-    });
-
-    res.json({
-      text: response.text || "No response text generated."
-    });
-  } catch (err: any) {
-    console.error("Waste Reduction Advisor error: ", err);
-    res.status(500).json({ error: err.message || "An error occurred with the waste reduction AI advisor." });
-  }
-});
-
-// ==========================================
-// 3. LOW LATENCY COPILOT
-// Model: gemini-3.1-flash-lite
-// ==========================================
-app.post("/api/gemini/low-latency-cmd", async (req, res) => {
-  try {
-    const { command } = req.body;
-    if (!command) {
-      return res.status(400).json({ error: "Command query is required" });
-    }
-
-    const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
-      return res.json({
-        text: `⚡ [Lite Simulation Mode] Processing: "${command}". Rapid Response suggests swapping Itamae Kowalski to the dinner sushi rush, raising Dragon Roll margins by 3%, and re-icing the neta display case. Configure a real API key for sub-second live replies!`
-      });
-    }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: command,
-      config: {
-        systemInstruction: "You are the rapid action-response dispatcher for Food Penguin sushi bar managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the itamae and floor leads with quick, direct answers about sushi prep, neta freshness, and service."
-      }
-    });
-
-    res.json({
-      text: response.text || "No response received."
-    });
-  } catch (err: any) {
-    console.error("Low latency copilot error: ", err);
-    res.status(500).json({ error: err.message || "An error occurred on the rapid copilot." });
-  }
-});
-
-// ==========================================
-// 3. MENU ILLUSTRATOR & BANNER GENERATOR
-// Model: gemini-2.5-flash-image
-// ==========================================
-app.post("/api/gemini/generate-marketing-image", async (req, res) => {
-  try {
-    const { prompt, aspectRatio } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: "Image prompt is required" });
-    }
-
-    const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
-      // Return a high quality SVG of food matching the prompt as fallback
-      const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${aspectRatio || '1:1'} (Simulated)</text></svg>`;
-      return res.json({ imageUrl: mockSvg, simulated: true });
-    }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-image",
-      contents: {
-        parts: [{ text: `A clean, commercial studio sushi advertisement banner for Food Penguin Limited, a premium sushi brand. Emphasize fresh nigiri, maki rolls and sashimi with appetizing styling. ${prompt}` }]
-      },
-      config: {
-        imageConfig: {
-          aspectRatio: aspectRatio || "1:1"
-        }
-      }
-    });
-
+app.post("/api/gemini/generate-marketing-image", createGeminiHandler({
+  endpointName: "Marketing Image Generator",
+  model: "gemini-2.5-flash-image",
+  validator: (body) => body.prompt ? null : "Image prompt is required",
+  simulationResponse: (body) => {
+    const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${body.prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${body.aspectRatio || '1:1'} (Simulated)</text></svg>`;
+    return { imageUrl: mockSvg, simulated: true };
+  },
+  buildContents: (body) => ({
+    parts: [{ text: `A clean, commercial studio sushi advertisement banner for Food Penguin Limited, a premium sushi brand. Emphasize fresh nigiri, maki rolls and sashimi with appetizing styling. ${body.prompt}` }]
+  }),
+  buildConfig: (body) => ({
+    imageConfig: { aspectRatio: body.aspectRatio || "1:1" }
+  }),
+  processResponse: (response) => {
     let base64Image = "";
     if (response.candidates && response.candidates[0]?.content?.parts) {
       for (const part of response.candidates[0].content.parts) {
@@ -193,118 +146,66 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
         }
       }
     }
+    if (!base64Image) throw new Error("No image data returned from Gemini flash image.");
+    return { imageUrl: `data:image/png;base64,${base64Image}`, simulated: false };
+  },
+}));
 
-    if (base64Image) {
-      res.json({ imageUrl: `data:image/png;base64,${base64Image}`, simulated: false });
-    } else {
-      throw new Error("No image data returned from Gemini flash image.");
-    }
-  } catch (err: any) {
-    console.error("Image generation error: ", err);
-    res.status(500).json({ error: err.message || "Failed to generate food advertisement banner." });
-  }
-});
+app.post("/api/gemini/analyze-dish-photo", createGeminiHandler({
+  endpointName: "Dish Auditor",
+  model: "gemini-3.1-pro-preview",
+  validator: (body) => body.imageBase64 ? null : "Base64 image is required.",
+  simulationResponse: () => ({
+    analysis: "🔍 [Photo Audit Simulation] Your sushi photo was received! It displays outstanding plating. Salmon neta slices appear uniform (approx. 0.8cm, clean 45° angle cut). Rice ball (shari) density looks consistent and the nori is crisp, not damp. Estimated portion weight is 180g. Freshness markers strong, no oxidation banding on the fish. Waste assessment: Negligible (<5% trim). Configure your Gemini key to get the live, multi-spectrometer analysis!"
+  }),
+  buildContents: (body) => {
+    const cleanBase64 = body.imageBase64.replace(/^data:image\/\w+;base64,/, "");
+    const imagePart = { inlineData: { mimeType: body.mimeType || "image/png", data: cleanBase64 } };
+    const promptPart = { text: "Perform a rigorous sushi culinary audit on this sushi dish or fish delivery photo. Critique the neta slice cuts, rice (shari) shaping and density, nori crispness, and overall plating. Estimate the volume/weight where applicable, assess sushi-grade freshness markers (color, sheen, oxidation), and estimate potential waste or trim percentages on the fish. Give actionable suggestions on how to improve sushi bar margins or prevent seafood spoilage." };
+    return { parts: [imagePart, promptPart] };
+  },
+  processResponse: (response) => ({ analysis: response.text || "No analysis generated." }),
+}));
 
-// ==========================================
-// 4. KITCHEN QUALITY DISH AUDITOR
-// Model: gemini-3.1-pro-preview
-// ==========================================
-app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
-  try {
-    const { imageBase64, mimeType } = req.body;
-    if (!imageBase64) {
-      return res.status(400).json({ error: "Base64 image is required." });
-    }
-
-    const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-
-    const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
-      return res.json({
-        analysis: "🔍 [Photo Audit Simulation] Your sushi photo was received! It displays outstanding plating. Salmon neta slices appear uniform (approx. 0.8cm, clean 45° angle cut). Rice ball (shari) density looks consistent and the nori is crisp, not damp. Estimated portion weight is 180g. Freshness markers strong, no oxidation banding on the fish. Waste assessment: Negligible (<5% trim). Configure your Gemini key to get the live, multi-spectrometer analysis!"
-      });
-    }
-
-    const imagePart = {
-      inlineData: {
-        mimeType: mimeType || "image/png",
-        data: cleanBase64,
-      },
-    };
-
-    const promptPart = {
-      text: "Perform a rigorous sushi culinary audit on this sushi dish or fish delivery photo. Critique the neta slice cuts, rice (shari) shaping and density, nori crispness, and overall plating. Estimate the volume/weight where applicable, assess sushi-grade freshness markers (color, sheen, oxidation), and estimate potential waste or trim percentages on the fish. Give actionable suggestions on how to improve sushi bar margins or prevent seafood spoilage."
-    };
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: { parts: [imagePart, promptPart] }
-    });
-
-    res.json({
-      analysis: response.text || "No analysis generated."
-    });
-  } catch (err: any) {
-    console.error("Dish analyzer error: ", err);
-    res.status(500).json({ error: err.message || "Quality audit analysis failed." });
-  }
-});
-
-// ==========================================
-// 5. MARKET TREND SEARCH GROUNDING
-// Model: gemini-3.5-flash
-// ==========================================
-app.post("/api/gemini/search-trends", async (req, res) => {
-  try {
-    const { query } = req.body;
-    if (!query) {
-      return res.status(400).json({ error: "Query is required" });
-    }
-
-    const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
-      return res.json({
-        text: `🌐 [Search Grounding Simulation] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Sushi-grade Bluefin Tuna and Norwegian Salmon hold a high premium, up 4.1% MoM amid tightening quotas. Demand for Koshihikari sushi rice and nori is rising as sushi consumption grows in urban regions. Bulk wasabi and rice-vinegar rates are up slightly due to freight climbs.`
-      });
-    }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: query,
-      config: {
-        systemInstruction: "You are active business intelligence for the Food Penguin sushi procurement department. Answer the user's research questions accurately using the search grounding tool, focusing on sushi-grade seafood, rice, nori and condiment markets.",
-        tools: [{ googleSearch: {} }]
-      }
-    });
-
-    res.json({
-      text: response.text || "No grounded research found."
-    });
-  } catch (err: any) {
-    console.error("Search Grounding error: ", err);
-    res.status(500).json({ error: err.message || "Failed to search web statistics." });
-  }
-});
+app.post("/api/gemini/search-trends", createGeminiHandler({
+  endpointName: "Search Trends",
+  model: "gemini-3.5-flash",
+  validator: (body) => body.query ? null : "Query is required",
+  simulationResponse: (body) => ({
+    text: `🌐 [Search Grounding Simulation] Searching for: "${body.query}" in 2026 indexes...\n\nAccording to mock 2026 data: Sushi-grade Bluefin Tuna and Norwegian Salmon hold a high premium, up 4.1% MoM amid tightening quotas. Demand for Koshihikari sushi rice and nori is rising as sushi consumption grows in urban regions. Bulk wasabi and rice-vinegar rates are up slightly due to freight climbs.`
+  }),
+  buildContents: (body) => body.query,
+  buildConfig: () => ({
+    systemInstruction: "You are active business intelligence for the Food Penguin procurement department. Answer the user's research questions accurately using the search grounding tool, focusing on sushi-grade seafood, rice, nori and condiment markets.",
+    tools: [{ googleSearch: {} }]
+  }),
+  processResponse: (response) => ({ text: response.text || "No grounded research found." }),
+}));
 
 // Serve static compiled UI or route to Vite dev-server (SPA mode)
 const startServer = async () => {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
+  try {
+    if (process.env.NODE_ENV !== "production") {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.join(process.cwd(), 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+      });
+    }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
-  });
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
+    });
+  } catch (err: any) {
+    console.error("Failed to start server:", err);
+    process.exit(1);
+  }
 };
 
 startServer();

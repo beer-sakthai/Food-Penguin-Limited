@@ -74,17 +74,64 @@ await page.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 30000 });
 
 let failed = 0;
 for (const tab of tabs) {
-  await page.click(`nav button:has-text("${navLabel(tab)}")`).catch(() => {});
+  await page.click(`nav button:has-text("${navLabel(tab)}")`).catch(() => { });
   await page.waitForTimeout(350);
+
+  let contentCheckOk = true;
+  let contentCheckMsg = '';
+
+  // Special test case for the Real-time AI Copilot tab
+  if (tab === 'Real-time') {
+    try {
+      await page.fill('input[placeholder="Ask the AI Copilot..."]', 'What is the freshness status of our tuna?');
+      await page.click('button:has-text("Ask")');
+      // Wait for the response container to appear and have some text content
+      const responseLocator = page.locator('#copilot-response');
+      await responseLocator.waitFor({ state: 'visible', timeout: 15000 });
+      const responseText = await responseLocator.innerText();
+
+      contentCheckOk = responseText.length > 10 && !responseText.toLowerCase().includes('error');
+      contentCheckMsg = contentCheckOk ? `(AI response OK)` : `(AI response check FAILED: "${responseText.substring(0, 50)}...")`;
+    } catch (e) {
+      contentCheckOk = false;
+      contentCheckMsg = `(AI response check FAILED: ${e.message})`;
+    }
+  }
+
+  // Special test case for the Kitchen Quality Dish Auditor on the Production tab
+  if (tab === 'Production') {
+    try {
+      // A 1x1 red pixel PNG to use for the upload test
+      const redPixelPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==', 'base64');
+
+      // Find the file input and set its value to our virtual PNG
+      const fileInput = page.locator('#dish-audit-input');
+      await fileInput.setInputFiles({
+        name: 'test-dish.png',
+        mimeType: 'image/png',
+        buffer: redPixelPng,
+      });
+
+      const responseLocator = page.locator('#dish-audit-response');
+      await responseLocator.waitFor({ state: 'visible', timeout: 20000 }); // Longer timeout for vision model
+      const responseText = await responseLocator.innerText();
+      contentCheckOk = responseText.length > 10 && !responseText.toLowerCase().includes('error');
+      contentCheckMsg = contentCheckOk ? `(Dish audit OK)` : `(Dish audit FAILED: "${responseText.substring(0, 50)}...")`;
+    } catch (e) {
+      contentCheckOk = false;
+      contentCheckMsg = `(Dish audit FAILED: ${e.message})`;
+    }
+  }
+
   const overflow = await page.evaluate(() => {
     const de = document.documentElement;
     return Math.max(de.scrollHeight - de.clientHeight, document.body.scrollHeight - document.body.clientHeight, 0);
   });
   const file = join(SHOT_DIR, `${tab.replace('/', '')}.png`);
   await page.screenshot({ path: file });
-  const ok = overflow <= 1;
-  if (!ok) failed++;
-  console.log(`${ok ? 'OK ' : 'XX '} ${tab.padEnd(11)} pageOverflow=${overflow}px  -> ${file}`);
+  const layoutOk = overflow <= 1;
+  if (!layoutOk || !contentCheckOk) failed++;
+  console.log(`${(layoutOk && contentCheckOk) ? 'OK ' : 'XX '} ${tab.padEnd(11)} pageOverflow=${overflow}px ${contentCheckMsg} -> ${file}`);
 }
 
 await browser.close();

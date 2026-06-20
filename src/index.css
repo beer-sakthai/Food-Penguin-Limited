@@ -1,141 +1,30 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ── Typography system ───────────────────────────────────────────────
-   Display : Sora              → headings + big stat numbers
-   Body    : Plus Jakarta Sans → everything else
-   Mono    : JetBrains Mono    → labels, codes, metrics                */
-@theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display: "Sora", "Plus Jakarta Sans", sans-serif;
+@layer base {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
-/* Nudge the whole UI a touch larger and crisper. */
-html {
-  font-size: 16.5px;
-}
+@layer utilities {
+  @keyframes indeterminate-progress {
+    from {
+      transform: translateX(-100%) scaleX(0.5);
+    }
 
-body {
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  letter-spacing: -0.01em;
-}
+    to {
+      transform: translateX(100%) scaleX(0.5);
+    }
+  }
 
-/* Unlayered (beats Tailwind's layered `font-sans` utility): every heading
-   renders in the Sora display face with tightened tracking, so titles and
-   KPI numbers read distinctly larger and more premium without per-component
-   edits. Mono headings (rare) can opt back out with `font-mono`. */
-h1,
-h2,
-h3 {
-  font-family: var(--font-display);
-  letter-spacing: -0.025em;
-}
-
-h4 {
-  font-family: var(--font-display);
-  letter-spacing: -0.015em;
-}
-
-/* Allow inherently-growing regions (ledgers, tables, alert feeds, AI output)
-   to scroll internally without ever showing a scrollbar. */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Lock the app to the viewport so individual dashboard pages fit in one
-   screen and the page itself never scrolls. */
-html,
-body,
-#root {
-  height: 100%;
-  overflow: hidden;
-}
-
-/* ── Super Dark Mode Custom Style Overrides ────────────────────────── */
-.dark body,
-.dark #app-workspace,
-.dark main {
-  background-color: #000000 !important;
-  /* True black background */
-  color: #f8fafc !important;
-}
-
-/* Override all white card containers in dark mode */
-.dark .bg-white,
-.dark .bg-white\/50,
-.dark [className*="bg-white"] {
-  background-color: #000000 !important;
-  /* True black for cards */
-  border-color: #27272a !important;
-  /* Zinc-800 border */
-  color: #f8fafc !important;
-}
-
-/* Table rows and list item hover effects */
-.dark tr:hover,
-.dark tr:hover td,
-.dark .hover\:bg-slate-50\/50:hover {
-  background-color: #18181b !important;
-}
-
-/* Override borders to sleek dark borders */
-.dark .border,
-.dark .border-slate-100,
-.dark .border-slate-150,
-.dark .border-slate-200,
-.dark .border-slate-205,
-.dark .border-slate-250,
-.dark .border-slate-300,
-.dark .border-slate-200\/80 {
-  border-color: #27272a !important;
-}
-
-/* Slate background zones to dark mode backgrounds */
-.dark .bg-slate-50,
-.dark .bg-slate-50\/50,
-.dark .bg-slate-100 {
-  background-color: #09090b !important;
-  border-color: #27272a !important;
-}
-
-/* Input fields, select forms, and textarea overrides */
-.dark input,
-.dark select,
-.dark textarea,
-.dark .bg-slate-950\/50 {
-  background-color: #000000 !important;
-  border-color: #27272a !important;
-  color: #f8fafc !important;
-}
-
-/* Text color overrides */
-.dark .text-slate-900,
-.dark .text-slate-905,
-.dark .text-slate-800,
-.dark .text-slate-700,
-.dark .text-slate-600 {
-  color: #f1f5f9 !important;
-}
-
-.dark .text-slate-500,
-.dark .text-slate-400 {
-  color: #94a3b8 !important;
-}
-
-/* Chart text labels */
-.dark .recharts-cartesian-grid-horizontal line,
-.dark .recharts-cartesian-grid-vertical line {
-  stroke: #27272a !important;
-}
-
-.dark .recharts-text {
-  fill: #94a3b8 !important;
+  .animate-indeterminate {
+    animation: indeterminate-progress 1.5s infinite ease-in-out;
+  }
 }

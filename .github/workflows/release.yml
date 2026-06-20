@@ -1,0 +1,79 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Triggers on tags like v1.0.0, v1.2.3, etc.
+
+permissions:
+  contents: write # Required to create releases and upload assets
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest # PowerShell Core is available on Ubuntu runners
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Install Playwright browsers for smoke tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Start server in background for smoke tests
+        env:
+          DISABLE_HMR: true
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run dev &
+
+      - name: Wait for server to be ready
+        run: |
+          for i in $(seq 1 15); do
+            curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/ | grep -q 200 && echo "Server is up!" && exit 0
+            sleep 1
+          done
+          echo "Server failed to start in 15 seconds." && exit 1
+
+      - name: Run E2E smoke tests with driver
+        run: node .claude/skills/run-food-penguin-limited/driver.mjs
+
+      - name: Run the release packaging script
+        id: package_script
+        shell: pwsh
+        run: ./scripts/create-release.ps1
+
+      - name: Get release artifact path and version
+        id: get_artifact_info
+        shell: pwsh
+        run: |
+          $packageJson = Get-Content -Raw -Path ./package.json | ConvertFrom-Json
+          $version = $packageJson.version
+          $artifactName = "food-penguin-limited-v$($version).zip"
+          $artifactPath = "release/$artifactName"
+          echo "ARTIFACT_PATH=$artifactPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Create GitHub Release and Upload Artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          # The release name will be the tag (e.g., "v1.0.0")
+          name: ${{ github.ref_name }}
+          # Use the RELEASE.md file as the body of the release notes.
+          # This makes it easy to update release notes by just editing the file.
+          body_path: ./RELEASE.md
+          # This marks the release as the "latest" stable release.
+          make_latest: true
+          files: |
+            ${{ steps.get_artifact_info.outputs.ARTIFACT_PATH }}

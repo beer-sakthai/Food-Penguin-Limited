@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { SalesOrder } from '../types';
+import { useApi } from '../hooks/useApi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
-import { 
-  DollarSign, 
-  ShoppingCart, 
+import {
+  DollarSign,
+  ShoppingCart,
   Image as ImageIcon,
   Sparkles,
   Download,
@@ -37,10 +38,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   // AI Menu Banner Maker state
   const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium salmon and bluefin tuna nigiri with a signature dragon roll on a slate board, garnished with wasabi and pickled ginger, high-end catalog style');
   const [selectedRatio, setSelectedRatio] = useState('16:9');
-  const [generatedImg, setGeneratedImg] = useState<string>('');
-  const [loadingImage, setLoadingImage] = useState(false);
-  const [imageError, setImageError] = useState('');
-
+  const { data: imageData, loading: loadingImage, error: imageError, execute: generateBannerApi } = useApi<{ imageUrl: string }>();
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.trim()) return;
@@ -64,28 +62,19 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
     setNewPrice(12.50);
   };
 
+  const bannerApiCall = (params: { prompt: string, aspectRatio: string }) =>
+    fetch("/api/gemini/generate-marketing-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    }).then(res => res.json().then(data => {
+      if (!res.ok || data.error) throw new Error(data.error || `Request failed with status ${res.status}`);
+      return data;
+    }));
+
   const handleGenerateBanner = async () => {
     if (!bannerPrompt.trim()) return;
-    setLoadingImage(true);
-    setImageError('');
-    setGeneratedImg('');
-    try {
-      const res = await fetch("/api/gemini/generate-marketing-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: bannerPrompt, aspectRatio: selectedRatio }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        setImageError(`Error: ${data.error}`);
-      } else {
-        setGeneratedImg(data.imageUrl);
-      }
-    } catch (err: any) {
-      setImageError(`Connection failure: ${err.message || err}`);
-    } finally {
-      setLoadingImage(false);
-    }
+    generateBannerApi(bannerApiCall, { prompt: bannerPrompt, aspectRatio: selectedRatio });
   };
 
   const categoryData = orders.reduce((acc: any, order) => {
@@ -117,7 +106,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
 
       {/* LEFT & CENTER: LIVE SALES & TRANSACTION TERMINAL */}
       <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
-        
+
         {/* Quick Menu Overview */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900">Food Penguin Limited Specialties</h2>
@@ -160,7 +149,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={(val) => `€${val}`} />
-                <Tooltip 
+                <Tooltip
                   cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
                   itemStyle={{ color: '#f97316', fontWeight: 'bold' }}
@@ -205,7 +194,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
 
       {/* RIGHT SIDEBAR: ORDER CREATOR & BANNER GENERATOR */}
       <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
-        
+
         {/* Mock POS Order Creator */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-slate-100 mb-4">
@@ -317,11 +306,10 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   type="button"
                   key={r.value}
                   onClick={() => setSelectedRatio(r.value)}
-                  className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${
-                    selectedRatio === r.value
+                  className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${selectedRatio === r.value
                       ? 'bg-slate-900 border-slate-900 text-white font-bold shadow'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   {r.label}
                 </button>
@@ -348,14 +336,14 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           </button>
 
           {/* Render Result with matching simulated bounds */}
-          {generatedImg && (
+          {imageData?.imageUrl && (
             <div className="space-y-2 pt-2">
               <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 font-bold block">
                 Visual Render Response ({selectedRatio}):
               </span>
               <div className="flex justify-center bg-slate-950 p-3 rounded-2xl border border-slate-900 shadow-inner">
                 <img
-                  src={generatedImg}
+                  src={imageData.imageUrl}
                   referrerPolicy="no-referrer"
                   alt="AI Food Penguin Banner"
                   className={`w-full max-h-[300px] object-contain rounded-xl ${getTailwindAspectClass(selectedRatio)}`}
