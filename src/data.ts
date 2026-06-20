@@ -87,3 +87,34 @@ export const initialAlerts: RealtimeAlert[] = [
   { id: 'A-03', timestamp: '13:55:00', sensor: 'Tuna Deep Freezer (-60°C)', value: '-54.1°C', status: 'warning', message: 'Slight thermal climb detected during door cycle.' },
   { id: 'A-04', timestamp: '13:10:45', sensor: 'Hand-wash Sanitation Tank', value: '82.5°C', status: 'normal', message: 'Sanitation high-temp rinse verified.' }
 ];
+
+import { BranchId, BranchData, Branch } from './types';
+
+export const BRANCHES: Branch[] = [
+  { id: 'ms-city-centre', name: 'M&S City Centre' },
+  { id: 'tesco-city-centre', name: 'Tesco City Centre' },
+  { id: 'tesco-manhon', name: 'Tesco Manhon' }
+];
+
+const createBranchData = (multiplier: number): BranchData => ({
+  metrics: {
+    ...initialMetrics,
+    salesToday: initialMetrics.salesToday * multiplier,
+    productionItems: initialMetrics.productionItems * multiplier,
+    wasteCost: initialMetrics.wasteCost * multiplier,
+  },
+  orders: initialOrders.map(o => ({ ...o, amount: o.amount * multiplier })),
+  targets: initialTargets.map(t => ({ ...t, currentValue: t.currentValue * multiplier })),
+  recipes: [...initialRecipes],
+  tasks: [...initialTasks],
+  wasteRecords: initialWaste.map(w => ({ ...w, cost: w.cost * multiplier })),
+  hoursData: [...initialHours],
+  inventory: [...initialInventory],
+  alerts: [...initialAlerts]
+});
+
+export const initialBranchesData: Record<BranchId, BranchData> = {
+  'ms-city-centre': createBranchData(1.0),
+  'tesco-city-centre': createBranchData(0.8),
+  'tesco-manhon': createBranchData(1.2)
+};

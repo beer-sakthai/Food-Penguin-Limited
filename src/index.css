@@ -60,7 +60,7 @@ body,
 .dark body,
 .dark #app-workspace,
 .dark main {
-  background-color: #030712 !important; /* True black background */
+  background-color: #000000 !important; /* True black background */
   color: #f8fafc !important;
 }
 
@@ -68,8 +68,8 @@ body,
 .dark .bg-white,
 .dark .bg-white\/50,
 .dark [className*="bg-white"] {
-  background-color: #090d16 !important; /* Slate-950/900 card background */
-  border-color: #1e293b !important;
+  background-color: #09090b !important; /* Zinc-950 for cards */
+  border-color: #27272a !important; /* Zinc-800 border */
   color: #f8fafc !important;
 }
 
@@ -77,7 +77,7 @@ body,
 .dark tr:hover,
 .dark tr:hover td,
 .dark .hover\:bg-slate-50\/50:hover {
-  background-color: #0f172a !important;
+  background-color: #18181b !important;
 }
 
 /* Override borders to sleek dark borders */
@@ -89,15 +89,15 @@ body,
 .dark .border-slate-250,
 .dark .border-slate-300,
 .dark .border-slate-200\/80 {
-  border-color: #1e293b !important;
+  border-color: #27272a !important;
 }
 
 /* Slate background zones to dark mode backgrounds */
 .dark .bg-slate-50,
 .dark .bg-slate-50\/50,
 .dark .bg-slate-100 {
-  background-color: #0d111d !important;
-  border-color: #1e293b !important;
+  background-color: #09090b !important;
+  border-color: #27272a !important;
 }
 
 /* Input fields, select forms, and textarea overrides */
@@ -105,8 +105,8 @@ body,
 .dark select,
 .dark textarea,
 .dark .bg-slate-950\/50 {
-  background-color: #040710 !important;
-  border-color: #1e293b !important;
+  background-color: #000000 !important;
+  border-color: #27272a !important;
   color: #f8fafc !important;
 }
 
@@ -127,7 +127,7 @@ body,
 /* Chart text labels */
 .dark .recharts-cartesian-grid-horizontal line,
 .dark .recharts-cartesian-grid-vertical line {
-  stroke: #1e293b !important;
+  stroke: #27272a !important;
 }
 .dark .recharts-text {
   fill: #94a3b8 !important;

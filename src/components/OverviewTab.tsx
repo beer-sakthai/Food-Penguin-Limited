@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CoreMetrics, CompanyTarget } from '../types';
+import { CoreMetrics, CompanyTarget, BranchId, BranchData } from '../types';
+import { BRANCHES } from '../data';
 import {
   TrendingUp,
   Package,
@@ -11,7 +12,8 @@ import {
   Lightbulb,
   CheckCircle2,
   Save,
-  Settings
+  Settings,
+  Building
 } from 'lucide-react';
 import {
   AreaChart,
@@ -20,21 +22,16 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Legend
+  ResponsiveContainer
 } from 'recharts';
 
 interface OverviewTabProps {
-  metrics: CoreMetrics;
-  onNavigateTab: (tabId: string) => void;
-  targets: CompanyTarget[];
-  userRole: 'Admin' | 'Manager' | 'Staff';
-  onUpdateMetrics: (newMetrics: Partial<CoreMetrics>) => void;
+  branchesData: Record<BranchId, BranchData>;
+  selectedBranch: BranchId;
+  onSelectBranch: (branch: BranchId) => void;
 }
 
-export default function OverviewTab({ metrics, onNavigateTab, targets, userRole, onUpdateMetrics }: OverviewTabProps) {
+export default function OverviewTab({ branchesData, selectedBranch, onSelectBranch }: OverviewTabProps) {
   const [strategicPrompt, setStrategicPrompt] = useState(
     "Synthesize an optimization plan for Food Penguin to reduce sushi-grade fish shipment costs by 12% while keeping fish-trim waste below 4% and maintaining neta freshness during peak dinner service."
   );
@@ -42,32 +39,10 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
   const [thinkingProcess, setThinkingProcess] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // Admin Manual Entry State
-  const [manualSales, setManualSales] = useState(metrics.salesToday.toString());
-  const [manualProduction, setManualProduction] = useState(metrics.productionItems.toString());
-  const [manualWaste, setManualWaste] = useState(metrics.wasteCost.toString());
-  const [manualHours, setManualHours] = useState(metrics.hoursScheduled.toString());
-  const [manualEntryDate, setManualEntryDate] = useState(new Date().toISOString().split('T')[0]);
+  const metrics = branchesData[selectedBranch].metrics;
+  const targets = branchesData[selectedBranch].targets;
 
-  // Keep manual values in sync if metrics change externally
-  useEffect(() => {
-    setManualSales(metrics.salesToday.toString());
-    setManualProduction(metrics.productionItems.toString());
-    setManualWaste(metrics.wasteCost.toString());
-    setManualHours(metrics.hoursScheduled.toString());
-  }, [metrics]);
-
-  const handleSaveManualMetrics = (e: React.FormEvent) => {
-    e.preventDefault();
-    onUpdateMetrics({
-      salesToday: parseFloat(manualSales) || 0,
-      productionItems: parseInt(manualProduction, 10) || 0,
-      wasteCost: parseFloat(manualWaste) || 0,
-      hoursScheduled: parseFloat(manualHours) || 0
-    });
-  };
-
-  // Recharts Chart Data (correlated metrics across hours)
+  // Recharts Chart Data (mock correlated metrics across hours)
   const hourlyData = [
     { hour: '08:00', Sales: 1200, Production: 450, Waste: 40, Hours: 12 },
     { hour: '10:00', Sales: 3400, Production: 1200, Waste: 65, Hours: 24 },
@@ -111,6 +86,9 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
     return 'text-rose-600 bg-rose-50 border-rose-100';
   };
 
+  // Calculate totals across branches for the banner
+  const totalSalesAllBranches = Object.values(branchesData).reduce((acc, branch) => acc + branch.metrics.salesToday, 0);
+
   return (
     <div id="overview-viewport" className="h-full space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
       {/* Header Banner with Premium ambient bento design */}
@@ -127,30 +105,45 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             Welcome Back, Skipper
           </h1>
           <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-            Food Penguin Limited is currently executing at <span className="text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Sushi plating goals are on target, and fish-waste reports show an improvement of <span className="text-emerald-400 font-semibold">18.2% vs last Friday</span>.
+            Food Penguin Limited is currently executing at <span className="text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Total enterprise revenue today is <span className="text-emerald-400 font-semibold">€{totalSalesAllBranches.toLocaleString()}</span>.
           </p>
         </div>
       </div>
 
+      {/* BRANCH SELECTOR TABS */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {BRANCHES.map(branch => (
+          <button
+            key={branch.id}
+            onClick={() => onSelectBranch(branch.id as BranchId)}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap shrink-0 ${
+              selectedBranch === branch.id 
+                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 border border-orange-400' 
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <Building className="w-4 h-4 shrink-0" />
+            {branch.name}
+          </button>
+        ))}
+      </div>
+
       {/* KPI Bento Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Sell Today */}
-        <div 
-          onClick={() => onNavigateTab('Sell')}
-          className="bg-white p-6 rounded-3xl border border-slate-200 hover:border-orange-500/40 transition-all shadow-sm cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Gross Revenue Today</p>
-              <h3 className="text-3xl font-sans font-black text-slate-900 dark:text-white mt-2">
-                €{metrics.salesToday.toLocaleString()}
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 hover:border-orange-500/40 transition-all shadow-sm group relative overflow-hidden flex flex-col justify-between">
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0">
+              <p className="text-slate-400 text-[10px] sm:text-[11px] font-mono uppercase tracking-widest font-bold truncate">Gross Revenue Today</p>
+              <h3 className="text-2xl xl:text-3xl font-sans font-black text-slate-900 dark:text-white mt-2 truncate">
+                €{metrics.salesToday.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h3>
-              <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-semibold mt-2">
-                <TrendingUp className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-semibold mt-2 whitespace-nowrap">
+                <TrendingUp className="w-3 h-3 shrink-0" />
                 +{metrics.salesGrowth}% vs yesterday
               </span>
             </div>
-            <div className="p-3 bg-orange-50 rounded-2xl text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-all duration-350">
+            <div className="p-3 bg-orange-50 rounded-2xl text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-all duration-350 shrink-0">
               <TrendingUp className="w-5 h-5" />
             </div>
           </div>
@@ -158,24 +151,21 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         </div>
 
         {/* Card 2: Production */}
-        <div 
-          onClick={() => onNavigateTab('Production')}
-          className="bg-white p-6 rounded-3xl border border-slate-200 hover:border-emerald-500/40 transition-all shadow-sm cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Kitchen Throughput</p>
-              <h3 className="text-3xl font-sans font-black text-slate-900 mt-2">
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 hover:border-emerald-500/40 transition-all shadow-sm group relative overflow-hidden flex flex-col justify-between">
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0 w-full">
+              <p className="text-slate-400 text-[10px] sm:text-[11px] font-mono uppercase tracking-widest font-bold truncate">Kitchen Throughput</p>
+              <h3 className="text-2xl xl:text-3xl font-sans font-black text-slate-900 mt-2 truncate">
                 {metrics.productionItems.toLocaleString()} <span className="text-xs text-slate-400 font-normal">/ {metrics.productionTarget.toLocaleString()} pcs</span>
               </h3>
-              <div className="w-36 bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
+              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
                 <div 
                   className="bg-emerald-500 h-full rounded-full transition-all" 
-                  style={{ width: `${(metrics.productionItems / metrics.productionTarget) * 100}%` }}
+                  style={{ width: `${Math.min((metrics.productionItems / metrics.productionTarget) * 100, 100)}%` }}
                 />
               </div>
             </div>
-            <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-350">
+            <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-350 shrink-0">
               <Package className="w-5 h-5" />
             </div>
           </div>
@@ -183,22 +173,19 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         </div>
 
         {/* Card 3: Waste Cost */}
-        <div 
-          onClick={() => onNavigateTab('Waste')}
-          className="bg-white p-6 rounded-3xl border border-slate-200 hover:border-rose-500/40 transition-all shadow-sm cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Food Waste Cost</p>
-              <h3 className="text-3xl font-sans font-black text-slate-900 dark:text-white mt-2">
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 hover:border-rose-500/40 transition-all shadow-sm group relative overflow-hidden flex flex-col justify-between">
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0">
+              <p className="text-slate-400 text-[10px] sm:text-[11px] font-mono uppercase tracking-widest font-bold truncate">Food Waste Cost</p>
+              <h3 className="text-2xl xl:text-3xl font-sans font-black text-slate-900 dark:text-white mt-2 truncate">
                 €{metrics.wasteCost.toFixed(2)}
               </h3>
-              <span className="inline-flex items-center gap-0.5 text-emerald-600 text-xs font-semibold mt-2">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-0.5 text-emerald-600 text-xs font-semibold mt-2 whitespace-nowrap">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 -18.2% from quota threshold
               </span>
             </div>
-            <div className="p-3 bg-rose-50 rounded-2xl text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-350">
+            <div className="p-3 bg-rose-50 rounded-2xl text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-350 shrink-0">
               <Trash2 className="w-5 h-5" />
             </div>
           </div>
@@ -206,22 +193,19 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
         </div>
 
         {/* Card 4: Hours - Re-styled as slate-900 high-contrast bento block */}
-        <div 
-          onClick={() => onNavigateTab('Hours')}
-          className="bg-slate-900 p-6 rounded-3xl border border-slate-800 text-white hover:border-orange-500/40 transition-all shadow-md cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-400 text-[11px] font-mono uppercase tracking-widest font-bold">Rostered Man-hours</p>
-              <h3 className="text-3xl font-sans font-black text-white mt-2">
+        <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 text-white hover:border-orange-500/40 transition-all shadow-md group relative overflow-hidden flex flex-col justify-between">
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0">
+              <p className="text-slate-400 text-[10px] sm:text-[11px] font-mono uppercase tracking-widest font-bold truncate">Rostered Man-hours</p>
+              <h3 className="text-2xl xl:text-3xl font-sans font-black text-white mt-2 truncate">
                 {metrics.hoursScheduled} hrs
               </h3>
-              <span className="inline-flex items-center gap-1 text-slate-300 text-xs font-semibold mt-2">
-                <Clock className="w-3 h-3 text-orange-400" />
+              <span className="inline-flex items-center gap-1 text-slate-300 text-xs font-semibold mt-2 whitespace-nowrap">
+                <Clock className="w-3 h-3 text-orange-400 shrink-0" />
                 Staffing Optimal
               </span>
             </div>
-            <div className="p-3 bg-slate-800 rounded-2xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all duration-350">
+            <div className="p-3 bg-slate-800 rounded-2xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all duration-350 shrink-0">
               <Clock className="w-5 h-5" />
             </div>
           </div>
@@ -231,7 +215,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
 
       {/* Main Stats Charts & Active Targets */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Interactive Production & Revenue Chart (Bento Orange Custom Area) */}
+        {/* Interactive Production & Revenue Chart */}
         <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-2">
             <div>
@@ -283,10 +267,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
               <h3 className="text-lg font-sans font-bold text-slate-900">Today's Key Milestones</h3>
               <p className="text-xs text-slate-500">Urgent target progress metrics</p>
             </div>
-            <button 
-              onClick={() => onNavigateTab('Target')}
-              className="text-xs text-orange-600 hover:text-orange-700 font-bold inline-flex items-center gap-0.5 hover:underline"
-            >
+            <button className="text-xs text-orange-600 hover:text-orange-700 font-bold inline-flex items-center gap-0.5 hover:underline">
               Manage
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -296,9 +277,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             {targets.slice(0, 4).map((target) => {
               const pct = Math.min((target.currentValue / target.targetValue) * 100, 100);
               const isHours = target.category === 'Hours';
-              // Check completion
               const isCompleted = isHours ? target.currentValue <= target.targetValue : target.currentValue >= target.targetValue;
-              const displayPct = isHours ? (target.currentValue === 0 ? 100 : 0) : pct;
 
               return (
                 <div key={target.id} className="space-y-1.5 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
@@ -313,7 +292,7 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
                   <div className="flex justify-between items-end text-xs">
                     <span className="text-slate-400 font-mono text-[10px]">{target.deadline}</span>
                     <span className="text-slate-700 font-mono font-bold">
-                      {target.currentValue}/{target.targetValue} {target.unit}
+                      {target.currentValue.toLocaleString(undefined, { maximumFractionDigits: 1 })}/{target.targetValue} {target.unit}
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
@@ -330,84 +309,6 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
           </div>
         </div>
       </div>
-
-      {/* Admin Manual Override Module */}
-      {userRole === 'Admin' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
-          <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-slate-800 rounded-2xl text-emerald-400">
-                <Settings className="w-5 h-5" />
-              </div>
-              <div className="z-10">
-                <h3 className="text-lg font-sans font-bold text-white flex items-center gap-2">
-                  Admin System Overrides
-                  <span className="px-2 py-0.5 rounded bg-rose-500/20 border border-rose-500/50 text-rose-400 text-[9px] font-mono uppercase tracking-widest font-bold">
-                    Root Access
-                  </span>
-                </h3>
-                <p className="subtitle text-xs text-slate-400">Force override dashboard baseline metrics</p>
-              </div>
-            </div>
-          </div>
-
-          <form onSubmit={handleSaveManualMetrics} className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 z-10 relative">
-            <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Gross Revenue (€)</label>
-              <input
-                type="number"
-                step="0.01"
-                required
-                value={manualSales}
-                onChange={(e) => setManualSales(e.target.value)}
-                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Items Prod (pcs)</label>
-              <input
-                type="number"
-                required
-                value={manualProduction}
-                onChange={(e) => setManualProduction(e.target.value)}
-                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Waste Cost (€)</label>
-              <input
-                type="number"
-                step="0.01"
-                required
-                value={manualWaste}
-                onChange={(e) => setManualWaste(e.target.value)}
-                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-widest block mb-1.5">Rostered (hrs)</label>
-              <input
-                type="number"
-                required
-                value={manualHours}
-                onChange={(e) => setManualHours(e.target.value)}
-                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
-            <div className="flex items-end">
-              <button
-                type="submit"
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
-              >
-                <Save className="w-4 h-4" />
-                Inject Data
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
 
       {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
       <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-sm">
@@ -460,7 +361,6 @@ export default function OverviewTab({ metrics, onNavigateTab, targets, userRole,
             </button>
           </div>
 
-          {/* Thinking process & Advice displays */}
           {thinkingProcess && (
             <div className="bg-orange-50/50 border border-orange-100 p-4 rounded-2xl space-y-2">
               <span className="text-[10px] uppercase font-mono tracking-wider text-orange-700 font-bold block">
