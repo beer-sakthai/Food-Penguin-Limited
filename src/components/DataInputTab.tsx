@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CoreMetrics, BranchId, BranchData } from '../types';
 import { BRANCHES } from '../data';
-import { Save, Activity, UploadCloud, Store, AlertTriangle } from 'lucide-react';
+import { Save, Activity, UploadCloud, Store, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface DataInputTabProps {
   onSyncData: (branchId: BranchId, metrics: CoreMetrics) => void;

@@ -184,7 +184,7 @@ export default function App() {
     updateBranchData(selectedBranch, prev => {
       const newInventory = prev.inventory.map(item => {
         if (item.id === itemId) {
-          return { ...item, stockLevel: 100, currentQty: item.reorderLevel + 120, status: 'Healthy' };
+          return { ...item, stockLevel: 100, currentQty: item.reorderLevel + 120, status: 'Healthy' as const };
         }
         return item;
       });
