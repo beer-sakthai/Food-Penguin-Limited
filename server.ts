@@ -182,6 +182,25 @@ app.post("/api/gemini/search-trends", createGeminiHandler({
   processResponse: (response) => ({ text: response.text || "No grounded research found." }),
 }));
 
+app.post("/api/gemini/summarize-sales", createGeminiHandler({
+  endpointName: "Sales Report Summarizer",
+  model: "gemini-3.5-flash",
+  validator: (body) => (body.orders && Array.isArray(body.orders) && body.orders.length > 0) ? null : "A non-empty array of orders is required.",
+  simulationResponse: () => ({
+    summary: "📈 [Sales Summary Simulation] Analysis of today's sales data reveals strong performance in 'Nigiri' and 'Signature Rolls' categories, contributing to over 60% of total revenue. A significant sales spike was observed around 19:00 UTC. Recommendation: Increase prep for Dragon Rolls during the evening rush. Configure your API key for a live, detailed breakdown."
+  }),
+  buildContents: (body) => {
+    const prompt = `Please analyze the following daily sales data (JSON format) and provide a summary:\n\n${JSON.stringify(body.orders, null, 2)}`;
+    return prompt;
+  },
+  buildConfig: () => ({
+    systemInstruction: "You are a senior financial analyst for Food Penguin Limited. Your task is to analyze a JSON array of daily sales orders and provide a concise, insightful summary. Focus on total revenue, sales by category, peak hours, and any notable trends or outliers. Present the summary in clear, professional language with bullet points."
+  }),
+  processResponse: (response) => ({
+    summary: response.text || "No summary could be generated."
+  }),
+}));
+
 // Serve static compiled UI or route to Vite dev-server (SPA mode)
 const startServer = async () => {
   try {

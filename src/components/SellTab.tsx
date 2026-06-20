@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SalesOrder } from '../types';
 import { useApi } from '../hooks/useApi';
+import { postApi } from '../utils/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import {
   DollarSign,
@@ -9,7 +10,8 @@ import {
   Sparkles,
   Download,
   AlertCircle,
-  Plus
+  Plus,
+  FileText
 } from 'lucide-react';
 
 interface SellTabProps {
@@ -39,6 +41,9 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium salmon and bluefin tuna nigiri with a signature dragon roll on a slate board, garnished with wasabi and pickled ginger, high-end catalog style');
   const [selectedRatio, setSelectedRatio] = useState('16:9');
   const { data: imageData, loading: loadingImage, error: imageError, execute: generateBannerApi } = useApi<{ imageUrl: string }>();
+  // AI Sales Summary state
+  const { data: salesSummaryData, loading: loadingSalesSummary, error: salesSummaryError, execute: generateSalesSummaryApi } = useApi<{ summary: string }>();
+
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.trim()) return;
@@ -62,19 +67,25 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
     setNewPrice(12.50);
   };
 
-  const bannerApiCall = (params: { prompt: string, aspectRatio: string }) =>
-    fetch("/api/gemini/generate-marketing-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(params),
-    }).then(res => res.json().then(data => {
-      if (!res.ok || data.error) throw new Error(data.error || `Request failed with status ${res.status}`);
-      return data;
-    }));
-
   const handleGenerateBanner = async () => {
     if (!bannerPrompt.trim()) return;
-    generateBannerApi(bannerApiCall, { prompt: bannerPrompt, aspectRatio: selectedRatio });
+    generateBannerApi(
+      (params) => postApi("/api/gemini/generate-marketing-image", params),
+      { prompt: bannerPrompt, aspectRatio: selectedRatio },
+      { successMessage: 'Banner generated successfully!' }
+    );
+  };
+
+  const handleGenerateSalesSummary = () => {
+    if (orders.length === 0) {
+      alert("No sales data available to summarize.");
+      return;
+    }
+    generateSalesSummaryApi(
+      (params) => postApi("/api/gemini/summarize-sales", params),
+      { orders },
+      { successMessage: 'Sales summary complete!' }
+    );
   };
 
   const categoryData = orders.reduce((acc: any, order) => {
@@ -138,9 +149,28 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               <h2 className="text-xl font-bold text-slate-900">Active Order Ledger</h2>
               <p className="text-xs text-slate-500">Live POS sales tracked since midnight</p>
             </div>
-            <span className="bg-orange-50 text-orange-700 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-orange-100 self-start">
-              {orders.length} Active Purchases
-            </span>
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              <button
+                onClick={handleGenerateSalesSummary}
+                disabled={loadingSalesSummary || orders.length === 0}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-all inline-flex items-center justify-center gap-1.5 shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+              >
+                {loadingSalesSummary ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-slate-400/30 border-t-slate-500 rounded-full animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                    Summarize Sales
+                  </>
+                )}
+              </button>
+              <span className="bg-orange-50 text-orange-700 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-orange-100">
+                {orders.length} Purchases
+              </span>
+            </div>
           </div>
 
           <div className="h-56 mt-6 mb-6">
@@ -162,6 +192,23 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          {salesSummaryData?.summary && (
+            <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-orange-600" />
+                <h3 className="text-sm font-bold text-slate-800">AI Sales Summary</h3>
+              </div>
+              <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">{salesSummaryData.summary}</p>
+            </div>
+          )}
+
+          {salesSummaryError && (
+            <div className="mb-6 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <p className="whitespace-pre-wrap">{salesSummaryError}</p>
+            </div>
+          )}
 
           <div className="overflow-x-auto border-t border-slate-100 pt-4">
             <table className="w-full text-left text-xs text-slate-700">
@@ -307,8 +354,8 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   key={r.value}
                   onClick={() => setSelectedRatio(r.value)}
                   className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${selectedRatio === r.value
-                      ? 'bg-slate-900 border-slate-900 text-white font-bold shadow'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                    ? 'bg-slate-900 border-slate-900 text-white font-bold shadow'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                 >
                   {r.label}
