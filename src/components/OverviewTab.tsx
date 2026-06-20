@@ -92,20 +92,20 @@ export default function OverviewTab({ branchesData, selectedBranch, onSelectBran
   return (
     <div id="overview-viewport" className="h-full space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
       {/* Header Banner with Premium ambient bento design */}
-      <div className="bg-slate-900 rounded-3xl p-5 md:p-6 text-white relative overflow-hidden shadow-md border border-slate-800">
-        <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl" />
+      <div className="bg-slate-900 dark:bg-black rounded-3xl p-5 md:p-6 text-white relative overflow-hidden shadow-md border border-slate-800 dark:border-amber-500/30 ring-1 ring-inset ring-white/5">
+        <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-amber-500/20 to-transparent rounded-full filter blur-3xl" />
         <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl" />
         
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-orange-400 text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 dark:bg-black/60 border border-slate-700/60 dark:border-amber-500/40 text-amber-400 text-xs font-mono mb-4 shadow-[0_0_15px_rgba(245,158,11,0.1)] backdrop-blur-md">
             <Sparkles className="w-3 h-3 animate-pulse" />
             2026 Core Intelligence Active
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 drop-shadow-sm">
             Welcome Back, Skipper
           </h1>
-          <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-            Food Penguin Limited is currently executing at <span className="text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Total enterprise revenue today is <span className="text-emerald-400 font-semibold">€{totalSalesAllBranches.toLocaleString()}</span>.
+          <p className="text-slate-300 text-sm md:text-base leading-relaxed p-4 mt-3 rounded-2xl border border-slate-700/50 dark:border-amber-500/20 bg-slate-800/30 dark:bg-amber-900/10 backdrop-blur-sm">
+            Food Penguin Limited is currently executing at <span className="text-amber-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Total enterprise revenue today is <span className="text-emerald-400 font-semibold drop-shadow-sm">€{totalSalesAllBranches.toLocaleString()}</span>.
           </p>
         </div>
       </div>
@@ -216,20 +216,20 @@ export default function OverviewTab({ branchesData, selectedBranch, onSelectBran
       {/* Main Stats Charts & Active Targets */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Interactive Production & Revenue Chart */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-2">
+        <div className="lg:col-span-2 bg-white dark:bg-black rounded-3xl border border-slate-200 dark:border-amber-500/30 p-6 shadow-sm ring-1 ring-inset ring-white/5 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-2 relative z-10">
             <div>
-              <h3 className="text-lg font-sans font-bold text-slate-900">Performance Index</h3>
-              <p className="subtitle text-xs text-slate-400 uppercase font-semibold">Correlated hourly view of cumulative metrics</p>
+              <h3 className="text-lg font-sans font-bold text-slate-900 dark:text-white">Performance Index</h3>
+              <p className="subtitle text-xs text-slate-400 dark:text-amber-500/70 uppercase font-semibold">Correlated hourly view of cumulative metrics</p>
             </div>
-            <div className="flex gap-4 font-mono text-xs">
+            <div className="flex gap-4 font-mono text-xs border border-slate-100 dark:border-amber-500/20 p-2 rounded-xl bg-slate-50 dark:bg-amber-950/20 backdrop-blur-sm">
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 bg-orange-500 rounded-sm" />
-                <span className="text-slate-600 font-semibold">Sales (Actual)</span>
+                <span className="w-3 h-3 bg-orange-500 rounded-sm shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
+                <span className="text-slate-600 dark:text-amber-400 font-semibold">Sales (Actual)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 bg-emerald-500 rounded-sm" />
-                <span className="text-slate-600 font-semibold">Items Cooked</span>
+                <span className="w-3 h-3 bg-emerald-500 rounded-sm shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                <span className="text-slate-600 dark:text-amber-400 font-semibold">Items Cooked</span>
               </div>
             </div>
           </div>
@@ -261,19 +261,20 @@ export default function OverviewTab({ branchesData, selectedBranch, onSelectBran
         </div>
 
         {/* Urgent Core Targets Summary */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col">
-          <div className="flex items-center justify-between pb-4">
+        <div className="bg-white dark:bg-black rounded-3xl border border-slate-200 dark:border-amber-500/30 p-6 shadow-sm ring-1 ring-inset ring-white/5 flex flex-col relative overflow-hidden">
+          <div className="absolute left-0 top-0 w-32 h-32 bg-emerald-500/5 rounded-full filter blur-2xl pointer-events-none" />
+          <div className="flex items-center justify-between pb-4 relative z-10 border-b border-slate-100 dark:border-amber-500/20 mb-4">
             <div>
-              <h3 className="text-lg font-sans font-bold text-slate-900">Today's Key Milestones</h3>
-              <p className="text-xs text-slate-500">Urgent target progress metrics</p>
+              <h3 className="text-lg font-sans font-bold text-slate-900 dark:text-white">Today's Key Milestones</h3>
+              <p className="text-xs text-slate-500 dark:text-amber-500/70">Urgent target progress metrics</p>
             </div>
-            <button className="text-xs text-orange-600 hover:text-orange-700 font-bold inline-flex items-center gap-0.5 hover:underline">
+            <button className="text-xs text-orange-600 dark:text-amber-400 hover:text-orange-700 dark:hover:text-amber-300 font-bold inline-flex items-center gap-0.5 hover:underline bg-orange-50 dark:bg-amber-950/30 px-3 py-1.5 rounded-full border border-orange-100 dark:border-amber-500/20 transition-colors">
               Manage
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="space-y-4 flex-1 overflow-y-auto scrollbar-hide max-h-56 pr-1">
+          <div className="space-y-4 flex-1 overflow-y-auto scrollbar-hide max-h-56 pr-1 relative z-10">
             {targets.slice(0, 4).map((target) => {
               const pct = Math.min((target.currentValue / target.targetValue) * 100, 100);
               const isHours = target.category === 'Hours';
@@ -311,19 +312,20 @@ export default function OverviewTab({ branchesData, selectedBranch, onSelectBran
       </div>
 
       {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
-      <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3">
+      <div className="bg-slate-50 dark:bg-black border border-slate-200 dark:border-amber-500/30 rounded-3xl p-6 shadow-sm relative overflow-hidden ring-1 ring-inset ring-white/5">
+        <div className="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full filter blur-2xl" />
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-slate-900 rounded-2xl text-orange-400 shadow-md">
-              <BrainCircuit className="w-6 h-6 animate-pulse" />
+            <div className="p-3 bg-slate-900 dark:bg-amber-950/40 rounded-2xl text-orange-400 shadow-md border border-slate-800 dark:border-amber-500/30">
+              <BrainCircuit className="w-6 h-6 animate-pulse text-amber-500" />
             </div>
             <div>
-              <h2 className="text-lg font-sans font-extrabold text-slate-900 flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg font-sans font-extrabold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
                 Deep Strategic Advisor
-                <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-700 text-[10px] font-mono select-none">
+                <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-amber-400 border dark:border-amber-500/20 text-[10px] font-mono select-none">
                   gemini-3.1-pro-preview
                 </span>
-                <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
+                <span className="px-2 py-0.5 rounded bg-orange-500 dark:bg-amber-500 text-white dark:text-black font-bold text-[10px] font-mono select-none animate-pulse">
                   Thinking Level: HIGH
                 </span>
               </h2>

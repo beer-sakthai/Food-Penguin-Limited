@@ -59,18 +59,19 @@ export default function KPITab({ branchesData }: KPITabProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Branch vs Branch Sales */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col h-96">
-          <div className="flex items-center justify-between pb-4">
+        <div className="bg-white dark:bg-black border border-slate-200 dark:border-amber-500/30 rounded-3xl p-6 shadow-sm flex flex-col h-96 relative overflow-hidden ring-1 ring-inset ring-white/5">
+          <div className="absolute right-0 top-0 w-48 h-48 bg-amber-500/5 rounded-full filter blur-3xl pointer-events-none" />
+          <div className="flex items-center justify-between pb-4 relative z-10">
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 Revenue Comparison
                 <Info className="w-4 h-4 text-slate-400 cursor-pointer" />
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Total Sales Today by Location</p>
+              <p className="text-xs text-slate-500 dark:text-amber-500/70">Total Sales Today by Location</p>
             </div>
-            <div className="text-right">
-              <span className="block text-xs font-mono uppercase text-slate-400">Total Enterprise</span>
-              <span className="text-lg font-black text-emerald-500">€{totalEnterpriseSales.toLocaleString()}</span>
+            <div className="text-right p-2 border border-slate-100 dark:border-amber-500/20 rounded-xl bg-slate-50 dark:bg-amber-950/20 backdrop-blur-sm">
+              <span className="block text-[10px] font-mono uppercase text-slate-400 dark:text-amber-500/80">Total Enterprise</span>
+              <span className="text-lg font-black text-emerald-500 dark:text-amber-400 drop-shadow-sm">€{totalEnterpriseSales.toLocaleString()}</span>
             </div>
           </div>
           <div className="flex-1 w-full">

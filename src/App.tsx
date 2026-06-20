@@ -277,12 +277,13 @@ export default function App() {
   };
 
   return (
-    <div id="app-workspace" className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-orange-100">
+    <div className={darkMode ? 'dark' : ''}>
+      <div id="app-workspace" className="h-screen overflow-hidden bg-slate-50 dark:bg-black flex flex-col md:flex-row font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-orange-100">
       
       {/* SIDEBAR: NAVIGATION */}
-      <aside className="w-full md:w-64 bg-slate-900 dark:bg-slate-950 text-slate-100 flex flex-col shrink-0 border-r border-slate-950 dark:border-slate-900/60 shadow-lg z-40 relative">
+      <aside className="w-full md:w-64 bg-slate-900 dark:bg-black text-slate-100 flex flex-col shrink-0 border-r border-slate-950 dark:border-amber-500/20 shadow-lg z-40 relative">
         {/* Brand Header */}
-        <div className="p-6 border-b border-slate-800/80 flex items-center gap-3">
+        <div className="p-6 border-b border-slate-800/80 dark:border-amber-500/20 flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group shrink-0">
             <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-slate-950 animate-pulse" />
