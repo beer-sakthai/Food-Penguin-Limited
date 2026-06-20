@@ -16,6 +16,8 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
   const [manualProduction, setManualProduction] = useState("");
   const [manualWaste, setManualWaste] = useState("");
   const [manualHours, setManualHours] = useState("");
+  const [manualProductionTarget, setManualProductionTarget] = useState("");
+  const [manualHealthScore, setManualHealthScore] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
 
@@ -26,6 +28,8 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
     setManualProduction(currentMetrics.productionItems.toString());
     setManualWaste(currentMetrics.wasteCost.toString());
     setManualHours(currentMetrics.hoursScheduled.toString());
+    setManualProductionTarget(currentMetrics.productionTarget.toString());
+    setManualHealthScore(currentMetrics.aiHealthScore.toString());
     setSyncSuccess(false);
   }, [targetBranch, branchesData]);
 
@@ -41,7 +45,9 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
         salesToday: parseFloat(manualSales) || 0,
         productionItems: parseInt(manualProduction, 10) || 0,
         wasteCost: parseFloat(manualWaste) || 0,
-        hoursScheduled: parseFloat(manualHours) || 0
+        hoursScheduled: parseFloat(manualHours) || 0,
+        productionTarget: parseInt(manualProductionTarget, 10) || 0,
+        aiHealthScore: parseInt(manualHealthScore, 10) || 0
       };
       
       onSyncData(targetBranch, updatedMetrics);
@@ -100,7 +106,7 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
                   required
                   value={manualSales}
                   onChange={(e) => setManualSales(e.target.value)}
-                  className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                  className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-black border border-slate-200 dark:border-amber-500/20 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                 />
               </div>
             </div>
@@ -112,7 +118,7 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
                 required
                 value={manualProduction}
                 onChange={(e) => setManualProduction(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-black border border-slate-200 dark:border-amber-500/20 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
               />
             </div>
 
@@ -126,7 +132,7 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
                   required
                   value={manualWaste}
                   onChange={(e) => setManualWaste(e.target.value)}
-                  className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                  className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-black border border-slate-200 dark:border-amber-500/20 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                 />
               </div>
             </div>
@@ -139,8 +145,36 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
                 required
                 value={manualHours}
                 onChange={(e) => setManualHours(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-black border border-slate-200 dark:border-amber-500/20 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
               />
+            </div>
+            
+            {/* Advanced Metrics Area */}
+            <div className="space-y-2 lg:col-span-2">
+              <label className="text-[11px] font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-amber-500">Target Production (pcs)</label>
+              <input
+                type="number"
+                required
+                value={manualProductionTarget}
+                onChange={(e) => setManualProductionTarget(e.target.value)}
+                className="w-full px-4 py-3 bg-emerald-50 dark:bg-amber-950/20 border border-emerald-200 dark:border-amber-500/30 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+              />
+            </div>
+            
+            <div className="space-y-2 lg:col-span-2">
+              <label className="text-[11px] font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-amber-500">AI Health Score (%)</label>
+              <div className="relative">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  required
+                  value={manualHealthScore}
+                  onChange={(e) => setManualHealthScore(e.target.value)}
+                  className="w-full pr-8 pl-4 py-3 bg-emerald-50 dark:bg-amber-950/20 border border-emerald-200 dark:border-amber-500/30 rounded-xl text-slate-900 dark:text-white font-mono font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                />
+              </div>
             </div>
           </div>
 
