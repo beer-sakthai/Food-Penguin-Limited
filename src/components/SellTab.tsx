@@ -44,6 +44,14 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.trim()) return;
+    if (newQty <= 0 || newPrice <= 0) {
+      alert("Error: Quantity and Unit Price must be greater than zero.");
+      return;
+    }
+    if (newPrice > 10000) {
+      alert("Error: Unit Price cannot exceed €10,000.");
+      return;
+    }
     onAddOrder({
       item: newItem,
       category: newCategory,
@@ -239,6 +247,8 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 <input
                   type="number"
                   step="0.10"
+                  min="0.01"
+                  max="10000"
                   required
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}

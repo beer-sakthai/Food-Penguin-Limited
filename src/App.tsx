@@ -74,14 +74,42 @@ export default function App() {
   }, [darkMode]);
 
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
-  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
-  const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
+  const [orders, setOrders] = useState<SalesOrder[]>(() => {
+    const saved = localStorage.getItem('orders');
+    return saved ? JSON.parse(saved) : initialOrders;
+  });
+  const [targets, setTargets] = useState<CompanyTarget[]>(() => {
+    const saved = localStorage.getItem('targets');
+    return saved ? JSON.parse(saved) : initialTargets;
+  });
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
-  const [tasks, setTasks] = useState<ProductionTask[]>(initialTasks);
-  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
+  const [tasks, setTasks] = useState<ProductionTask[]>(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : initialTasks;
+  });
+  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(() => {
+    const saved = localStorage.getItem('wasteRecords');
+    return saved ? JSON.parse(saved) : initialWaste;
+  });
   const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
+
+  useEffect(() => {
+    localStorage.setItem('orders', JSON.stringify(orders));
+  }, [orders]);
+
+  useEffect(() => {
+    localStorage.setItem('targets', JSON.stringify(targets));
+  }, [targets]);
+
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('wasteRecords', JSON.stringify(wasteRecords));
+  }, [wasteRecords]);
 
   // Sync core metrics periodically if mock transactions run
   const totalWasteCost = wasteRecords.reduce((acc, row) => acc + row.cost, 0);

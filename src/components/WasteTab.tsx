@@ -49,7 +49,19 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItem.trim() || weight <= 0 || cost <= 0) return;
+    if (!newItem.trim()) return;
+    if (weight <= 0 || cost <= 0) {
+      alert("Error: Weight and Estimated loss must be greater than zero.");
+      return;
+    }
+    if (weight > 1000) {
+      alert("Error: Weight cannot exceed 1,000 kg.");
+      return;
+    }
+    if (cost > 10000) {
+      alert("Error: Cost cannot exceed €10,000.");
+      return;
+    }
     onAddWaste({
       item: newItem,
       category,
@@ -259,6 +271,8 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 <input
                   type="number"
                   step="0.1"
+                  min="0.1"
+                  max="1000"
                   required
                   value={weight || ''}
                   onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
@@ -273,6 +287,8 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 <input
                   type="number"
                   step="0.1"
+                  min="0.01"
+                  max="10000"
                   required
                   value={cost || ''}
                   onChange={(e) => setCost(parseFloat(e.target.value) || 0)}
