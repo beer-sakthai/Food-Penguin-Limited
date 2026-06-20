@@ -10,6 +10,7 @@ interface ApiState<T> {
 
 interface ExecuteOptions {
     successMessage?: string;
+    loadingMessage?: string;
 }
 
 /**
@@ -33,21 +34,30 @@ export function useApi<T, P>() {
     const execute = useCallback(async (
         apiFunc: (params: P) => Promise<T>,
         params: P,
-        options: ExecuteOptions = {}
+        options: ExecuteOptions = {},
     ) => {
         incrementRequests();
         setState({ data: null, loading: true, error: null });
-        try {
-            const responseData = await apiFunc(params);
-            setState({ data: responseData, loading: false, error: null });
-            toast.success(options.successMessage || 'Operation successful!');
-        } catch (err: any) {
-            const errorMessage = err.message || 'An unknown error occurred.';
-            setState({ data: null, loading: false, error: errorMessage });
-            toast.error(errorMessage);
-        } finally {
-            decrementRequests();
-        }
+
+        const promise = apiFunc(params);
+
+        toast.promise(promise, {
+            loading: options.loadingMessage || 'Processing...',
+            success: (data) => {
+                setState({ data, loading: false, error: null });
+                decrementRequests();
+                return options.successMessage || 'Operation successful!';
+            },
+            error: (err: any) => {
+                const errorMessage = err.message || 'An unknown error occurred.';
+                setState({ data: null, loading: false, error: errorMessage });
+                decrementRequests();
+                return errorMessage;
+            },
+        });
+
+        // We still await the promise to ensure the calling component can chain actions if needed.
+        await promise.catch(() => { /* Errors are handled by toast.promise */ });
     }, [incrementRequests, decrementRequests]);
 
     return { ...state, execute };
