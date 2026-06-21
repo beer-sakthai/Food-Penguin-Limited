@@ -773,7 +773,7 @@ export default function App() {
           />
         );
       case 'Planning':
-        return <PlanningTab inventory={inventory} onOrderRestock={handleOrderRestock} />;
+        return <PlanningTab inventory={inventory} onOrderRestock={handleOrderRestock} selectedBranch={selectedBranch} theme={theme} />;
       default:
         return (
           <OverviewTab 

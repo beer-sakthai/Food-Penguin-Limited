@@ -277,6 +277,59 @@ app.post("/api/gemini/search-trends", async (req, res) => {
   }
 });
 
+// ==========================================
+// 6. SUGGEST RESTOCK ALGORITHMIC PLANNER
+// Model: gemini-3.5-flash
+// ==========================================
+app.post("/api/gemini/suggest-restock", async (req, res) => {
+  try {
+    const { branch, inventory } = req.body;
+    if (!branch) {
+      return res.status(400).json({ error: "Branch is required" });
+    }
+
+    const ai = getAiClient();
+    const mockJson = {
+      "INV-101": 50,
+      "INV-102": 25,
+      "INV-103": 100
+    };
+
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+      return res.json({
+        text: `📦 [Simulation Mode] Analyzed past 7 days for ${branch}. Suggested restock allocations generated based on simulated historical drawdown velocity.`,
+        jsonString: JSON.stringify(mockJson)
+      });
+    }
+
+    try {
+      const prompt = `You are a replenishment supply chain AI. Analyze the simulated past sales output and waste metrics for branch: ${branch}. Given the current inventory state: ${JSON.stringify(inventory)}, calculate optimal replenishment amounts to ensure 100% capacity heading into the weekend. Output a valid JSON object where keys are item IDs and values are integer numbers of units to reorder. Output ONLY JSON, e.g., {"INV-101": 50, "INV-102": 30}. Do not use markdown wrappers.`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt
+      });
+
+      const rawText = response.text || "{}";
+      const cleanedJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+      res.json({
+        text: `📦 Analyzed ${branch} sales volume and waste metrics. Replenishment allocations securely calculated.`,
+        jsonString: cleanedJson
+      });
+    } catch (apiErr: any) {
+      console.warn("Suggest restock API call failed. Falling back to simulation.", apiErr);
+      res.json({
+        text: `📦 [Simulation Mode - Fallback] Analyzed past 7 days for ${branch}. Suggested restock allocations generated based on simulated historical drawdown velocity. (API returned: ${apiErr.message || apiErr})`,
+        jsonString: JSON.stringify(mockJson)
+      });
+    }
+  } catch (err: any) {
+    console.error("Suggest Restock error: ", err);
+    res.status(500).json({ error: err.message || "Failed to calculate restock metrics." });
+  }
+});
+
 // Serve static compiled UI or route to Vite dev-server (SPA mode)
 const startServer = async () => {
   if (process.env.NODE_ENV !== "production") {
