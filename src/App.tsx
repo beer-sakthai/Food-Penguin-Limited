@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
  initialMetrics,
  initialOrders,
@@ -108,10 +108,16 @@ export default function App() {
 
  const recipes = useMemo<Recipe[]>(() => buildRecipesForBranch(selectedBranch), [selectedBranch]);
 
- const [tasks, setTasks] = useState<ProductionTask[]>(() => buildTasksForBranch(BRANCHES[0]));
+ const [tasks, setTasks] = useState<ProductionTask[]>(() => buildTasksForBranch(selectedBranch));
+ const hasInitializedBranchTasks = useRef(false);
 
  // Sync tasks list with active branch products on branch switch
  useEffect(() => {
+ if (!hasInitializedBranchTasks.current) {
+ hasInitializedBranchTasks.current = true;
+ return;
+ }
+
  setTasks(buildTasksForBranch(selectedBranch));
  }, [selectedBranch]);
 

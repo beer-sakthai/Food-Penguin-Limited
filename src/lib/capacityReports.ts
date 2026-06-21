@@ -315,6 +315,7 @@ export function downloadCapacityPdf(options: {
 
   const bulletins = [
     '• Capacity forecasts are computed dynamically from completed production batches versus target output.',
+    '• The bottleneck threshold represents the projected share of available production capacity used on a given day.',
     '• Yellow BOTTLENECK badges indicate days exceeding the configured threshold.',
     '• The smoothed view reduces short-term spikes so managers can spot sustained pressure.',
     '• Use this report for staffing, production balancing, and branch-level planning reviews.',
