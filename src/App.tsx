@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
  initialMetrics,
  initialOrders,
@@ -109,17 +109,11 @@ export default function App() {
  const recipes = useMemo<Recipe[]>(() => buildRecipesForBranch(selectedBranch), [selectedBranch]);
 
  const [tasks, setTasks] = useState<ProductionTask[]>(() => buildTasksForBranch(selectedBranch));
- const hasInitializedBranchTasks = useRef(false);
 
- // Sync tasks list with active branch products on branch switch
- useEffect(() => {
- if (!hasInitializedBranchTasks.current) {
- hasInitializedBranchTasks.current = true;
- return;
- }
-
- setTasks(buildTasksForBranch(selectedBranch));
- }, [selectedBranch]);
+ const handleSelectBranch = (branch: BranchName) => {
+ setSelectedBranch(branch);
+ setTasks(buildTasksForBranch(branch));
+ };
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
  const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
@@ -587,7 +581,7 @@ export default function App() {
  return (
  <div 
  key={branch} 
- onClick={() => setSelectedBranch(branch)}
+ onClick={() => handleSelectBranch(branch)}
  className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
  isSelected 
  ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30'
@@ -1219,7 +1213,7 @@ export default function App() {
  <span className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Store:</span>
  <select
  value={selectedBranch}
- onChange={(e) => setSelectedBranch(e.target.value as BranchName)}
+ onChange={(e) => handleSelectBranch(e.target.value as BranchName)}
  className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
  style={{ outline: 'none' }}
  >

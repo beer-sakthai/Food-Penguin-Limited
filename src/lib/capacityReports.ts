@@ -318,7 +318,7 @@ export function downloadCapacityPdf(options: {
     '• The bottleneck threshold represents the projected percentage of available production capacity used on a given day.',
     '• Yellow BOTTLENECK badges indicate days exceeding the configured threshold.',
     '• The smoothed view reduces short-term spikes so managers can spot sustained pressure.',
-    '• Use this report for staffing, production balancing, and branch-level planning reviews.',
+    '• Use this report for staffing, production balancing, and resource conservation planning.',
   ];
 
   bulletins.forEach((bullet) => {

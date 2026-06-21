@@ -19,12 +19,14 @@ app.use((req, res, next) => {
 });
 
 const PORT = 3000;
+// Broad limiter for dashboard navigation, assets, and normal interactive traffic.
 const appLimiter = rateLimit({
   windowMs: 60_000,
   limit: 300,
   standardHeaders: true,
   legacyHeaders: false,
 });
+// Tighter limiter for AI endpoints to protect external quota-backed requests.
 const aiLimiter = rateLimit({
   windowMs: 60_000,
   limit: 30,
