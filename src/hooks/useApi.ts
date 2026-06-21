@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useApiContext } from './context/ApiContext';
+import { useApiContext } from '../context/ApiContext';
 import toast from 'react-hot-toast';
 
 interface ApiState<T> {
@@ -18,7 +18,7 @@ interface ExecuteOptions {
  * @template T The expected data type of the API response.
  * @template P The type of the parameters for the API call.
  */
-export function useApi<T, P>() {
+export function useApi<T, P = any>() {
     const { incrementRequests, decrementRequests } = useApiContext();
     const [state, setState] = useState<ApiState<T>>({
         data: null,

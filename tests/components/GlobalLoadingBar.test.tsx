@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import GlobalLoadingBar from '../../src/components/GlobalLoadingBar';
 import { ApiContext } from '../../src/context/ApiContext'; // Import the context itself
