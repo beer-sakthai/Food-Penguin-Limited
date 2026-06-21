@@ -2155,9 +2155,10 @@ function OverviewTab({
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
- className={`w-full min-h-[72px] sm:min-h-[80px] max-h-28 resize-y p-3 border shadow-inner transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] font-sans rounded-2xl ${
+ className={[
+ 'w-full min-h-[72px] sm:min-h-[80px] max-h-28 resize-y p-3 border shadow-inner transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] font-sans rounded-2xl',
  isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
- }`}
+ ].join(' ')}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
  />
  </div>
