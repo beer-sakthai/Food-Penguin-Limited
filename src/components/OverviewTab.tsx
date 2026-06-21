@@ -64,6 +64,15 @@ function OverviewTab({
  theme = 'dark'
 }: OverviewTabProps) {
  const isLight = theme === 'light';
+ const goldFocusRingClasses = [
+ 'focus:outline-none',
+ 'focus:ring-2',
+ 'focus:ring-yellow-500',
+ 'focus:border-yellow-500',
+ 'focus:shadow-[0_0_8px_rgba(234,179,8,0.4)]'
+ ].join(' ');
+ const advisorTextareaBaseClasses =
+ 'w-full min-h-[4.5rem] sm:min-h-20 max-h-28 resize-y p-3 border shadow-inner transition-all duration-200 font-sans rounded-2xl';
  const [strategicPrompt, setStrategicPrompt] = useState(
  "Synthesize an optimization plan for premium Sushi production to reduce Tazaki and Sysco transport delays by 12% while keeping active kitchen seafood waste indexes below 3% under Dublin humid weather."
  );
@@ -427,16 +436,25 @@ function OverviewTab({
  return [...rawBranchList].sort((a, b) => b.efficiencyScore - a.efficiencyScore)[0];
  }, [rawBranchList]);
 
+ const advisorTextareaThemeClasses = isLight
+ ? 'border-zinc-300 bg-white text-zinc-900'
+ : 'border-zinc-800 bg-zinc-900 text-zinc-100';
+ const advisorTextareaClasses = [
+ advisorTextareaBaseClasses,
+ goldFocusRingClasses,
+ advisorTextareaThemeClasses
+ ].join(' ');
+
  return (
- <div id="overview-viewport" className="space-y-6">
+ <div id="overview-viewport" className="space-y-5">
  {/* Header Banner with Premium ambient bento design */}
- <div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
+ <div className={`rounded-3xl p-5 md:p-6 lg:p-7 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 border transition-colors duration-200 ${
  isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}>
  <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
  
- <div className="relative z-10 max-w-2xl">
+ <div className="relative z-10 max-w-xl xl:max-w-2xl">
  <div className="flex flex-wrap items-center gap-2.5 mb-4">
  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono transition-colors ${
  isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-800 border-zinc-700/60 text-orange-400'
@@ -464,7 +482,7 @@ function OverviewTab({
  </div>
 
  {/* Date-Range Selector Box */}
- <div className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
+ <div className={`relative z-10 backdrop-blur-md p-4 rounded-2xl border w-full sm:max-w-sm lg:w-64 xl:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
  isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-950/60 border-zinc-800'
  }`}>
  <div className={`flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider ${
@@ -813,7 +831,7 @@ function OverviewTab({
  </div>
 
  {/* Real-time AI Operations Shift Summary */}
- <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
+ <div id="ai-shift-summary" className={`rounded-3xl border p-5 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
  isLight ? 'bg-orange-50/50 border border-orange-200' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'
  }`}>
  <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
@@ -1576,8 +1594,8 @@ function OverviewTab({
  isLight ? 'border-zinc-200' : 'border-zinc-800/95'
  }`}>
  <div className="flex items-start gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-350 ${
- isLight ? 'bg-zinc-150 bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
+ <div className={`p-3 border rounded-2xl transition-all duration-200 ${
+ isLight ? 'bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
  }`}>
  <Activity className="w-5 h-5 animate-pulse" />
  </div>
@@ -2150,15 +2168,15 @@ function OverviewTab({
  <span className="text-[11px] text-zinc-500 font-mono sm:text-right">Uses deep thinking tree solver</span>
  </div>
 
- <div className="space-y-4 mt-4">
+ <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+ <div>
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
- className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans rounded-2xl ${
- isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
- }`}
+ className={advisorTextareaClasses}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
  />
+ </div>
 
  <div className="flex justify-end items-center">
  <button
