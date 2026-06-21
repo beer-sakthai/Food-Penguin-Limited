@@ -32,6 +32,7 @@ import ProductionTab from './components/ProductionTab';
 import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
+import SupplierTab from './components/SupplierTab';
 import CompanyKpiTab from './components/CompanyKpiTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
 import DublinClock from './components/DublinClock';
@@ -411,6 +412,7 @@ export default function App() {
  { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
  { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
  { id: 'Hours', label: 'Hours', icon: <CalendarDays className="w-4 h-4" /> },
+ { id: 'Supplier', label: 'Supplier COGS', icon: <Boxes className="w-4 h-4" /> },
  { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> }
  ];
 
@@ -492,6 +494,8 @@ export default function App() {
  totalHoursScheduled={totalHours}
  />
  );
+ case 'Supplier':
+ return <SupplierTab theme={theme} />;
  case 'Planning':
  return <PlanningTab inventory={inventory} onOrderRestock={handleOrderRestock} selectedBranch={selectedBranch} theme={theme} weeklyLogs={weeklyLogs} />;
  default:
