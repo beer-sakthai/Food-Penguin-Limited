@@ -8,13 +8,70 @@ import {
   Sparkles,
   Download,
   AlertCircle,
-  Plus
+  Plus,
+  Printer,
+  EyeOff
 } from 'lucide-react';
 
 interface SellTabProps {
   orders: SalesOrder[];
   onAddOrder: (order: Omit<SalesOrder, 'id' | 'timestamp'>) => void;
   selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point';
+  theme: 'dark' | 'light';
+}
+
+// Highly authentic visual barcode renderer according to standard UPC-A/EAN-13 binary representation
+export function Barcode({ value, isLight }: { value: string; isLight: boolean }) {
+  const bars = React.useMemo(() => {
+    let pattern: number[] = [];
+    // Start guards
+    pattern.push(1, 0, 1);
+    for (let i = 0; i < value.length; i++) {
+      const num = parseInt(value[i], 10) || 0;
+      // standard binary patterns for digits
+      const codes = [
+        [0,0,0,1,1,0,1], // 0
+        [0,0,1,1,0,0,1], // 1
+        [0,0,1,0,0,1,1], // 2
+        [0,1,1,1,1,0,1], // 3
+        [0,1,0,0,0,1,1], // 4
+        [0,1,1,0,0,0,1], // 5
+        [0,1,0,1,1,1,1], // 6
+        [0,1,1,1,0,1,1], // 7
+        [0,1,1,0,1,1,1], // 8
+        [0,0,0,1,0,1,1]  // 9
+      ];
+      pattern.push(...codes[num]);
+      if (i === 6) {
+        // Center guards
+        pattern.push(0, 1, 0, 1, 0);
+      }
+    }
+    // End guards
+    pattern.push(1, 0, 1);
+    return pattern;
+  }, [value]);
+
+  return (
+    <div className={`p-2 rounded-xl border flex flex-col justify-center items-center transition-colors duration-200 mt-2 ${
+      isLight 
+        ? 'bg-zinc-100 border-zinc-200 text-zinc-800' 
+        : 'bg-zinc-950 border-zinc-800 text-zinc-350'
+    }`}>
+      <div className="flex h-5 w-full items-stretch justify-center max-w-[150px] overflow-hidden bg-white px-1 py-0.5 rounded" style={{ gap: '0.1px' }}>
+        {bars.map((bit, idx) => (
+          <div
+            key={idx}
+            className={`flex-1 ${bit === 1 ? 'bg-black' : 'bg-transparent'}`}
+            style={{ minWidth: '1px' }}
+          />
+        ))}
+      </div>
+      <span className="text-[8px] font-mono tracking-[1px] mt-1 font-bold leading-none select-all">
+        {value}
+      </span>
+    </div>
+  );
 }
 
 export const ASPECT_RATIOS = [
@@ -28,15 +85,15 @@ export const ASPECT_RATIOS = [
   { label: '21:9 UltraWide', value: '21:9' }
 ];
 
-const MS_PRODUCTS = [
-  { name: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', price: 34.50, margin: '76%' },
-  { name: 'Gastropub Spicy Truffle Roll', category: 'Specialty Rolls', price: 19.95, margin: '73%' },
-  { name: 'M&S Gold Grade Lobster Nigiri', category: 'Nigiri Selections', price: 24.00, margin: '80%' },
-  { name: 'Handcrafted Premium Dragon Roll', category: 'Sushi Rolls', price: 17.50, margin: '78%' },
-  { name: 'Gourmet Signature Bento Set', category: 'Bento Lunch Sets', price: 26.50, margin: '70%' }
+export const MS_PRODUCTS = [
+  { name: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', price: 34.50, margin: '76%', barcode: '5391548895018' },
+  { name: 'Gastropub Spicy Truffle Roll', category: 'Specialty Rolls', price: 19.95, margin: '73%', barcode: '5391548895025' },
+  { name: 'M&S Gold Grade Lobster Nigiri', category: 'Nigiri Selections', price: 24.00, margin: '80%', barcode: '5391548895032' },
+  { name: 'Handcrafted Premium Dragon Roll', category: 'Sushi Rolls', price: 17.50, margin: '78%', barcode: '5391548895049' },
+  { name: 'Gourmet Signature Bento Set', category: 'Bento Lunch Sets', price: 26.50, margin: '70%', barcode: '5391548895056' }
 ];
 
-const TESCO_PRODUCTS = [
+export const TESCO_PRODUCTS = [
   { name: 'YO! highlights', category: 'Specialty Selections', price: 11.25, margin: '74%', barcode: '5391548890457' },
   { name: 'veggie tofu yakisoba noodles', category: 'Noodles & Sides', price: 7.95, margin: '78%', barcode: '5391548890679' },
   { name: 'veggie gyoza - heat me first!', category: 'Gyoza & Starters', price: 5.95, margin: '82%', barcode: '5391548890150' },
@@ -105,12 +162,21 @@ const TESCO_PRODUCTS = [
   { name: 'chicken katsu curry', category: 'Warm Street Food', price: 7.95, margin: '79%', barcode: '5391548890617' }
 ];
 
-export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabProps) {
+export default function SellTab({ orders, onAddOrder, selectedBranch, theme }: SellTabProps) {
+  const isLight = theme === 'light';
   const isMS = selectedBranch === 'Marks & Spencer - Cork City';
   const branchProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
   const branchCategories = isMS 
     ? ['Sushi Rolls', 'Sashimi & Platters', 'Specialty Rolls', 'Nigiri Selections', 'Bento Lunch Sets']
     : Array.from(new Set(TESCO_PRODUCTS.map(p => p.category))).sort();
+
+  // Multi-select & Bulk actions state
+  const [selectedProductNames, setSelectedProductNames] = useState<string[]>([]);
+  const [hiddenProducts, setHiddenProducts] = useState<string[]>([]);
+
+  // Search and Category Filter state for Product Presets
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   // New Order Form state
   const [newItem, setNewItem] = useState(branchProducts[0].name);
@@ -121,6 +187,18 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
   const matchedProduct = branchProducts.find(p => p.name === newItem);
   const matchedBarcode = (matchedProduct as any)?.barcode;
 
+  // Compute filtered product presets matching search & category
+  const filteredProducts = React.useMemo(() => {
+    return branchProducts.filter(p => {
+      if (hiddenProducts.includes(p.name)) return false;
+      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            p.barcode?.includes(searchTerm) || 
+                            p.category.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [branchProducts, searchTerm, selectedCategory, hiddenProducts]);
+
   // Automatically sync presets and reset quantity when active store branch shifts
   React.useEffect(() => {
     const firstProduct = branchProducts[0];
@@ -128,6 +206,10 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
     setNewCategory(firstProduct.category);
     setNewPrice(firstProduct.price);
     setNewQty(1);
+    // Reset search
+    setSearchTerm('');
+    setSelectedCategory('All');
+    setSelectedProductNames([]);
   }, [selectedBranch]);
 
   // AI Menu Banner Maker state
@@ -145,6 +227,7 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
       category: newCategory,
       quantity: newQty,
       amount: newPrice * newQty,
+      barcode: matchedBarcode,
       status: 'Completed'
     });
     setNewItem('');
@@ -207,49 +290,228 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
       <div className="xl:col-span-2 space-y-6">
         
         {/* Quick Menu Overview */}
-        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
-          <h2 className="text-sans font-bold text-white">
-            {isMS ? '🇬🇧 Marks & Spencer Cork City - Luxury Selections' : `🇮🇪 ${selectedBranch} Active Daily Range`}
-          </h2>
-          <p className="text-xs text-zinc-500 uppercase font-semibold mt-0.5 mb-4 font-mono">
-            {isMS 
-              ? 'Signature crafted luxury pairings with premium premium margins'
-              : 'Optimized high-volume value selections and Finest series'
-            }
-          </p>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {branchProducts.map((p, idx) => (
-              <button 
-                type="button"
-                key={idx} 
-                onClick={() => {
-                  setNewItem(p.name);
-                  setNewCategory(p.category);
-                  setNewPrice(p.price);
-                }}
-                className="bg-zinc-950 border border-zinc-850 p-4 rounded-2xl flex flex-col justify-between text-left transition-all hover:bg-zinc-900 hover:shadow-md hover:border-amber-500/50 group/item cursor-pointer"
-                title={`Click to load ${p.name} preset`}
-              >
-                <span className="text-xs font-bold text-zinc-200 group-hover/item:text-amber-400 transition-colors leading-tight">{p.name}</span>
-                <span className="text-[10px] text-zinc-500 mt-1 leading-tight">{p.category}</span>
-                <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-800/60 w-full">
-                  <span className="font-mono text-xs font-bold text-orange-400 font-sans">€{p.price.toFixed(2)}</span>
-                  <span className="text-[9px] text-emerald-450 bg-emerald-950/45 px-1.5 py-0.5 rounded font-mono font-medium">{p.margin} margin</span>
-                </div>
-              </button>
-            ))}
+        <div className={`rounded-3xl border p-6 shadow-sm transition-all duration-200 ${
+          isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900 border-zinc-800 text-white'
+        }`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-zinc-805">
+            <div>
+              <h2 className={`text-base font-bold tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+                {isMS ? '🇬🇧 Marks & Spencer Cork City - Luxury Selections' : `🇮🇪 ${selectedBranch} Active Range`}
+              </h2>
+              <p className={`text-xs uppercase font-semibold mt-0.5 font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                {isMS 
+                  ? 'Signature crafted luxury pairings with premium margins'
+                  : 'Optimized high-volume value selections and Finest series'
+                }
+              </p>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold tracking-tight border ${
+              isLight ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-orange-950/40 border-orange-850 text-orange-400'
+            }`}>
+              {filteredProducts.length} unique SKUs listed
+            </span>
           </div>
+
+          {/* Search and Category Filter Bar */}
+          <div className="space-y-3 mb-6 bg-zinc-950/5 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-150 dark:border-zinc-850/60">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="🔍 Search name, category, or barcode..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full p-2.5 pl-3 text-xs rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all ${
+                    isLight 
+                      ? 'bg-white border border-zinc-200 text-zinc-800 placeholder-zinc-400' 
+                      : 'bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500'
+                  }`}
+                />
+                {searchTerm && (
+                  <button 
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-2.5 text-xs font-bold text-zinc-400 hover:text-zinc-200"
+                  >
+                    Clear Match
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className={`p-2.5 text-xs rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all font-sans font-semibold cursor-pointer ${
+                  isLight 
+                    ? 'bg-white border border-zinc-200 text-zinc-850' 
+                    : 'bg-zinc-950 border border-zinc-800 text-zinc-300'
+                }`}
+              >
+                <option value="All">All Categories</option>
+                {branchCategories.map((cat, idx) => (
+                  <option key={idx} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Quick Filter Pill tags */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 invisible-scrollbar">
+              <span className={`text-[9px] font-mono uppercase tracking-wider shrink-0 mr-1.5 ${isLight ? 'text-zinc-400' : 'text-zinc-550'}`}>Quick:</span>
+              <button
+                type="button"
+                onClick={() => setSelectedCategory('All')}
+                className={`text-[10px] px-2.5 py-1 rounded-full font-bold transition-all whitespace-nowrap ${
+                  selectedCategory === 'All'
+                    ? 'bg-amber-500 text-zinc-950 shadow'
+                    : isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600' : 'bg-zinc-900 hover:bg-zinc-850 text-zinc-400'
+                }`}
+              >
+                All
+              </button>
+              {branchCategories.slice(0, 4).map((cat, idx) => (
+                <button
+                  type="button"
+                  key={idx}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`text-[10px] px-2.5 py-1 rounded-full font-bold transition-all whitespace-nowrap ${
+                    selectedCategory === cat
+                      ? 'bg-amber-500 text-zinc-950 shadow'
+                      : isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600' : 'bg-zinc-900 hover:bg-zinc-850 text-zinc-400'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Bulk Actions Toolbar */}
+          {selectedProductNames.length > 0 && (
+            <div className={`mb-4 p-3 rounded-xl flex items-center justify-between border shadow-sm transition-all ${
+              isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-950/20 border-amber-900/50'
+            }`}>
+              <div className="flex items-center gap-2">
+                 <span className={`text-xs font-bold font-mono ${isLight ? 'text-amber-800' : 'text-amber-500'}`}>
+                   {selectedProductNames.length} selected
+                 </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert(`Printing labels for ${selectedProductNames.length} items:\n${selectedProductNames.join('\n')}`);
+                    setSelectedProductNames([]);
+                  }}
+                  className={`px-3 py-1.5 text-[10px] font-bold tracking-wide rounded-lg flex items-center gap-1.5 transition-all ${
+                    isLight ? 'bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-800 shadow-sm' : 'bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-zinc-200 shadow-sm'
+                  }`}
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  Print Labels
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHiddenProducts(prev => [...prev, ...selectedProductNames]);
+                    setSelectedProductNames([]);
+                  }}
+                  className={`px-3 py-1.5 text-[10px] uppercase font-bold tracking-wide rounded-lg flex items-center gap-1.5 transition-all ${
+                    isLight ? 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 shadow-sm' : 'bg-red-950/40 hover:bg-red-950/60 text-red-400 border border-red-900/50 shadow-sm'
+                  }`}
+                >
+                  <EyeOff className="w-3.5 h-3.5" />
+                  Hide from POS
+                </button>
+              </div>
+            </div>
+          )}
+
+          {filteredProducts.length === 0 ? (
+            <div className={`p-8 rounded-2xl text-center border border-dashed ${
+              isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500' : 'bg-zinc-950/40 border-zinc-850 text-zinc-400'
+            }`}>
+              <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2 opacity-80" />
+              <p className="text-sm font-semibold">No products matches your parameters</p>
+              <p className="text-xs text-zinc-500 mt-1">Try refining your search keyword or selecting "All Categories"</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[460px] overflow-y-auto pr-1">
+              {filteredProducts.map((p, idx) => (
+                <div key={idx} className="relative group">
+                  <div 
+                    className="absolute top-2 right-2 z-10 p-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <input 
+                      type="checkbox" 
+                      title="Select product"
+                      checked={selectedProductNames.includes(p.name)}
+                      onChange={(e) => {
+                         if (e.target.checked) {
+                           setSelectedProductNames(prev => [...prev, p.name]);
+                         } else {
+                           setSelectedProductNames(prev => prev.filter(n => n !== p.name));
+                         }
+                      }}
+                      className="w-4 h-4 rounded border-zinc-400 text-amber-500 focus:ring-amber-500 cursor-pointer shadow-sm disabled:opacity-50"
+                    />
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setNewItem(p.name);
+                      setNewCategory(p.category);
+                      setNewPrice(p.price);
+                    }}
+                    className={`w-full p-3 rounded-2xl flex flex-col justify-between text-left transition-all shadow-sm border cursor-pointer hover:shadow hover:scale-[1.01] ${
+                      isLight 
+                        ? 'bg-white border-zinc-200 hover:bg-zinc-50 hover:border-amber-500/50' 
+                        : 'bg-zinc-950 border-zinc-850/80 hover:bg-zinc-900 hover:border-amber-500/40'
+                    } ${selectedProductNames.includes(p.name) ? (isLight ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-50/50 hover:bg-amber-50' : 'ring-2 ring-amber-500 border-amber-500 bg-amber-950/20 hover:bg-amber-950/30') : ''}`}
+                    title={`Click to load ${p.name} preset`}
+                  >
+                    <div className="pr-6">
+                      <span className={`text-[11px] font-bold transition-colors leading-snug block ${
+                        isLight 
+                          ? 'text-zinc-850 group-hover/item:text-amber-600' 
+                          : 'text-zinc-200 group-hover/item:text-amber-400'
+                      }`}>{p.name}</span>
+                      <span className={`text-[9px] block mt-0.5 leading-none ${isLight ? 'text-zinc-400' : 'text-zinc-550'}`}>{p.category}</span>
+                    </div>
+
+                    <div className="mt-3 w-full">
+                      {/* Visual Barcode Segment */}
+                      {p.barcode && <Barcode value={p.barcode} isLight={isLight} />}
+
+                      <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-zinc-100 dark:border-zinc-850 w-full">
+                        <span className={`font-mono text-xs font-extrabold ${isLight ? 'text-orange-600' : 'text-orange-400'}`}>€{p.price.toFixed(2)}</span>
+                        <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                          isLight ? 'text-emerald-700 bg-emerald-55' : 'text-emerald-400 bg-emerald-950/45'
+                        }`}>{p.margin} margin</span>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Live Transaction Ledger and Chart */}
-        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-800">
+        <div className={`rounded-3xl border p-6 transition-all duration-200 shadow-sm ${
+          isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900 border-zinc-800 text-white'
+        }`}>
+          <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b ${
+            isLight ? 'border-zinc-200' : 'border-zinc-800'
+          }`}>
             <div>
-              <h2 className="text-sans font-bold text-white">Active Order Ledger</h2>
-              <p className="text-xs text-zinc-500 font-medium">Live POS sales logged at <span className="text-amber-450 font-semibold">{selectedBranch}</span></p>
+              <h2 className={`text-sm font-bold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Active Order Ledger</h2>
+              <p className={`text-xs font-medium ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Live POS sales logged at <span className="text-amber-500 font-bold">{selectedBranch}</span></p>
             </div>
-            <span className="bg-zinc-950 text-orange-400 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-zinc-800 self-start">
+            <span className={`font-mono text-[10px] px-3 py-1 rounded-full font-bold border ${
+              isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700' : 'bg-zinc-950 border-zinc-800 text-orange-400'
+            }`}>
               {orders.length} Active {isMS ? 'M&S' : 'Tesco'} Transactions
             </span>
           </div>
@@ -257,12 +519,19 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
           <div className="h-56 mt-6 mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
-                <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} tickFormatter={(val) => `€${val}`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
+                <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 10 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 10 }} tickFormatter={(val) => `€${val}`} />
                 <Tooltip 
-                  cursor={{ fill: '#1e293b' }}
-                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+                  cursor={{ fill: isLight ? '#f4f4f5' : '#1e293b' }}
+                  contentStyle={{ 
+                    backgroundColor: isLight ? '#ffffff' : '#09090b', 
+                    borderRadius: '12px', 
+                    border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
+                    color: isLight ? '#18181b' : '#fff', 
+                    fontSize: '12px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
                   itemStyle={{ color: '#f97316', fontWeight: 'bold' }}
                 />
                 <Bar dataKey="revenue" radius={[6, 6, 0, 0]} maxBarSize={50}>
@@ -274,27 +543,31 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
             </ResponsiveContainer>
           </div>
 
-          <div className="overflow-x-auto border-t border-zinc-800 pt-4">
-            <table className="w-full text-left text-xs text-zinc-300">
-              <thead className="bg-zinc-950 text-zinc-400 text-[10px] uppercase font-mono tracking-wider border-b border-zinc-800">
+          <div className={`overflow-x-auto border-t pt-4 ${isLight ? 'border-zinc-200' : 'border-zinc-805'}`}>
+            <table className="w-full text-left text-xs">
+              <thead className={`text-[10px] uppercase font-mono tracking-wider border-b ${
+                isLight ? 'bg-zinc-100/60 border-zinc-250 text-zinc-630' : 'bg-zinc-950 text-zinc-400 border-zinc-800'
+              }`}>
                 <tr>
-                  <th className="py-3 px-4">Order ID</th>
-                  <th className="py-3 px-4">Timestamp</th>
-                  <th className="py-3 px-4">Specialty Item</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4 text-center">Qty</th>
-                  <th className="py-3 px-4 text-right">Revenue</th>
+                  <th className="py-2.5 px-3">Order ID</th>
+                  <th className="py-2.5 px-3">Timestamp</th>
+                  <th className="py-2.5 px-3">Specialty Item</th>
+                  <th className="py-2.5 px-3">Category</th>
+                  <th className="py-2.5 px-3">Barcode</th>
+                  <th className="py-2.5 px-3 text-center">Qty</th>
+                  <th className="py-2.5 px-3 text-right">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60">
+              <tbody className={`divide-y ${isLight ? 'divide-zinc-100 text-zinc-800' : 'divide-zinc-800/60 text-zinc-300'}`}>
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-zinc-950/50 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-white">{order.id}</td>
-                    <td className="py-3 px-4 text-zinc-500 font-mono">{order.timestamp}</td>
-                    <td className="py-3 px-4 font-medium text-zinc-200">{order.item}</td>
-                    <td className="py-3 px-4 text-zinc-400">{order.category}</td>
-                    <td className="py-3 px-4 text-center font-mono">{order.quantity}</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-white">€{order.amount.toFixed(2)}</td>
+                  <tr key={order.id} className={`transition-colors ${isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-950/50'}`}>
+                    <td className={`py-3 px-3 font-mono font-bold ${isLight ? 'text-zinc-900' : 'text-white'}`}>{order.id}</td>
+                    <td className="py-3 px-3 font-mono text-zinc-500">{order.timestamp}</td>
+                    <td className={`py-3 px-3 font-medium ${isLight ? 'text-zinc-850' : 'text-zinc-200'}`}>{order.item}</td>
+                    <td className={`py-3 px-3 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>{order.category}</td>
+                    <td className={`py-3 px-3 font-mono text-[10px] ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>{order.barcode || 'N/A'}</td>
+                    <td className="py-3 px-3 text-center font-mono">{order.quantity}</td>
+                    <td className={`py-3 px-3 text-right font-mono font-bold ${isLight ? 'text-zinc-900' : 'text-white'}`}>€{order.amount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -307,10 +580,12 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
       <div className="space-y-6">
         
         {/* Mock POS Order Creator */}
-        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
-          <div className="flex items-center gap-2 pb-4 border-b border-zinc-800 mb-4 font-sans">
+        <div className={`rounded-3xl border p-6 shadow-sm transition-all duration-200 ${
+          isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
+        }`}>
+          <div className={`flex items-center gap-2 pb-4 mb-4 font-sans border-b ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}>
             <ShoppingCart className="w-5 h-5 text-orange-500" />
-            <span className="text-xs font-bold text-white uppercase tracking-wider">Kitchen POS Terminal</span>
+            <span className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-zinc-900' : 'text-white'}`}>Kitchen POS Terminal</span>
           </div>
 
           <form onSubmit={handleCreateOrder} className="space-y-4">
@@ -327,34 +602,46 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
                     setNewPrice(matched.price);
                   }
                 }}
-                className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-amber-550 font-bold rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
+                className={`w-full mt-1.5 p-2.5 text-xs font-bold rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 transition-all ${
+                  isLight 
+                    ? 'bg-zinc-150 border border-zinc-200 text-zinc-800' 
+                    : 'bg-zinc-950 border border-zinc-800 text-amber-500'
+                }`}
               >
                 <option value="">-- Or click custom / enter below --</option>
                 {branchProducts.map((p) => (
-                  <option key={p.name} value={p.name} className="bg-zinc-950 text-white font-bold">{p.name} (€{p.price.toFixed(2)})</option>
+                  <option key={p.name} value={p.name} className={`${isLight ? 'text-zinc-800' : 'text-white'}`}>{p.name} (€{p.price.toFixed(2)})</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Specialty Item Name</label>
+              <label className={`text-[10px] font-mono uppercase font-semibold ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>Specialty Item Name</label>
               <input
                 type="text"
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
                 placeholder="e.g. Kyoto Spicy Tuna Roll"
-                className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
+                className={`w-full mt-1.5 p-2.5 text-xs rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 transition-all ${
+                  isLight 
+                    ? 'bg-zinc-50 border border-zinc-200 text-zinc-900' 
+                    : 'bg-zinc-950 border border-zinc-800 text-white'
+                }`}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Grouping</label>
+                <label className={`text-[10px] font-mono uppercase font-semibold ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>Grouping</label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  className={`w-full mt-1.5 p-2.5 text-xs rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 transition-all ${
+                    isLight 
+                      ? 'bg-zinc-50 border border-zinc-200 text-zinc-900 font-semibold' 
+                      : 'bg-zinc-950 border border-zinc-800 text-white'
+                  }`}
                 >
                   {branchCategories.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -363,20 +650,26 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
               </div>
 
               <div>
-                <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Unit Price (€)</label>
+                <label className={`text-[10px] font-mono uppercase font-semibold ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>Unit Price (€)</label>
                 <input
                   type="number"
                   step="0.05"
                   required
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}
-                  className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono"
+                  className={`w-full mt-1.5 p-2.5 text-xs rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono transition-all ${
+                    isLight 
+                      ? 'bg-zinc-50 border border-zinc-200 text-zinc-900' 
+                      : 'bg-zinc-950 border border-zinc-800 text-white'
+                  }`}
                 />
               </div>
             </div>
 
             {matchedBarcode && (
-              <div className="bg-zinc-950 px-3 py-2 border border-zinc-850 rounded-xl flex items-center justify-between font-mono text-[10px] text-zinc-400 select-none">
+              <div className={`px-3 py-2 border rounded-xl flex items-center justify-between font-mono text-[10px] select-none ${
+                isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-850 text-zinc-400'
+              }`}>
                 <span className="text-zinc-500 font-bold uppercase tracking-wider text-[9px]">EAN-13 Barcode</span>
                 <span className="text-amber-500 font-extrabold">{matchedBarcode}</span>
               </div>
@@ -387,15 +680,23 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
                 <button
                   type="button"
                   onClick={() => setNewQty(prev => Math.max(1, prev - 1))}
-                  className="w-8 h-8 border border-zinc-800 rounded-xl bg-zinc-950 flex items-center justify-center font-bold font-mono text-xs text-zinc-300 hover:bg-zinc-900 transition-all"
+                  className={`w-8 h-8 font-bold font-mono text-xs rounded-xl flex items-center justify-center transition-all ${
+                    isLight 
+                      ? 'border border-zinc-205 bg-zinc-100 hover:bg-zinc-200 text-zinc-800' 
+                      : 'border border-zinc-800 bg-zinc-950 text-zinc-300 hover:bg-zinc-900'
+                  }`}
                 >
                   -
                 </button>
-                <span className="font-mono text-xs font-bold text-zinc-200 w-4 text-center">{newQty}</span>
+                <span className={`font-mono text-xs font-bold w-4 text-center ${isLight ? 'text-zinc-800' : 'text-zinc-200'}`}>{newQty}</span>
                 <button
                   type="button"
                   onClick={() => setNewQty(prev => prev + 1)}
-                  className="w-8 h-8 border border-zinc-800 rounded-xl bg-zinc-950 flex items-center justify-center font-bold font-mono text-xs text-zinc-300 hover:bg-zinc-900 transition-all"
+                  className={`w-8 h-8 font-bold font-mono text-xs rounded-xl flex items-center justify-center transition-all ${
+                    isLight 
+                      ? 'border border-zinc-205 bg-zinc-100 hover:bg-zinc-200 text-zinc-800' 
+                      : 'border border-zinc-800 bg-zinc-950 text-zinc-300 hover:bg-zinc-900'
+                  }`}
                 >
                   +
                 </button>
@@ -403,7 +704,11 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
 
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-zinc-955 bg-zinc-950 border border-zinc-800 hover:bg-zinc-850 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow"
+                className={`px-5 py-2.5 font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow ${
+                  isLight 
+                    ? 'bg-zinc-900 hover:bg-zinc-850 text-white' 
+                    : 'bg-zinc-955 bg-zinc-950 border border-zinc-800 hover:bg-zinc-850 text-white'
+                }`}
               >
                 <Plus className="w-4 h-4 text-orange-400" />
                 Commit POS Sale
@@ -413,29 +718,37 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
         </div>
 
         {/* AI Menu Banner Maker: Supports ratio control as requested */}
-        <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80">
+        <div className={`rounded-3xl border p-6 shadow-sm space-y-4 transition-all duration-200 ${
+          isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-950 border border-zinc-900 text-white'
+        }`}>
+          <div className={`flex items-center justify-between pb-2 border-b ${isLight ? 'border-zinc-150' : 'border-zinc-800/80'}`}>
             <div className="flex items-center gap-2 font-sans">
               <ImageIcon className="w-5 h-5 text-orange-500" />
-              <span className="text-xs font-bold text-white uppercase tracking-widest">AI Banner Illustrator</span>
+              <span className={`text-xs font-bold uppercase tracking-widest ${isLight ? 'text-zinc-900' : 'text-white'}`}>AI Banner Illustrator</span>
             </div>
-            <span className="bg-teal-950/85 text-teal-400 border border-teal-900/40 font-mono text-[9px] px-2 py-0.5 rounded font-bold">
+            <span className={`font-mono text-[9px] px-2 py-0.5 rounded font-bold ${
+              isLight ? 'bg-teal-50 text-teal-600 border border-teal-200' : 'bg-teal-950/85 text-teal-400 border border-teal-900/40'
+            }`}>
               gemini-2.5-flash-image
             </span>
           </div>
 
           <div>
-            <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Banner Marketing Prompt</label>
+            <label className={`text-[10px] font-mono uppercase font-semibold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Banner Marketing Prompt</label>
             <textarea
               value={bannerPrompt}
               onChange={(e) => setBannerPrompt(e.target.value)}
-              className="w-full h-20 mt-1.5 p-3 text-xs border border-zinc-800 bg-zinc-900 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-sans shadow-inner leading-relaxed"
+              className={`w-full h-20 mt-1.5 p-3 text-xs rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-sans shadow-inner leading-relaxed transition-all ${
+                isLight 
+                  ? 'bg-zinc-50 border border-zinc-200 text-zinc-900 placeholder-zinc-400' 
+                  : 'border border-zinc-800 bg-zinc-900 text-white'
+              }`}
               placeholder="Describe the aesthetic and food element..."
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Controlled Aspect Ratio</label>
+            <label className={`text-[10px] font-mono uppercase font-semibold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Controlled Aspect Ratio</label>
             <div className="grid grid-cols-2 gap-1.5 mt-1.5">
               {ASPECT_RATIOS.map((r) => (
                 <button
@@ -444,8 +757,10 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
                   onClick={() => setSelectedRatio(r.value)}
                   className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${
                     selectedRatio === r.value
-                      ? 'bg-orange-605 bg-orange-600 border-orange-600 text-white font-bold shadow'
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-850'
+                      ? 'bg-orange-600 border-orange-600 text-white font-bold shadow'
+                      : isLight 
+                        ? 'bg-zinc-50 border-zinc-200 text-zinc-650 hover:bg-zinc-100' 
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-850'
                   }`}
                 >
                   {r.label}
@@ -457,7 +772,11 @@ export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabP
           <button
             onClick={handleGenerateBanner}
             disabled={loadingImage}
-            className="w-full py-2.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-sm disabled:bg-zinc-950"
+            className={`w-full py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-sm ${
+              isLight 
+                ? 'bg-zinc-900 text-white hover:bg-zinc-800 disabled:bg-zinc-200' 
+                : 'bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-white disabled:bg-zinc-950'
+            }`}
           >
             {loadingImage ? (
               <>

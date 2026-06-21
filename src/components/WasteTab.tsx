@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WasteRecord } from '../types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { 
@@ -10,20 +10,52 @@ import {
   Plus, 
   UtensilsCrossed 
 } from 'lucide-react';
+import { MS_PRODUCTS, TESCO_PRODUCTS } from './SellTab';
 
 interface WasteTabProps {
   wasteRecords: WasteRecord[];
   onAddWaste: (record: Omit<WasteRecord, 'id' | 'date'>) => void;
   totalCostToday: number;
+  selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point';
 }
 
-export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: WasteTabProps) {
+export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday, selectedBranch }: WasteTabProps) {
+  const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+  const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+
   // New logging form state
-  const [newItem, setNewItem] = useState('');
-  const [category, setCategory] = useState('Seafood');
+  const [newItem, setNewItem] = useState(products[0].name);
+  const [category, setCategory] = useState(products[0].category);
   const [weight, setWeight] = useState(1.0);
-  const [cost, setCost] = useState(10.00);
+  const [cost, setCost] = useState(products[0].price);
   const [reason, setReason] = useState<'Expired' | 'Overproduced' | 'Quality Issue' | 'Spill/Accident'>('Expired');
+
+  const handleProductChange = (prodName: string) => {
+    setNewItem(prodName);
+    const prod = products.find(p => p.name === prodName);
+    if (prod) {
+      setCategory(prod.category);
+      setCost(parseFloat((prod.price * weight).toFixed(2)));
+    }
+  };
+
+  const handleWeightChange = (newWg: number) => {
+    setWeight(newWg);
+    const prod = products.find(p => p.name === newItem);
+    if (prod) {
+      setCost(parseFloat((prod.price * newWg).toFixed(2)));
+    }
+  };
+
+  // Sync state when selected branch changes
+  useEffect(() => {
+    const firstProd = products[0];
+    if (firstProd) {
+      setNewItem(firstProd.name);
+      setCategory(firstProd.category);
+      setCost(parseFloat((firstProd.price * weight).toFixed(2)));
+    }
+  }, [selectedBranch]);
 
   // AI strategy helper states
   const [helpCat, setHelpCat] = useState('Seafood');
@@ -57,9 +89,17 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
       cost,
       reason
     });
-    setNewItem('');
-    setWeight(1.0);
-    setCost(10.00);
+    const firstProd = products[0];
+    if (firstProd) {
+      setNewItem(firstProd.name);
+      setCategory(firstProd.category);
+      setWeight(1.0);
+      setCost(firstProd.price);
+    } else {
+      setNewItem('');
+      setWeight(1.0);
+      setCost(10.00);
+    }
   };
 
   const handleFetchRepurposeStrategy = async () => {
@@ -227,41 +267,43 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className="text-[10px] font-mono text-zinc-400 uppercase">Debited Item Description</label>
-              <input
-                type="text"
+              <label id="waste-select-label" className="text-[10px] font-mono text-zinc-400 uppercase">Debited Item (Select Branch Product)</label>
+              <select
+                id="waste-select-item"
                 required
                 value={newItem}
-                onChange={(e) => setNewItem(e.target.value)}
-                placeholder="e.g. Broken cod batter, Soggy lettuce"
-                className="w-full mt-1 p-2 text-xs bg-zinc-950 border border-zinc-800 text-white rounded focus:ring-1 focus:ring-orange-500 focus:outline-none"
-              />
+                onChange={(e) => handleProductChange(e.target.value)}
+                className="w-full mt-1 p-2 text-xs bg-zinc-950 border border-zinc-800 text-white rounded focus:ring-1 focus:ring-orange-500 focus:outline-none font-bold"
+              >
+                {products.map((p, idx) => (
+                  <option key={idx} value={p.name} className="bg-zinc-950 text-white">
+                    {p.name} (€{p.price.toFixed(2)})
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] font-mono text-zinc-400 uppercase">Category</label>
-                <select
+                <label id="waste-category-label" className="text-[10px] font-mono text-zinc-400 uppercase">Product Category</label>
+                <input
+                  type="text"
+                  id="waste-category-input"
+                  readOnly
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full mt-1 p-2 text-xs bg-zinc-950 border border-zinc-800 text-white rounded focus:ring-1 focus:ring-orange-500 focus:outline-none"
-                >
-                  <option>Seafood</option>
-                  <option>Bakery</option>
-                  <option>Dairy</option>
-                  <option>Produce</option>
-                  <option>Packaging</option>
-                </select>
+                  className="w-full mt-1 p-2 text-xs bg-zinc-950 border border-zinc-900 text-zinc-400 rounded cursor-not-allowed focus:outline-none"
+                />
               </div>
 
               <div>
-                <label className="text-[10px] font-mono text-zinc-400 uppercase">Weight Equivalent (kg)</label>
+                <label id="waste-weight-label" className="text-[10px] font-mono text-zinc-400 uppercase">Weight Equivalent (kg)</label>
                 <input
                   type="number"
+                  id="waste-weight-input"
                   step="0.1"
                   required
                   value={weight || ''}
-                  onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleWeightChange(parseFloat(e.target.value) || 0)}
                   className="w-full mt-1 p-2 text-xs bg-zinc-950 border border-zinc-800 text-white rounded focus:ring-1 focus:ring-orange-500 focus:outline-none font-mono"
                 />
               </div>

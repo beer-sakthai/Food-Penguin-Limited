@@ -32,6 +32,7 @@ import ProductionTab from './components/ProductionTab';
 import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
+import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 
 
 // Main Icons
@@ -50,7 +51,9 @@ import {
   GlassWater,
   ChevronDown,
   ChevronUp,
-  Download
+  Download,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
@@ -61,14 +64,101 @@ const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
 
 export default function App() {
   // App States
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    try {
+      return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    try {
+      localStorage.setItem('theme', nextTheme);
+    } catch (_) {}
+  };
+
   const [activeTab, setActiveTab] = useState<string>('Overview');
   const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff'>('Admin');
   const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
   const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
   const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
-  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+
+  const recipes = useMemo<Recipe[]>(() => {
+    const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+    const activeProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+
+    const getIngredients = (category: string, name: string) => {
+      const lowerName = name.toLowerCase();
+      if (lowerName.includes('salmon')) {
+        return ['Atlantic Salmon Fillet', 'Fresh Wasabi Paste', 'Premium Sushi Rice', 'Grated Daikon Radish', 'Soy Sauce'];
+      }
+      if (lowerName.includes('chicken')) {
+        return ['Free-range Chicken Fillet', 'Katsu Curry Sauce', 'Panko Breadcrumbs', 'Seasoned Jasmine Rice', 'Spring Onions'];
+      }
+      if (lowerName.includes('tofu') || lowerName.includes('veggie') || lowerName.includes('plant')) {
+        return ['Pressed Silken Tofu', 'Fresh Avocado', 'Cucumber ribbon', 'Mixed Sesame seeds', 'Sweet Glaze Drizzle'];
+      }
+      if (category === 'Sushi Rolls' || category === 'Maki Rolls' || category === 'Nigiri Duos') {
+        return ['Seasoned Hinohikari Rice', 'Premium Toasted Nori Sheets', 'Crispy Cucumber', 'Kyoto Japanese Mayo', 'Soy Glaze'];
+      }
+      if (category === 'Noodles & Sides' || lowerName.includes('noodles')) {
+        return ['Fresh Udon Grains', 'Julienned Sweet Peppers', 'Savory Soy Brew sauce', 'Crushed Peanuts', 'Chili Flakes'];
+      }
+      if (category === 'Desserts & Sweets' || lowerName.includes('mochi')) {
+        return ['Sweetened Rice Flour Paste', 'Artisanal Ice Cream Core', 'Powdered Starch coating', 'Natural Strawberry syrup'];
+      }
+      return ['Hand-picked Nori', 'Select Sushi Rice', 'Signature Dipping Sauce', 'Crisp Cucumber slice'];
+    };
+
+    const getAllergens = (category: string, name: string) => {
+      const lowerName = name.toLowerCase();
+      const allergens: string[] = [];
+      if (lowerName.includes('salmon') || lowerName.includes('fish')) allergens.push('Fish');
+      if (lowerName.includes('chicken')) allergens.push('Gluten');
+      if (lowerName.includes('tofu') || lowerName.includes('veggie')) allergens.push('Soya');
+      if (lowerName.includes('noodles') || lowerName.includes('gyoza') || lowerName.includes('katsu')) {
+        if (!allergens.includes('Gluten')) allergens.push('Gluten');
+      }
+      if (lowerName.includes('mochi')) allergens.push('Milk');
+      if (category.toLowerCase().includes('roll')) {
+        allergens.push('Sesame');
+      }
+      if (allergens.length === 0) allergens.push('Soya');
+      return allergens;
+    };
+
+    return activeProducts.map((p, idx) => ({
+      id: `${isMS ? 'R-MS' : 'R-T'}-${idx + 1}`,
+      name: p.name,
+      category: p.category,
+      status: 'active' as const,
+      prepTime: Math.min(15, Math.max(3, Math.round(p.price * 1.2))),
+      ingredients: getIngredients(p.category, p.name),
+      allergens: getAllergens(p.category, p.name)
+    }));
+  }, [selectedBranch]);
+
   const [tasks, setTasks] = useState<ProductionTask[]>(initialTasks);
+
+  // Sync tasks list with active branch products on branch switch
+  useEffect(() => {
+    const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+    const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+
+    if (products.length >= 4) {
+      setTasks([
+        { id: 'PT-301', itemName: products[0].name, assignedTo: 'Chef Skipper', status: 'Cooking', quantity: 2, priority: 'high' },
+        { id: 'PT-302', itemName: products[1].name, assignedTo: 'Chef Private', status: 'Cooking', quantity: 1, priority: 'medium' },
+        { id: 'PT-303', itemName: products[2].name, assignedTo: 'Kitchen Aide Rico', status: 'In Queue', quantity: 3, priority: 'low' },
+        { id: 'PT-304', itemName: products[3 % products.length].name, assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 4, priority: 'high' }
+      ]);
+    }
+  }, [selectedBranch]);
+
   const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
   const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
@@ -613,7 +703,7 @@ export default function App() {
 
   const allTabMeta = [
     { id: 'Overview', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: 'Sell', label: 'Sell', icon: <Coins className="w-4 h-4" /> },
+    { id: 'Sell', label: 'Branch Product', icon: <Coins className="w-4 h-4" /> },
     { id: 'Target', label: 'Target', icon: <ShieldCheck className="w-4 h-4" /> },
     { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
     { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
@@ -647,11 +737,12 @@ export default function App() {
             onSelectedWeekRangeChange={setSelectedWeekRange}
             orders={orders}
             selectedBranch={selectedBranch}
+            theme={theme}
           />
         );
       case 'Sell': {
         const filteredOrders = orders.filter(o => !o.branch || o.branch === selectedBranch);
-        return <SellTab orders={filteredOrders} onAddOrder={handleAddOrder} selectedBranch={selectedBranch} />;
+        return <SellTab orders={filteredOrders} onAddOrder={handleAddOrder} selectedBranch={selectedBranch} theme={theme} />;
       }
       case 'Target':
         return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
@@ -670,6 +761,7 @@ export default function App() {
             wasteRecords={wasteRecords} 
             onAddWaste={handleAddWaste} 
             totalCostToday={totalWasteCost}
+            selectedBranch={selectedBranch}
           />
         );
       case 'Hours':
@@ -725,20 +817,29 @@ export default function App() {
 
   const healthTooltip = `System Health Status: ${healthLabel}\n• Operations Score: ${metrics.aiHealthScore}%\n• Low Stock Ingredients: ${lowStockCount}\n• Lagging Goals: ${targetDeficitCount}`;
 
+  const isLight = theme === 'light';
+
   return (
-    <div id="app-workspace" className="min-h-screen bg-black flex flex-col md:flex-row font-sans text-zinc-100 antialiased selection:bg-zinc-800">
+    <div 
+      id="app-workspace" 
+      className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-200 ${
+        isLight ? 'bg-zinc-50 text-zinc-900 selection:bg-zinc-200' : 'bg-black text-zinc-100 selection:bg-zinc-800'
+      }`}
+    >
       
       {/* SIDEBAR: NAVIGATION */}
-      <aside className="w-full md:w-64 bg-zinc-950 text-zinc-100 flex flex-col shrink-0 border-r border-zinc-900 shadow-xl">
+      <aside className={`w-full md:w-64 flex flex-col shrink-0 border-r shadow-xl transition-colors duration-200 ${
+        isLight ? 'bg-zinc-105 bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-900 text-zinc-100'
+      }`}>
         {/* Brand Header */}
-        <div className="p-6 border-b border-zinc-900 flex items-center gap-3">
+        <div className={`p-6 border-b flex items-center gap-3 transition-colors ${isLight ? 'border-zinc-150' : 'border-zinc-900'}`}>
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group">
             <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
             <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${healthColorClass} rounded-full border border-black animate-pulse`} title={healthTooltip} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-1">
-              <h1 className="text-sm font-bold font-sans tracking-tight text-white leading-tight truncate">Food Penguin</h1>
+              <h1 className={`text-sm font-bold font-sans tracking-tight leading-tight truncate ${isLight ? 'text-zinc-900' : 'text-white'}`}>Food Penguin</h1>
               <span 
                 className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
                 title={healthTooltip}
@@ -747,7 +848,7 @@ export default function App() {
                 {healthLabel}
               </span>
             </div>
-            <span className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase leading-none block mt-0.5">Limited</span>
+            <span className={`text-[10px] font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Limited</span>
           </div>
         </div>
 
@@ -759,19 +860,23 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-all duration-200 ${
+                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
                   isActive
-                    ? 'bg-zinc-900 text-white font-bold shadow-inner'
-                    : 'text-zinc-500 hover:bg-zinc-905 hover:text-white'
+                    ? isLight
+                      ? 'bg-zinc-100 text-zinc-950 font-extrabold shadow-sm'
+                      : 'bg-zinc-900 text-white font-bold shadow-inner'
+                    : isLight
+                      ? 'text-zinc-605 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+                      : 'text-zinc-500 hover:bg-zinc-905 hover:text-white'
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
                   isActive 
                     ? tab.id === 'Real-time' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125' 
-                    : 'bg-transparent border border-zinc-800'
+                    : isLight ? 'bg-transparent border border-zinc-300' : 'bg-transparent border border-zinc-800'
                 }`} />
                 <span className="flex-1 flex items-center gap-2">
-                  <span className={isActive ? 'text-orange-400' : 'text-zinc-500'}>{tab.icon}</span>
+                  <span className={isActive ? 'text-orange-500' : isLight ? 'text-zinc-400' : 'text-zinc-500'}>{tab.icon}</span>
                   {tab.label}
                 </span>
               </button>
@@ -781,20 +886,28 @@ export default function App() {
 
         {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
         <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
-          <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800 relative overflow-hidden group">
-            <div className="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-orange-500/5 to-transparent rounded-full filter blur-2xl pointer-events-none" />
+          <div className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${
+            isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900 border-zinc-800 text-white'
+          }`}>
+            <div className={`absolute right-0 top-0 w-24 h-24 bg-gradient-to-br rounded-full filter blur-2xl pointer-events-none ${
+              isLight ? 'from-orange-550/5' : 'from-orange-500/5 to-transparent'
+            }`} />
             
             <div className="flex items-center justify-between mb-2">
               <button 
                 onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
-                className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-left focus:outline-none"
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${
+                  isLight ? 'hover:text-zinc-900' : 'hover:text-white'
+                }`}
                 title="Click to view daily breakdown"
               >
-                <p className="text-[10px] text-zinc-400 uppercase font-mono font-bold tracking-wider select-none">Weekly Capacity</p>
+                <p className={`text-[10px] uppercase font-mono font-bold tracking-wider select-none ${
+                  isLight ? 'text-zinc-500' : 'text-zinc-400'
+                }`}>Weekly Capacity</p>
                 {isCapacityExpanded ? (
-                  <ChevronUp className="w-3.5 h-3.5 text-zinc-400 hover:text-white transition-all transform hover:scale-110" />
+                  <ChevronUp className={`w-3.5 h-3.5 transition-all transform hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
                 ) : (
-                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hover:text-white transition-all transform hover:scale-110" />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-all transform hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
                 )}
               </button>
               <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
@@ -803,7 +916,9 @@ export default function App() {
             </div>
 
             {/* Premium, interactive, layered capacity progress bar */}
-            <div className="relative h-3 bg-zinc-800/80 rounded-full overflow-hidden mt-3 shadow-inner">
+            <div className={`relative h-3 rounded-full overflow-hidden mt-3 shadow-inner ${
+              isLight ? 'bg-zinc-200' : 'bg-zinc-800/80'
+            }`}>
               {/* Optional dynamic striped extension for projected excess */}
               {projectedCapacityPct > capacityPct && (
                 <div 
@@ -831,72 +946,96 @@ export default function App() {
             </div>
 
             {/* Text details and comparison metrics */}
-            <div className="space-y-1.5 mt-3 pt-2.5 border-t border-zinc-800/60 font-mono text-[10px] leading-relaxed">
-              <div className="flex justify-between items-center text-zinc-400">
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Current Load:</span>
-                <span className="font-bold text-white">{capacityPct}%</span>
+            <div className={`space-y-1.5 mt-3 pt-2.5 border-t font-mono text-[10px] leading-relaxed ${
+              isLight ? 'border-zinc-200' : 'border-zinc-800/60'
+            }`}>
+              <div className="flex justify-between items-center">
+                <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Current Load:
+                </span>
+                <span className={`font-bold ${isLight ? 'text-zinc-800' : 'text-white'}`}>{capacityPct}%</span>
               </div>
-              <div className="flex justify-between items-center text-zinc-400">
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 7-Day Forecast:</span>
-                <span className={`font-bold ${projectedCapacityPct >= capacityPct ? 'text-amber-400' : 'text-emerald-400'}`}>
+              <div className="flex justify-between items-center">
+                <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 7-Day Forecast:
+                </span>
+                <span className={`font-bold ${projectedCapacityPct >= capacityPct ? 'text-amber-500' : 'text-emerald-500'}`}>
                   {projectedCapacityPct}% {projectedCapacityPct >= capacityPct ? '↑' : '↓'}
                 </span>
               </div>
-              <p className="text-[9px] text-zinc-500 leading-normal mt-1 pt-1 italic font-sans border-t border-zinc-800/20">
+              <p className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${
+                isLight ? 'border-zinc-200 text-zinc-400' : 'border-zinc-800/20 text-zinc-550'
+              }`}>
                 Estimated from rolling week rates & trend momentum.
               </p>
             </div>
 
             {/* Expandable daily capacity breakdown block */}
             {isCapacityExpanded && (
-              <div className="mt-4 pt-3.5 border-t border-zinc-800/80 font-mono text-[9px] space-y-3 animate-fadeIn duration-300">
+              <div className={`mt-4 pt-3.5 border-t font-mono text-[9px] space-y-3 animate-fadeIn duration-300 ${isLight ? 'border-zinc-205' : 'border-zinc-800/80'}`}>
                 <div className="flex items-center justify-between">
-                  <p className="text-zinc-500 font-bold uppercase tracking-wider text-[8px]">Daily Capacity Breakdown</p>
+                  <p className={`font-bold uppercase tracking-wider text-[8px] ${isLight ? 'text-zinc-500' : 'text-zinc-555'}`}>Daily Capacity Breakdown</p>
                   <div className="flex items-center gap-1.5">
                     <button 
                       onClick={handleExportCapacityCSV}
-                      className="p-1 px-1.5 rounded bg-zinc-800 hover:bg-zinc-700/80 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center gap-1 border border-zinc-700/40"
+                      className={`p-1 px-1.5 rounded hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
+                        isLight 
+                          ? 'bg-zinc-100 border-zinc-250 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
+                          : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
+                      }`}
                       title="Download daily capacity report as CSV"
                     >
                       <Download className="w-2.5 h-2.5 text-orange-400" />
-                      <span className="text-[7.5px] font-bold text-zinc-300 uppercase tracking-wide">CSV</span>
+                      <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
                     </button>
                     <button 
                       onClick={handleExportCapacityPDF}
-                      className="p-1 px-1.5 rounded bg-zinc-800 hover:bg-zinc-700/80 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center gap-1 border border-zinc-700/40"
+                      className={`p-1 px-1.5 rounded hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
+                        isLight 
+                          ? 'bg-zinc-100 border-zinc-250 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
+                          : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
+                      }`}
                       title="Download styled PDF projection summary report"
                     >
                       <Download className="w-2.5 h-2.5 text-amber-500" />
-                      <span className="text-[7.5px] font-bold text-zinc-300 uppercase tracking-wide">PDF</span>
+                      <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
                     </button>
-                    <span className="text-[8px] text-zinc-650 font-semibold ml-1">[Current vs Proj]</span>
+                    <span className="text-[8px] text-zinc-400 font-semibold ml-1">[Current vs Proj]</span>
                   </div>
                 </div>
 
                 {/* Sort Option Sorter Selector Dropdown & Smoothing Toggle */}
-                <div className="flex flex-col gap-2 bg-zinc-950/80 p-2.5 rounded-xl border border-zinc-900/60">
+                <div className={`flex flex-col gap-2 p-2.5 rounded-xl border ${
+                  isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
+                }`}>
                   <div className="flex items-center justify-between gap-1.5">
-                    <span className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest">Order by:</span>
+                    <span className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Order by:</span>
                     <select
                       value={capacitySortBy}
                       onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck')}
-                      className="bg-zinc-900 hover:bg-zinc-800 text-amber-450 hover:text-amber-300 text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none border border-zinc-800/80 cursor-pointer transition-all font-bold"
+                      className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
+                        isLight 
+                          ? 'bg-white border-zinc-250 text-amber-600' 
+                          : 'bg-zinc-900 border-zinc-800/80 text-amber-450 hover:text-amber-300'
+                      }`}
                     >
-                      <option value="date">📅 Date (Chronological)</option>
-                      <option value="bottleneck">🔥 Bottleneck Intensity</option>
+                      <option value="date" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>📅 Date (Chronological)</option>
+                      <option value="bottleneck" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>🔥 Bottleneck Intensity</option>
                     </select>
                   </div>
                   
                   {/* Smoothing Mode Toggle */}
-                  <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-zinc-900/60">
-                    <span className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest" title="3-Day moving average smoothing vs raw data">Data View:</span>
-                    <div className="flex rounded bg-zinc-900 p-0.5 border border-zinc-800/80">
+                  <div className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
+                    <span className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500 font-bold' : 'text-zinc-500'}`} title="3-Day moving average smoothing vs raw data">Data View:</span>
+                    <div className={`flex rounded p-0.5 border ${isLight ? 'bg-zinc-200 border-zinc-250' : 'bg-zinc-900 border-zinc-800/80'}`}>
                       <button
                         onClick={() => setCapacitySmoothing('raw')}
                         className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
                           capacitySmoothing === 'raw' 
                             ? 'bg-orange-500 text-white shadow-sm' 
-                            : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-800'
+                            : isLight 
+                              ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-300' 
+                              : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-850'
                         }`}
                       >
                         Raw
@@ -906,7 +1045,9 @@ export default function App() {
                         className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
                           capacitySmoothing === 'smoothed' 
                             ? 'bg-orange-500 text-white shadow-sm' 
-                            : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-800'
+                            : isLight 
+                              ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-300' 
+                              : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-850'
                         }`}
                         title="3-Day Moving Average Smoothed"
                       >
@@ -917,10 +1058,16 @@ export default function App() {
                 </div>
 
                 {/* Bottleneck Threshold Slider */}
-                <div className="flex flex-col gap-2 bg-zinc-950/80 p-2.5 rounded-xl border border-zinc-900/60">
-                  <div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+                <div className={`flex flex-col gap-2 p-2.5 rounded-xl border ${
+                  isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
+                }`}>
+                  <div className="flex justify-between items-center text-[7.5px] text-zinc-550 font-bold uppercase tracking-widest leading-none">
                     <span>Bottleneck Threshold</span>
-                    <span className="text-amber-450 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800/55">{bottleneckThreshold}%</span>
+                    <span className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                      isLight 
+                        ? 'bg-white border-zinc-250 text-amber-600' 
+                        : 'bg-zinc-900 border-zinc-800/55 text-amber-450'
+                    }`}>{bottleneckThreshold}%</span>
                   </div>
                   <input
                     type="range"
@@ -929,10 +1076,10 @@ export default function App() {
                     step="1"
                     value={bottleneckThreshold}
                     onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
-                    className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 focus:outline-none transition-all"
+                    className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 focus:outline-none transition-all"
                     style={{ accentColor: '#f97316' }}
                   />
-                  <div className="flex justify-between text-[7px] text-zinc-650 font-mono leading-none">
+                  <div className="flex justify-between text-[7px] text-zinc-500 font-mono leading-none">
                     <span>50%</span>
                     <span>75%</span>
                     <span>100%</span>
@@ -959,19 +1106,23 @@ export default function App() {
                     return (
                       <div 
                         key={index} 
-                        className={`flex flex-col gap-1.5 text-zinc-450 pb-2 border-b border-zinc-950/40 last:border-0 last:pb-0 transition-all duration-300 ${
+                        className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-300 ${
+                          isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40'
+                        } ${
                           isBottleneck 
-                            ? 'bg-amber-950/20 border border-amber-500/20 p-2.5 rounded-xl my-1 shadow-[inset_0_1px_1px_rgba(245,158,11,0.05)]' 
+                            ? isLight 
+                              ? 'bg-amber-50/70 border border-amber-200 p-2.5 rounded-xl my-1 text-zinc-900' 
+                              : 'bg-amber-950/20 border border-amber-500/20 p-2.5 rounded-xl my-1 shadow-[inset_0_1px_1px_rgba(245,158,11,0.05)] text-zinc-300' 
                             : 'px-1 pt-1'
                         }`}
                       >
                         <div className="flex justify-between items-center text-[10px] gap-2">
-                          <span className="font-sans font-bold text-zinc-350 flex items-center gap-1 flex-wrap min-w-[70px]">
+                          <span className={`font-sans font-bold flex items-center gap-1 flex-wrap min-w-[70px] ${isLight ? 'text-zinc-800' : 'text-zinc-350'}`}>
                             {item.day.substring(0, 3)} 
-                            <span className="text-[8px] text-zinc-500 font-normal font-mono">({item.date})</span>
+                            <span className={`text-[8px] font-normal font-mono ${isLight ? 'text-zinc-550' : 'text-zinc-500'}`}>({item.date})</span>
                             {isBottleneck && (
-                              <span className="text-[7.5px] font-mono leading-none bg-amber-500/10 text-amber-300 border border-amber-500/20 py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5">
-                                <span className="w-1 h-1 rounded-full bg-amber-400 fill-amber-400" /> Hot
+                              <span className="text-[7.5px] font-mono leading-none bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20 py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" /> Hot
                               </span>
                             )}
                           </span>
@@ -1096,18 +1247,22 @@ export default function App() {
         </div>
 
         {/* Footer info links */}
-        <div className="p-4 border-t border-zinc-900 bg-black/40 static">
+        <div className={`p-4 border-t static transition-colors duration-200 ${isLight ? 'border-zinc-200 bg-zinc-50/50' : 'border-zinc-900 bg-black/40'}`}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center text-zinc-300 relative shrink-0">
+            <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border ${
+              isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800'
+            }`}>
               <User className="w-4 h-4" />
-              <span className="w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border border-zinc-950" />
+              <span className={`w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
             </div>
             <div className="text-[11px] leading-tight flex-1">
-              <p className="font-semibold text-white">Skipper Koala</p>
+              <p className={`font-semibold ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`}>Skipper Koala</p>
               <select 
                 value={userRole} 
                 onChange={(e) => setUserRole(e.target.value as any)}
-                className="mt-0.5 bg-transparent text-zinc-550 font-mono text-[10px] uppercase cursor-pointer hover:text-zinc-300 focus:outline-none appearance-none"
+                className={`mt-0.5 bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
+                  isLight ? 'text-zinc-500 hover:text-zinc-800 font-bold' : 'text-zinc-550 hover:text-zinc-300'
+                }`}
               >
                 <option value="Admin">Admin</option>
                 <option value="Manager">Manager</option>
@@ -1118,52 +1273,72 @@ export default function App() {
         </div>
       </aside>
 
-      {/* MAIN CONTAINER CONTENT VIEWPORT */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-zinc-50' : 'bg-black'}`}>
         
         {/* Global Toolbar */}
-        <header className="bg-zinc-950 h-16 border-b border-zinc-900 px-6 flex items-center justify-between shadow-md sticky top-0 z-30">
+        <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
+          isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-950 border-zinc-900 text-white shadow-md'
+        }`}>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-xs sm:text-sm font-sans font-bold text-white shrink-0">
+            <h2 className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
               {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
             </h2>
-            <span className="hidden lg:inline-block text-[9px] bg-zinc-900 text-zinc-400 border border-zinc-850 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+            <span className={`hidden lg:inline-block text-[9px] font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
+              isLight ? 'bg-zinc-100 text-zinc-650 border-zinc-200' : 'bg-zinc-900 text-zinc-400 border-zinc-850'
+            }`}>
               Food chain ops portal
             </span>
             
             {/* Global Branch Selector Dropdown */}
-            <div className="flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded-lg border border-zinc-800 shadow-inner">
-              <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono shrink-0 pl-1">Store:</span>
+            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${
+              isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800'
+            }`}>
+              <span className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Store:</span>
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value as any)}
                 className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none"
                 style={{ outline: 'none' }}
               >
-                <option value="Marks & Spencer - Cork City" className="bg-zinc-950 text-white font-bold">Marks & Spencer Cork City</option>
-                <option value="Tesco - Cork City" className="bg-zinc-950 text-white font-bold">Tesco Cork City</option>
-                <option value="Tesco - Mahon Point" className="bg-zinc-950 text-white font-bold">Tesco Mahon Point</option>
+                <option value="Marks & Spencer - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Marks & Spencer Cork City</option>
+                <option value="Tesco - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Cork City</option>
+                <option value="Tesco - Mahon Point" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Mahon Point</option>
               </select>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest block leading-none">🇮🇪 Ireland Time (Dublin)</span>
-              <span className="text-xs font-mono font-bold text-zinc-100 block mt-1">
+              <span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">🇮🇪 Ireland Time (Dublin)</span>
+              <span className={`text-xs font-mono font-bold block mt-1 ${isLight ? 'text-zinc-800' : 'text-zinc-100'}`}>
                 {irelandTime || 'Updating live...'}
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-800">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-colors ${
+              isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800'
+            }`}>
               <Cpu className="w-3.5 h-3.5 text-orange-500" />
-              <span className="text-[11px] font-mono text-zinc-300 font-bold">Gemini-3 Unified Intel</span>
+              <span className={`text-[11px] font-mono font-bold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>Gemini-3 Unified Intel</span>
             </div>
+
+            {/* Dynamic Day/Night Mode Switcher button */}
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                isLight 
+                  ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 shadow-sm' 
+                  : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
+              }`}
+            >
+              {isLight ? <Moon className="w-4.5 h-4.5 text-zinc-600" /> : <Sun className="w-4.5 h-4.5 text-amber-400" />}
+            </button>
           </div>
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto bg-black">
+        <main className="flex-1 p-6 overflow-y-auto bg-transparent">
           <div className="max-w-7xl mx-auto">
             {renderActiveView()}
           </div>

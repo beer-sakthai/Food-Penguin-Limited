@@ -17,6 +17,7 @@ export interface SalesOrder {
   category: string;
   quantity: number;
   amount: number;
+  barcode?: string;
   status: 'Completed' | 'Pending' | 'Refunded';
   branch?: string;
 }
