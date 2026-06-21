@@ -26,6 +26,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Line,
+  LineChart,
   BarChart,
   Bar,
   Legend,
@@ -1143,6 +1144,120 @@ export default function OverviewTab({
                 maxBarSize={45}
               />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Weekly Production Made vs Target Line Chart */}
+      <div id="weekly-production-trend" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
+        isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'
+      }`}>
+        <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+        
+        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
+          isLight ? 'border-zinc-200' : 'border-zinc-800'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`p-3 border rounded-2xl transition-all duration-300 ${
+              isLight ? 'bg-zinc-100 border-zinc-200 text-indigo-600' : 'bg-zinc-950 border-zinc-800 text-indigo-400'
+            }`}>
+              <TrendingUp className="w-5 h-5 flex-shrink-0" />
+            </div>
+            <div>
+              <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+                Weekly Production Run-Rate (Trend Line)
+                <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+                  isLight 
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                    : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
+                }`}>
+                  Trend Analysis
+                </span>
+              </h3>
+              <p className="subtitle text-xs text-zinc-500">Chronological trend progression of actual production output against weekly target goals</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-4 font-mono text-[11px] items-center">
+            <div className="flex items-center gap-1.5 font-sans">
+              <span className="w-2.5 h-0.5 border-t-2 border-dashed" style={{ borderColor: isLight ? '#71717a' : '#9ca3af' }} />
+              <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production Target</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-sans">
+              <span className="w-2.5 h-0.5 bg-emerald-500" />
+              <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production Made</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-80 w-full mt-6">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={weeklyLogs}
+              margin={{ top: 15, right: 15, left: 10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
+              <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: isLight ? '#ffffff' : '#09090b', 
+                  borderRadius: '16px', 
+                  color: isLight ? '#18181b' : '#fff', 
+                  border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' 
+                }}
+                labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
+                cursor={{ stroke: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', strokeWidth: 1 }}
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36} 
+                content={({ payload }) => (
+                  <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
+                    {payload?.map((entry: any, index: number) => (
+                      <div key={`item-${index}`} className="flex items-center gap-2">
+                        <span 
+                          className={`w-2.5 h-0.5 ${entry.value === 'productionTarget' ? 'border-t border-dashed' : 'bg-emerald-500'}`}
+                          style={{ borderColor: entry.value === 'productionTarget' ? (isLight ? '#71717a' : '#9ca3af') : undefined }} 
+                        />
+                        <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-650' : 'text-zinc-400'}`}>
+                          {entry.value === 'productionTarget' ? 'Production Target' : 'Production Made'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              />
+              <Line 
+                type="monotone"
+                dataKey="productionTarget" 
+                name="productionTarget" 
+                stroke={isLight ? '#71717a' : '#4b5563'} 
+                strokeDasharray="5 5"
+                strokeWidth={2}
+                dot={{ r: 3, strokeWidth: 1 }}
+                activeDot={{ r: 5 }}
+              />
+              <Line 
+                type="monotone"
+                dataKey="productionMade" 
+                name="productionMade" 
+                stroke="#10b981" 
+                strokeWidth={3}
+                dot={{ r: 4, strokeWidth: 1 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </div>
       </div>

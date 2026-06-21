@@ -364,7 +364,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
               <div className="space-y-2">
                 <div className="flex justify-center max-h-36 overflow-hidden rounded bg-zinc-950 p-2 border border-zinc-800">
                   {selectedPhoto.startsWith("data") ? (
-                    <img src={selectedPhoto} className="object-contain max-h-32" alt="Selected photo" />
+                    <div dangerouslySetInnerHTML={{ __html: selectedPhoto.includes("xml") ? selectedPhoto.replace("data:image/svg+xml;utf8,", "") : `<img src="${selectedPhoto}" class="object-contain max-h-32" />` }} />
                   ) : (
                     <p className="text-xs text-white">Image pre-loaded</p>
                   )}

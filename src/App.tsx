@@ -187,6 +187,33 @@ export default function App() {
     }
   }, [selectedWeekRange, weeklyLogsMap]);
 
+  // Polling mechanism to simulate real-time operational database updates every 60 seconds
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setMetrics(prev => {
+        // Slightly randomize metrics.salesToday by +/- 2%
+        const percentChange = (Math.random() * 0.04 - 0.02);
+        const newSalesToday = Number((prev.salesToday * (1 + percentChange)).toFixed(2));
+        
+        // Slightly randomize metrics.productionItems by a small integer delta (+/- 1-2 items)
+        const productionDelta = Math.floor(Math.random() * 5) - 2;
+        const newProductionItems = Math.max(0, prev.productionItems + productionDelta);
+
+        // Recompute the real-time AI Health Score based on updated figures
+        const newHealth = Math.round(Math.min(100, Math.max(50, 90 + (newProductionItems / (prev.productionTarget || 1)) * 10 - (prev.wasteCost / (newSalesToday || 1)) * 50)));
+
+        return {
+          ...prev,
+          salesToday: newSalesToday,
+          productionItems: newProductionItems,
+          aiHealthScore: newHealth
+        };
+      });
+    }, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   // Ireland real-time Clock state (Dublin)
   const [irelandTime, setIrelandTime] = useState<string>('');
 
@@ -762,6 +789,9 @@ export default function App() {
             onAddWaste={handleAddWaste} 
             totalCostToday={totalWasteCost}
             selectedBranch={selectedBranch}
+            weeklyLogs={weeklyLogs}
+            targets={targets}
+            theme={theme}
           />
         );
       case 'Hours':
