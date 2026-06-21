@@ -117,14 +117,6 @@ export default function OverviewTab({
  setSummaryLoading(false);
  }
  };
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchShiftSummary();
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [selectedBranch, selectedDayTab]);
-
-
  const totalCogsActiveDay = activeLog.cogs.tazaki + activeLog.cogs.sysco + activeLog.cogs.bulza + activeLog.cogs.sticker + activeLog.cogs.others;
 
  // Total Weekly COGS

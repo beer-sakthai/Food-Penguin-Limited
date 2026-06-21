@@ -1,0 +1,47 @@
+
+        {/* Hour Plan and Hour Used */}
+        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
+          <div className="pb-4">
+            <h2 className="text-base font-sans font-semibold text-white">Hour Plan & Hours Used in Branch</h2>
+            <p className="text-xs text-zinc-500">Detailed review of scheduled hours vs. actual hours logged by staff</p>
+          </div>
+
+          <div className="overflow-hidden border border-zinc-800 rounded-xl">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-zinc-950 font-mono text-[10px] uppercase text-zinc-500">
+                <tr>
+                  <th className="px-4 py-3">Team Member</th>
+                  <th className="px-4 py-3">Role & Shift</th>
+                  <th className="px-4 py-3 text-right">Hour Plan</th>
+                  <th className="px-4 py-3 text-right">Hours Used</th>
+                  <th className="px-4 py-3 text-right">Variance</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800">
+                {hoursData.map((emp) => {
+                  const variance = emp.scheduledHours - emp.actualHours;
+                  return (
+                    <tr key={emp.id} className="bg-zinc-900 hover:bg-zinc-800/50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-zinc-200">{emp.name}</td>
+                      <td className="px-4 py-3 text-[10px] font-mono text-zinc-400">
+                        <span className="uppercase font-bold">{emp.role}</span>
+                        <span className="block opacity-70">{emp.shiftStart} - {emp.shiftEnd}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-zinc-300">{emp.scheduledHours}h</td>
+                      <td className="px-4 py-3 text-right font-mono text-amber-400">{emp.actualHours}h</td>
+                      <td className="px-4 py-3 text-right font-mono">
+                        {variance > 0 ? (
+                          <span className="text-emerald-400">-{variance.toFixed(1)}h</span>
+                        ) : variance < 0 ? (
+                          <span className="text-rose-400">+{Math.abs(variance).toFixed(1)}h</span>
+                        ) : (
+                          <span className="text-zinc-500">0h</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>

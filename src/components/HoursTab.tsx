@@ -7,7 +7,7 @@ import {
  AlertTriangle, 
  UserCheck, 
  CheckCircle2, 
- RefreshCw, 
+ 
  Contact 
 } from 'lucide-react';
 
@@ -96,55 +96,54 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
  </div>
  </div>
 
- {/* Employee Roster List */}
- <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
- <div className="pb-4">
- <h2 className="text-base font-sans font-semibold text-white">Current Crew Roll-Call</h2>
- <p className="text-xs text-zinc-500">Click actions to simulate live clocking and work register shifts</p>
- </div>
+ 
+        {/* Hour Plan and Hour Used */}
+        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
+          <div className="pb-4">
+            <h2 className="text-base font-sans font-semibold text-white">Hour Plan & Hours Used in Branch</h2>
+            <p className="text-xs text-zinc-500">Detailed review of scheduled hours vs. actual hours logged by staff</p>
+          </div>
 
- <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- {hoursData.map((emp) => (
- <div key={emp.id} className="border border-zinc-800 bg-zinc-950 rounded-xl p-4 flex flex-col justify-between group">
- <div className="flex justify-between items-start pb-2">
- <div className="space-y-0.5">
- <span className="text-[9px] uppercase font-mono text-zinc-500 font-bold">{emp.role}</span>
- <h4 className="text-sm font-bold text-zinc-200">{emp.name}</h4>
- </div>
- <span className={`px-2 py-0.5 rounded font-mono text-[9px] font-bold ${
- emp.status === 'Clocked In' 
- ? 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40 animate-pulse' 
- : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
- }`}>
- {emp.status}
- </span>
- </div>
-
- <div className="border-t border-zinc-800 my-3 pt-3 flex justify-between items-center text-xs text-zinc-500">
- <div className="font-mono text-[10px]">
- <p>Shift: {emp.shiftStart} - {emp.shiftEnd}</p>
- <p className="mt-0.5">Actual: {emp.actualHours} hrs / {emp.scheduledHours} hrs</p>
- </div>
-
- <button
- onClick={() => onToggleClockStatus(emp.id)}
- className={`px-3 py-1 text-[10px] rounded font-medium border transition-colors inline-flex items-center gap-1 ${
- emp.status === 'Clocked Out'
- ? 'bg-zinc-900 text-white hover:bg-zinc-850 border-zinc-800'
- : 'bg-zinc-950 text-zinc-300 border border-zinc-800 hover:bg-zinc-900'
- }`}
- >
- <RefreshCw className="w-3 h-3" />
- {emp.status === 'Clocked Out' ? 'Clock In' : 'Clock Out'}
- </button>
- </div>
- </div>
- ))}
- </div>
- </div>
-
- </div>
-
- </div>
- );
+          <div className="overflow-hidden border border-zinc-800 rounded-xl">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-zinc-950 font-mono text-[10px] uppercase text-zinc-500">
+                <tr>
+                  <th className="px-4 py-3">Team Member</th>
+                  <th className="px-4 py-3">Role & Shift</th>
+                  <th className="px-4 py-3 text-right">Hour Plan</th>
+                  <th className="px-4 py-3 text-right">Hours Used</th>
+                  <th className="px-4 py-3 text-right">Variance</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800">
+                {hoursData.map((emp) => {
+                  const variance = emp.scheduledHours - emp.actualHours;
+                  return (
+                    <tr key={emp.id} className="bg-zinc-900 hover:bg-zinc-800/50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-zinc-200">{emp.name}</td>
+                      <td className="px-4 py-3 text-[10px] font-mono text-zinc-400">
+                        <span className="uppercase font-bold">{emp.role}</span>
+                        <span className="block opacity-70">{emp.shiftStart} - {emp.shiftEnd}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-zinc-300">{emp.scheduledHours}h</td>
+                      <td className="px-4 py-3 text-right font-mono text-amber-400">{emp.actualHours}h</td>
+                      <td className="px-4 py-3 text-right font-mono">
+                        {variance > 0 ? (
+                          <span className="text-emerald-400">-{variance.toFixed(1)}h</span>
+                        ) : variance < 0 ? (
+                          <span className="text-rose-400">+{Math.abs(variance).toFixed(1)}h</span>
+                        ) : (
+                          <span className="text-zinc-500">0h</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

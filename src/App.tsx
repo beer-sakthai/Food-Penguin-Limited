@@ -28,6 +28,7 @@ import {
 import OverviewTab from './components/OverviewTab';
 import SellTab from './components/SellTab';
 import TargetTab from './components/TargetTab';
+import StudioTab from './components/StudioTab';
 import ProductionTab from './components/ProductionTab';
 import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
@@ -38,7 +39,7 @@ import CapacityVarianceChart from './components/CapacityVarianceChart';
 
 // Main Icons
 import {
- LayoutDashboard,
+ LayoutDashboard, Camera,
  Coins,
  ShieldCheck,
  ChefHat,
@@ -64,8 +65,8 @@ import {
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
- Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning'],
- Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning'],
+ Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Studio'],
+ Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Studio'],
  Staff: ['Overview', 'Sell', 'Production', 'Waste']
 };
 
@@ -846,10 +847,12 @@ export default function App() {
  );
  case 'Sell': {
  const filteredOrders = orders.filter(o => !o.branch || o.branch === selectedBranch);
- return <SellTab orders={filteredOrders} onAddOrder={handleAddOrder} selectedBranch={selectedBranch} theme={theme} />;
+ return <SellTab selectedBranch={selectedBranch} theme={theme} />;
  }
  case 'Target':
  return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
+    case 'Studio':
+      return <StudioTab theme={theme} />;
  case 'Production':
  return (
  <ProductionTab 
@@ -992,9 +995,9 @@ export default function App() {
  }`}>
  {shortName}
  </span>
- <span className="text-emerald-500 font-mono font-bold tracking-tight shrink-0 flex items-center gap-1.5">
- <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
- </span>
+ <span className={`font-mono tracking-tight shrink-0 flex items-center gap-1.5 ${isLight ? 'text-emerald-500 font-bold' : 'text-[9px] px-2 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black'}`}>
+                      {isLight && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>} Live
+                    </span>
  </div>
  );
  })}
@@ -1363,9 +1366,9 @@ export default function App() {
  {item.day.substring(0, 3)} 
  <span className={`text-[8px] font-normal font-mono ${isLight ? 'text-zinc-550' : 'text-zinc-500'}`}>({item.date})</span>
  {isBottleneck && (
- <span className="text-[7.5px] font-mono leading-none bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20 py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5">
- <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" /> Hot
- </span>
+ <span className={`text-[7.5px] font-mono leading-none py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5 ${isLight ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'}`}>
+                        {isLight && <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />} Hot
+                      </span>
  )}
  </span>
 
