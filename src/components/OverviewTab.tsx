@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { CoreMetrics, CompanyTarget, DailyOperationalLog } from '../types';
 import {
   TrendingUp,
@@ -257,8 +258,16 @@ export default function OverviewTab({
         </div>
       </div>
 
-      {/* Weekday Quick Select Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-zinc-950 p-4 rounded-3xl border border-zinc-900">
+      {/* Dynamic Main Content Container with Smooth Fade-In on Week Selection Change */}
+      <motion.div
+        key={selectedWeekRange}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-6"
+      >
+        {/* Weekday Quick Select Tabs */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-zinc-950 p-4 rounded-3xl border border-zinc-900">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-orange-400 font-bold" />
           <span className="text-xs font-mono text-zinc-350 uppercase tracking-wider font-bold">
@@ -1125,6 +1134,7 @@ export default function OverviewTab({
           )}
         </div>
       </div>
+      </motion.div>
     </div>
   );
 }
