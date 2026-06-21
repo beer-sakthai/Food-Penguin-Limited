@@ -1576,7 +1576,7 @@ function OverviewTab({
  isLight ? 'border-zinc-200' : 'border-zinc-800/95'
  }`}>
  <div className="flex items-start gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-350 ${
+ <div className={`p-3 border rounded-2xl transition-all duration-300 ${
  isLight ? 'bg-zinc-150 bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
  }`}>
  <Activity className="w-5 h-5 animate-pulse" />
