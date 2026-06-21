@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { CoreMetrics, BranchId, BranchData } from '../types';
 import { BRANCHES } from '../data';
-import { Save, Activity, UploadCloud, Store, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Save, Activity, UploadCloud, Store, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { useApi } from '../hooks/useApi';
+import { syncData } from '../utils/api';
 
 interface DataInputTabProps {
   onSyncData: (branchId: BranchId, metrics: CoreMetrics) => void;
@@ -18,8 +20,8 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
   const [manualHours, setManualHours] = useState("");
   const [manualProductionTarget, setManualProductionTarget] = useState("");
   const [manualHealthScore, setManualHealthScore] = useState("");
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncSuccess, setSyncSuccess] = useState(false);
+
+  const { data: syncSuccess, loading: isSyncing, error: syncError, execute: executeSync } = useApi<{ success: boolean }, { branchId: BranchId; metrics: CoreMetrics }>();
 
   // When target branch changes, populate form with its current metrics
   useEffect(() => {
@@ -30,30 +32,37 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
     setManualHours(currentMetrics.hoursScheduled.toString());
     setManualProductionTarget(currentMetrics.productionTarget.toString());
     setManualHealthScore(currentMetrics.aiHealthScore.toString());
-    setSyncSuccess(false);
   }, [targetBranch, branchesData]);
 
   const handleSync = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSyncing(true);
-    setSyncSuccess(false);
+    
+    const updatedMetrics: CoreMetrics = {
+      ...branchesData[targetBranch].metrics,
+      salesToday: parseFloat(manualSales) || 0,
+      productionItems: parseInt(manualProduction, 10) || 0,
+      wasteCost: parseFloat(manualWaste) || 0,
+      hoursScheduled: parseFloat(manualHours) || 0,
+      productionTarget: parseInt(manualProductionTarget, 10) || 0,
+      aiHealthScore: parseInt(manualHealthScore, 10) || 0
+    };
 
-    // Simulate network delay for "smooth UI" feel
-    setTimeout(() => {
-      const updatedMetrics: CoreMetrics = {
-        ...branchesData[targetBranch].metrics,
-        salesToday: parseFloat(manualSales) || 0,
-        productionItems: parseInt(manualProduction, 10) || 0,
-        wasteCost: parseFloat(manualWaste) || 0,
-        hoursScheduled: parseFloat(manualHours) || 0,
-        productionTarget: parseInt(manualProductionTarget, 10) || 0,
-        aiHealthScore: parseInt(manualHealthScore, 10) || 0
-      };
-      
-      onSyncData(targetBranch, updatedMetrics);
-      setIsSyncing(false);
-      setSyncSuccess(true);
-    }, 800);
+    executeSync(
+        () => {
+            // This is a temporary mock. In a real scenario, the API would handle this.
+            onSyncData(targetBranch, updatedMetrics);
+            // We'll throw an error 30% of the time to test our error handling
+            if (Math.random() < 0.3) {
+                return Promise.reject(new Error("Random network failure! Please try again."));
+            }
+            return Promise.resolve({ success: true });
+        },
+        { branchId: targetBranch, metrics: updatedMetrics },
+        {
+            loadingMessage: 'Syncing to Core...',
+            successMessage: 'Dashboard synchronized successfully!'
+        }
+    );
   };
 
   return (
@@ -179,11 +188,17 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
           </div>
 
           <div className="pt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
-            <div>
+            <div className="h-6">
               {syncSuccess && (
                 <span className="text-emerald-500 text-sm font-bold flex items-center gap-1.5 animate-in fade-in slide-in-from-bottom-2">
                   <CheckCircle2 className="w-4 h-4" />
                   Dashboard synchronized successfully
+                </span>
+              )}
+              {syncError && (
+                <span className="text-red-500 text-sm font-bold flex items-center gap-1.5 animate-in fade-in slide-in-from-bottom-2">
+                  <XCircle className="w-4 h-4" />
+                  {syncError}
                 </span>
               )}
             </div>
@@ -195,7 +210,7 @@ export default function DataInputTab({ onSyncData, branchesData }: DataInputTabP
               {isSyncing ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Syncing to Core...
+                  Syncing...
                 </>
               ) : (
                 <>

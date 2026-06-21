@@ -23,3 +23,16 @@ export async function postApi<T>(endpoint: string, body: unknown): Promise<T> {
 
     return data as T;
 }
+
+/**
+ * Specifically for synchronizing core metrics from the data input tab.
+ * @param branchId The ID of the branch to sync data for.
+ * @param metrics The core metrics to update.
+ * @returns A promise that resolves with a success message.
+ */
+export async function syncData(params: { branchId: string; metrics: any }): Promise<{ success: boolean }> {
+    // For now, this will fail because the endpoint doesn't exist.
+    // This allows us to test the error handling.
+    // In a real implementation, you would create this endpoint in `server.ts`.
+    return postApi<{ success: boolean }>('/api/sync-data', params);
+}
