@@ -169,6 +169,7 @@ export function registerGeminiRoutes(app: Express, { getAiClient, hasValidGemini
     }
   });
 
+  // Search grounded market and procurement trends for planning workflows.
   app.post('/api/gemini/search-trends', async (req: Request, res: Response) => {
     try {
       const { query } = req.body;

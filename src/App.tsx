@@ -12,6 +12,7 @@ import {
  CoreMetrics,
  SalesOrder,
  CompanyTarget,
+ Recipe,
  ProductionTask,
  WasteRecord,
  EmployeeHour,
@@ -105,7 +106,7 @@ export default function App() {
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
  const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
 
- const recipes = useMemo(() => buildRecipesForBranch(selectedBranch), [selectedBranch]);
+ const recipes = useMemo<Recipe[]>(() => buildRecipesForBranch(selectedBranch), [selectedBranch]);
 
  const [tasks, setTasks] = useState<ProductionTask[]>(() => buildTasksForBranch(BRANCHES[0]));
 

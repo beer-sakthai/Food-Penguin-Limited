@@ -6,7 +6,7 @@ Food Penguin Limited is a React + TypeScript + Vite dashboard with an Express AP
 
 This repository is best understood as a **rich internal demo / prototype**:
 - UI flows are polished and feature-heavy
-- most business data is seeded locally from `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/data.ts`
+- most business data is seeded locally from `src/data.ts`
 - there is no persistent database or production auth system in this repo
 
 ## What the app includes
@@ -20,15 +20,15 @@ This repository is best understood as a **rich internal demo / prototype**:
 ## Architecture
 
 ### Frontend
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/App.tsx` orchestrates shell-level state and navigation
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/components/` contains the feature tabs and charts
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/lib/` contains shared app helpers for branch/catalog and capacity-report logic
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/data.ts` holds seeded demo data
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/types.ts` defines shared domain types
+- `src/App.tsx` orchestrates shell-level state and navigation
+- `src/components/` contains the feature tabs and charts
+- `src/lib/` contains shared app helpers for branch/catalog and capacity-report logic
+- `src/data.ts` holds seeded demo data
+- `src/types.ts` defines shared domain types
 
 ### Backend
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/server.ts` boots the Express server and Vite middleware
-- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/server/geminiRoutes.ts` contains the AI/image API endpoints
+- `server.ts` boots the Express server and Vite middleware
+- `server/geminiRoutes.ts` contains the AI/image API endpoints
 
 ## AI model constraints used in this repo
 
@@ -49,7 +49,7 @@ npm run start
 
 ## Environment
 
-Use `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/.env.example` as the starting point.
+Use `.env.example` as the starting point.
 
 ## Notes
 
