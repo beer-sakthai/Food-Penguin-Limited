@@ -1446,6 +1446,7 @@ function OverviewTab({
  isLight ? 'border-zinc-200' : 'border-zinc-800/95'
  }`}>
  <div className="flex items-start gap-3">
+ <div className={`p-3 border rounded-2xl transition-all duration-350 ${
  <div className={`p-3 border rounded-2xl transition-all duration-200 ${
  isLight ? 'bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
  }`}>
@@ -1989,7 +1990,7 @@ function OverviewTab({
  </form>
  </div>
 
- {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
+ {/* Deep Advisor: "Enable high thinking" with gemini-1.5-flash */}
  <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
  }`}>
@@ -2008,7 +2009,7 @@ function OverviewTab({
  <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
  isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300'
  }`}>
- gemini-3.1-pro-preview
+ gemini-1.5-flash
  </span>
  <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
  Thinking Level: HIGH
@@ -2025,6 +2026,9 @@ function OverviewTab({
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
+ className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] font-sans rounded-2xl ${
+ isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
+ }`}
  className={advisorTextareaClasses}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
  />
