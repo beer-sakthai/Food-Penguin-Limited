@@ -1,87 +1,58 @@
-# Food Penguin Limited - Corporate Dashboard
+# Food Penguin Limited
 
-A comprehensive, unified corporate dashboard built for Food Penguin Limited. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, role-based access control, data visualizations, and embedded AI analytics for efficient restaurant management.
+Food Penguin Limited is a React + TypeScript + Vite dashboard with an Express API layer for operational reporting, branch planning, and manual AI-assisted workflows.
 
-## 🌟 Key Functional Modules & Features
+## Current status
 
-* **Role-Based Access Control (RBAC):** Distinct permission levels and module access configurations for Admin, Manager, and Staff roles.
-* **Dynamic Day/Night Mode:** Full application-wide support for Day (Light) and Night (Dark) mode themes, completely customizing the user interface aesthetics based on preference.
-* **Intelligent Dashboarding & Visualizations:** Interactive analytics powered by `recharts` providing visual overviews seamlessly.
-  * **Unified Overview (Strategic Center):** Real-time production status indicators, calendar-scoped throughput tracking, Irish standard regulatory clock indicators, and deep operational audits.
-    * **Weekly Production Comparison Bar Chart [NEW]:** A robust dual-axis visual comparison of `Production Made` versus `Production Targets` across each day of the calendar week (Monday to Sunday).
-    * **Audit Calendar Date-Range Selector [NEW]:** A header-integrated dropdown selecting between various active, historic (Week 24), and forecast (Week 26) weeks. Changing the selection dynamically recalculates general dashboard throughput, COGS, waste stats, and the production bars.
-    * **Fluid Page Transition System [NEW]:** Integrated powered motion fade-ins (`motion/react`) smoothly displaying metrics, cards, and Recharts structures on database queries or week changes instead of standard snapping.
-    * **Predictive Weekly Capacity Card [NEW]:** A sidebar component featuring advanced predictive logic. It processes rolling daily production rates and week-over-week trend momentum of the active calendar week to project capacity loads for the next 7 days, visualised with an amber-striped extension bar and a custom dashed boundary pointer. Includes an interactive dropdown button to reveal day-by-day projected rates with miniature progress graphs, **one-click CSV data export & professional styled PDF summary report downloads** for executive reporting, an **interactive sort menu** to instantly filter by date chronological sequence or peak Bottleneck Intensity, a customizable **dynamic Bottleneck Threshold slider** (defaulting to 90%) to visually isolate and alert managers of specific high-risk bottleneck days, inline **micro-SVG sparklines with delta comparisons** to visualize exact chronological capacity trends, and a **Data View smoothing filter selector** (Raw vs 3-Day Moving Average) to instantly filter out high-frequency daily variance or peak production spikes.
-  * **Branch Product Module:** Track active POS sales, transaction ledgers, margins, barcodes, and revenue bar charts. Includes multi-select checkboxes and bulk actions like 'Print Labels' and 'Hide from POS' for enhanced workflow.
-  * **Production Module:** Kitchen throughput monitoring, task queuing, recipe formulation, and chef workflows.
-  * **Waste Module:** Financial leakage tracking with interactive pie chart distributions and safety allowance thresholds.
-  * **Hours Module:** Workforce scheduling, clocked-in time tracking versus scheduled hours, and visual utilization rates.
-  * **Target Module:** Corporate-wide milestone tracking, completion bar charts, progress validations, and AI-optimized targets.
-* **Embedded AI Integrations:**
-  * **Deep Strategic Advisor:** Built-in multi-layered logic solver using advanced reasoning (Powered by Gemini 1.5 Flash for cost-free, high-speed execution).
-  * **AI Banner Illustrator:** Automated marketing asset generation with specific focal points and aspect ratios (Powered by Imagen 3.0).
-  * **Waste Investigator & Recipe Generator:** Automated photo-based insights and production aids.
-  * **Real-time Shift Summary & Analytics:** Manually generated AI insights against live operation data, kept strictly on-demand to respect API quota limits.
+This repository is best understood as a **rich internal demo / prototype**:
+- UI flows are polished and feature-heavy
+- most business data is seeded locally from `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/data.ts`
+- there is no persistent database or production auth system in this repo
 
-## 🛠 Tech Stack
+## What the app includes
 
-* **Framework:** React 18 + TypeScript + Vite
-* **Styling:** Tailwind CSS (responsive layouts, modern bento UI, custom semantic colors)
-* **Animations:** `motion/react` for elegant hardware-accelerated interface slide & fade effects
-* **Icons:** `lucide-react`
-* **Charts:** `recharts` for highly customized Area, Pie, and Bar charts
-* **Date Handling:** Native JS with streamlined date utilities
+- Overview dashboard with KPI cards, branch-level metrics, and weekly production/capacity analysis
+- Branch product views for Marks & Spencer and Tesco branches
+- Production, waste, hours, target, planning, and studio tabs
+- CSV/PDF export flows for capacity reporting
+- Manual AI utilities for shift summaries, strategy prompts, trend lookup, restock suggestions, image generation, and dish-photo analysis
 
-## 🚀 Getting Started
+## Architecture
 
-### Prerequisites
+### Frontend
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/App.tsx` orchestrates shell-level state and navigation
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/components/` contains the feature tabs and charts
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/lib/` contains shared app helpers for branch/catalog and capacity-report logic
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/data.ts` holds seeded demo data
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/src/types.ts` defines shared domain types
 
-* Node.js (v18+ recommended)
-* npm
+### Backend
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/server.ts` boots the Express server and Vite middleware
+- `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/server/geminiRoutes.ts` contains the AI/image API endpoints
 
-### Installation
+## AI model constraints used in this repo
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd food-penguin
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+- Language tasks use `gemini-1.5-flash`
+- Image generation uses `imagen-3.0-generate-001`
+- AI actions are **manual/on-demand**; there should be no automatic background AI polling loop
+- When `GEMINI_API_KEY` is absent, the API returns simulation/fallback responses so the demo still works
 
-### Development Server
-
-To start the local development server:
+## Scripts
 
 ```bash
+npm install
 npm run dev
-```
-
-The application will bind to `0.0.0.0` at port `3050` (or the configured standard container proxy port `3000`) locally.
-
-### Production Build
-
-To create a production-ready build:
-
-```bash
+npm run lint
 npm run build
+npm run start
 ```
 
-Then you can preview the generated `dist/` directory with `npm run preview`.
+## Environment
 
-## 📂 Project Structure
+Use `/home/runner/work/Food-Penguin-Limited/Food-Penguin-Limited/.env.example` as the starting point.
 
-* `/src/components/` - Features a modular layout with separate tabs (`OverviewTab.tsx`, `SellTab.tsx`, `TargetTab.tsx`, `ProductionTab.tsx`, `WasteTab.tsx`, `HoursTab.tsx`).
-* `/src/App.tsx` - Main orchestration entry point handling states, user roles, calendar date-range scopes, and unified navigation.
-* `/src/types.ts` - Centralized TypeScript interfaces for metrics, models, targets, etc.
-* `/src/data.ts` - Local data engines, multi-week data maps, and default state providers context.
-* `/src/index.css` - Global Tailwind CSS and specific font asset integrations.
+## Notes
 
-## 📄 License
-
-This project is licensed under the MIT License.
+- The development server runs through `tsx server.ts`
+- The production build outputs the frontend bundle and `dist/server.cjs`
+- There is currently no dedicated automated test suite in the repository; validation is primarily via type-checking and production builds

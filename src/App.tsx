@@ -1,22 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
-import { jsPDF } from 'jspdf';
 import {
  initialMetrics,
  initialOrders,
  initialTargets,
- initialRecipes,
- initialTasks,
  initialWaste,
  initialHours,
  initialInventory,
- initialWeeklyLogs,
  alternativeWeeklyLogsMap
 } from './data';
 import {
  CoreMetrics,
  SalesOrder,
  CompanyTarget,
- Recipe,
  ProductionTask,
  WasteRecord,
  EmployeeHour,
@@ -33,9 +28,28 @@ import ProductionTab from './components/ProductionTab';
 import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
-import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
 import DublinClock from './components/DublinClock';
+import {
+  BRANCHES,
+  buildRecipesForBranch,
+  buildTasksForBranch,
+  formatBranchLabel,
+  formatBranchOptionLabel,
+  rolePermissions,
+  type BranchName,
+  type UserRole,
+} from './lib/branchConfig';
+import {
+  buildDailyCapacityBreakdown,
+  calculateProjectedCapacityPct,
+  downloadCapacityCsv,
+  downloadCapacityPdf,
+  sortDailyCapacityBreakdown,
+  type CapacityOverride,
+  type CapacitySortBy,
+  type CapacitySmoothing,
+} from './lib/capacityReports';
 
 
 // Main Icons
@@ -65,11 +79,6 @@ import {
  Store
 } from 'lucide-react';
 
-const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
- Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Studio'],
- Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Studio'],
- Staff: ['Overview', 'Sell', 'Production', 'Waste']
-};
 
 export default function App() {
  // App States
@@ -90,82 +99,19 @@ export default function App() {
  };
 
  const [activeTab, setActiveTab] = useState<string>('Overview');
- const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff'>('Admin');
- const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
+ const [userRole, setUserRole] = useState<UserRole>('Admin');
+ const [selectedBranch, setSelectedBranch] = useState<BranchName>(BRANCHES[0]);
  const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
  const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
 
- const recipes = useMemo<Recipe[]>(() => {
- const isMS = selectedBranch === 'Marks & Spencer - Cork City';
- const activeProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+ const recipes = useMemo(() => buildRecipesForBranch(selectedBranch), [selectedBranch]);
 
- const getIngredients = (category: string, name: string) => {
- const lowerName = name.toLowerCase();
- if (lowerName.includes('salmon')) {
- return ['Atlantic Salmon Fillet', 'Fresh Wasabi Paste', 'Premium Sushi Rice', 'Grated Daikon Radish', 'Soy Sauce'];
- }
- if (lowerName.includes('chicken')) {
- return ['Free-range Chicken Fillet', 'Katsu Curry Sauce', 'Panko Breadcrumbs', 'Seasoned Jasmine Rice', 'Spring Onions'];
- }
- if (lowerName.includes('tofu') || lowerName.includes('veggie') || lowerName.includes('plant')) {
- return ['Pressed Silken Tofu', 'Fresh Avocado', 'Cucumber ribbon', 'Mixed Sesame seeds', 'Sweet Glaze Drizzle'];
- }
- if (category === 'Sushi Rolls' || category === 'Maki Rolls' || category === 'Nigiri Duos') {
- return ['Seasoned Hinohikari Rice', 'Premium Toasted Nori Sheets', 'Crispy Cucumber', 'Kyoto Japanese Mayo', 'Soy Glaze'];
- }
- if (category === 'Noodles & Sides' || lowerName.includes('noodles')) {
- return ['Fresh Udon Grains', 'Julienned Sweet Peppers', 'Savory Soy Brew sauce', 'Crushed Peanuts', 'Chili Flakes'];
- }
- if (category === 'Desserts & Sweets' || lowerName.includes('mochi')) {
- return ['Sweetened Rice Flour Paste', 'Artisanal Ice Cream Core', 'Powdered Starch coating', 'Natural Strawberry syrup'];
- }
- return ['Hand-picked Nori', 'Select Sushi Rice', 'Signature Dipping Sauce', 'Crisp Cucumber slice'];
- };
-
- const getAllergens = (category: string, name: string) => {
- const lowerName = name.toLowerCase();
- const allergens: string[] = [];
- if (lowerName.includes('salmon') || lowerName.includes('fish')) allergens.push('Fish');
- if (lowerName.includes('chicken')) allergens.push('Gluten');
- if (lowerName.includes('tofu') || lowerName.includes('veggie')) allergens.push('Soya');
- if (lowerName.includes('noodles') || lowerName.includes('gyoza') || lowerName.includes('katsu')) {
- if (!allergens.includes('Gluten')) allergens.push('Gluten');
- }
- if (lowerName.includes('mochi')) allergens.push('Milk');
- if (category.toLowerCase().includes('roll')) {
- allergens.push('Sesame');
- }
- if (allergens.length === 0) allergens.push('Soya');
- return allergens;
- };
-
- return activeProducts.map((p, idx) => ({
- id: `${isMS ? 'R-MS' : 'R-T'}-${idx + 1}`,
- name: p.name,
- category: p.category,
- status: 'active' as const,
- prepTime: Math.min(15, Math.max(3, Math.round(p.price * 1.2))),
- ingredients: getIngredients(p.category, p.name),
- allergens: getAllergens(p.category, p.name)
- }));
- }, [selectedBranch]);
-
- const [tasks, setTasks] = useState<ProductionTask[]>(initialTasks);
+ const [tasks, setTasks] = useState<ProductionTask[]>(() => buildTasksForBranch(BRANCHES[0]));
 
  // Sync tasks list with active branch products on branch switch
  useEffect(() => {
- const isMS = selectedBranch === 'Marks & Spencer - Cork City';
- const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
-
- if (products.length >= 4) {
- setTasks([
- { id: 'PT-301', itemName: products[0].name, assignedTo: 'Chef Skipper', status: 'Cooking', quantity: 2, priority: 'high' },
- { id: 'PT-302', itemName: products[1].name, assignedTo: 'Chef Private', status: 'Cooking', quantity: 1, priority: 'medium' },
- { id: 'PT-303', itemName: products[2].name, assignedTo: 'Kitchen Aide Rico', status: 'In Queue', quantity: 3, priority: 'low' },
- { id: 'PT-304', itemName: products[3 % products.length].name, assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 4, priority: 'high' }
- ]);
- }
+ setTasks(buildTasksForBranch(selectedBranch));
  }, [selectedBranch]);
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
@@ -174,13 +120,13 @@ export default function App() {
  const [selectedWeekRange, setSelectedWeekRange] = useState<string>('2026-06-15 to 2026-06-21');
  const [weeklyLogsMap, setWeeklyLogsMap] = useState<Record<string, DailyOperationalLog[]>>(alternativeWeeklyLogsMap);
  const [isCapacityExpanded, setIsCapacityExpanded] = useState<boolean>(false);
- const [capacitySortBy, setCapacitySortBy] = useState<'date' | 'bottleneck'>('date');
+ const [capacitySortBy, setCapacitySortBy] = useState<CapacitySortBy>('date');
  const [bottleneckThreshold, setBottleneckThreshold] = useState<number>(90);
- const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
+ const [capacitySmoothing, setCapacitySmoothing] = useState<CapacitySmoothing>('raw');
 
  // Quick Adjust simulated capacity overrides states
  const [quickAdjustEnabled, setQuickAdjustEnabled] = useState<boolean>(false);
- const [capacityOverrides, setCapacityOverrides] = useState<Record<string, { mode: 'ai' | 'manual'; value: number }>>({});
+ const [capacityOverrides, setCapacityOverrides] = useState<CapacityOverride>({});
  const [globalAdjustValue, setGlobalAdjustValue] = useState<number>(100);
 
  // Email report schedule states
@@ -228,7 +174,7 @@ export default function App() {
 
  const handleGlobalOverride = () => {
  if (!weeklyLogs) return;
- const newOverrides: Record<string, { mode: 'ai' | 'manual'; value: number }> = {};
+ const newOverrides: CapacityOverride = {};
  weeklyLogs.forEach(log => {
  newOverrides[log.day] = { mode: 'manual', value: globalAdjustValue };
  });
@@ -289,358 +235,39 @@ export default function App() {
  const capacityPct = Math.round(Math.min((metrics.productionItems / metrics.productionTarget) * 80, 100));
 
  // Daily breakdown of 7-day projected capacity for the expandable section
- const dailyCapacityBreakdown = useMemo(() => {
- if (!weeklyLogs || weeklyLogs.length === 0) return [];
- 
- const midIdx = Math.floor(weeklyLogs.length / 2);
- const firstHalf = weeklyLogs.slice(0, midIdx);
- const secondHalf = weeklyLogs.slice(midIdx);
-
- const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
- const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
-
- const trendFactor = secondHalfRate / (firstHalfRate || 1);
-
- const rawList = weeklyLogs.map(log => {
- const dailyCurrentPct = Math.round(Math.min((log.productionMade / (log.productionTarget || 1)) * 80, 100));
- const rawDailyProjection = Math.round(dailyCurrentPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
- let dailyProjectedPct = isNaN(rawDailyProjection) || rawDailyProjection <= 0
- ? Math.min(100, Math.max(0, dailyCurrentPct + 4))
- : Math.min(100, rawDailyProjection);
-
- // Support live 'What-If' manual overrides when Quick Adjust mode is active
- if (quickAdjustEnabled) {
- const override = capacityOverrides[log.day];
- if (override && override.mode === 'manual') {
- dailyProjectedPct = override.value;
- }
- }
-
- return {
- day: log.day,
- date: log.date.substring(5), // simplified 'MM-DD'
- current: dailyCurrentPct,
- projected: dailyProjectedPct
- };
- });
-
- if (capacitySmoothing === 'smoothed') {
- // Apply 3-day moving average centering around current index to reduce visual spikes
- return rawList.map((item, idx) => {
- const neighbors = [item];
- if (idx > 0) neighbors.push(rawList[idx - 1]);
- if (idx < rawList.length - 1) neighbors.push(rawList[idx + 1]);
-
- const avgCurrent = Math.round(neighbors.reduce((sum, n) => sum + n.current, 0) / neighbors.length);
- const avgProjected = Math.round(neighbors.reduce((sum, n) => sum + n.projected, 0) / neighbors.length);
-
- return {
- ...item,
- current: avgCurrent,
- projected: avgProjected
- };
- });
- }
-
- return rawList;
- }, [weeklyLogs, capacitySmoothing, quickAdjustEnabled, capacityOverrides]);
+ const dailyCapacityBreakdown = useMemo(() => buildDailyCapacityBreakdown({
+ weeklyLogs,
+ capacitySmoothing,
+ quickAdjustEnabled,
+ capacityOverrides
+ }), [weeklyLogs, capacitySmoothing, quickAdjustEnabled, capacityOverrides]);
 
  // Determine rolling 7-day predictive capacity projection based on operational rates of the selected week context
- const projectedCapacityPct = useMemo(() => {
- // If Quick Adjust simulation mode is active, the global projection is computed as the simple average of daily projected capacities
- if (quickAdjustEnabled && dailyCapacityBreakdown && dailyCapacityBreakdown.length > 0) {
- return Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / dailyCapacityBreakdown.length);
- }
-
- if (!weeklyLogs || weeklyLogs.length === 0) return capacityPct;
-
- const totalMade = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
- const totalTarget = weeklyLogs.reduce((sum, log) => sum + log.productionTarget, 0);
- const baseRate = totalTarget > 0 ? (totalMade / totalTarget) : 0.8;
-
- // Estimate relative trend/momentum comparing the back-half of week with front-half
- const midIdx = Math.floor(weeklyLogs.length / 2);
- const firstHalf = weeklyLogs.slice(0, midIdx);
- const secondHalf = weeklyLogs.slice(midIdx);
-
- const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
- const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
-
- const trendFactor = secondHalfRate / (firstHalfRate || 1);
- 
- // Core predictive calculation: current baseline capacity adjusted by rolling trend momentum
- const rawProjection = Math.round(capacityPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
-
- return isNaN(rawProjection) || rawProjection <= 0 
- ? Math.min(100, Math.max(0, capacityPct + 4)) 
- : Math.min(100, rawProjection);
- }, [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
+ const projectedCapacityPct = useMemo(() => calculateProjectedCapacityPct({
+ weeklyLogs,
+ capacityPct,
+ quickAdjustEnabled,
+ dailyCapacityBreakdown
+ }), [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
  
  // Sorted daily capacity breakdown based on selected sort order (Chronological vs Bottleneck Intensity)
- const sortedDailyCapacityBreakdown = useMemo(() => {
- const list = [...dailyCapacityBreakdown];
- if (capacitySortBy === 'bottleneck') {
- return list.sort((a, b) => b.projected - a.projected);
- }
- return list; // 'date' is default chronological order of weeklyLogs
- }, [dailyCapacityBreakdown, capacitySortBy]);
+ const sortedDailyCapacityBreakdown = useMemo(() => sortDailyCapacityBreakdown(dailyCapacityBreakdown, capacitySortBy), [dailyCapacityBreakdown, capacitySortBy]);
  
  // Export Daily projected capacity as a CSV string file download
  const handleExportCapacityCSV = () => {
- if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
- 
- const headers = ['Day', 'Date', 'Current Capacity (%)', 'Projected Capacity (%)'];
- const rows = dailyCapacityBreakdown.map(item => [
- item.day,
- item.date,
- item.current,
- item.projected
- ]);
- 
- const csvContent = [
- headers.join(','),
- ...rows.map(row => row.map(val => `"${val}"`).join(','))
- ].join('\n');
- 
- const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
- const url = URL.createObjectURL(blob);
- const link = document.createElement('a');
- link.href = url;
- link.setAttribute('download', `weekly_capacity_breakdown_${selectedWeekRange.replace(/\s+/g, '_')}.csv`);
- document.body.appendChild(link);
- link.click();
- document.body.removeChild(link);
- URL.revokeObjectURL(url);
+ downloadCapacityCsv(dailyCapacityBreakdown, selectedWeekRange);
  };
 
- // Export Daily projected capacity as a stunning, styled PDF summary document for reporting purposes
+ // Export Daily projected capacity as a styled PDF summary document for reporting purposes
  const handleExportCapacityPDF = () => {
- if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
-
- // Initialize portrait PDF (A4 size page dimensions: 210mm x 297mm)
- const doc = new jsPDF({
- orientation: 'portrait',
- unit: 'mm',
- format: 'a4'
+ downloadCapacityPdf({
+ dailyCapacityBreakdown,
+ sortedDailyCapacityBreakdown,
+ selectedWeekRange,
+ bottleneckThreshold,
+ capacitySmoothing,
+ capacitySortBy
  });
-
- // Helper color palette following the elegant Slate & Amber UI dashboard theme
- const primaryColor = [24, 24, 27]; // Dark Slate (Zinc 900)
- const accentColor = [249, 115, 22]; // Orange 500
- const lightBg = [244, 244, 245]; // Light Gray (Zinc 100)
- const alertColor = [239, 68, 68]; // Red 500
- const amberAlert = [217, 119, 6]; // Amber 600
- const textGray = [113, 113, 122]; // Zinc 500
-
- // --- Page Header Background Accent Banner ---
- doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.rect(0, 0, 210, 42, 'F');
-
- // Header Metadata & Typography branding
- doc.setTextColor(255, 255, 255);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(15);
- doc.text('BAKERY OPERATIONAL CORE SUITE', 15, 14);
-
- doc.setFont('helvetica', 'normal');
- doc.setFontSize(9.5);
- doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
- doc.text('PREDICTIVE WEEKLY CAPACITY PROJECTION REPORT', 15, 20);
-
- doc.setTextColor(161, 161, 170); // Zinc 400
- doc.setFontSize(8);
- doc.text(`Active Calendar Frame: ${selectedWeekRange}`, 15, 26);
- doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US')}`, 15, 30);
-
- // Dynamic watermarked badge
- doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
- doc.rect(168, 10, 27, 5, 'F');
- doc.setTextColor(255, 255, 255);
- doc.setFontSize(7);
- doc.setFont('helvetica', 'bold');
- doc.text('ANALYTICS ENGINE', 170, 13.5);
-
- // --- KPIs / Summary Metric Cards Banner ---
- let yPos = 52;
- 
- const totalDays = dailyCapacityBreakdown.length;
- const avgProjected = Math.round(dailyCapacityBreakdown.reduce((sum, item) => sum + item.projected, 0) / totalDays);
- const maxProjectedItem = [...dailyCapacityBreakdown].sort((a, b) => b.projected - a.projected)[0];
- const bottlenecksCount = dailyCapacityBreakdown.filter(item => item.projected > bottleneckThreshold).length;
-
- // Background container sheet for key summaries
- doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]);
- doc.roundedRect(15, yPos, 180, 25, 2.5, 2.5, 'F');
-
- // KPI Box 1: Average Load
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(8.5);
- doc.text('AVERAGE LOAD FACTOR', 22, yPos + 7);
- doc.setFontSize(14);
- doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
- doc.text(`${avgProjected}%`, 22, yPos + 17);
-
- // KPI Box 2: Peak Loaded Day
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(8.5);
- doc.text('PEAK CAPACITY LIMIT', 80, yPos + 7);
- doc.setFontSize(12.5);
- doc.setTextColor(39, 39, 42); // Zinc 800
- doc.text(`${maxProjectedItem.projected}% Load`, 80, yPos + 14.5);
- doc.setFontSize(7.5);
- doc.setFont('helvetica', 'normal');
- doc.setTextColor(textGray[0], textGray[1], textGray[2]);
- doc.text(`On ${maxProjectedItem.day}`, 80, yPos + 19);
-
- // KPI Box 3: Bottleneck Threshold Alarms
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(8.5);
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.text('THRESHOLD BOTTLENECKS', 138, yPos + 7);
- doc.setFontSize(13.5);
- if (bottlenecksCount > 0) {
- doc.setTextColor(alertColor[0], alertColor[1], alertColor[2]);
- doc.text(`${bottlenecksCount} Hot Days`, 138, yPos + 17);
- } else {
- doc.setTextColor(16, 185, 129); // Green 500
- doc.text('Stable Output (0)', 138, yPos + 17);
- }
-
- // --- Subtitle parameter summary line ---
- yPos += 35;
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(10.5);
- doc.text('7-DAY DAILY PREDICTED TIMELINE BREAKDOWN', 15, yPos);
-
- // Thin grey spacer boundary line
- doc.setDrawColor(228, 228, 231); // Zinc 200
- doc.setLineWidth(0.35);
- doc.line(15, yPos + 2, 195, yPos + 2);
-
- // Print metadata variables 
- yPos += 7;
- doc.setFont('helvetica', 'normal');
- doc.setFontSize(8);
- doc.setTextColor(textGray[0], textGray[1], textGray[2]);
- doc.text(`Bottleneck Limit Trigger: ${bottleneckThreshold}%`, 15, yPos);
- doc.text(`Smoothing Mode: ${capacitySmoothing === 'smoothed' ? '3-Day Rolling Moving Average' : 'Raw Metrics (None)'}`, 72, yPos);
- doc.text(`Sequence Filter Order: ${capacitySortBy === 'bottleneck' ? 'Bottleneck Intensity' : 'Calendar Sequence'}`, 142, yPos);
-
- // --- Main Capacity Breakdown Table ---
- yPos += 6;
- doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.rect(15, yPos, 180, 8, 'F');
-
- doc.setTextColor(255, 255, 255);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(8);
- doc.text('WEEKDAY', 20, yPos + 5.5);
- doc.text('DATE', 50, yPos + 5.5);
- doc.text('BASE CURRENT (%)', 85, yPos + 5.5);
- doc.text('PROJECTED LOAD (%)', 125, yPos + 5.5);
- doc.text('BOTTLENECK STATE', 165, yPos + 5.5);
-
- const rowHeight = 9.5;
- yPos += 8;
-
- sortedDailyCapacityBreakdown.forEach((item, idx) => {
- const isBottleneck = item.projected > bottleneckThreshold;
-
- // Alternating row highlighting background
- if (idx % 2 === 1) {
- doc.setFillColor(250, 250, 250);
- doc.rect(15, yPos, 180, rowHeight, 'F');
- }
-
- // Draw light wire separators
- doc.setDrawColor(244, 244, 245);
- doc.setLineWidth(0.2);
- doc.line(15, yPos + rowHeight, 195, yPos + rowHeight);
-
- // Value rendering block
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(8.5);
- doc.text(item.day, 20, yPos + 6);
-
- doc.setFont('helvetica', 'normal');
- doc.setTextColor(82, 82, 91);
- doc.text(item.date, 50, yPos + 6);
-
- doc.text(`${item.current}%`, 85, yPos + 6);
-
- // Project highlighting styling
- doc.setFont('helvetica', 'bold');
- if (isBottleneck) {
- doc.setTextColor(amberAlert[0], amberAlert[1], amberAlert[2]);
- doc.text(`${item.projected}%`, 125, yPos + 6);
- } else {
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.text(`${item.projected}%`, 125, yPos + 6);
- }
-
- // Alert cell tag
- if (isBottleneck) {
- doc.setFillColor(254, 243, 199); // Amber 100
- doc.roundedRect(162, yPos + 1.8, 28, 5.5, 0.8, 0.8, 'F');
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(7.5);
- doc.setTextColor(180, 83, 9); // Amber 700
- doc.text('BOTTLENECK', 165.5, yPos + 5.6);
- } else {
- doc.setTextColor(113, 113, 122);
- doc.setFont('helvetica', 'normal');
- doc.setFontSize(7.5);
- doc.text('NORMAL LOAD', 165, yPos + 5.6);
- }
-
- yPos += rowHeight;
- });
-
- // --- Footer Explanatory Bullet Points & Notes ---
- yPos += 10;
- doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(9.5);
- doc.text('EXECUTIVE INTERPRETATION GUIDELINE', 15, yPos);
-
- doc.setDrawColor(228, 228, 231);
- doc.setLineWidth(0.35);
- doc.line(15, yPos + 2, 195, yPos + 2);
-
- yPos += 7;
- doc.setFont('helvetica', 'normal');
- doc.setFontSize(7.5);
- doc.setTextColor(82, 82, 91);
-
- const bulletins = [
- '• Capacity forecasts are computed dynamically based on the active rolling index of completed production batches versus target.',
- '• Days highlighted with yellow "BOTTLENECK" alert badges exceed your configured threshold parameter limit.',
- '• Moving average view reduces short-term variation spikes to reveal systemic weekly production limits for senior management reporting.',
- '• Report intended for staff duty scheduling, shifts optimization, and oven heating resource conservation.'
- ];
-
- bulletins.forEach(bullet => {
- doc.text(bullet, 15, yPos);
- yPos += 4.5;
- });
-
- // Ground footer copyright boundary lines
- yPos = 282;
- doc.setDrawColor(228, 228, 231);
- doc.setLineWidth(0.3);
- doc.line(15, yPos - 3, 195, yPos - 3);
-
- doc.setTextColor(textGray[0], textGray[1], textGray[2]);
- doc.setFontSize(7);
- doc.text('Automated forecast projection report. Confidential & intended for Bakery Internal Operations.', 15, yPos);
- doc.text('Page 1 of 1', 182, yPos);
-
- // Trigger PDF browser-side download
- doc.save(`Capacity_Projection_Report_${selectedWeekRange.replace(/\s+/g, '_')}.pdf`);
  };
 
  const handleUpdateMetrics = (newMetrics: Partial<CoreMetrics>) => {
@@ -947,12 +574,8 @@ export default function App() {
  <span className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Global Branches</span>
  </div>
  <div className="space-y-1.5 font-sans">
- {([
- 'Marks & Spencer - Cork City',
- 'Tesco - Cork City',
- 'Tesco - Mahon Point'
- ] as const).map(branch => {
- const shortName = branch.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
+ {BRANCHES.map(branch => {
+ const shortName = formatBranchLabel(branch);
  const isSelected = selectedBranch === branch;
  return (
  <div 
@@ -1589,13 +1212,13 @@ export default function App() {
  <span className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Store:</span>
  <select
  value={selectedBranch}
- onChange={(e) => setSelectedBranch(e.target.value as any)}
+ onChange={(e) => setSelectedBranch(e.target.value as BranchName)}
  className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
  style={{ outline: 'none' }}
  >
- <option value="Marks & Spencer - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Marks & Spencer Cork City</option>
- <option value="Tesco - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Cork City</option>
- <option value="Tesco - Mahon Point" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Mahon Point</option>
+ {BRANCHES.map(branch => (
+ <option key={branch} value={branch} className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>{formatBranchOptionLabel(branch)}</option>
+ ))}
  </select>
  </div>
  </div>
