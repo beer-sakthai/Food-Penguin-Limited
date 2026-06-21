@@ -84,38 +84,38 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
       <div className="xl:col-span-2 space-y-6">
 
         {/* Live Flashing Header Sensors */}
-        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white">
           <div className="flex items-center justify-between pb-6">
             <div>
-              <h2 className="text-base font-sans font-semibold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-sans font-semibold text-white flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
                 </span>
                 Active Cold-Chain Telemetry
               </h2>
-              <p className="text-xs text-slate-500">Fluctuating thermal state indices for kitchen units</p>
+              <p className="text-xs text-zinc-505 text-zinc-500">Fluctuating thermal state indices for kitchen units</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {sensors.map((s, i) => (
-              <div key={i} className="border border-slate-150 rounded-xl p-4 bg-slate-50 flex items-center justify-between group">
+              <div key={i} className="border border-zinc-805 border-zinc-800 rounded-xl p-4 bg-zinc-950 flex items-center justify-between group">
                 <div className="space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono block tracking-wide font-bold uppercase">{s.name}</span>
+                  <span className="text-[10px] text-zinc-500 font-mono block tracking-wide font-bold uppercase">{s.name}</span>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-sans font-bold text-slate-900 tracking-tight font-mono">{s.temp}</span>
-                    <span className="text-slate-400 text-sm">{s.suffix}</span>
+                    <span className="text-2xl font-sans font-bold text-white tracking-tight font-mono">{s.temp}</span>
+                    <span className="text-zinc-500 text-sm">{s.suffix}</span>
                   </div>
                 </div>
 
                 <div className="text-right">
                   <span className={`inline-block px-2.5 py-0.5 rounded font-mono text-[9px] font-bold ${
-                    s.status === 'Normal' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'
+                    s.status === 'Normal' ? 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40' : 'bg-amber-950/40 text-amber-450 border border-amber-900/40'
                   }`}>
                     ● {s.status}
                   </span>
-                  <div className="text-[9px] text-slate-400 font-mono mt-2">
+                  <div className="text-[9px] text-zinc-500 font-mono mt-2">
                     {s.name.includes('Cold') || s.name.includes('Deep') ? 'Freezer Probe' : 'Heating Element'}
                   </div>
                 </div>
@@ -125,29 +125,29 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
         </div>
 
         {/* Real-time Incident Audit Stream */}
-        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
-          <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white">
+          <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
             <div>
-              <h2 className="text-base font-sans font-semibold text-slate-900">Live Sensory Alarms & Events</h2>
-              <p className="text-xs text-slate-500">Real-time chronos logs of food kitchen probes</p>
+              <h2 className="text-base font-sans font-semibold text-white">Live Sensory Alarms & Events</h2>
+              <p className="text-xs text-zinc-500">Real-time chronos logs of food kitchen probes</p>
             </div>
-            <Activity className="w-5 h-5 text-sky-500 animate-pulse" />
+            <Activity className="w-5 h-5 text-orange-400 animate-pulse" />
           </div>
 
           <div className="space-y-3.5 pt-4">
             {alerts.map((al) => (
               <div key={al.id} className="flex gap-3 text-xs leading-relaxed">
-                <div className="w-20 font-mono text-slate-400 text-[10px] shrink-0 pt-0.5">{al.timestamp}</div>
+                <div className="w-20 font-mono text-zinc-500 text-[10px] shrink-0 pt-0.5">{al.timestamp}</div>
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-semibold text-slate-800">{al.sensor}</span>
+                    <span className="font-semibold text-zinc-200">{al.sensor}</span>
                     <span className={`px-1 rounded text-[9px] font-mono font-medium ${
-                      al.status === 'warning' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'
+                      al.status === 'warning' ? 'bg-amber-950/40 text-amber-450 border border-amber-900/40' : 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40'
                     }`}>
                       {al.value}
                     </span>
                   </div>
-                  <p className="text-slate-500 font-sans">{al.message}</p>
+                  <p className="text-zinc-400 font-sans">{al.message}</p>
                 </div>
               </div>
             ))}
@@ -157,20 +157,20 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
       </div>
 
       {/* RIGHT ASPECT SIDEBAR: LOW-LATENCY COPILOT CHAT */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[500px] flex flex-col justify-between">
+      <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 shadow-sm space-y-4 max-h-[500px] flex flex-col justify-between text-white">
         
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Cpu className="w-4 h-4 text-sky-650" />
-              <span className="text-xs font-bold text-slate-900 uppercase tracking-widest font-sans">Kitchen Dispatcher</span>
+            <div className="flex items-center gap-1.5 font-sans">
+              <Cpu className="w-4 h-4 text-orange-400" />
+              <span className="text-xs font-bold text-white uppercase tracking-widest font-sans">Kitchen Dispatcher</span>
             </div>
-            <span className="bg-sky-100 text-sky-800 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold animate-pulse">
+            <span className="bg-zinc-900 text-zinc-300 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold border border-zinc-800">
               gemini-3.1-flash-lite
             </span>
           </div>
 
-          <p className="text-xs text-slate-500 leading-relaxed font-sans">
+          <p className="text-xs text-zinc-400 leading-relaxed font-sans">
             Under-sub-second rapid floor responses. Throw quick operational checks, warnings or alerts to kitchen leads:
           </p>
 
@@ -182,28 +182,28 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
                 value={lowLatencyCmd}
                 onChange={(e) => setLowLatencyCmd(e.target.value)}
                 placeholder="e.g. notify kowalski to check deep chamber temp"
-                className="w-full p-2.5 pr-10 text-xs border border-slate-250 bg-white rounded focus:ring-1 focus:ring-sky-500 focus:outline-none shadow-inner text-slate-805"
+                className="w-full p-2.5 pr-10 text-xs border border-zinc-800 bg-zinc-900 text-white rounded focus:ring-1 focus:ring-orange-500 focus:outline-none shadow-inner"
               />
               <button
                 type="submit"
                 disabled={loadingCopilot}
-                className="absolute right-1.5 top-1.5 p-1 text-slate-500 hover:text-sky-600 focus:outline-none disabled:text-slate-300"
+                className="absolute right-1.5 top-1.5 p-1 text-zinc-400 hover:text-orange-400 focus:outline-none disabled:text-zinc-650"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
-            <span className="text-[10px] text-slate-400 font-mono block">Speed-priority response engine (<span className="text-emerald-500 font-bold">Fast-Lite</span>)</span>
+            <span className="text-[10px] text-zinc-500 font-mono block">Speed-priority response engine (<span className="text-emerald-450 font-bold">Fast-Lite</span>)</span>
           </form>
 
           {copilotReply && (
-            <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-inner space-y-1 mt-3">
-              <span className="text-[10px] uppercase font-mono tracking-wider text-sky-650 font-bold block">Dispatcher Response:</span>
-              <p className="text-xs text-slate-755 leading-relaxed font-sans">{copilotReply}</p>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 shadow-inner space-y-1 mt-3 text-zinc-300">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-orange-400 font-bold block">Dispatcher Response:</span>
+              <p className="text-xs text-zinc-305 leading-relaxed font-sans">{copilotReply}</p>
             </div>
           )}
         </div>
 
-        <div className="border-t border-slate-200 pt-3 flex justify-between items-center text-[10px] text-slate-400 font-mono">
+        <div className="border-t border-zinc-900 pt-3 flex justify-between items-center text-[10px] text-zinc-500 font-mono">
           <span>Simulation Active</span>
           <span>Latency: ~80ms</span>
         </div>

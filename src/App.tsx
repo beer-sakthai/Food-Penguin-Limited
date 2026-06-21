@@ -72,6 +72,9 @@ export default function App() {
   const totalWasteCost = wasteRecords.reduce((acc, row) => acc + row.cost, 0);
   const totalHours = hoursData.reduce((acc, row) => acc + row.scheduledHours, 0);
 
+  // Calculative capacity metric that matches initial 78% but moves dynamically with metrics.productionItems
+  const capacityPct = Math.round(Math.min((metrics.productionItems / metrics.productionTarget) * 80, 100));
+
   const handleUpdateMetrics = (newMetrics: Partial<CoreMetrics>) => {
     setMetrics(prev => ({ ...prev, ...newMetrics }));
   };
@@ -289,19 +292,19 @@ export default function App() {
   };
 
   return (
-    <div id="app-workspace" className="min-h-screen bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800 antialiased selection:bg-orange-100">
+    <div id="app-workspace" className="min-h-screen bg-black flex flex-col md:flex-row font-sans text-zinc-100 antialiased selection:bg-zinc-800">
       
       {/* SIDEBAR: NAVIGATION */}
-      <aside className="w-full md:w-64 bg-slate-900 text-slate-100 flex flex-col shrink-0 border-r border-slate-950 shadow-lg">
+      <aside className="w-full md:w-64 bg-zinc-950 text-zinc-100 flex flex-col shrink-0 border-r border-zinc-900 shadow-xl">
         {/* Brand Header */}
-        <div className="p-6 border-b border-slate-800/80 flex items-center gap-3">
+        <div className="p-6 border-b border-zinc-900 flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group">
             <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-slate-950 animate-pulse" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-black animate-pulse" />
           </div>
           <div>
             <h1 className="text-sm font-bold font-sans tracking-tight text-white leading-tight">Food Penguin</h1>
-            <span className="text-[10px] font-mono tracking-wider text-slate-500 uppercase leading-none block mt-0.5">Limited</span>
+            <span className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase leading-none block mt-0.5">Limited</span>
           </div>
         </div>
 
@@ -315,17 +318,17 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-all duration-200 ${
                   isActive
-                    ? 'bg-slate-800 text-white font-bold shadow-inner'
-                    : 'text-slate-400 hover:bg-slate-800/40 hover:text-white'
+                    ? 'bg-zinc-900 text-white font-bold shadow-inner'
+                    : 'text-zinc-500 hover:bg-zinc-905 hover:text-white'
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
                   isActive 
                     ? tab.id === 'Real-time' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125' 
-                    : 'bg-transparent border border-slate-600'
+                    : 'bg-transparent border border-zinc-800'
                 }`} />
                 <span className="flex-1 flex items-center gap-2">
-                  <span className={isActive ? 'text-orange-400' : 'text-slate-400'}>{tab.icon}</span>
+                  <span className={isActive ? 'text-orange-400' : 'text-zinc-500'}>{tab.icon}</span>
                   {tab.label}
                 </span>
               </button>
@@ -335,28 +338,31 @@ export default function App() {
 
         {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
         <div className="px-4 py-2 mt-auto mb-2 hidden md:block">
-          <div className="p-4 bg-slate-800/40 rounded-2xl border border-slate-800/50">
-            <p className="text-[10px] text-slate-500 uppercase font-mono font-bold tracking-wider mb-2">Weekly Capacity</p>
-            <div className="h-1.5 bg-slate-700/60 rounded-full overflow-hidden">
-              <div className="h-full bg-orange-500 w-[78%] rounded-full"></div>
+          <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-900">
+            <p className="text-[10px] text-zinc-500 uppercase font-mono font-bold tracking-wider mb-2">Weekly Capacity</p>
+            <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-orange-500 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${capacityPct}%` }}
+              ></div>
             </div>
-            <p className="text-[10px] text-slate-400 font-mono mt-2">78% Production Load</p>
+            <p className="text-[10px] text-zinc-400 font-mono mt-2">{capacityPct}% Production Load</p>
           </div>
         </div>
 
         {/* Footer info links */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 static">
+        <div className="p-4 border-t border-zinc-900 bg-black/40 static">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-slate-800/80 border border-slate-700/50 flex flex-col items-center justify-center text-slate-300 relative shrink-0">
+            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center text-zinc-300 relative shrink-0">
               <User className="w-4 h-4" />
-              <span className="w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border border-slate-900" />
+              <span className="w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border border-zinc-950" />
             </div>
             <div className="text-[11px] leading-tight flex-1">
               <p className="font-semibold text-white">Skipper Koala</p>
               <select 
                 value={userRole} 
                 onChange={(e) => setUserRole(e.target.value as any)}
-                className="mt-0.5 bg-transparent text-slate-400 font-mono text-[10px] uppercase cursor-pointer hover:text-slate-300 focus:outline-none appearance-none"
+                className="mt-0.5 bg-transparent text-zinc-550 font-mono text-[10px] uppercase cursor-pointer hover:text-zinc-300 focus:outline-none appearance-none"
               >
                 <option value="Admin">Admin</option>
                 <option value="Manager">Manager</option>
@@ -371,33 +377,33 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Global Toolbar */}
-        <header className="bg-white h-16 border-b border-slate-200/80 px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
+        <header className="bg-zinc-950 h-16 border-b border-zinc-900 px-6 flex items-center justify-between shadow-md sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-sans font-bold text-slate-900">
+            <h2 className="text-sm font-sans font-bold text-white">
               {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
             </h2>
-            <span className="text-[10px] bg-slate-100 text-slate-500 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+            <span className="text-[10px] bg-zinc-900 text-zinc-400 border border-zinc-800 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
               Food chain ops portal
             </span>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block leading-none">Local time</span>
-              <span className="text-sm font-mono font-bold text-slate-700 block mt-1">
+              <span className="text-[10px] font-mono text-zinc-550 uppercase tracking-widest block leading-none">Local time</span>
+              <span className="text-sm font-mono font-bold text-zinc-300 block mt-1">
                 {new Date().toISOString().split('T')[0]} 14:13 UTC
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+            <div className="flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-800">
               <Cpu className="w-3.5 h-3.5 text-orange-500" />
-              <span className="text-[11px] font-mono text-slate-600 font-bold">Gemini-3 Unified Intel</span>
+              <span className="text-[11px] font-mono text-zinc-300 font-bold">Gemini-3 Unified Intel</span>
             </div>
           </div>
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto bg-slate-50/50">
+        <main className="flex-1 p-6 overflow-y-auto bg-black">
           <div className="max-w-7xl mx-auto">
             {renderActiveView()}
           </div>

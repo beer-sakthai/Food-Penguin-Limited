@@ -111,23 +111,23 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
       <div className="xl:col-span-2 space-y-6">
         
         {/* Quick Menu Overview */}
-        <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
-          <h2 className="text-sans font-bold text-slate-900">Food Penguin Limited Specialties</h2>
-          <p className="text-xs text-slate-400 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary cold-chain product groups</p>
+        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
+          <h2 className="text-sans font-bold text-white">Food Penguin Limited Specialties</h2>
+          <p className="text-xs text-zinc-500 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary cold-chain product groups</p>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'Arctic Burgers', price: '$12.90', margin: '68% margin' },
-              { name: 'Glacier Pizzas', price: '$18.50', margin: '72% margin' },
-              { name: 'Cold Desserts', price: '$6.50', margin: '80% margin' },
-              { name: 'Glacier Drinks', price: '$5.80', margin: '85% margin' },
-              { name: 'Marine Platters', price: '$24.90', margin: '65% margin' }
+              { name: 'Arctic Burgers', price: '€12.90', margin: '68% margin' },
+              { name: 'Glacier Pizzas', price: '€18.50', margin: '72% margin' },
+              { name: 'Cold Desserts', price: '€6.50', margin: '80% margin' },
+              { name: 'Glacier Drinks', price: '€5.80', margin: '85% margin' },
+              { name: 'Marine Platters', price: '€24.90', margin: '65% margin' }
             ].map((cat, idx) => (
-              <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-white hover:shadow-sm hover:border-orange-200">
-                <span className="text-xs font-bold text-slate-700">{cat.name}</span>
-                <div className="flex justify-between items-center mt-3 pt-2 border-t border-slate-100">
-                  <span className="font-mono text-xs font-bold text-orange-600">{cat.price}</span>
-                  <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-mono font-medium">{cat.margin}</span>
+              <div key={idx} className="bg-zinc-950 border border-zinc-850 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-zinc-900 hover:shadow-md hover:border-orange-500/40">
+                <span className="text-xs font-bold text-zinc-200">{cat.name}</span>
+                <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-800/60">
+                  <span className="font-mono text-xs font-bold text-orange-400">{cat.price}</span>
+                  <span className="text-[10px] text-emerald-450 bg-emerald-950/40 px-1.5 py-0.5 rounded font-mono font-medium">{cat.margin}</span>
                 </div>
               </div>
             ))}
@@ -135,13 +135,13 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         </div>
 
         {/* Live Transaction Ledger and Chart */}
-        <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-800">
             <div>
-              <h2 className="text-sans font-bold text-slate-900">Active Order Ledger</h2>
-              <p className="text-xs text-slate-500">Live POS sales tracked since midnight</p>
+              <h2 className="text-sans font-bold text-white">Active Order Ledger</h2>
+              <p className="text-xs text-zinc-500">Live POS sales tracked since midnight</p>
             </div>
-            <span className="bg-orange-50 text-orange-700 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-orange-100 self-start">
+            <span className="bg-zinc-950 text-orange-400 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-zinc-800 self-start">
               {orders.length} Active Purchases
             </span>
           </div>
@@ -149,26 +149,26 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           <div className="h-56 mt-6 mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={(val) => `$${val}`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
+                <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} tickFormatter={(val) => `€${val}`} />
                 <Tooltip 
-                  cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
+                  cursor={{ fill: '#1e293b' }}
+                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
                   itemStyle={{ color: '#f97316', fontWeight: 'bold' }}
                 />
                 <Bar dataKey="revenue" radius={[6, 6, 0, 0]} maxBarSize={50}>
                   {barData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#f97316' : '#fdba74'} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#f97316' : '#ea580c'} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="overflow-x-auto border-t border-slate-100 pt-4">
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 text-slate-500 text-[10px] uppercase font-mono tracking-wider border-b border-slate-100">
+          <div className="overflow-x-auto border-t border-zinc-800 pt-4">
+            <table className="w-full text-left text-xs text-zinc-300">
+              <thead className="bg-zinc-950 text-zinc-400 text-[10px] uppercase font-mono tracking-wider border-b border-zinc-800">
                 <tr>
                   <th className="py-3 px-4">Order ID</th>
                   <th className="py-3 px-4">Timestamp</th>
@@ -178,15 +178,15 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   <th className="py-3 px-4 text-right">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-800/60">
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900">{order.id}</td>
-                    <td className="py-3 px-4 text-slate-400 font-mono">{order.timestamp}</td>
-                    <td className="py-3 px-4 font-medium text-slate-800">{order.item}</td>
-                    <td className="py-3 px-4 text-slate-500">{order.category}</td>
+                  <tr key={order.id} className="hover:bg-zinc-950/50 transition-colors">
+                    <td className="py-3 px-4 font-mono font-bold text-white">{order.id}</td>
+                    <td className="py-3 px-4 text-zinc-500 font-mono">{order.timestamp}</td>
+                    <td className="py-3 px-4 font-medium text-zinc-200">{order.item}</td>
+                    <td className="py-3 px-4 text-zinc-400">{order.category}</td>
                     <td className="py-3 px-4 text-center font-mono">{order.quantity}</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">${order.amount.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-white">€{order.amount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -199,32 +199,32 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
       <div className="space-y-6">
         
         {/* Mock POS Order Creator */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-          <div className="flex items-center gap-2 pb-4 border-b border-slate-100 mb-4">
-            <ShoppingCart className="w-5 h-5 text-orange-600" />
-            <span className="text-xs font-bold text-slate-905 uppercase tracking-wider">Kitchen POS Terminal</span>
+        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
+          <div className="flex items-center gap-2 pb-4 border-b border-zinc-800 mb-4 font-sans">
+            <ShoppingCart className="w-5 h-5 text-orange-500" />
+            <span className="text-xs font-bold text-white uppercase tracking-wider">Kitchen POS Terminal</span>
           </div>
 
           <form onSubmit={handleCreateOrder} className="space-y-4">
             <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Specialty Item Name</label>
+              <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Specialty Item Name</label>
               <input
                 type="text"
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
                 placeholder="e.g. Glacier Cod burger Double"
-                className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
+                className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Grouping</label>
+                <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Grouping</label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
                 >
                   <option>Arctic Burgers</option>
                   <option>Glacier Pizzas</option>
@@ -235,14 +235,14 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               </div>
 
               <div>
-                <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Unit Price ($)</label>
+                <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Unit Price (€)</label>
                 <input
                   type="number"
                   step="0.10"
                   required
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}
-                  className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono"
+                  className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono"
                 />
               </div>
             </div>
@@ -252,15 +252,15 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 <button
                   type="button"
                   onClick={() => setNewQty(prev => Math.max(1, prev - 1))}
-                  className="w-8 h-8 border border-slate-200 rounded-xl bg-slate-50 flex items-center justify-center font-bold font-mono text-xs text-slate-600 hover:bg-slate-100 transition-all"
+                  className="w-8 h-8 border border-zinc-800 rounded-xl bg-zinc-950 flex items-center justify-center font-bold font-mono text-xs text-zinc-300 hover:bg-zinc-900 transition-all"
                 >
                   -
                 </button>
-                <span className="font-mono text-xs font-bold text-slate-800 w-4 text-center">{newQty}</span>
+                <span className="font-mono text-xs font-bold text-zinc-200 w-4 text-center">{newQty}</span>
                 <button
                   type="button"
                   onClick={() => setNewQty(prev => prev + 1)}
-                  className="w-8 h-8 border border-slate-200 rounded-xl bg-slate-50 flex items-center justify-center font-bold font-mono text-xs text-slate-600 hover:bg-slate-100 transition-all"
+                  className="w-8 h-8 border border-zinc-800 rounded-xl bg-zinc-950 flex items-center justify-center font-bold font-mono text-xs text-zinc-300 hover:bg-zinc-900 transition-all"
                 >
                   +
                 </button>
@@ -268,7 +268,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
 
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow"
+                className="px-5 py-2.5 bg-zinc-955 bg-zinc-950 border border-zinc-800 hover:bg-zinc-850 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 shadow"
               >
                 <Plus className="w-4 h-4 text-orange-400" />
                 Commit POS Sale
@@ -278,29 +278,29 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         </div>
 
         {/* AI Menu Banner Maker: Supports ratio control as requested */}
-        <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-orange-600" />
-              <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">AI Banner Illustrator</span>
+        <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80">
+            <div className="flex items-center gap-2 font-sans">
+              <ImageIcon className="w-5 h-5 text-orange-500" />
+              <span className="text-xs font-bold text-white uppercase tracking-widest">AI Banner Illustrator</span>
             </div>
-            <span className="bg-amber-100 text-amber-800 font-mono text-[9px] px-2 py-0.5 rounded font-bold">
+            <span className="bg-teal-950/85 text-teal-400 border border-teal-900/40 font-mono text-[9px] px-2 py-0.5 rounded font-bold">
               gemini-2.5-flash-image
             </span>
           </div>
 
           <div>
-            <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Banner Marketing Prompt</label>
+            <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Banner Marketing Prompt</label>
             <textarea
               value={bannerPrompt}
               onChange={(e) => setBannerPrompt(e.target.value)}
-              className="w-full h-20 mt-1.5 p-3 text-xs border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-sans shadow-inner leading-relaxed"
+              className="w-full h-20 mt-1.5 p-3 text-xs border border-zinc-800 bg-zinc-900 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 font-sans shadow-inner leading-relaxed"
               placeholder="Describe the aesthetic and food element..."
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Controlled Aspect Ratio</label>
+            <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Controlled Aspect Ratio</label>
             <div className="grid grid-cols-2 gap-1.5 mt-1.5">
               {ASPECT_RATIOS.map((r) => (
                 <button
@@ -309,8 +309,8 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   onClick={() => setSelectedRatio(r.value)}
                   className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${
                     selectedRatio === r.value
-                      ? 'bg-slate-900 border-slate-900 text-white font-bold shadow'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-orange-605 bg-orange-600 border-orange-600 text-white font-bold shadow'
+                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-850'
                   }`}
                 >
                   {r.label}
@@ -322,7 +322,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           <button
             onClick={handleGenerateBanner}
             disabled={loadingImage}
-            className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-sm disabled:bg-slate-300"
+            className="w-full py-2.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center justify-center gap-2 shadow-sm disabled:bg-zinc-950"
           >
             {loadingImage ? (
               <>
@@ -340,10 +340,10 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           {/* Render Result with matching simulated bounds */}
           {generatedImg && (
             <div className="space-y-2 pt-2">
-              <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 font-bold block">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-500 font-bold block">
                 Visual Render Response ({selectedRatio}):
               </span>
-              <div className="flex justify-center bg-slate-950 p-3 rounded-2xl border border-slate-900 shadow-inner">
+              <div className="flex justify-center bg-black p-3 rounded-2xl border border-zinc-850 shadow-inner overflow-hidden">
                 <img
                   src={generatedImg}
                   referrerPolicy="no-referrer"
@@ -355,8 +355,8 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           )}
 
           {imageError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-3 bg-red-950/50 border border-red-900/60 rounded-xl text-red-200 text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <p className="whitespace-pre-wrap">{imageError}</p>
             </div>
           )}
