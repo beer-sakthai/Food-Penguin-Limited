@@ -70,6 +70,7 @@ export default function OverviewTab({
   );
   const [advisorResponse, setAdvisorResponse] = useState<string>("");
   const [thinkingProcess, setThinkingProcess] = useState<string>("");
+  const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Daily Selection tabs for viewing the KPI dashboard
@@ -136,6 +137,8 @@ export default function OverviewTab({
       }
     };
     onAddOrUpdateLog(updatedRecord);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
   };
 
   // Recharts Chart Data (correlated metrics across hours/days)
@@ -1811,10 +1814,14 @@ export default function OverviewTab({
           <div className={`flex justify-end pt-4 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}>
             <button
               type="submit"
-              className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01]"
+              className={`px-6 py-3 transition-all duration-300 rounded-xl flex items-center justify-center gap-2 shadow-lg border hover:scale-[1.01] font-bold text-sm ${
+                showSuccess
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500/20 shadow-emerald-500/15"
+                  : "bg-orange-600 hover:bg-orange-700 text-white border-orange-500/20 shadow-orange-500/15"
+              }`}
             >
-              <Save className="w-4 h-4" />
-              Commit Active Operational Records
+              {showSuccess ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+              {showSuccess ? "Records Committed!" : "Commit Active Operational Records"}
             </button>
           </div>
         </form>
