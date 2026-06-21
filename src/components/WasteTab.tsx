@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { WasteRecord, DailyOperationalLog, CompanyTarget } from '../types';
 import { 
  PieChart, 
@@ -35,7 +35,7 @@ interface WasteTabProps {
  theme?: 'light' | 'dark';
 }
 
-export default function WasteTab({ 
+function WasteTab({
  wasteRecords, 
  onAddWaste, 
  totalCostToday, 
@@ -404,3 +404,5 @@ export default function WasteTab({
  </div>
  );
 }
+
+export default memo(WasteTab);

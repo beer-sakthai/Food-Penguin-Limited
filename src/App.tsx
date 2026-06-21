@@ -35,6 +35,7 @@ import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
 import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
+import DublinClock from './components/DublinClock';
 
 
 // Main Icons
@@ -279,29 +280,6 @@ export default function App() {
  return () => clearInterval(intervalId);
  }, []);
 
- // Ireland real-time Clock state (Dublin)
- const [irelandTime, setIrelandTime] = useState<string>('');
-
- useEffect(() => {
- const updateTime = () => {
- const now = new Date();
- const formatter = new Intl.DateTimeFormat('en-IE', {
- timeZone: 'Europe/Dublin',
- weekday: 'short',
- year: 'numeric',
- month: 'short',
- day: '2-digit',
- hour: '2-digit',
- minute: '2-digit',
- second: '2-digit',
- hour12: false
- });
- setIrelandTime(formatter.format(now));
- };
- updateTime();
- const intervalId = setInterval(updateTime, 1000);
- return () => clearInterval(intervalId);
- }, []);
 
  // Sync core metrics periodically if mock transactions run
  const totalWasteCost = wasteRecords.reduce((acc, row) => acc + row.cost, 0);
@@ -835,7 +813,6 @@ export default function App() {
  targets={targets}
  userRole={userRole}
  onUpdateMetrics={handleUpdateMetrics}
- irelandTime={irelandTime}
  weeklyLogs={weeklyLogs}
  onAddOrUpdateLog={handleUpdateWeeklyLog}
  selectedWeekRange={selectedWeekRange}
@@ -892,7 +869,6 @@ export default function App() {
  targets={targets} 
  userRole={userRole}
  onUpdateMetrics={handleUpdateMetrics}
- irelandTime={irelandTime}
  weeklyLogs={weeklyLogs}
  onAddOrUpdateLog={handleUpdateWeeklyLog}
  selectedWeekRange={selectedWeekRange}
@@ -1628,7 +1604,7 @@ export default function App() {
  <div className="text-right hidden sm:block">
  <span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">🇮🇪 Ireland Time (Dublin)</span>
  <span className={`text-xs font-mono font-bold block mt-1 ${isLight ? 'text-zinc-800' : 'text-zinc-100'}`}>
- {irelandTime || 'Updating live...'}
+ <DublinClock />
  </span>
  </div>
 
