@@ -68,3 +68,88 @@ You can get an API key from Google AI Studio.
 *   **Styling**: Utilize Tailwind CSS utility classes for styling. Global styles are in `src/index.css`.
 *   **API**: The backend API routes are defined in `server.ts`. Frontend components interact with these endpoints for AI-powered features.
 *   **Modularity**: The application is structured around feature-based tabs, making it easy to locate and work on specific areas of functionality.
+
+## 🤖 Rules for AI Assistants & Agents
+
+These rules apply to **any** AI assistant or agent (Gemini, Gemini Code Assist,
+Claude, Copilot, etc.) making changes here. The goal: **keep CI green and keep
+the project safe and secure.**
+
+### 1. Never break CI
+
+CI (`.github/workflows/ci.yml`) runs on every PR to `main`, in this order:
+
+```bash
+npm ci        # exact install from package-lock.json (fails if lockfile is out of sync)
+npm run lint  # tsc --noEmit — type-checks the WHOLE project (src, server, tests, prisma)
+npm run build # vite build + esbuild bundle of server.ts
+```
+
+**Before committing or pushing, run the full pipeline locally and make sure it
+all passes:**
+
+```bash
+npm ci && npm run lint && npm run build && npm test
+```
+
+If a step fails locally, it will fail in CI. Do not push hoping otherwise.
+
+### 2. Keep `package.json` and `package-lock.json` in sync
+
+This is the most common cause of CI failure here — `npm ci` fails hard when the
+two disagree.
+
+*   After changing any dependency, run `npm install` to regenerate the lockfile
+    and **commit the lockfile in the same change**.
+*   Never edit dependency versions in only one of the two files.
+*   `vitest` must match the installed `vite` major (vite 6 needs vitest ≥ 3; we
+    use vitest 4). A mismatched vitest pulls in a nested second copy of vite and
+    breaks `vite.config.ts` type-checking.
+
+### 3. Prisma
+
+*   `@prisma/client` is generated, not committed; the `postinstall` script runs
+    `prisma generate`. It is written as `prisma generate || true` so a
+    production-only install (`npm ci --omit=dev`, where the `prisma` CLI is not
+    present) cannot fail. `@prisma/client` is not imported at runtime, so the
+    CLI stays out of production `dependencies`.
+*   Prisma 7 removed the `datasourceUrl` constructor option — use
+    `new PrismaClient()`; the URL comes from `prisma.config.ts`.
+
+### 4. Type safety
+
+*   `npm run lint` checks every file, including `tests/` and `prisma/`. New code
+    must type-check.
+*   Prefer precise types over `any`. For generic hooks (e.g.
+    `useApi<T, P = void>`), pass explicit type arguments at call sites instead
+    of widening the default to `any`.
+*   In Vitest tests, import `describe`/`it`/`expect` from `vitest`.
+
+### 5. Security & safety — do not regress these
+
+*   **Never commit secrets.** `.env*` is git-ignored (except `.env.example`).
+    Keep real keys out of the repo, logs, error messages, commits, and PR text.
+*   **`GEMINI_API_KEY`:** the server reads it from the environment and falls
+    back to simulation responses when it is missing or still the placeholder.
+    Never hard-code or echo the key, and keep the missing-key fallback intact so
+    the app degrades gracefully instead of leaking or crashing.
+*   **Keep input validation on the server.** AI routes validate input (e.g. the
+    dish-photo endpoint caps base64 payloads at 12 MB). Do not remove size/type
+    checks; add them for any new endpoint that accepts user input.
+*   **Do not weaken RBAC.** Tab access is gated by `rolePermissions` in
+    `App.tsx`; changes must be deliberate.
+*   **`prisma/dev.db` is local dev/seed data only** — never store real or
+    sensitive data there (it is tracked in git).
+*   Treat all request bodies, query params, and uploads as untrusted; sanitize
+    before passing them to filesystem, shell, or database operations.
+*   Run `npm audit` when adding or bumping dependencies; avoid known-vulnerable
+    packages.
+
+### Pre-push checklist
+
+1.  `npm ci` succeeds from a clean state (lockfile in sync).
+2.  `npm run lint` passes.
+3.  `npm run build` succeeds.
+4.  `npm test` passes.
+5.  No secrets, `.env` files, or sensitive data staged.
+6.  Lockfile committed alongside any dependency change.
