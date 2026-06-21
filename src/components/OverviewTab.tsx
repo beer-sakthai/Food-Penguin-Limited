@@ -779,7 +779,7 @@ function OverviewTab({
 
  <div>
  <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
- <span>Sysco (Ssh Grains)</span>
+ <span>BUNZL (Packaging)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.sysco.toLocaleString()}</span>
  </div>
  <div className={`w-full h-1 rounded-full overflow-hidden mt-0.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
@@ -789,7 +789,7 @@ function OverviewTab({
 
  <div>
  <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
- <span>Bulza (Display Box)</span>
+ <span>Asia Market (Food & Condiments)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.bulza.toLocaleString()}</span>
  </div>
  <div className={`w-full h-1 rounded-full overflow-hidden mt-0.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
@@ -799,7 +799,7 @@ function OverviewTab({
 
  <div>
  <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
- <span>Sticker (Thermal Label)</span>
+ <span>VS Direct (Stickers)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.sticker.toLocaleString()}</span>
  </div>
  <div className={`w-full h-1 rounded-full overflow-hidden mt-0.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
@@ -1159,9 +1159,9 @@ function OverviewTab({
  }`}
  >
  <option value="Tazaki">Tazaki</option>
- <option value="Sysco">Sysco</option>
- <option value="Bulza">Bulza</option>
- <option value="Sticker">Sticker</option>
+ <option value="Sysco">BUNZL</option>
+ <option value="Bulza">Asia Market</option>
+ <option value="Sticker">VS Direct - Stickers</option>
  <option value="Others">Others</option>
  </select>
  </td>
@@ -1946,9 +1946,9 @@ function OverviewTab({
  }`}
  >
  <option value="Tazaki">Tazaki</option>
- <option value="Sysco">Sysco</option>
- <option value="Bulza">Bulza</option>
- <option value="Sticker">Sticker</option>
+ <option value="Sysco">BUNZL</option>
+ <option value="Bulza">Asia Market</option>
+ <option value="Sticker">VS Direct - Stickers</option>
  <option value="Others">Others</option>
  </select>
  </div>
@@ -2052,7 +2052,7 @@ function OverviewTab({
  />
  </div>
  <div>
- <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Sysco Supplier (€)</label>
+ <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>BUNZL Supplier (€)</label>
  <input
  type="number"
  step="0.01"
@@ -2065,7 +2065,7 @@ function OverviewTab({
  />
  </div>
  <div>
- <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Bulza Supplier (€)</label>
+ <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Asia Market Supplier (€)</label>
  <input
  type="number"
  step="0.01"
@@ -2078,7 +2078,7 @@ function OverviewTab({
  />
  </div>
  <div>
- <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Sticker Supplier (€)</label>
+ <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>VS Direct Supplier (€)</label>
  <input
  type="number"
  step="0.01"

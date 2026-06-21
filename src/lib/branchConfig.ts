@@ -13,9 +13,9 @@ export const BRANCHES: BranchName[] = [
 ];
 
 export const rolePermissions: Record<UserRole, string[]> = {
-  Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Studio'],
-  Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Studio'],
-  Staff: ['Overview', 'Sell', 'Production', 'Waste'],
+  Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Supplier', 'Planning', 'Studio'],
+  Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Supplier', 'Planning', 'Studio'],
+  Staff: ['Overview', 'Sell', 'Production', 'Waste', 'Supplier'],
 };
 
 export function getProductsForBranch(branch: BranchName): ProductCatalogItem[] {
