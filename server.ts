@@ -7,6 +7,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+app.disable("x-powered-by");
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  next();
+});
 const PORT = 3000;
 
 // Set up larger limits for uploading base64 images for food audits
@@ -82,7 +90,7 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Strategic Advisor error: ", err);
-    res.status(500).json({ error: err.message || "An error occurred with the strategic AI advisor." });
+    res.status(500).json({ error: "An internal error occurred while processing the strategic advice." });
   }
 });
 
@@ -124,7 +132,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Low latency copilot error: ", err);
-    res.status(500).json({ error: err.message || "An error occurred on the rapid copilot." });
+    res.status(500).json({ error: "Failed to execute command due to an internal error." });
   }
 });
 
@@ -175,7 +183,7 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Image generation error: ", err);
-    res.status(500).json({ error: err.message || "Failed to generate food advertisement banner." });
+    res.status(500).json({ error: "Failed to generate advertisement banner." });
   }
 });
 
@@ -227,7 +235,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Dish analyzer error: ", err);
-    res.status(500).json({ error: err.message || "Quality audit analysis failed." });
+    res.status(500).json({ error: "Quality audit analysis failed due to an internal error." });
   }
 });
 
@@ -270,7 +278,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Search Grounding error: ", err);
-    res.status(500).json({ error: err.message || "Failed to search web statistics." });
+    res.status(500).json({ error: "Failed to retrieve market trends." });
   }
 });
 
@@ -281,8 +289,8 @@ app.post("/api/gemini/search-trends", async (req, res) => {
 app.post("/api/gemini/suggest-restock", async (req, res) => {
   try {
     const { branch, inventory } = req.body;
-    if (!branch) {
-      return res.status(400).json({ error: "Branch is required" });
+    if (!branch || typeof inventory !== "object") {
+      return res.status(400).json({ error: "Branch and valid inventory are required" });
     }
 
     const ai = getAiClient();
@@ -323,7 +331,7 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Suggest Restock error: ", err);
-    res.status(500).json({ error: err.message || "Failed to calculate restock metrics." });
+    res.status(500).json({ error: "Failed to calculate restock metrics due to an internal error." });
   }
 });
 
@@ -334,7 +342,7 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
 app.post("/api/gemini/shift-summary", async (req, res) => {
   try {
     const { branch, metrics } = req.body;
-    if (!branch || !metrics) {
+    if (!branch || !metrics || typeof metrics !== "object") {
       return res.status(400).json({ error: "Branch and metrics are required" });
     }
 
@@ -367,7 +375,7 @@ app.post("/api/gemini/shift-summary", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Shift Summary error: ", err);
-    res.status(500).json({ error: err.message || "Failed to generate shift summary." });
+    res.status(500).json({ error: "Failed to generate shift summary due to an internal error." });
   }
 });
 
