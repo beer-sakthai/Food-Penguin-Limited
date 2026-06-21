@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { CompanyTarget } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { 
@@ -18,7 +18,7 @@ interface TargetTabProps {
  onAddTarget: (target: Omit<CompanyTarget, 'id'>) => void;
 }
 
-export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
+function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  // Target Formulation Form state
  const [name, setName] = useState('');
  const [metric, setMetric] = useState('');
@@ -325,3 +325,5 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  </div>
  );
 }
+
+export default memo(TargetTab);

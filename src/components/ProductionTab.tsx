@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { Recipe, ProductionTask } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { 
@@ -40,7 +40,7 @@ const SAMPLE_MOCK_DISHES = [
  }
 ];
 
-export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: ProductionTabProps) {
+function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: ProductionTabProps) {
  // New production cooker task form
  const [taskItem, setTaskItem] = useState('');
  const [assignedTo, setAssignedTo] = useState('Chef Skipper');
@@ -238,3 +238,5 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  </div>
  );
 }
+
+export default memo(ProductionTab);

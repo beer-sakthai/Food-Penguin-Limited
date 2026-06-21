@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import DublinClock from './DublinClock';
 import { CoreMetrics, CompanyTarget, DailyOperationalLog, SalesOrder } from '../types';
 import {
  TrendingUp,
@@ -39,7 +40,6 @@ interface OverviewTabProps {
  targets: CompanyTarget[];
  userRole: 'Admin' | 'Manager' | 'Staff';
  onUpdateMetrics: (newMetrics: Partial<CoreMetrics>) => void;
- irelandTime?: string;
  weeklyLogs: DailyOperationalLog[];
  onAddOrUpdateLog: (log: DailyOperationalLog) => void;
  selectedWeekRange: string;
@@ -49,13 +49,12 @@ interface OverviewTabProps {
  theme?: 'dark' | 'light';
 }
 
-export default function OverviewTab({ 
+function OverviewTab({
  metrics, 
  onNavigateTab, 
  targets, 
  userRole, 
  onUpdateMetrics, 
- irelandTime,
  weeklyLogs,
  onAddOrUpdateLog,
  selectedWeekRange,
@@ -445,13 +444,12 @@ export default function OverviewTab({
  <Sparkles className="w-3 h-3 animate-pulse" />
  Sushi Intelligence Portal Active
  </div>
- {irelandTime && (
+
  <span className={`text-xs px-3.5 py-1 font-mono tracking-tight font-semibold border rounded-full inline-flex items-center gap-1.5 transition-colors ${
  isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-855 text-zinc-400'
  }`}>
- Dublin Clock (IE): {irelandTime}
+ <DublinClock prefix="Dublin Clock (IE): " />
  </span>
- )}
  </div>
  <h1 className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
  isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'
@@ -2229,3 +2227,5 @@ export default function OverviewTab({
  </div>
  );
 }
+
+export default memo(OverviewTab);

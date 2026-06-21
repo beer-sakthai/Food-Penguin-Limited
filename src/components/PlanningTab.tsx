@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState } from 'react';
 import { InventoryItem, DailyOperationalLog } from '../types';
 import CapacityAnalytics from './CapacityAnalytics';
@@ -21,7 +22,7 @@ interface PlanningTabProps {
  weeklyLogs: DailyOperationalLog[];
 }
 
-export default function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyLogs }: PlanningTabProps) {
+function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyLogs }: PlanningTabProps) {
  const isLight = theme === 'light';
  
  // Search Grounding states
@@ -213,3 +214,4 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  </div>
  );
 }
+export default memo(PlanningTab);

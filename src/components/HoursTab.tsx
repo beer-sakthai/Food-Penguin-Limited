@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState } from 'react';
 import { EmployeeHour } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
@@ -17,7 +18,7 @@ interface HoursTabProps {
  totalHoursScheduled: number;
 }
 
-export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
+function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
  // Roster AI analyzer states
  const [schedulerPrompt, setSchedulerPrompt] = useState(
  "Junior Chef Private is scheduled to open tomorrow (08:00) but requires swap with Kitchen Aide Rico, who is scheduled for the night closing. Kowalski is supervisor. Review viability."
@@ -147,3 +148,5 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
     </div>
   );
 }
+
+export default memo(HoursTab);
