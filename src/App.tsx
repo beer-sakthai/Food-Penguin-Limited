@@ -1,14 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
- initialMetrics,
  initialOrders,
  initialTargets,
  initialWaste,
  initialHours,
  initialInventory,
- alternativeWeeklyLogsMap
+ branchWeeklyLogsMap as seededBranchWeeklyLogsMap,
+ buildCoreMetricsFromLog,
+ DEFAULT_WEEK_RANGE,
+ WEEK_RANGE_OPTIONS,
 } from './data';
 import {
+ BranchOperationalWeekMap,
  CoreMetrics,
  SalesOrder,
  CompanyTarget,
@@ -30,6 +33,7 @@ import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
 import SupplierTab from './components/SupplierTab';
+import CompanyKpiTab from './components/CompanyKpiTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
 import DublinClock from './components/DublinClock';
 import {
@@ -103,7 +107,7 @@ export default function App() {
  const [activeTab, setActiveTab] = useState<string>('Overview');
  const [userRole, setUserRole] = useState<UserRole>('Admin');
  const [selectedBranch, setSelectedBranch] = useState<BranchName>(BRANCHES[0]);
- const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
+ const [metrics, setMetrics] = useState<CoreMetrics>(() => buildCoreMetricsFromLog(seededBranchWeeklyLogsMap[DEFAULT_WEEK_RANGE][BRANCHES[0]][6]));
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
  const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
 
@@ -119,8 +123,8 @@ export default function App() {
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
  const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
- const [selectedWeekRange, setSelectedWeekRange] = useState<string>('2026-06-15 to 2026-06-21');
- const [weeklyLogsMap, setWeeklyLogsMap] = useState<Record<string, DailyOperationalLog[]>>(alternativeWeeklyLogsMap);
+ const [selectedWeekRange, setSelectedWeekRange] = useState<string>(DEFAULT_WEEK_RANGE);
+ const [weeklyLogsMap, setWeeklyLogsMap] = useState<BranchOperationalWeekMap>(seededBranchWeeklyLogsMap);
  const [isCapacityExpanded, setIsCapacityExpanded] = useState<boolean>(false);
  const [capacitySortBy, setCapacitySortBy] = useState<CapacitySortBy>('date');
  const [bottleneckThreshold, setBottleneckThreshold] = useState<number>(90);
@@ -183,7 +187,8 @@ export default function App() {
  setCapacityOverrides(newOverrides);
  };
 
- const weeklyLogs = weeklyLogsMap[selectedWeekRange] || alternativeWeeklyLogsMap['2026-06-15 to 2026-06-21'];
+ const weeklyLogsByBranch = weeklyLogsMap[selectedWeekRange] || seededBranchWeeklyLogsMap[DEFAULT_WEEK_RANGE];
+ const weeklyLogs = weeklyLogsByBranch[selectedBranch] || seededBranchWeeklyLogsMap[DEFAULT_WEEK_RANGE][selectedBranch];
 
  // Keep metrics in perfect alignment with selected week range and logs
  useEffect(() => {
@@ -199,34 +204,8 @@ export default function App() {
  aiHealthScore: Math.round(Math.min(100, Math.max(50, 90 + (sundayLog.productionMade / sundayLog.productionTarget) * 10 - (sundayLog.waste / sundayLog.sales) * 50)))
  }));
  }
- }, [selectedWeekRange, weeklyLogsMap]);
+ }, [weeklyLogs]);
 
- // Polling mechanism to simulate real-time operational database updates every 60 seconds
- useEffect(() => {
- const intervalId = setInterval(() => {
- setMetrics(prev => {
- // Slightly randomize metrics.salesToday by +/- 2%
- const percentChange = (Math.random() * 0.04 - 0.02);
- const newSalesToday = Number((prev.salesToday * (1 + percentChange)).toFixed(2));
- 
- // Slightly randomize metrics.productionItems by a small integer delta (+/- 1-2 items)
- const productionDelta = Math.floor(Math.random() * 5) - 2;
- const newProductionItems = Math.max(0, prev.productionItems + productionDelta);
-
- // Recompute the real-time AI Health Score based on updated figures
- const newHealth = Math.round(Math.min(100, Math.max(50, 90 + (newProductionItems / (prev.productionTarget || 1)) * 10 - (prev.wasteCost / (newSalesToday || 1)) * 50)));
-
- return {
- ...prev,
- salesToday: newSalesToday,
- productionItems: newProductionItems,
- aiHealthScore: newHealth
- };
- });
- }, 60000);
-
- return () => clearInterval(intervalId);
- }, []);
 
 
  // Sync core metrics periodically if mock transactions run
@@ -392,11 +371,15 @@ export default function App() {
 
  const handleUpdateWeeklyLog = (updatedLog: DailyOperationalLog) => {
  setWeeklyLogsMap(prev => {
- const currentWeekLogs = prev[selectedWeekRange] || [];
+ const currentWeekByBranch = prev[selectedWeekRange] || {};
+ const currentWeekLogs = currentWeekByBranch[selectedBranch] || [];
  const updatedWeekLogs = currentWeekLogs.map(log => log.day === updatedLog.day ? updatedLog : log);
  return {
  ...prev,
- [selectedWeekRange]: updatedWeekLogs
+ [selectedWeekRange]: {
+ ...currentWeekByBranch,
+ [selectedBranch]: updatedWeekLogs
+ }
  };
  });
 
@@ -415,6 +398,7 @@ export default function App() {
 
  const allTabMeta = [
  { id: 'Overview', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+ { id: 'Company KPI', label: 'Company KPI', icon: <Activity className="w-4 h-4" /> },
  { id: 'Sell', label: 'Branch Product', icon: <Coins className="w-4 h-4" /> },
  { id: 'Target', label: 'Target', icon: <ShieldCheck className="w-4 h-4" /> },
  { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
@@ -447,8 +431,8 @@ export default function App() {
  onAddOrUpdateLog={handleUpdateWeeklyLog}
  selectedWeekRange={selectedWeekRange}
  onSelectedWeekRangeChange={setSelectedWeekRange}
- orders={orders}
  selectedBranch={selectedBranch}
+ branchWeeklyLogsByBranch={weeklyLogsByBranch}
  theme={theme}
  />
  );
@@ -458,6 +442,19 @@ export default function App() {
  }
  case 'Target':
  return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
+ case 'Company KPI':
+ return (
+ <CompanyKpiTab
+ branchWeeklyLogsMap={weeklyLogsMap}
+ selectedWeekRange={selectedWeekRange}
+ weekRangeOptions={WEEK_RANGE_OPTIONS}
+ onSelectedWeekRangeChange={setSelectedWeekRange}
+ targets={targets}
+ theme={theme}
+ onNavigateTab={setActiveTab}
+ selectedBranch={selectedBranch}
+ />
+ );
     case 'Studio':
       return <StudioTab theme={theme} />;
  case 'Production':
@@ -505,8 +502,8 @@ export default function App() {
  onAddOrUpdateLog={handleUpdateWeeklyLog}
  selectedWeekRange={selectedWeekRange}
  onSelectedWeekRangeChange={setSelectedWeekRange}
- orders={orders}
  selectedBranch={selectedBranch}
+ branchWeeklyLogsByBranch={weeklyLogsByBranch}
  theme={theme}
  />
  );
