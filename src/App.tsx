@@ -1636,7 +1636,8 @@ export default function App() {
  <button
  onClick={toggleTheme}
  title={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
- className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+ aria-label={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
+ className={`w-9 h-9 rounded-full flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none ${
  isLight 
  ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 shadow-sm' 
  : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
