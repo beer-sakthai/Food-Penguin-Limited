@@ -12,7 +12,7 @@ export default function GlobalLoadingBar() {
     }
 
     return (
-        <div className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden">
+        <div className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden" data-testid="global-loading-bar">
             <div className="relative h-full w-full">
                 <div className="absolute h-full w-full bg-orange-500 animate-indeterminate" />
             </div>

@@ -6,7 +6,7 @@ interface ApiContextType {
     decrementRequests: () => void;
 }
 
-const ApiContext = createContext<ApiContextType | undefined>(undefined);
+export const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
 /**
  * Provides a global state for tracking the number of active API requests.

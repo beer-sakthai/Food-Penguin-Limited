@@ -1,63 +1,64 @@
-import { test, describe } from "node:test";
-import assert from "node:assert";
-import request from "supertest";
-import { app } from "../server";
+/**
+ * @vitest-environment node
+ */
+import { describe, it, expect } from 'vitest';
+import request from 'supertest';
+import { app } from '../server';
 
-describe("Food Penguin Limited API Endpoints Test", () => {
-  
-  test("GET / should return 404 in test env", async () => {
-    const res = await request(app).get("/");
-    assert.strictEqual(res.status, 404);
+describe('Food Penguin Limited API Endpoints Test', () => {
+  it('GET / should return 404 in test env', async () => {
+    const res = await request(app).get('/');
+    expect(res.status).toBe(404);
   });
 
-  test("POST /api/gemini/strategic-advisor - simulation mode", async () => {
+  it('POST /api/gemini/strategic-advisor - simulation mode', async () => {
     const res = await request(app)
-      .post("/api/gemini/strategic-advisor")
-      .send({ prompt: "What are the key optimization steps for our sushi stock?" });
-    assert.strictEqual(res.status, 200);
+      .post('/api/gemini/strategic-advisor')
+      .send({ prompt: 'What are the key optimization steps for our sushi stock?' });
+    expect(res.status).toBe(200);
     const data = res.body as { text: string; thinking: string };
-    assert.ok(data.text);
-    assert.ok(data.thinking);
-    assert.match(data.text, /Simulation Mode/);
+    expect(data.text).toBeDefined();
+    expect(data.thinking).toBeDefined();
+    expect(data.text).toMatch(/Simulation Mode/);
   });
 
-  test("POST /api/gemini/low-latency-cmd - simulation mode", async () => {
+  it('POST /api/gemini/low-latency-cmd - simulation mode', async () => {
     const res = await request(app)
-      .post("/api/gemini/low-latency-cmd")
-      .send({ command: "itamae shifts" });
-    assert.strictEqual(res.status, 200);
+      .post('/api/gemini/low-latency-cmd')
+      .send({ command: 'itamae shifts' });
+    expect(res.status).toBe(200);
     const data = res.body as { text: string };
-    assert.ok(data.text);
-    assert.match(data.text, /Lite Simulation Mode/);
+    expect(data.text).toBeDefined();
+    expect(data.text).toMatch(/Lite Simulation Mode/);
   });
 
-  test("POST /api/gemini/generate-marketing-image - simulation mode", async () => {
+  it('POST /api/gemini/generate-marketing-image - simulation mode', async () => {
     const res = await request(app)
-      .post("/api/gemini/generate-marketing-image")
-      .send({ prompt: "Fresh glacier salmon roll", aspectRatio: "16:9" });
-    assert.strictEqual(res.status, 200);
+      .post('/api/gemini/generate-marketing-image')
+      .send({ prompt: 'Fresh glacier salmon roll', aspectRatio: '16:9' });
+    expect(res.status).toBe(200);
     const data = res.body as { imageUrl: string; simulated: boolean };
-    assert.strictEqual(data.simulated, true);
-    assert.match(data.imageUrl, /^data:image\/svg\+xml;/);
+    expect(data.simulated).toBe(true);
+    expect(data.imageUrl).toMatch(/^data:image\/svg\+xml;/);
   });
 
-  test("POST /api/gemini/analyze-dish-photo - simulation mode", async () => {
+  it('POST /api/gemini/analyze-dish-photo - simulation mode', async () => {
     const res = await request(app)
-      .post("/api/gemini/analyze-dish-photo")
-      .send({ imageBase64: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", mimeType: "image/png" });
-    assert.strictEqual(res.status, 200);
+      .post('/api/gemini/analyze-dish-photo')
+      .send({ imageBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', mimeType: 'image/png' });
+    expect(res.status).toBe(200);
     const data = res.body as { analysis: string };
-    assert.ok(data.analysis);
-    assert.match(data.analysis, /Photo Audit Simulation/);
+    expect(data.analysis).toBeDefined();
+    expect(data.analysis).toMatch(/Photo Audit Simulation/);
   });
 
-  test("POST /api/gemini/search-trends - simulation mode", async () => {
+  it('POST /api/gemini/search-trends - simulation mode', async () => {
     const res = await request(app)
-      .post("/api/gemini/search-trends")
-      .send({ query: "tuna prices" });
-    assert.strictEqual(res.status, 200);
+      .post('/api/gemini/search-trends')
+      .send({ query: 'tuna prices' });
+    expect(res.status).toBe(200);
     const data = res.body as { text: string };
-    assert.ok(data.text);
-    assert.match(data.text, /Search Grounding Simulation/);
+    expect(data.text).toBeDefined();
+    expect(data.text).toMatch(/Search Grounding Simulation/);
   });
 });
