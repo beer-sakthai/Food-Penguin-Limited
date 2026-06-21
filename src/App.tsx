@@ -33,6 +33,7 @@ import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
 import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
+import CapacityVarianceChart from './components/CapacityVarianceChart';
 
 
 // Main Icons
@@ -53,7 +54,10 @@ import {
   ChevronUp,
   Download,
   Sun,
-  Moon
+  Moon,
+  Wand2,
+  Sparkles,
+  SlidersHorizontal
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
@@ -169,6 +173,40 @@ export default function App() {
   const [bottleneckThreshold, setBottleneckThreshold] = useState<number>(90);
   const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
 
+  // Quick Adjust simulated capacity overrides states
+  const [quickAdjustEnabled, setQuickAdjustEnabled] = useState<boolean>(false);
+  const [capacityOverrides, setCapacityOverrides] = useState<Record<string, { mode: 'ai' | 'manual'; value: number }>>({});
+
+  const handleToggleOverrideMode = (day: string, mode: 'ai' | 'manual', currentValue: number) => {
+    setCapacityOverrides(prev => {
+      const existing = prev[day];
+      return {
+        ...prev,
+        [day]: {
+          mode,
+          value: existing ? existing.value : currentValue
+        }
+      };
+    });
+  };
+
+  const handleUpdateOverrideValue = (day: string, value: number) => {
+    setCapacityOverrides(prev => {
+      const existing = prev[day];
+      return {
+        ...prev,
+        [day]: {
+          mode: existing ? existing.mode : 'manual',
+          value
+        }
+      };
+    });
+  };
+
+  const handleResetOverrides = () => {
+    setCapacityOverrides({});
+  };
+
   const weeklyLogs = weeklyLogsMap[selectedWeekRange] || alternativeWeeklyLogsMap['2026-06-15 to 2026-06-21'];
 
   // Keep metrics in perfect alignment with selected week range and logs
@@ -245,32 +283,6 @@ export default function App() {
   // Calculative capacity metric that matches initial 78% but moves dynamically with metrics.productionItems
   const capacityPct = Math.round(Math.min((metrics.productionItems / metrics.productionTarget) * 80, 100));
 
-  // Determine rolling 7-day predictive capacity projection based on operational rates of the selected week context
-  const projectedCapacityPct = useMemo(() => {
-    if (!weeklyLogs || weeklyLogs.length === 0) return capacityPct;
-
-    const totalMade = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
-    const totalTarget = weeklyLogs.reduce((sum, log) => sum + log.productionTarget, 0);
-    const baseRate = totalTarget > 0 ? (totalMade / totalTarget) : 0.8;
-
-    // Estimate relative trend/momentum comparing the back-half of week with front-half
-    const midIdx = Math.floor(weeklyLogs.length / 2);
-    const firstHalf = weeklyLogs.slice(0, midIdx);
-    const secondHalf = weeklyLogs.slice(midIdx);
-
-    const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
-    const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
-
-    const trendFactor = secondHalfRate / (firstHalfRate || 1);
-    
-    // Core predictive calculation: current baseline capacity adjusted by rolling trend momentum
-    const rawProjection = Math.round(capacityPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
-
-    return isNaN(rawProjection) || rawProjection <= 0 
-      ? Math.min(100, Math.max(0, capacityPct + 4)) 
-      : Math.min(100, rawProjection);
-  }, [weeklyLogs, capacityPct]);
-
   // Daily breakdown of 7-day projected capacity for the expandable section
   const dailyCapacityBreakdown = useMemo(() => {
     if (!weeklyLogs || weeklyLogs.length === 0) return [];
@@ -287,9 +299,17 @@ export default function App() {
     const rawList = weeklyLogs.map(log => {
       const dailyCurrentPct = Math.round(Math.min((log.productionMade / (log.productionTarget || 1)) * 80, 100));
       const rawDailyProjection = Math.round(dailyCurrentPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
-      const dailyProjectedPct = isNaN(rawDailyProjection) || rawDailyProjection <= 0
+      let dailyProjectedPct = isNaN(rawDailyProjection) || rawDailyProjection <= 0
         ? Math.min(100, Math.max(0, dailyCurrentPct + 4))
         : Math.min(100, rawDailyProjection);
+
+      // Support live 'What-If' manual overrides when Quick Adjust mode is active
+      if (quickAdjustEnabled) {
+        const override = capacityOverrides[log.day];
+        if (override && override.mode === 'manual') {
+          dailyProjectedPct = override.value;
+        }
+      }
 
       return {
         day: log.day,
@@ -318,7 +338,38 @@ export default function App() {
     }
 
     return rawList;
-  }, [weeklyLogs, capacitySmoothing]);
+  }, [weeklyLogs, capacitySmoothing, quickAdjustEnabled, capacityOverrides]);
+
+  // Determine rolling 7-day predictive capacity projection based on operational rates of the selected week context
+  const projectedCapacityPct = useMemo(() => {
+    // If Quick Adjust simulation mode is active, the global projection is computed as the simple average of daily projected capacities
+    if (quickAdjustEnabled && dailyCapacityBreakdown && dailyCapacityBreakdown.length > 0) {
+      return Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / dailyCapacityBreakdown.length);
+    }
+
+    if (!weeklyLogs || weeklyLogs.length === 0) return capacityPct;
+
+    const totalMade = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
+    const totalTarget = weeklyLogs.reduce((sum, log) => sum + log.productionTarget, 0);
+    const baseRate = totalTarget > 0 ? (totalMade / totalTarget) : 0.8;
+
+    // Estimate relative trend/momentum comparing the back-half of week with front-half
+    const midIdx = Math.floor(weeklyLogs.length / 2);
+    const firstHalf = weeklyLogs.slice(0, midIdx);
+    const secondHalf = weeklyLogs.slice(midIdx);
+
+    const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
+    const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
+
+    const trendFactor = secondHalfRate / (firstHalfRate || 1);
+    
+    // Core predictive calculation: current baseline capacity adjusted by rolling trend momentum
+    const rawProjection = Math.round(capacityPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
+
+    return isNaN(rawProjection) || rawProjection <= 0 
+      ? Math.min(100, Math.max(0, capacityPct + 4)) 
+      : Math.min(100, rawProjection);
+  }, [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
   
   // Sorted daily capacity breakdown based on selected sort order (Chronological vs Bottleneck Intensity)
   const sortedDailyCapacityBreakdown = useMemo(() => {
@@ -819,6 +870,7 @@ export default function App() {
             onSelectedWeekRangeChange={setSelectedWeekRange}
             orders={orders}
             selectedBranch={selectedBranch}
+            theme={theme}
           />
         );
     }
@@ -1085,6 +1137,54 @@ export default function App() {
                       </button>
                     </div>
                   </div>
+                  
+                  {/* Quick Adjust Mode Toggle */}
+                  <div className={`flex flex-col gap-1.5 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
+                    <div className="flex items-center justify-between gap-1">
+                      <span className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${
+                        quickAdjustEnabled 
+                          ? 'text-orange-500 font-extrabold' 
+                          : isLight 
+                            ? 'text-zinc-500' 
+                            : 'text-zinc-550'
+                      }`} title="Toggle manual vs AI capacity adjustments">
+                        <Wand2 className={`w-3 h-3 ${quickAdjustEnabled ? 'animate-pulse text-orange-500' : ''}`} />
+                        Quick Adjust:
+                      </span>
+                      <button
+                        onClick={() => {
+                          setQuickAdjustEnabled(!quickAdjustEnabled);
+                          if (quickAdjustEnabled) {
+                            handleResetOverrides();
+                          }
+                        }}
+                        type="button"
+                        className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
+                          quickAdjustEnabled
+                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm'
+                            : isLight
+                              ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200'
+                              : 'bg-zinc-900 border-zinc-800 text-zinc-350 hover:text-white hover:bg-zinc-850'
+                        }`}
+                      >
+                        {quickAdjustEnabled ? 'What-If ON' : 'OFF'}
+                      </button>
+                    </div>
+
+                    {quickAdjustEnabled && Object.keys(capacityOverrides).length > 0 && (
+                      <div className="flex justify-end pt-0.5">
+                        <button
+                          onClick={handleResetOverrides}
+                          type="button"
+                          className={`text-[7px] font-mono uppercase tracking-wide font-extrabold transition-all underline decoration-dotted hover:text-amber-500 cursor-pointer ${
+                            isLight ? 'text-zinc-500' : 'text-zinc-400'
+                          }`}
+                        >
+                          Clear Adjustments
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Bottleneck Threshold Slider */}
@@ -1114,6 +1214,13 @@ export default function App() {
                     <span>75%</span>
                     <span>100%</span>
                   </div>
+                </div>
+
+                {/* Visual D3 Target vs Actual Variance performance drift Chart */}
+                <div className={`p-2.5 rounded-xl border ${
+                  isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
+                }`}>
+                  <CapacityVarianceChart weeklyLogs={weeklyLogs} isLight={isLight} />
                 </div>
                 
                 <div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
@@ -1267,6 +1374,62 @@ export default function App() {
                             style={{ width: `${Math.max(0, item.projected - item.current)}%` }}
                           />
                         </div>
+
+                        {/* Inline What-If adjustments for specific day */}
+                        {quickAdjustEnabled && (
+                          <div className={`mt-1.5 flex flex-wrap items-center justify-between gap-1.5 p-1.5 rounded-xl border transition-all duration-200 ${
+                            isLight ? 'bg-zinc-50 border-zinc-200/80 shadow-inner' : 'bg-zinc-950/40 border-zinc-800/60 shadow-inner'
+                          }`}>
+                            <div className="flex border rounded-lg p-0.5 bg-zinc-900 dark:bg-zinc-950 border-zinc-800 shrink-0">
+                              <button
+                                onClick={() => handleToggleOverrideMode(item.day, 'ai', item.projected)}
+                                type="button"
+                                className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
+                                  (!capacityOverrides[item.day] || capacityOverrides[item.day].mode === 'ai')
+                                    ? 'bg-amber-500 text-zinc-950 shadow-sm font-extrabold'
+                                    : 'text-zinc-500 hover:text-zinc-200'
+                                }`}
+                              >
+                                <Sparkles className="w-2 h-2 shrink-0" />
+                                AI
+                              </button>
+                              <button
+                                onClick={() => handleToggleOverrideMode(item.day, 'manual', item.projected)}
+                                type="button"
+                                className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
+                                  (capacityOverrides[item.day]?.mode === 'manual')
+                                    ? 'bg-orange-500 text-white shadow-sm font-extrabold'
+                                    : 'text-zinc-500 hover:text-zinc-200'
+                                }`}
+                              >
+                                <SlidersHorizontal className="w-2 h-2 shrink-0" />
+                                SIM
+                              </button>
+                            </div>
+
+                            {capacityOverrides[item.day]?.mode === 'manual' ? (
+                              <div className="flex-1 flex items-center gap-1.5 justify-end">
+                                <input
+                                  type="range"
+                                  min="10"
+                                  max="110"
+                                  step="5"
+                                  value={capacityOverrides[item.day]?.value ?? item.projected}
+                                  onChange={(e) => handleUpdateOverrideValue(item.day, Number(e.target.value))}
+                                  className="w-16 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400"
+                                  style={{ accentColor: '#f97316' }}
+                                />
+                                <span className="font-mono text-[8px] font-bold text-orange-500 w-6 text-right shrink-0">
+                                  {capacityOverrides[item.day]?.value}%
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[7px] text-zinc-400 italic font-mono uppercase tracking-wide">
+                                forecast active
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}

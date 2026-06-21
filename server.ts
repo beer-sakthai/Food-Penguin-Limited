@@ -13,17 +13,23 @@ const PORT = 3000;
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ extended: true, limit: '12mb' }));
 
+function isRealGeminiKey(key: string | undefined): boolean {
+  if (!key) return false;
+  const k = key.trim();
+  if (k === "" || k === "MY_GEMINI_API_KEY" || k === "PLACEHOLDER" || k === "YOUR_GEMINI_API_KEY") {
+    return false;
+  }
+  return k.startsWith("AIzaSy");
+}
+
 // Shared lazy-loaded Gemini client
 let aiClient: GoogleGenAI | null = null;
 
 function getAiClient(): GoogleGenAI {
   if (!aiClient) {
     const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      console.warn("GEMINI_API_KEY is not set in environment variables.");
-    }
     aiClient = new GoogleGenAI({
-      apiKey: key || "PLACEHOLDER",
+      apiKey: isRealGeminiKey(key) ? key : "PLACEHOLDER",
       httpOptions: {
         headers: {
           'User-Agent': 'aistudio-build',
@@ -47,7 +53,7 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
     }
 
     const ai = getAiClient();
-    if (process.env.GEMINI_API_KEY === undefined || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       return res.json({
         text: "💡 [Simulation Mode] Since GEMINI_API_KEY is not configured yet, here is some simulated advice: Keep waste minimal by matching production targets to high-traffic rain hours, and shift Chef Skipper to peak times. Set up your actual key in Settings > Secrets to unleash deep system thinking capabilities!",
         thinking: "Simulating high-reasoning tree for Food Penguin Limited..."
@@ -71,9 +77,9 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
         thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
       });
     } catch (apiErr: any) {
-      console.warn("Strategic Advisor API call failed. Falling back to simulation mode.", apiErr);
+      console.log("Strategic Advisor falling back to simulation because Gemini key is inactive or failed.");
       res.json({
-        text: `💡 [Simulation Mode - Fallback] Keep waste minimal by matching production targets to high-traffic rain hours, and shift Chef Skipper to peak times. Set up a valid key in Settings > Secrets to unleash deep system thinking capabilities! (API returned: ${apiErr.message || apiErr})`,
+        text: `💡 [Simulation Mode - Fallback] Keep waste minimal by matching production targets to high-traffic rain hours, and shift Chef Skipper to peak times. Set up a valid key in Settings > Secrets to unleash deep system thinking capabilities!`,
         thinking: "Simulating high-reasoning tree gracefully on API fallback..."
       });
     }
@@ -95,7 +101,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
     }
 
     const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       return res.json({
         text: `⚡ [Lite Simulation Mode] Processing: "${command}". Rapid Response suggests Swapping Chef Kowalski to dinner shift, increasing Arctic Burger margins by 3%, and scheduling refrigeration defrosters. Configure a real API key for sub-second live replies!`
       });
@@ -114,9 +120,9 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
         text: response.text || "No response received."
       });
     } catch (apiErr: any) {
-      console.warn("Low Latency Copilot API call failed. Falling back to simulation mode.", apiErr);
+      console.log("Low Latency Copilot falling back to simulation because Gemini key is inactive or failed.");
       res.json({
-        text: `⚡ [Lite Simulation Mode - Fallback] (API returned error: ${apiErr.message || apiErr}). Swapping Chef Kowalski to dinner shift, increasing Arctic Burger margins by 3%, and scheduling refrigeration defrosters. Configure a valid API key for live sub-second replies!`
+        text: `⚡ [Lite Simulation Mode - Fallback] Swapping Chef Kowalski to dinner shift, increasing Arctic Burger margins by 3%, and scheduling refrigeration defrosters. Configure a valid API key for live sub-second replies!`
       });
     }
   } catch (err: any) {
@@ -137,7 +143,7 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
     }
 
     const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       // Return a high quality SVG of food matching the prompt as fallback
       const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${aspectRatio || '1:1'} (Simulated)</text></svg>`;
       return res.json({ imageUrl: mockSvg, simulated: true });
@@ -172,9 +178,9 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
         throw new Error("No image data returned from Gemini flash image.");
       }
     } catch (apiErr: any) {
-      console.warn("Marketing Image API call failed, falling back to simulated SVG:", apiErr);
+      console.log("Marketing Image falling back to simulated SVG because Gemini key is inactive or failed.");
       const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${aspectRatio || '1:1'} (Simulated on Fallback)</text></svg>`;
-      res.json({ imageUrl: mockSvg, simulated: true, explanation: `Real API call returned: ${apiErr.message || apiErr}` });
+      res.json({ imageUrl: mockSvg, simulated: true });
     }
   } catch (err: any) {
     console.error("Image generation error: ", err);
@@ -196,7 +202,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
     const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
 
     const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       return res.json({
         analysis: "🔍 [Photo Audit Simulation] Your dish photo was received! It displays outstanding plating. Cod thickness appears uniform (approx. 2.4cm). Asparagus is well-steamed and color index is healthy. Estimated portion weight is 320g. Waste assessment: Negligible (<5% scrap). Configure your Gemini key to get the live, multi-spectrometer analysis!"
       });
@@ -223,9 +229,9 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
         analysis: response.text || "No analysis generated."
       });
     } catch (apiErr: any) {
-      console.warn("Photo analysis API call failed. Falling back to simulation.", apiErr);
+      console.log("Photo analysis falling back to simulation because Gemini key is inactive or failed.");
       res.json({
-        analysis: `🔍 [Photo Audit Simulation - Fallback] Your dish photo was received! It displays outstanding plating. Cod thickness appears uniform (approx. 2.4cm). Asparagus is well-steamed and color index is healthy. Estimated portion weight is 320g. Waste assessment: Negligible (<5% scrap). Configure a valid Gemini key to get live, multi-spectrometer analysis! (API returned: ${apiErr.message || apiErr})`
+        analysis: `🔍 [Photo Audit Simulation - Fallback] Your dish photo was received! It displays outstanding plating. Cod thickness appears uniform (approx. 2.4cm). Asparagus is well-steamed and color index is healthy. Estimated portion weight is 320g. Waste assessment: Negligible (<5% scrap). Configure a valid Gemini key to get live, multi-spectrometer analysis!`
       });
     }
   } catch (err: any) {
@@ -246,7 +252,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
     }
 
     const ai = getAiClient();
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       return res.json({
         text: `🌐 [Search Grounding Simulation] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Cold-water species like Atlantic Salmon and Halibut keep a high premium, up 4.1% MoM. Plant-based ocean substitutes gain popularity in urban regions. Commodity rates for bulk packaging plastics are up due to freight climbs.`
       });
@@ -266,9 +272,9 @@ app.post("/api/gemini/search-trends", async (req, res) => {
         text: response.text || "No grounded research found."
       });
     } catch (apiErr: any) {
-      console.warn("Search grounding API call failed. Falling back to simulation.", apiErr);
+      console.log("Search grounding falling back to simulation because Gemini key is inactive or failed.");
       res.json({
-        text: `🌐 [Search Grounding Simulation - Fallback] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Cold-water species like Atlantic Salmon and Halibut keep a high premium, up 4.1% MoM; plant-based seafood alternatives expand key urban channels. (API returned: ${apiErr.message || apiErr})`
+        text: `🌐 [Search Grounding Simulation - Fallback] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Cold-water species like Atlantic Salmon and Halibut keep a high premium, up 4.1% MoM; plant-based seafood alternatives expand key urban channels.`
       });
     }
   } catch (err: any) {
@@ -295,7 +301,7 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
       "INV-103": 100
     };
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "MY_GEMINI_API_KEY") {
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       return res.json({
         text: `📦 [Simulation Mode] Analyzed past 7 days for ${branch}. Suggested restock allocations generated based on simulated historical drawdown velocity.`,
         jsonString: JSON.stringify(mockJson)
@@ -318,15 +324,59 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
         jsonString: cleanedJson
       });
     } catch (apiErr: any) {
-      console.warn("Suggest restock API call failed. Falling back to simulation.", apiErr);
+      console.log("Suggest restock falling back to simulation because Gemini key is inactive or failed.");
       res.json({
-        text: `📦 [Simulation Mode - Fallback] Analyzed past 7 days for ${branch}. Suggested restock allocations generated based on simulated historical drawdown velocity. (API returned: ${apiErr.message || apiErr})`,
+        text: `📦 [Simulation Mode - Fallback] Analyzed past 7 days for ${branch}. Suggested restock allocations generated based on simulated historical drawdown velocity.`,
         jsonString: JSON.stringify(mockJson)
       });
     }
   } catch (err: any) {
     console.error("Suggest Restock error: ", err);
     res.status(500).json({ error: err.message || "Failed to calculate restock metrics." });
+  }
+});
+
+// ==========================================
+// 7. SHIFT SUMMARY GENERATOR
+// Model: gemini-3.5-flash
+// ==========================================
+app.post("/api/gemini/shift-summary", async (req, res) => {
+  try {
+    const { branch, metrics } = req.body;
+    if (!branch || !metrics) {
+      return res.status(400).json({ error: "Branch and metrics are required" });
+    }
+
+    const ai = getAiClient();
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
+      return res.json({
+        summary: `✨ [Simulation Mode] ${branch} is performing solidly today with an AI Health Score of ${metrics.aiHealthScore || 78}%. Cumulative sales are currently €${(metrics.salesToday || 0).toLocaleString()} against €${(metrics.wasteCost || 0).toFixed(2)} in recorded food waste costs. Maintain steady focus on key-hour kitchen scheduling to keep margins high.`
+      });
+    }
+
+    try {
+      const prompt = `Analyze these shift metrics for our food retail branch "${branch}" today and write a short, professional, natural language "Shift Summary" (no more than 3 sentences). Emphasize current sales of €${(metrics.salesToday || 0).toLocaleString()}, food waste costs of €${(metrics.wasteCost || 0).toFixed(2)}, an active AI Health Score of ${metrics.aiHealthScore || 78}%, and production items outputted (${metrics.productionItems || 0} items made out of a target of ${metrics.productionTarget || 0}). Keep it punchy, motivating, and highly practical for floor managers.`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          systemInstruction: "You are an elite operational executive at Food Penguin kitchen operations. You write high-precision, natural language shift summaries that are clear, concise, and professional."
+        }
+      });
+
+      res.json({
+        summary: response.text || "No summary text generated."
+      });
+    } catch (apiErr: any) {
+      console.log("Shift summary falling back to simulation because Gemini key is inactive or failed.");
+      res.json({
+        summary: `✨ [Simulation Mode - Fallback] ${branch} is performing solidly today with an AI Health Score of ${metrics.aiHealthScore || 78}%. Cumulative sales are €${(metrics.salesToday || 0).toLocaleString()} against €${(metrics.wasteCost || 0).toFixed(2)} in recorded food waste costs.`
+      });
+    }
+  } catch (err: any) {
+    console.error("Shift Summary error: ", err);
+    res.status(500).json({ error: err.message || "Failed to generate shift summary." });
   }
 });
 

@@ -70,13 +70,64 @@ export default function OverviewTab({
   );
   const [advisorResponse, setAdvisorResponse] = useState<string>("");
   const [thinkingProcess, setThinkingProcess] = useState<string>("");
-  const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Gemini Shift Summary states
+  const [shiftSummary, setShiftSummary] = useState<string>("");
+  const [summaryLoading, setSummaryLoading] = useState<boolean>(false);
+  const [summaryError, setSummaryError] = useState<string>("");
 
   // Daily Selection tabs for viewing the KPI dashboard
   const [selectedDayTab, setSelectedDayTab] = useState<'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun'>('Sun');
 
   const activeLog = weeklyLogs.find(l => l.day === selectedDayTab) || weeklyLogs[6];
+
+  const fetchShiftSummary = async () => {
+    setSummaryLoading(true);
+    setSummaryError("");
+    try {
+      const calculatedEff = Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110)));
+      const response = await fetch("/api/gemini/shift-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branch: selectedBranch,
+          metrics: {
+            salesToday: activeLog.sales,
+            wasteCost: activeLog.waste,
+            productionTarget: activeLog.productionTarget,
+            productionItems: activeLog.productionMade,
+            aiHealthScore: calculatedEff
+          }
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.summary) {
+        setShiftSummary(data.summary);
+      } else {
+        throw new Error("No summary returned");
+      }
+    } catch (err: any) {
+      console.error("Error fetching shift summary:", err);
+      setSummaryError(err.message || "Failed to generate summary");
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchShiftSummary();
+  }, [
+    selectedBranch,
+    selectedDayTab,
+    activeLog.sales,
+    activeLog.waste,
+    activeLog.productionMade,
+    activeLog.productionTarget
+  ]);
   const totalCogsActiveDay = activeLog.cogs.tazaki + activeLog.cogs.sysco + activeLog.cogs.bulza + activeLog.cogs.sticker + activeLog.cogs.others;
 
   // Total Weekly COGS
@@ -137,8 +188,6 @@ export default function OverviewTab({
       }
     };
     onAddOrUpdateLog(updatedRecord);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 2000);
   };
 
   // Recharts Chart Data (correlated metrics across hours/days)
@@ -776,6 +825,104 @@ export default function OverviewTab({
         </div>
       </div>
 
+      {/* Real-time AI Operations Shift Summary */}
+      <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
+        isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'
+      }`}>
+        <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+        
+        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
+          isLight ? 'border-zinc-200' : 'border-zinc-800'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`p-3 border rounded-2xl transition-all duration-300 ${
+              isLight ? 'bg-orange-50 border-orange-100 text-orange-600' : 'bg-orange-950/30 border-orange-900/40 text-orange-400'
+            }`}>
+              <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
+            </div>
+            <div>
+              <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+                AI Live Shift Summary Report
+                <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+                  isLight 
+                    ? 'bg-orange-50 border-orange-200 text-orange-700' 
+                    : 'bg-orange-500/10 border-orange-500/30 text-orange-400'
+                }`}>
+                  Live Analysis
+                </span>
+              </h3>
+              <p className="subtitle text-xs text-zinc-500">
+                Cognitive evaluation of performance metrics for {selectedBranch} on {activeLog.day} ({activeLog.date})
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={fetchShiftSummary}
+            disabled={summaryLoading}
+            type="button"
+            className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border hover:shadow-md disabled:opacity-50 ${
+              isLight 
+                ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' 
+                : 'bg-zinc-950 border-zinc-800 text-zinc-350 hover:bg-zinc-900 hover:text-white'
+            }`}
+          >
+            {summaryLoading ? (
+              <>
+                <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <BrainCircuit className="w-3.5 h-3.5" />
+                Regenerate Feedback
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="mt-6">
+          {summaryLoading ? (
+            <div className="space-y-3 py-2 animate-pulse">
+              <div className={`h-4 rounded-full w-3/4 ${isLight ? 'bg-zinc-100' : 'bg-zinc-800'}`} />
+              <div className={`h-4 rounded-full w-5/6 ${isLight ? 'bg-zinc-100' : 'bg-zinc-800'}`} />
+              <div className={`h-4 rounded-full w-2/3 ${isLight ? 'bg-zinc-100' : 'bg-zinc-800'}`} />
+            </div>
+          ) : summaryError ? (
+            <div className={`p-4 rounded-2xl border text-xs font-mono/80 ${
+              isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-950/20 border-rose-900/40 text-rose-400'
+            }`}>
+              ⚠️ Failed to fetch live summary feedback: {summaryError}. Please verify your API key is correctly configured.
+            </div>
+          ) : (
+            <div className={`p-5 rounded-2xl border relative overflow-hidden transition-colors ${
+              isLight 
+                ? 'bg-orange-50/20 border-orange-100/70 text-zinc-800' 
+                : 'bg-orange-950/5 border-orange-900/10 text-zinc-300'
+            }`}>
+              <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full filter blur-xl pointer-events-none" />
+              <p className="text-sm leading-relaxed whitespace-pre-wrap font-sans relative z-10 italic">
+                "{shiftSummary || 'Selecting metrics and compiling the shift trajectory summary...'}"
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-6 mt-4 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-850 font-mono text-[10px] text-zinc-500">
+                <div className="flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${
+                    Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110))) >= 80 
+                      ? 'bg-emerald-500' 
+                      : 'bg-amber-500'
+                  }`} />
+                  <span>Efficiency Score: {Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110)))}%</span>
+                </div>
+                <div>Sales: €{activeLog.sales.toLocaleString()}</div>
+                <div>Waste: €{activeLog.waste.toFixed(2)}</div>
+                <div>Production Items: {activeLog.productionMade}/{activeLog.productionTarget}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Main Stats Charts & Active Targets */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
         {/* Interactive Production & Revenue Chart */}
@@ -1255,6 +1402,172 @@ export default function OverviewTab({
                 type="monotone"
                 dataKey="productionMade" 
                 name="productionMade" 
+                stroke="#10b981" 
+                strokeWidth={3}
+                dot={{ r: 4, strokeWidth: 1 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Live Estimated Profit Trajectory Line Chart */}
+      <div id="live-profit-trajectory" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
+        isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'
+      }`}>
+        <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+        
+        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
+          isLight ? 'border-zinc-200' : 'border-zinc-800'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`p-3 border rounded-2xl transition-all duration-300 ${
+              isLight ? 'bg-zinc-100 border-zinc-200 text-emerald-600' : 'bg-zinc-950 border-zinc-800 text-emerald-400'
+            }`}>
+              <Activity className="w-5 h-5 flex-shrink-0" />
+            </div>
+            <div>
+              <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+                Real-Time Intra-Day Profit Trajectory
+                <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+                  isLight 
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                }`}>
+                  Live Projection
+                </span>
+              </h3>
+              <p className="subtitle text-xs text-zinc-500">
+                Prorated hourly cumulative trajectory using live sales (€{metrics.salesToday.toLocaleString()}) and active waste costs (€{metrics.wasteCost.toFixed(2)})
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex gap-4 font-mono text-[11px] items-center">
+            <div className="flex items-center gap-1.5 font-sans">
+              <span className="w-2.5 h-0.5" style={{ backgroundColor: isLight ? '#71717a' : '#9ca3af' }} />
+              <span className={`font-semibold ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>Est. Sales</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-sans">
+              <span className="w-2.5 h-0.5 bg-rose-500" />
+              <span className={`font-semibold ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>Est. Waste</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-sans">
+              <span className="w-2.5 h-0.5 bg-emerald-500 font-extrabold" />
+              <span className={`font-semibold ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>Est. Cumulative Profit</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-80 w-full mt-6">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={(() => {
+                const hourlyRatios = [
+                  { time: '08:00', salesPct: 0.05, wastePct: 0.12 },
+                  { time: '10:00', salesPct: 0.15, wastePct: 0.22 },
+                  { time: '12:00', salesPct: 0.40, wastePct: 0.38 },
+                  { time: '14:00', salesPct: 0.55, wastePct: 0.52 },
+                  { time: '16:00', salesPct: 0.65, wastePct: 0.62 },
+                  { time: '18:00', salesPct: 0.85, wastePct: 0.78 },
+                  { time: '20:00', salesPct: 0.95, wastePct: 0.90 },
+                  { time: '22:00', salesPct: 1.00, wastePct: 1.00 },
+                ];
+                return hourlyRatios.map(pt => {
+                  const cumSales = pt.salesPct * metrics.salesToday;
+                  const cumWaste = pt.wastePct * metrics.wasteCost;
+                  const cumProfit = cumSales - cumWaste;
+                  return {
+                    time: pt.time,
+                    Sales: Math.round(cumSales),
+                    Waste: Math.round(cumWaste),
+                    Profit: Math.round(cumProfit)
+                  };
+                });
+              })()}
+              margin={{ top: 15, right: 15, left: 10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
+              <XAxis 
+                dataKey="time" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }}
+                unit="€"
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: isLight ? '#ffffff' : '#09090b', 
+                  borderRadius: '16px', 
+                  color: isLight ? '#18181b' : '#fff', 
+                  border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' 
+                }}
+                labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
+                cursor={{ stroke: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', strokeWidth: 1 }}
+                formatter={(value: any, name: any) => [`€${Number(value).toLocaleString()}`, name]}
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36} 
+                content={({ payload }) => (
+                  <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
+                    {payload?.map((entry: any, index: number) => {
+                      let strokeColor = entry.color;
+                      let label = entry.value;
+                      if (entry.value === 'Profit') {
+                        strokeColor = '#10b981';
+                        label = 'Est. Cumulative Profit';
+                      } else if (entry.value === 'Sales') {
+                        strokeColor = isLight ? '#71717a' : '#9ca3af';
+                        label = 'Est. Sales';
+                      } else if (entry.value === 'Waste') {
+                        strokeColor = '#f43f5e';
+                        label = 'Est. Waste';
+                      }
+                      return (
+                        <div key={`item-${index}`} className="flex items-center gap-2">
+                          <span 
+                            className="w-2.5 h-0.5"
+                            style={{ backgroundColor: strokeColor }} 
+                          />
+                          <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-650' : 'text-zinc-400'}`}>
+                            {label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              />
+              <Line 
+                type="monotone"
+                dataKey="Sales" 
+                name="Sales" 
+                stroke={isLight ? '#71717a' : '#9ca3af'} 
+                strokeWidth={2}
+                dot={{ r: 3, strokeWidth: 1 }}
+                activeDot={{ r: 5 }}
+              />
+              <Line 
+                type="monotone"
+                dataKey="Waste" 
+                name="Waste" 
+                stroke="#f43f5e" 
+                strokeWidth={2}
+                dot={{ r: 3, strokeWidth: 1 }}
+                activeDot={{ r: 5 }}
+              />
+              <Line 
+                type="monotone"
+                dataKey="Profit" 
+                name="Profit" 
                 stroke="#10b981" 
                 strokeWidth={3}
                 dot={{ r: 4, strokeWidth: 1 }}
@@ -1814,14 +2127,10 @@ export default function OverviewTab({
           <div className={`flex justify-end pt-4 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}>
             <button
               type="submit"
-              className={`px-6 py-3 transition-all duration-300 rounded-xl flex items-center justify-center gap-2 shadow-lg border hover:scale-[1.01] font-bold text-sm ${
-                showSuccess
-                  ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500/20 shadow-emerald-500/15"
-                  : "bg-orange-600 hover:bg-orange-700 text-white border-orange-500/20 shadow-orange-500/15"
-              }`}
+              className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01]"
             >
-              {showSuccess ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-              {showSuccess ? "Records Committed!" : "Commit Active Operational Records"}
+              <Save className="w-4 h-4" />
+              Commit Active Operational Records
             </button>
           </div>
         </form>
