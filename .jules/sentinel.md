@@ -1,0 +1,4 @@
+## 2025-05-24 - [XSS via Dangerous SVG Injection]
+**Vulnerability:** Cross-Site Scripting (XSS) via `dangerouslySetInnerHTML`. The application was taking a user-provided data URL, and if it contained "xml", it was stripping the header and injecting the raw SVG content directly into a `div`'s `innerHTML`.
+**Learning:** Even "simulation" or "fallback" code paths can introduce severe vulnerabilities if they bypass standard security controls like React's escaping. SVGs are particularly dangerous because they can contain `<script>` tags that execute in the context of the origin when injected into the DOM.
+**Prevention:** Never use `dangerouslySetInnerHTML` with user-provided content. To render SVGs safely, use an `<img>` tag with the SVG as the `src`. Browsers treat images as static resources and will not execute scripts within them.
