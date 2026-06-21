@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { SalesOrder } from '../types';
-import { useApi } from '../hooks/useApi';
-import { postApi } from '../utils/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
-import {
-  DollarSign,
-  ShoppingCart,
+import { 
+  DollarSign, 
+  ShoppingCart, 
   Image as ImageIcon,
   Sparkles,
   Download,
   AlertCircle,
-  Plus,
-  FileText
+  Plus
 } from 'lucide-react';
 
 interface SellTabProps {
@@ -33,28 +30,20 @@ export const ASPECT_RATIOS = [
 export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   // New Order Form state
   const [newItem, setNewItem] = useState('');
-  const [newCategory, setNewCategory] = useState('Nigiri');
+  const [newCategory, setNewCategory] = useState('Arctic Burgers');
   const [newQty, setNewQty] = useState(1);
   const [newPrice, setNewPrice] = useState(12.50);
 
   // AI Menu Banner Maker state
-  const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium salmon and bluefin tuna nigiri with a signature dragon roll on a slate board, garnished with wasabi and pickled ginger, high-end catalog style');
+  const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium Alaskan Cod fish burgers on ice, side of seaweed fries, high-end catalog style');
   const [selectedRatio, setSelectedRatio] = useState('16:9');
-  const { data: imageData, loading: loadingImage, error: imageError, execute: generateBannerApi } = useApi<{ imageUrl: string }, { prompt: string; aspectRatio: string }>();
-  // AI Sales Summary state
-  const { data: salesSummaryData, loading: loadingSalesSummary, error: salesSummaryError, execute: generateSalesSummaryApi } = useApi<{ summary: string }, { orders: SalesOrder[] }>();
+  const [generatedImg, setGeneratedImg] = useState<string>('');
+  const [loadingImage, setLoadingImage] = useState(false);
+  const [imageError, setImageError] = useState('');
 
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.trim()) return;
-    if (newQty <= 0 || newPrice <= 0) {
-      alert("Error: Quantity and Unit Price must be greater than zero.");
-      return;
-    }
-    if (newPrice > 10000) {
-      alert("Error: Unit Price cannot exceed €10,000.");
-      return;
-    }
     onAddOrder({
       item: newItem,
       category: newCategory,
@@ -69,23 +58,26 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
 
   const handleGenerateBanner = async () => {
     if (!bannerPrompt.trim()) return;
-    generateBannerApi(
-      (params) => postApi("/api/gemini/generate-marketing-image", params),
-      { prompt: bannerPrompt, aspectRatio: selectedRatio },
-      { successMessage: 'Banner generated successfully!' }
-    );
-  };
-
-  const handleGenerateSalesSummary = () => {
-    if (orders.length === 0) {
-      alert("No sales data available to summarize.");
-      return;
+    setLoadingImage(true);
+    setImageError('');
+    setGeneratedImg('');
+    try {
+      const res = await fetch("/api/gemini/generate-marketing-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: bannerPrompt, aspectRatio: selectedRatio }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setImageError(`Error: ${data.error}`);
+      } else {
+        setGeneratedImg(data.imageUrl);
+      }
+    } catch (err: any) {
+      setImageError(`Connection failure: ${err.message || err}`);
+    } finally {
+      setLoadingImage(false);
     }
-    generateSalesSummaryApi(
-      (params) => postApi("/api/gemini/summarize-sales", params),
-      { orders },
-      { successMessage: 'Sales summary complete!' }
-    );
   };
 
   const categoryData = orders.reduce((acc: any, order) => {
@@ -113,23 +105,23 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
-
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      
       {/* LEFT & CENTER: LIVE SALES & TRANSACTION TERMINAL */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
-
+      <div className="xl:col-span-2 space-y-6">
+        
         {/* Quick Menu Overview */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-900">Food Penguin Limited Specialties</h2>
-          <p className="text-xs text-slate-400 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary sushi product groups</p>
-
+          <h2 className="text-sans font-bold text-slate-900">Food Penguin Limited Specialties</h2>
+          <p className="text-xs text-slate-400 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary cold-chain product groups</p>
+          
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'Nigiri Sets', price: '€12.90', margin: '68% margin' },
-              { name: 'Maki Rolls', price: '€8.50', margin: '74% margin' },
-              { name: 'Sashimi Platters', price: '€24.90', margin: '65% margin' },
-              { name: 'Signature Rolls', price: '€16.50', margin: '70% margin' },
-              { name: 'Sides & Drinks', price: '€5.80', margin: '85% margin' }
+              { name: 'Arctic Burgers', price: '$12.90', margin: '68% margin' },
+              { name: 'Glacier Pizzas', price: '$18.50', margin: '72% margin' },
+              { name: 'Cold Desserts', price: '$6.50', margin: '80% margin' },
+              { name: 'Glacier Drinks', price: '$5.80', margin: '85% margin' },
+              { name: 'Marine Platters', price: '$24.90', margin: '65% margin' }
             ].map((cat, idx) => (
               <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-white hover:shadow-sm hover:border-orange-200">
                 <span className="text-xs font-bold text-slate-700">{cat.name}</span>
@@ -146,31 +138,12 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Active Order Ledger</h2>
+              <h2 className="text-sans font-bold text-slate-900">Active Order Ledger</h2>
               <p className="text-xs text-slate-500">Live POS sales tracked since midnight</p>
             </div>
-            <div className="flex items-center gap-2 self-start sm:self-center">
-              <button
-                onClick={handleGenerateSalesSummary}
-                disabled={loadingSalesSummary || orders.length === 0}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-all inline-flex items-center justify-center gap-1.5 shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-              >
-                {loadingSalesSummary ? (
-                  <>
-                    <span className="w-3.5 h-3.5 border-2 border-slate-400/30 border-t-slate-500 rounded-full animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                    Summarize Sales
-                  </>
-                )}
-              </button>
-              <span className="bg-orange-50 text-orange-700 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-orange-100">
-                {orders.length} Purchases
-              </span>
-            </div>
+            <span className="bg-orange-50 text-orange-700 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-orange-100 self-start">
+              {orders.length} Active Purchases
+            </span>
           </div>
 
           <div className="h-56 mt-6 mb-6">
@@ -178,8 +151,8 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               <BarChart data={barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={(val) => `€${val}`} />
-                <Tooltip
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} tickFormatter={(val) => `$${val}`} />
+                <Tooltip 
                   cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
                   itemStyle={{ color: '#f97316', fontWeight: 'bold' }}
@@ -192,23 +165,6 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          {salesSummaryData?.summary && (
-            <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-orange-600" />
-                <h3 className="text-sm font-bold text-slate-800">AI Sales Summary</h3>
-              </div>
-              <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">{salesSummaryData.summary}</p>
-            </div>
-          )}
-
-          {salesSummaryError && (
-            <div className="mb-6 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <p className="whitespace-pre-wrap">{salesSummaryError}</p>
-            </div>
-          )}
 
           <div className="overflow-x-auto border-t border-slate-100 pt-4">
             <table className="w-full text-left text-xs text-slate-700">
@@ -230,7 +186,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                     <td className="py-3 px-4 font-medium text-slate-800">{order.item}</td>
                     <td className="py-3 px-4 text-slate-500">{order.category}</td>
                     <td className="py-3 px-4 text-center font-mono">{order.quantity}</td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">€{order.amount.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">${order.amount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -240,8 +196,8 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
       </div>
 
       {/* RIGHT SIDEBAR: ORDER CREATOR & BANNER GENERATOR */}
-      <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
-
+      <div className="space-y-6">
+        
         {/* Mock POS Order Creator */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="flex items-center gap-2 pb-4 border-b border-slate-100 mb-4">
@@ -257,7 +213,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
-                placeholder="e.g. Glacier Salmon Nigiri (8pc)"
+                placeholder="e.g. Glacier Cod burger Double"
                 className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
@@ -270,21 +226,19 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full mt-1.5 p-2.5 text-xs border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
                 >
-                  <option>Nigiri</option>
-                  <option>Maki Rolls</option>
-                  <option>Signature Rolls</option>
-                  <option>Sashimi</option>
-                  <option>Sides & Drinks</option>
+                  <option>Arctic Burgers</option>
+                  <option>Glacier Pizzas</option>
+                  <option>Desserts</option>
+                  <option>Glacier Drinks</option>
+                  <option>Arctic Platters</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Unit Price (€)</label>
+                <label className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Unit Price ($)</label>
                 <input
                   type="number"
                   step="0.10"
-                  min="0.01"
-                  max="10000"
                   required
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}
@@ -353,10 +307,11 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   type="button"
                   key={r.value}
                   onClick={() => setSelectedRatio(r.value)}
-                  className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${selectedRatio === r.value
-                    ? 'bg-slate-900 border-slate-900 text-white font-bold shadow'
-                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-                    }`}
+                  className={`px-3 py-2 border text-[10px] rounded-xl text-left transition-all ${
+                    selectedRatio === r.value
+                      ? 'bg-slate-900 border-slate-900 text-white font-bold shadow'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
                 >
                   {r.label}
                 </button>
@@ -383,14 +338,14 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           </button>
 
           {/* Render Result with matching simulated bounds */}
-          {imageData?.imageUrl && (
+          {generatedImg && (
             <div className="space-y-2 pt-2">
               <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 font-bold block">
                 Visual Render Response ({selectedRatio}):
               </span>
               <div className="flex justify-center bg-slate-950 p-3 rounded-2xl border border-slate-900 shadow-inner">
                 <img
-                  src={imageData.imageUrl}
+                  src={generatedImg}
                   referrerPolicy="no-referrer"
                   alt="AI Food Penguin Banner"
                   className={`w-full max-h-[300px] object-contain rounded-xl ${getTailwindAspectClass(selectedRatio)}`}

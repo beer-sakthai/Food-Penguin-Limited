@@ -30,10 +30,6 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
   const [repurposeStrategy, setRepurposeStrategy] = useState('');
   const [strategyLoading, setStrategyLoading] = useState(false);
 
-  // AI waste reduction advisor states
-  const [reductionAnalysis, setReductionAnalysis] = useState('');
-  const [analysisLoading, setAnalysisLoading] = useState(false);
-
   // Compute Data for Pie Chart
   const reasonData = wasteRecords.reduce((acc: any, rec) => {
     if (!acc[rec.reason]) acc[rec.reason] = 0;
@@ -53,19 +49,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItem.trim()) return;
-    if (weight <= 0 || cost <= 0) {
-      alert("Error: Weight and Estimated loss must be greater than zero.");
-      return;
-    }
-    if (weight > 1000) {
-      alert("Error: Weight cannot exceed 1,000 kg.");
-      return;
-    }
-    if (cost > 10000) {
-      alert("Error: Cost cannot exceed €10,000.");
-      return;
-    }
+    if (!newItem.trim() || weight <= 0 || cost <= 0) return;
     onAddWaste({
       item: newItem,
       category,
@@ -112,17 +96,17 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="xl:col-span-2 space-y-6">
 
         {/* Dynamic Allowance Index and Chart Split */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Food Waste Cost Summary</h2>
+                <h2 className="text-base font-sans font-semibold text-slate-900">Food Waste Cost Summary</h2>
                 <p className="subtitle text-xs text-slate-500">Corporate daily financial leakage benchmarks</p>
               </div>
               
@@ -133,7 +117,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 <div>
                   <span className="text-[10px] uppercase font-mono text-rose-500 font-bold tracking-wide">Leakage Today</span>
                   <span className="text-lg font-sans font-bold text-slate-905 block -mt-1">
-                    €{totalCostToday.toFixed(2)}
+                    ${totalCostToday.toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -147,7 +131,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 />
               </div>
               <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-2">
-                <span>Safety Limit Target: €500.00 Max</span>
+                <span>Safety Limit Target: $500.00 Max</span>
                 <span className="font-bold text-rose-600">
                   {((totalCostToday / 500) * 100).toFixed(1)}% of allowance consumed
                 </span>
@@ -156,7 +140,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm h-48 md:h-auto min-h-[220px] flex flex-col">
-            <h2 className="text-lg font-semibold text-slate-900">Leakage Proportions</h2>
+            <h2 className="text-base font-sans font-semibold text-slate-900">Leakage Proportions</h2>
             <p className="text-xs text-slate-500">Cost value breakdown by incident reason</p>
             <div className="flex-1 mt-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -164,7 +148,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
                     itemStyle={{ fontWeight: 'bold' }}
-                    formatter={(value: number) => `€${value.toFixed(2)}`}
+                    formatter={(value: number) => `$${value.toFixed(2)}`}
                   />
                   <Pie
                     data={pieData}
@@ -196,7 +180,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
         {/* Active Waste Ledger */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="pb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Daily Spoilage & Scrap Ledger</h2>
+            <h2 className="text-base font-sans font-semibold text-slate-900">Daily Spoilage & Scrap Ledger</h2>
             <p className="text-xs text-slate-500">Documented items removed from active inventory</p>
           </div>
 
@@ -222,7 +206,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                         {rec.reason}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-rose-600">-€{rec.cost.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-rose-600">-${rec.cost.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -232,7 +216,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
       </div>
 
       {/* RIGHT SIDE ASPECT: WASTE LOG BUILDER & AI OPTIMIZER */}
-      <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="space-y-6">
 
         {/* Scraps Spoilage Log Creator */}
         <div className="bg-white rounded-xl border border-slate-150 p-5 shadow-sm">
@@ -249,7 +233,7 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
-                placeholder="e.g. Oxidized tuna trim, Dried nori sheets"
+                placeholder="e.g. Broken cod batter, Soggy lettuce"
                 className="w-full mt-1 p-2 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none"
               />
             </div>
@@ -263,10 +247,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                   className="w-full mt-1 p-2 text-xs border border-slate-200 bg-white rounded focus:ring-1 focus:ring-sky-500 focus:outline-none"
                 >
                   <option>Seafood</option>
-                  <option>Rice</option>
-                  <option>Seaweed</option>
+                  <option>Bakery</option>
+                  <option>Dairy</option>
                   <option>Produce</option>
-                  <option>Condiments</option>
+                  <option>Packaging</option>
                 </select>
               </div>
 
@@ -275,8 +259,6 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 <input
                   type="number"
                   step="0.1"
-                  min="0.1"
-                  max="1000"
                   required
                   value={weight || ''}
                   onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
@@ -287,12 +269,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] font-mono text-slate-400 uppercase">Estimated loss (€)</label>
+                <label className="text-[10px] font-mono text-slate-400 uppercase">Estimated loss ($)</label>
                 <input
                   type="number"
                   step="0.1"
-                  min="0.01"
-                  max="10000"
                   required
                   value={cost || ''}
                   onChange={(e) => setCost(parseFloat(e.target.value) || 0)}
@@ -349,10 +329,10 @@ export default function WasteTab({ wasteRecords, onAddWaste, totalCostToday }: W
                 onChange={(e) => setHelpCat(e.target.value)}
                 className="w-full mt-1 p-2 text-xs border border-slate-250 bg-white rounded focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
-                <option value="Seafood">Seafood Scraps (tuna/salmon trim, belly cuts)</option>
-                <option value="Rice">Sushi Rice Overshoot (over-seasoned shari)</option>
-                <option value="Seaweed">Nori Offcuts (dried or damp sheets)</option>
-                <option value="Produce">Produce Trimmings (avocado, cucumber ends)</option>
+                <option value="Seafood">Seafood Scraps (cod, salmon cuts)</option>
+                <option value="Bakery">Bakery Overshoot (buns, crusts)</option>
+                <option value="Dairy">Dairy Leftovers (custard mixes, milks)</option>
+                <option value="Produce">Produce Trimmings (lettuce stalks, lemon skins)</option>
               </select>
             </div>
 

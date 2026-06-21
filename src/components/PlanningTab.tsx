@@ -18,7 +18,7 @@ interface PlanningTabProps {
 
 export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabProps) {
   // Search Grounding states
-  const [procurementQuery, setProcurementQuery] = useState('Current wholesale bulk price of sushi-grade bluefin tuna and Norwegian salmon, plus Koshihikari rice and nori supply bottlenecks.');
+  const [procurementQuery, setProcurementQuery] = useState('Current wholesale bulk price of wild cold-water Alaskan Cod slabs, and general ocean shipment bottlenecks.');
   const [groundedInsights, setGroundedInsights] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
 
@@ -55,15 +55,15 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="xl:col-span-2 space-y-6">
 
         {/* Stock Level Matrix */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="pb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Cold Chain Inventory Planning</h2>
+            <h2 className="text-base font-sans font-semibold text-slate-900">Cold Chain Inventory Planning</h2>
             <p className="text-xs text-slate-500">Documented levels of fresh ingredients & freezer raw materials</p>
           </div>
 
@@ -117,7 +117,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
       </div>
 
       {/* RIGHT SIDEBAR: COMMODITY PROCUREMENT GROUNDING WITH gemini-3.5-flash */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[580px]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-sky-600 animate-pulse" />
@@ -129,7 +129,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
         </div>
 
         <p className="text-xs text-slate-500 leading-relaxed font-sans">
-          This feature implements active <span className="text-sky-600 font-bold">Google Search Grounding</span>. Before purchasing bulk shipments of sushi-grade fish, rice, or nori, use the live search grounder to scan global wholesale trends:
+          This feature implements active <span className="text-sky-600 font-bold">Google Search Grounding</span>. Before purchasing bulk shipments of flour, fish, or packaging, use the live search grounder to scan global wholesale trends:
         </p>
 
         <div>
@@ -163,7 +163,7 @@ export default function PlanningTab({ inventory, onOrderRestock }: PlanningTabPr
         </button>
 
         {groundedInsights && (
-          <div className="bg-white border border-slate-200/95 rounded-lg p-4 shadow-inner space-y-2 overflow-y-auto scrollbar-hide max-h-[220px]">
+          <div className="bg-white border border-slate-200/95 rounded-lg p-4 shadow-inner space-y-2 overflow-y-auto max-h-[220px]">
             <span className="text-[10px] uppercase font-mono tracking-wider text-sky-600 font-extrabold flex items-center gap-1">
               <Globe className="w-3.5 h-3.5" /> Grounded Search Findings (2026):
             </span>

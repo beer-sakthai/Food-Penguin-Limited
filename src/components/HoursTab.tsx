@@ -20,7 +20,7 @@ interface HoursTabProps {
 export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
   // Roster AI analyzer states
   const [schedulerPrompt, setSchedulerPrompt] = useState(
-    "Junior Itamae Private is scheduled to open the sushi counter tomorrow (08:00) but requires a swap with Prep Aide Rico, who is scheduled for the night closing. Itamae Kowalski is supervisor. Review viability and fish-handling certification coverage."
+    "Junior Chef Private is scheduled to open tomorrow (08:00) but requires swap with Kitchen Aide Rico, who is scheduled for the night closing. Kowalski is supervisor. Review viability."
   );
   const [schedulingResult, setSchedulingResult] = useState('');
   const [complianceLoading, setComplianceLoading] = useState(false);
@@ -50,16 +50,16 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       {/* LEFT ASPECT: EMPLOYEES DIRECTORY & SIMULATORS */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="xl:col-span-2 space-y-6">
 
         {/* Shift Roster Summary metrics */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Weekly Labor Allocation</h2>
+              <h2 className="text-sans font-bold text-slate-900">Weekly Labor Allocation</h2>
               <p className="subtitle text-xs text-slate-500">Live operational hours logged vs scheduled</p>
             </div>
 
@@ -99,7 +99,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
         {/* Employee Roster List */}
         <div className="bg-white rounded-3xl border border-slate-205 p-6 shadow-sm">
           <div className="pb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Current Crew Roll-Call</h2>
+            <h2 className="text-base font-sans font-semibold text-slate-900">Current Crew Roll-Call</h2>
             <p className="text-xs text-slate-500">Click actions to simulate live clocking and work register shifts</p>
           </div>
 
@@ -146,7 +146,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
       </div>
 
       {/* RIGHT ASPECT SIDEBAR: SHIFT SWAP AI CONSULTANT */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[550px]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Contact className="w-4 h-4 text-sky-600" />

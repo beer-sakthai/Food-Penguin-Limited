@@ -24,26 +24,26 @@ interface ProductionTabProps {
 // Low-profile base64 image placeholders for instant simulation
 const SAMPLE_MOCK_DISHES = [
   {
-    name: "Salmon Nigiri",
-    data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23fb7185'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10'>Salmon Nigiri</text></svg>",
-    desc: "A pair of hand-pressed salmon nigiri over seasoned shari rice with a brush of wasabi."
+    name: "Cod Burger Double",
+    data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%230284c7'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10'>Cod Burger</text></svg>",
+    desc: "A freshly cooked double stack Alaskan Cod filet burger with dripping glacier-sauce."
   },
   {
-    name: "Dragon Roll",
-    data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23047857'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10'>Dragon Roll</text></svg>",
-    desc: "Unagi and tempura shrimp roll topped with fanned avocado, eel glaze and tobiko."
+    name: "Emperor Pizza",
+    data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23b91c1c'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10'>Emperor Pizza</text></svg>",
+    desc: "Ultra thin sourdough pizza slice with molten mozzarella and charred pepperoni discs."
   },
   {
-    name: "Sashimi Platter",
-    data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%230284c7'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10'>Sashimi</text></svg>",
-    desc: "Sliced bluefin tuna, salmon belly and yellowtail sashimi on a daikon nest with shiso."
+    name: "Peppermint Sundae",
+    data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23059669'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='10'>Sweet Polar</text></svg>",
+    desc: "Peppermint-infused gelato with chocolate crumbs and sugar crystal frost."
   }
 ];
 
 export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: ProductionTabProps) {
   // New production cooker task form
   const [taskItem, setTaskItem] = useState('');
-  const [assignedTo, setAssignedTo] = useState('Itamae Skipper');
+  const [assignedTo, setAssignedTo] = useState('Chef Skipper');
   const [qty, setQty] = useState(1);
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
 
@@ -122,20 +122,20 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
-
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      
       {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="xl:col-span-2 space-y-6">
         
         {/* Active Cooking Grid */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Kitchen Thru-rate Monitoring</h2>
+              <h2 className="text-base font-sans font-semibold text-slate-900">Kitchen Thru-rate Monitoring</h2>
               <p className="text-xs text-slate-500">Active chef workflows and queue states</p>
             </div>
             <span className="p-1 px-3 text-[10px] rounded-full bg-emerald-50 text-emerald-700 font-mono font-bold border border-emerald-100">
-              {tasks.filter(t => t.status === 'Cooking').length} At The Counter
+              {tasks.filter(t => t.status === 'Cooking').length} Active Pots
             </span>
           </div>
 
@@ -206,7 +206,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
 
         {/* Master Recipes Catalogue */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 pb-1">Ocean-to-Plate Recipe Standard</h2>
+          <h2 className="text-base font-sans font-semibold text-slate-900 pb-1">Ocean-to-Plate Recipe Standard</h2>
           <p className="text-xs text-slate-500 pb-4">Approved corporate dish compositions and prep profiles</p>
 
           <div className="space-y-3">
@@ -234,7 +234,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
       </div>
 
       {/* RIGHT SIDE: KITCHEN CONTROLLER & CULINARY QUALITY SCANNER */}
-      <div className="space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="space-y-6">
         
         {/* Create task inline */}
         <div className="bg-white rounded-xl border border-slate-150 p-5 shadow-sm">
@@ -267,10 +267,10 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                   onChange={(e) => setAssignedTo(e.target.value)}
                   className="w-full mt-1 p-2 text-xs border border-slate-200 bg-white rounded focus:ring-1 focus:ring-sky-500 focus:outline-none"
                 >
-                  <option>Itamae Skipper</option>
-                  <option>Itamae Kowalski</option>
-                  <option>Itamae Private</option>
-                  <option>Prep Aide Rico</option>
+                  <option>Chef Skipper</option>
+                  <option>Chef Kowalski</option>
+                  <option>Chef Private</option>
+                  <option>Kitchen Aide Rico</option>
                 </select>
               </div>
 
@@ -330,7 +330,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
           </div>
 
           <p className="text-xs text-slate-500">
-            Upload a photo of plated sushi, fish deliveries, or prep setups to analyze neta cut quality, rice shaping, freshness, slice thickness, weight, and trim waste.
+            Upload a photo of finished food, ingredient shipments, or prep setups to analyze culinary standards, thickness, weight, and trim waste.
           </p>
 
           {/* Preset Buttons for Easy Instant Testing */}

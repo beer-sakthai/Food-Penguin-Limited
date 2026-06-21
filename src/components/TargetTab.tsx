@@ -93,16 +93,16 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
-
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      
       {/* TARGET PROGRESS & PERFORMANCE OVERVIEW */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="xl:col-span-2 space-y-6">
 
         {/* Global Progress Chart Overview */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="pb-4 border-b border-slate-100 flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Completion Status</h2>
+              <h2 className="text-sans font-bold text-slate-900">Completion Status</h2>
               <p className="text-xs text-slate-500">Corporate-wide metric completions visualized</p>
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
       </div>
 
       {/* FORM: TARGET BUILDER */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm max-h-[550px]">
         <div className="flex items-center gap-2 pb-4 border-b border-slate-100 mb-4 animate-fade-in">
           <Target className="w-5 h-5 text-orange-500" />
           <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Target Formulary Board</span>
@@ -256,7 +256,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
               required
               value={metric}
               onChange={(e) => setMetric(e.target.value)}
-              placeholder="e.g. Sales (€)"
+              placeholder="e.g. Sales ($)"
               className="w-full mt-1.5 p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
             />
           </div>
@@ -279,7 +279,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
                 required
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                placeholder="pcs, €, kg"
+                placeholder="pcs, $, kg"
                 className="w-full mt-1.5 p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
               />
             </div>

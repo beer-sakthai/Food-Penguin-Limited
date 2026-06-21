@@ -18,20 +18,16 @@ interface RealtimeTabProps {
 }
 
 export default function RealtimeTab({ alerts }: RealtimeTabProps) {
-  // Fluctuating Simulated Sensors state.
-  // kind drives both the live tick range and the status thresholds:
-  //   chiller  - sushi-grade neta display case (~3°C)
-  //   freezer  - ultra-low tuna freezer (~-54°C)
-  //   warmer   - shari rice warmer (~37°C) / sanitation tank (~82°C)
+  // Fluctuating Simulated Sensors state
   const [sensors, setSensors] = useState([
-    { name: 'Neta Display Chiller-01', kind: 'chiller', temp: 3.4, status: 'Normal', suffix: '°C' },
-    { name: 'Tuna Deep Freezer (-60)', kind: 'freezer', temp: -54.1, status: 'Warning', suffix: '°C' },
-    { name: 'Shari Rice Warmer Line B', kind: 'warmer', temp: 37.2, status: 'Normal', suffix: '°C' },
-    { name: 'Hand-wash Sanitation Tank', kind: 'warmer', temp: 82.5, status: 'Normal', suffix: '°C' }
+    { name: 'Cold-Storage Freezy-01', temp: -18.4, status: 'Normal', suffix: '°C' },
+    { name: 'Seafood Deep Chamber', temp: -12.1, status: 'Warning', suffix: '°C' },
+    { name: 'Glacier Double Oven', temp: 185.2, status: 'Normal', suffix: '°C' },
+    { name: 'Dishwasher Rinsing Tank', temp: 82.5, status: 'Normal', suffix: '°C' }
   ]);
 
   // Low latency prompt state
-  const [lowLatencyCmd, setLowLatencyCmd] = useState('warn skipper the tuna freezer temp is climbing');
+  const [lowLatencyCmd, setLowLatencyCmd] = useState('warn skipper seafood temp warning');
   const [copilotReply, setCopilotReply] = useState('');
   const [loadingCopilot, setLoadingCopilot] = useState(false);
 
@@ -39,14 +35,16 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       setSensors(prev => prev.map(s => {
-        const swing = s.kind === 'warmer' ? 1.5 : 0.4;
-        const newTemp = parseFloat((s.temp + (Math.random() - 0.5) * swing).toFixed(1));
+        const delta = (Math.random() - 0.5) * 0.4;
+        let newTemp = parseFloat((s.temp + delta).toFixed(1));
+        if (s.name.includes('Oven')) {
+          newTemp = parseFloat((s.temp + (Math.random() - 0.5) * 1.5).toFixed(1));
+        }
         let status = 'Normal';
-        if (s.kind === 'chiller' && newTemp > 5) {
-          // Sushi-grade fish must stay cold; warm display is a food-safety risk
-          status = newTemp > 8 ? 'Critical' : 'Warning';
-        } else if (s.kind === 'freezer' && newTemp > -45) {
+        if (s.name.includes('Seafood') && newTemp > -12.5) {
           status = 'Warning';
+        } else if (newTemp > 0 && !s.name.includes('Oven') && !s.name.includes('Dishwasher')) {
+          status = 'Critical';
         }
         return { ...s, temp: newTemp, status };
       }));
@@ -80,16 +78,16 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
   };
 
   return (
-    <div className="h-full grid grid-cols-1 xl:grid-cols-3 gap-4 overflow-hidden">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
       {/* LEFT ASPECT: TELEMETRY INTERFACES & GAUGES */}
-      <div className="xl:col-span-2 space-y-4 min-h-0 overflow-y-auto scrollbar-hide">
+      <div className="xl:col-span-2 space-y-6">
 
         {/* Live Flashing Header Sensors */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="flex items-center justify-between pb-6">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-sans font-semibold text-slate-900 flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
@@ -118,7 +116,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
                     ● {s.status}
                   </span>
                   <div className="text-[9px] text-slate-400 font-mono mt-2">
-                    {s.kind === 'chiller' ? 'Chiller Probe' : s.kind === 'freezer' ? 'Freezer Probe' : 'Heating Element'}
+                    {s.name.includes('Cold') || s.name.includes('Deep') ? 'Freezer Probe' : 'Heating Element'}
                   </div>
                 </div>
               </div>
@@ -130,7 +128,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
           <div className="flex justify-between items-center pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Live Sensory Alarms & Events</h2>
+              <h2 className="text-base font-sans font-semibold text-slate-900">Live Sensory Alarms & Events</h2>
               <p className="text-xs text-slate-500">Real-time chronos logs of food kitchen probes</p>
             </div>
             <Activity className="w-5 h-5 text-sky-500 animate-pulse" />
@@ -159,7 +157,7 @@ export default function RealtimeTab({ alerts }: RealtimeTabProps) {
       </div>
 
       {/* RIGHT ASPECT SIDEBAR: LOW-LATENCY COPILOT CHAT */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 min-h-0 overflow-y-auto scrollbar-hide flex flex-col justify-between">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm space-y-4 max-h-[500px] flex flex-col justify-between">
         
         <div className="space-y-3">
           <div className="flex items-center justify-between">

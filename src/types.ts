@@ -90,22 +90,3 @@ export interface RealtimeAlert {
   status: 'normal' | 'warning' | 'critical';
   message: string;
 }
-
-export type BranchId = 'ms-city-centre' | 'tesco-city-centre' | 'tesco-manhon';
-
-export interface Branch {
-  id: BranchId;
-  name: string;
-}
-
-export interface BranchData {
-  metrics: CoreMetrics;
-  orders: SalesOrder[];
-  targets: CompanyTarget[];
-  recipes: Recipe[];
-  tasks: ProductionTask[];
-  wasteRecords: WasteRecord[];
-  hoursData: EmployeeHour[];
-  inventory: InventoryItem[];
-  alerts: RealtimeAlert[];
-}
