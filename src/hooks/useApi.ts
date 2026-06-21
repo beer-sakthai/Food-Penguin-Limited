@@ -18,7 +18,7 @@ interface ExecuteOptions {
  * @template T The expected data type of the API response.
  * @template P The type of the parameters for the API call.
  */
-export function useApi<T, P = any>() {
+export function useApi<T, P = void>() {
     const { incrementRequests, decrementRequests } = useApiContext();
     const [state, setState] = useState<ApiState<T>>({
         data: null,

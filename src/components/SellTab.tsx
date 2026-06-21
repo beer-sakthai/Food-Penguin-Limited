@@ -40,9 +40,9 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
   // AI Menu Banner Maker state
   const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium salmon and bluefin tuna nigiri with a signature dragon roll on a slate board, garnished with wasabi and pickled ginger, high-end catalog style');
   const [selectedRatio, setSelectedRatio] = useState('16:9');
-  const { data: imageData, loading: loadingImage, error: imageError, execute: generateBannerApi } = useApi<{ imageUrl: string }>();
+  const { data: imageData, loading: loadingImage, error: imageError, execute: generateBannerApi } = useApi<{ imageUrl: string }, { prompt: string; aspectRatio: string }>();
   // AI Sales Summary state
-  const { data: salesSummaryData, loading: loadingSalesSummary, error: salesSummaryError, execute: generateSalesSummaryApi } = useApi<{ summary: string }>();
+  const { data: salesSummaryData, loading: loadingSalesSummary, error: salesSummaryError, execute: generateSalesSummaryApi } = useApi<{ summary: string }, { orders: SalesOrder[] }>();
 
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
