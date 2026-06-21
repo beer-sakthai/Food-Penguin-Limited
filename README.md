@@ -18,9 +18,10 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
   * **Hours Module:** Workforce scheduling, clocked-in time tracking versus scheduled hours, and visual utilization rates.
   * **Target Module:** Corporate-wide milestone tracking, completion bar charts, progress validations, and AI-optimized targets.
 * **Embedded AI Integrations:**
-  * **Deep Strategic Advisor:** Built-in multi-layered logic solver using advanced reasoning.
-  * **AI Banner Illustrator:** Automated marketing asset generation with specific focal points and aspect ratios.
+  * **Deep Strategic Advisor:** Built-in multi-layered logic solver using advanced reasoning (Powered by Gemini 1.5 Flash for cost-free, high-speed execution).
+  * **AI Banner Illustrator:** Automated marketing asset generation with specific focal points and aspect ratios (Powered by Imagen 3.0).
   * **Waste Investigator & Recipe Generator:** Automated photo-based insights and production aids.
+  * **Real-time Shift Summary & Analytics:** Background polling automatically fetches live operations data and regenerates AI insights every 60 seconds.
 
 ## 🛠 Tech Stack
 

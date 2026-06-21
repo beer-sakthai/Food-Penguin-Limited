@@ -41,3 +41,10 @@ Before taking any action (either tool calls *or* responses to the user), you mus
     8.2) This persistence must be intelligent: On *transient* errors (e.g. please try again), you *must* retry **unless an explicit retry limit (e.g., max x tries) has been reached**. If such a limit is hit, you *must* stop. On *other* errors, you must change your strategy or arguments, not repeat the same failed call.
 
 9) Inhibit your response: only take an action after all the above reasoning is completed. Once you've taken an action, you cannot take it back.
+
+---
+
+# Project-Specific Rules (Food Penguin Limited)
+- **Model Constraints**: This project STRICTLY uses **Gemini 1.5 Flash (`gemini-1.5-flash`)** for language tasks to ensure cost-free, high-speed execution. Image generation uses **`imagen-3.0-generate-001`**. Do NOT upgrade to Pro or legacy models unless instructed by the user.
+- **UI & Design Language**: All active forms and inputs utilize a unified "gold liner" styling (`focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500` along with a custom gold shadow glow). Buttons, cards, and interactive rows include distinct micro-animations (e.g., `hover:-translate-y-0.5`, `active:scale-[0.98]`) globally.
+- **Real-time Loop Architecture**: The main application implements continuous AI polling. The dashboard (`OverviewTab.tsx`) automatically triggers the `fetchShiftSummary` endpoint every 60 seconds to regenerate real-time analysis against live metrics without user intervention.
