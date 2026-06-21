@@ -109,10 +109,13 @@ two disagree.
 ### 3. Prisma
 
 *   `@prisma/client` is generated, not committed; the `postinstall` script runs
-    `prisma generate`. It is written as `prisma generate || true` so a
-    production-only install (`npm ci --omit=dev`, where the `prisma` CLI is not
-    present) cannot fail. `@prisma/client` is not imported at runtime, so the
-    CLI stays out of production `dependencies`.
+    `prisma generate`. The script first checks whether the `prisma` CLI is
+    installed (`require.resolve('prisma')`) and skips silently if it is not, so a
+    production-only install (`npm ci --omit=dev`, which omits the devDependency
+    `prisma`) cannot fail. When `prisma` is present (dev/CI), generation runs
+    normally and real schema/config errors are surfaced rather than swallowed.
+    `@prisma/client` is not imported at runtime, so the CLI stays out of
+    production `dependencies`.
 *   Prisma 7 removed the `datasourceUrl` constructor option — use
     `new PrismaClient()`; the URL comes from `prisma.config.ts`.
 
