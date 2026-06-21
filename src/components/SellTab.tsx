@@ -14,6 +14,7 @@ import {
 interface SellTabProps {
   orders: SalesOrder[];
   onAddOrder: (order: Omit<SalesOrder, 'id' | 'timestamp'>) => void;
+  selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point';
 }
 
 export const ASPECT_RATIOS = [
@@ -27,12 +28,107 @@ export const ASPECT_RATIOS = [
   { label: '21:9 UltraWide', value: '21:9' }
 ];
 
-export default function SellTab({ orders, onAddOrder }: SellTabProps) {
+const MS_PRODUCTS = [
+  { name: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', price: 34.50, margin: '76%' },
+  { name: 'Gastropub Spicy Truffle Roll', category: 'Specialty Rolls', price: 19.95, margin: '73%' },
+  { name: 'M&S Gold Grade Lobster Nigiri', category: 'Nigiri Selections', price: 24.00, margin: '80%' },
+  { name: 'Handcrafted Premium Dragon Roll', category: 'Sushi Rolls', price: 17.50, margin: '78%' },
+  { name: 'Gourmet Signature Bento Set', category: 'Bento Lunch Sets', price: 26.50, margin: '70%' }
+];
+
+const TESCO_PRODUCTS = [
+  { name: 'YO! highlights', category: 'Specialty Selections', price: 11.25, margin: '74%', barcode: '5391548890457' },
+  { name: 'veggie tofu yakisoba noodles', category: 'Noodles & Sides', price: 7.95, margin: '78%', barcode: '5391548890679' },
+  { name: 'veggie gyoza - heat me first!', category: 'Gyoza & Starters', price: 5.95, margin: '82%', barcode: '5391548890150' },
+  { name: 'TokYO! party platter', category: 'Party Platters', price: 16.75, margin: '71%', barcode: '5391548890549' },
+  { name: 'teriyaki chicken udon noodles', category: 'Noodles & Sides', price: 8.25, margin: '76%', barcode: '5391548890730' },
+  { name: 'Tokyo top 5', category: 'Specialty Selections', price: 11.25, margin: '75%', barcode: '5391548890495' },
+  { name: 'teriyaki chicken rice bowl', category: 'Rice Bowls & Poké', price: 7.95, margin: '77%', barcode: '5391548890648' },
+  { name: 'teriyaki chicken karaage', category: 'Warm Street Food', price: 7.75, margin: '79%', barcode: '5391548890129' },
+  { name: 'sweet chilli chicken yakitori', category: 'Warm Street Food', price: 5.50, margin: '84%', barcode: '5391548890136' },
+  { name: 'sriracha salmon poké bowl', category: 'Rice Bowls & Poké', price: 8.25, margin: '78%', barcode: '5391548890600' },
+  { name: 'St Patrick\'s Irish stout karaage', category: 'Warm Street Food', price: 7.75, margin: '80%', barcode: '5391548892611' },
+  { name: 'strawberry cheesecake mochi', category: 'Desserts & Sweets', price: 3.95, margin: '85%', barcode: '5391548890754' },
+  { name: 'spicy veggie roll', category: 'Sushi Rolls', price: 5.50, margin: '81%', barcode: '5391548890266' },
+  { name: 'Spicy salmon avocado sushi sando', category: 'Sushi Sandos', price: 4.95, margin: '83%', barcode: '5391548892512' },
+  { name: 'spicy salmon & avocado roll', category: 'Sushi Rolls', price: 7.25, margin: '79%', barcode: '5391548890372' },
+  { name: 'spicy california roll', category: 'Sushi Rolls', price: 5.95, margin: '81%', barcode: '5391548890303' },
+  { name: 'spicy chicken katsu crunch roll', category: 'Sushi Rolls', price: 6.50, margin: '80%', barcode: '5391548890358' },
+  { name: 'spicy prawn katsu roll', category: 'Sushi Rolls', price: 7.95, margin: '76%', barcode: '5391548890419' },
+  { name: 'spice up YO! life', category: 'Specialty Selections', price: 11.25, margin: '75%', barcode: '5391548890464' },
+  { name: 'Shinjuku Collection', category: 'Premium Assortments', price: 27.95, margin: '72%', barcode: '5391548892376' },
+  { name: 'Shibuya Collection', category: 'Premium Assortments', price: 23.50, margin: '73%', barcode: '5391548892499' },
+  { name: 'salmon maki', category: 'Maki Rolls', price: 4.50, margin: '84%', barcode: '5391548890020' },
+  { name: 'salmon nigiri', category: 'Nigiri Duos', price: 6.95, margin: '82%', barcode: '5391548890051' },
+  { name: 'seaweed salad', category: 'Sides & Starters', price: 3.95, margin: '86%', barcode: '5391548890174' },
+  { name: 'salmon dragon roll', category: 'Sushi Rolls', price: 8.75, margin: '77%', barcode: '5391548890181' },
+  { name: 'salmon sashimi', category: 'Sashimi Selections', price: 7.75, margin: '79%', barcode: '5391548890068' },
+  { name: 'Salmon Poke', category: 'Rice Bowls & Poké', price: 8.25, margin: '77%', barcode: '5391548892642' },
+  { name: 'Saikou! selects', category: 'Specialty Selections', price: 9.75, margin: '78%', barcode: '5391548890518' },
+  { name: 'Sakana selects', category: 'Specialty Selections', price: 9.75, margin: '78%', barcode: '5391548890501' },
+  { name: 'salmon classics', category: 'Specialty Selections', price: 9.75, margin: '78%', barcode: '5391548890440' },
+  { name: 'pumpkin katsu rice bowl', category: 'Rice Bowls & Poké', price: 7.25, margin: '81%', barcode: '5391548890655' },
+  { name: 'pumpkin katsu curry', category: 'Warm Street Food', price: 7.75, margin: '79%', barcode: '5391548890624' },
+  { name: 'pumpkin katsu bao', category: 'Bao & Buns', price: 4.50, margin: '83%', barcode: '5391548890099' },
+  { name: 'nigiri selection', category: 'Nigiri Duos', price: 6.95, margin: '82%', barcode: '5391548890044' },
+  { name: 'Osaka veggie platter', category: 'Party Platters', price: 14.95, margin: '75%', barcode: '5391548890556' },
+  { name: 'plant power', category: 'Specialty Selections', price: 8.50, margin: '80%', barcode: '5391548890471' },
+  { name: 'mixed maki box', category: 'Maki Rolls', price: 6.75, margin: '81%', barcode: '5391548890525' },
+  { name: 'Mexican Mango Salmon Sharer', category: 'Premium Assortments', price: 19.75, margin: '74%', barcode: '5391548892789' },
+  { name: 'Mexican Mango Salmon Roll', category: 'Sushi Rolls', price: 7.95, margin: '77%', barcode: '5391548892741' },
+  { name: 'Mexican Mango Salmon Bento', category: 'Bento Lunch Boxes', price: 11.25, margin: '76%', barcode: '5391548892765' },
+  { name: 'Mexican Crunch Chicken Roll', category: 'Sushi Rolls', price: 6.95, margin: '79%', barcode: '5391548892734' },
+  { name: 'korean chicken udon noodles', category: 'Noodles & Sides', price: 8.25, margin: '78%', barcode: '5391548890723' },
+  { name: 'lucky dip', category: 'Specialty Selections', price: 12.95, margin: '76%', barcode: '5391548890488' },
+  { name: 'Mexican Crunch Chicken Bento', category: 'Bento Lunch Boxes', price: 10.75, margin: '77%', barcode: '5391548892758' },
+  { name: 'inari nigiri', category: 'Nigiri Duos', price: 4.75, margin: '84%', barcode: '5391548890037' },
+  { name: 'Harajuku Collection', category: 'Premium Assortments', price: 33.50, margin: '70%', barcode: '5391548892406' },
+  { name: 'Ginza Collection', category: 'Premium Assortments', price: 36.95, margin: '69%', barcode: '5391548892437' },
+  { name: 'crunchy prawn katsu roll', category: 'Sushi Rolls', price: 8.25, margin: '78%', barcode: '5391548890426' },
+  { name: 'crunchy salmon & avocado roll', category: 'Sushi Rolls', price: 7.50, margin: '80%', barcode: '5391548890389' },
+  { name: 'crunchy veggie roll', category: 'Sushi Rolls', price: 5.75, margin: '81%', barcode: '5391548890273' },
+  { name: 'chocolate mochi', category: 'Desserts & Sweets', price: 3.95, margin: '85%', barcode: '5391548890747' },
+  { name: 'crunchy california roll', category: 'Sushi Rolls', price: 6.25, margin: '82%', barcode: '5391548890310' },
+  { name: 'crunchy chicken katsu roll', category: 'Sushi Rolls', price: 6.25, margin: '82%', barcode: '5391548890341' },
+  { name: 'Chicken Teriyaki Sushi Sando', category: 'Sushi Sandos', price: 4.75, margin: '83%', barcode: '5391548892505' },
+  { name: 'chicken teriyaki roll', category: 'Sushi Rolls', price: 6.50, margin: '82%', barcode: '5391548890204' },
+  { name: 'chicken yakisoba noodles', category: 'Noodles & Sides', price: 7.95, margin: '79%', barcode: '5391548890662' },
+  { name: 'chicken katsu curry udon noodles', category: 'Noodles & Sides', price: 7.75, margin: '80%', barcode: '5391548890716' },
+  { name: 'chicken teriyaki bao', category: 'Bao & Buns', price: 4.50, margin: '84%', barcode: '5391548890075' },
+  { name: 'Chicken teriyaki Poke', category: 'Rice Bowls & Poké', price: 8.25, margin: '79%', barcode: '5391548892635' },
+  { name: 'avocado maki', category: 'Maki Rolls', price: 3.50, margin: '86%', barcode: '5391548890006' },
+  { name: 'chicken gyoza - heat me first!', category: 'Gyoza & Starters', price: 6.25, margin: '81%', barcode: '5391548890143' },
+  { name: 'California sushi sando', category: 'Sushi Sandos', price: 4.75, margin: '83%', barcode: '5391548892529' },
+  { name: 'california mango roll', category: 'Sushi Rolls', price: 6.50, margin: '82%', barcode: '5391548890198' },
+  { name: 'chicken gyoza udon noodles', category: 'Noodles & Sides', price: 7.75, margin: '80%', barcode: '5391548890709' },
+  { name: 'chicken katsu bao', category: 'Bao & Buns', price: 4.50, margin: '84%', barcode: '5391548890082' },
+  { name: 'chicken katsu curry', category: 'Warm Street Food', price: 7.95, margin: '79%', barcode: '5391548890617' }
+];
+
+export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabProps) {
+  const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+  const branchProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+  const branchCategories = isMS 
+    ? ['Sushi Rolls', 'Sashimi & Platters', 'Specialty Rolls', 'Nigiri Selections', 'Bento Lunch Sets']
+    : Array.from(new Set(TESCO_PRODUCTS.map(p => p.category))).sort();
+
   // New Order Form state
-  const [newItem, setNewItem] = useState('');
-  const [newCategory, setNewCategory] = useState('Arctic Burgers');
+  const [newItem, setNewItem] = useState(branchProducts[0].name);
+  const [newCategory, setNewCategory] = useState(branchProducts[0].category);
   const [newQty, setNewQty] = useState(1);
-  const [newPrice, setNewPrice] = useState(12.50);
+  const [newPrice, setNewPrice] = useState(branchProducts[0].price);
+
+  const matchedProduct = branchProducts.find(p => p.name === newItem);
+  const matchedBarcode = (matchedProduct as any)?.barcode;
+
+  // Automatically sync presets and reset quantity when active store branch shifts
+  React.useEffect(() => {
+    const firstProduct = branchProducts[0];
+    setNewItem(firstProduct.name);
+    setNewCategory(firstProduct.category);
+    setNewPrice(firstProduct.price);
+    setNewQty(1);
+  }, [selectedBranch]);
 
   // AI Menu Banner Maker state
   const [bannerPrompt, setBannerPrompt] = useState('A professional, delicious publicity photograph of premium Alaskan Cod fish burgers on ice, side of seaweed fries, high-end catalog style');
@@ -112,24 +208,36 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         
         {/* Quick Menu Overview */}
         <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
-          <h2 className="text-sans font-bold text-white">Food Penguin Sushi Specialties</h2>
-          <p className="text-xs text-zinc-500 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary sushi and sashimi product lines</p>
+          <h2 className="text-sans font-bold text-white">
+            {isMS ? '🇬🇧 Marks & Spencer Cork City - Luxury Selections' : `🇮🇪 ${selectedBranch} Active Daily Range`}
+          </h2>
+          <p className="text-xs text-zinc-500 uppercase font-semibold mt-0.5 mb-4 font-mono">
+            {isMS 
+              ? 'Signature crafted luxury pairings with premium premium margins'
+              : 'Optimized high-volume value selections and Finest series'
+            }
+          </p>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {[
-              { name: 'Sushi Rolls', price: '€14.50', margin: '75% margin' },
-              { name: 'Sashimi & Platters', price: '€28.90', margin: '70% margin' },
-              { name: 'Specialty Rolls', price: '€19.00', margin: '78% margin' },
-              { name: 'Nigiri Selections', price: '€16.00', margin: '82% margin' },
-              { name: 'Bento Lunch Sets', price: '€22.50', margin: '68% margin' }
-            ].map((cat, idx) => (
-              <div key={idx} className="bg-zinc-950 border border-zinc-850 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-zinc-900 hover:shadow-md hover:border-orange-500/40">
-                <span className="text-xs font-bold text-zinc-200">{cat.name}</span>
-                <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-800/60">
-                  <span className="font-mono text-xs font-bold text-orange-400">{cat.price}</span>
-                  <span className="text-[10px] text-emerald-450 bg-emerald-950/40 px-1.5 py-0.5 rounded font-mono font-medium">{cat.margin}</span>
+            {branchProducts.map((p, idx) => (
+              <button 
+                type="button"
+                key={idx} 
+                onClick={() => {
+                  setNewItem(p.name);
+                  setNewCategory(p.category);
+                  setNewPrice(p.price);
+                }}
+                className="bg-zinc-950 border border-zinc-850 p-4 rounded-2xl flex flex-col justify-between text-left transition-all hover:bg-zinc-900 hover:shadow-md hover:border-amber-500/50 group/item cursor-pointer"
+                title={`Click to load ${p.name} preset`}
+              >
+                <span className="text-xs font-bold text-zinc-200 group-hover/item:text-amber-400 transition-colors leading-tight">{p.name}</span>
+                <span className="text-[10px] text-zinc-500 mt-1 leading-tight">{p.category}</span>
+                <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-800/60 w-full">
+                  <span className="font-mono text-xs font-bold text-orange-400 font-sans">€{p.price.toFixed(2)}</span>
+                  <span className="text-[9px] text-emerald-450 bg-emerald-950/45 px-1.5 py-0.5 rounded font-mono font-medium">{p.margin} margin</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -139,10 +247,10 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-800">
             <div>
               <h2 className="text-sans font-bold text-white">Active Order Ledger</h2>
-              <p className="text-xs text-zinc-500">Live POS sales tracked since midnight</p>
+              <p className="text-xs text-zinc-500 font-medium">Live POS sales logged at <span className="text-amber-450 font-semibold">{selectedBranch}</span></p>
             </div>
             <span className="bg-zinc-950 text-orange-400 font-mono text-[10px] px-3 py-1 rounded-full font-bold border border-zinc-800 self-start">
-              {orders.length} Active Purchases
+              {orders.length} Active {isMS ? 'M&S' : 'Tesco'} Transactions
             </span>
           </div>
 
@@ -207,6 +315,28 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
 
           <form onSubmit={handleCreateOrder} className="space-y-4">
             <div>
+              <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold block leading-none">Preset Product Select</label>
+              <select
+                value={branchProducts.some(p => p.name === newItem) ? newItem : ''}
+                onChange={(e) => {
+                  if (!e.target.value) return;
+                  const matched = branchProducts.find(p => p.name === e.target.value);
+                  if (matched) {
+                    setNewItem(matched.name);
+                    setNewCategory(matched.category);
+                    setNewPrice(matched.price);
+                  }
+                }}
+                className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-amber-550 font-bold rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
+              >
+                <option value="">-- Or click custom / enter below --</option>
+                {branchProducts.map((p) => (
+                  <option key={p.name} value={p.name} className="bg-zinc-950 text-white font-bold">{p.name} (€{p.price.toFixed(2)})</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Specialty Item Name</label>
               <input
                 type="text"
@@ -226,11 +356,9 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
                 >
-                  <option>Sushi Rolls</option>
-                  <option>Sashimi & Platters</option>
-                  <option>Specialty Rolls</option>
-                  <option>Nigiri Selections</option>
-                  <option>Bento Lunch Sets</option>
+                  {branchCategories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
                 </select>
               </div>
 
@@ -238,7 +366,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Unit Price (€)</label>
                 <input
                   type="number"
-                  step="0.10"
+                  step="0.05"
                   required
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseFloat(e.target.value) || 0)}
@@ -246,6 +374,13 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 />
               </div>
             </div>
+
+            {matchedBarcode && (
+              <div className="bg-zinc-950 px-3 py-2 border border-zinc-850 rounded-xl flex items-center justify-between font-mono text-[10px] text-zinc-400 select-none">
+                <span className="text-zinc-500 font-bold uppercase tracking-wider text-[9px]">EAN-13 Barcode</span>
+                <span className="text-amber-500 font-extrabold">{matchedBarcode}</span>
+              </div>
+            )}
 
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-2">

@@ -24,13 +24,21 @@ export const initialMetrics: CoreMetrics = {
 };
 
 export const initialOrders: SalesOrder[] = [
-  { id: 'FP-1084', timestamp: '14:10', item: 'Tokyo Dragon Roll', category: 'Sushi Rolls', quantity: 2, amount: 25.80, status: 'Completed' },
-  { id: 'FP-1083', timestamp: '13:58', item: 'Spicy Bluefin Tuna Roll', category: 'Sushi Rolls', quantity: 1, amount: 14.50, status: 'Completed' },
-  { id: 'FP-1082', timestamp: '13:51', item: 'Kyoto Salmon Sashimi Platter', category: 'Sashimi & Platters', quantity: 1, amount: 28.90, status: 'Completed' },
-  { id: 'FP-1081', timestamp: '13:45', item: 'California Roll Classic', category: 'Sushi Rolls', quantity: 3, amount: 36.00, status: 'Completed' },
-  { id: 'FP-1080', timestamp: '13:30', item: 'Volcano Baked Scallop Roll', category: 'Specialty Rolls', quantity: 2, amount: 38.00, status: 'Completed' },
-  { id: 'FP-1079', timestamp: '13:12', item: 'Kyoto Salmon Sashimi Platter', category: 'Sashimi & Platters', quantity: 1, amount: 28.90, status: 'Completed' },
-  { id: 'FP-1078', timestamp: '12:45', item: 'Tokyo Dragon Roll', category: 'Sushi Rolls', quantity: 2, amount: 25.80, status: 'Completed' }
+  // Marks & Spencer - Cork City (Luxury Gourmet Sushi Specialties)
+  { id: 'FP-1084', timestamp: '14:10', item: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', quantity: 2, amount: 69.00, status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1083', timestamp: '13:58', item: 'Gastropub Spicy Truffle Roll', category: 'Specialty Rolls', quantity: 1, amount: 19.95, status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1081', timestamp: '13:45', item: 'Handcrafted Premium Dragon Roll', category: 'Sushi Rolls', quantity: 3, amount: 52.50, status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1079', timestamp: '13:12', item: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', quantity: 1, amount: 34.50, status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+
+  // Tesco - Cork City (Everyday Value & Finest Selection)
+  { id: 'FP-2081', timestamp: '13:51', item: 'Tesco Finest Salmon Sashimi', category: 'Seafood Platters', quantity: 1, amount: 14.90, status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-2080', timestamp: '13:30', item: 'Everyday Value California Roll', category: 'Classic Rolls', quantity: 2, amount: 13.00, status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-2078', timestamp: '12:45', item: 'Tesco Meal Deal Double Tuna Combo', category: 'Meal Deals', quantity: 2, amount: 10.00, status: 'Completed', branch: 'Tesco - Cork City' },
+
+  // Tesco - Mahon Point (Everyday Value, Meals, & Local Mahon Special)
+  { id: 'FP-3081', timestamp: '13:55', item: 'Everyday Value California Roll', category: 'Classic Rolls', quantity: 1, amount: 6.50, status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-3080', timestamp: '13:20', item: 'Cork Family Mega Platter', category: 'Family Trays', quantity: 1, amount: 22.00, status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-3078', timestamp: '12:30', item: 'Tesco Meal Deal Double Tuna Combo', category: 'Meal Deals', quantity: 3, amount: 15.00, status: 'Completed', branch: 'Tesco - Mahon Point' }
 ];
 
 export const initialTargets: CompanyTarget[] = [

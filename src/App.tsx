@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { jsPDF } from 'jspdf';
 import {
   initialMetrics,
   initialOrders,
@@ -46,7 +47,10 @@ import {
   User,
   Power,
   Cpu,
-  GlassWater
+  GlassWater,
+  ChevronDown,
+  ChevronUp,
+  Download
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
@@ -59,6 +63,7 @@ export default function App() {
   // App States
   const [activeTab, setActiveTab] = useState<string>('Overview');
   const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff'>('Admin');
+  const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
   const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
   const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
@@ -69,6 +74,10 @@ export default function App() {
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [selectedWeekRange, setSelectedWeekRange] = useState<string>('2026-06-15 to 2026-06-21');
   const [weeklyLogsMap, setWeeklyLogsMap] = useState<Record<string, DailyOperationalLog[]>>(alternativeWeeklyLogsMap);
+  const [isCapacityExpanded, setIsCapacityExpanded] = useState<boolean>(false);
+  const [capacitySortBy, setCapacitySortBy] = useState<'date' | 'bottleneck'>('date');
+  const [bottleneckThreshold, setBottleneckThreshold] = useState<number>(90);
+  const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
 
   const weeklyLogs = weeklyLogsMap[selectedWeekRange] || alternativeWeeklyLogsMap['2026-06-15 to 2026-06-21'];
 
@@ -119,6 +128,348 @@ export default function App() {
   // Calculative capacity metric that matches initial 78% but moves dynamically with metrics.productionItems
   const capacityPct = Math.round(Math.min((metrics.productionItems / metrics.productionTarget) * 80, 100));
 
+  // Determine rolling 7-day predictive capacity projection based on operational rates of the selected week context
+  const projectedCapacityPct = useMemo(() => {
+    if (!weeklyLogs || weeklyLogs.length === 0) return capacityPct;
+
+    const totalMade = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
+    const totalTarget = weeklyLogs.reduce((sum, log) => sum + log.productionTarget, 0);
+    const baseRate = totalTarget > 0 ? (totalMade / totalTarget) : 0.8;
+
+    // Estimate relative trend/momentum comparing the back-half of week with front-half
+    const midIdx = Math.floor(weeklyLogs.length / 2);
+    const firstHalf = weeklyLogs.slice(0, midIdx);
+    const secondHalf = weeklyLogs.slice(midIdx);
+
+    const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
+    const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
+
+    const trendFactor = secondHalfRate / (firstHalfRate || 1);
+    
+    // Core predictive calculation: current baseline capacity adjusted by rolling trend momentum
+    const rawProjection = Math.round(capacityPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
+
+    return isNaN(rawProjection) || rawProjection <= 0 
+      ? Math.min(100, Math.max(0, capacityPct + 4)) 
+      : Math.min(100, rawProjection);
+  }, [weeklyLogs, capacityPct]);
+
+  // Daily breakdown of 7-day projected capacity for the expandable section
+  const dailyCapacityBreakdown = useMemo(() => {
+    if (!weeklyLogs || weeklyLogs.length === 0) return [];
+    
+    const midIdx = Math.floor(weeklyLogs.length / 2);
+    const firstHalf = weeklyLogs.slice(0, midIdx);
+    const secondHalf = weeklyLogs.slice(midIdx);
+
+    const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
+    const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
+
+    const trendFactor = secondHalfRate / (firstHalfRate || 1);
+
+    const rawList = weeklyLogs.map(log => {
+      const dailyCurrentPct = Math.round(Math.min((log.productionMade / (log.productionTarget || 1)) * 80, 100));
+      const rawDailyProjection = Math.round(dailyCurrentPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
+      const dailyProjectedPct = isNaN(rawDailyProjection) || rawDailyProjection <= 0
+        ? Math.min(100, Math.max(0, dailyCurrentPct + 4))
+        : Math.min(100, rawDailyProjection);
+
+      return {
+        day: log.day,
+        date: log.date.substring(5), // simplified 'MM-DD'
+        current: dailyCurrentPct,
+        projected: dailyProjectedPct
+      };
+    });
+
+    if (capacitySmoothing === 'smoothed') {
+      // Apply 3-day moving average centering around current index to reduce visual spikes
+      return rawList.map((item, idx) => {
+        const neighbors = [item];
+        if (idx > 0) neighbors.push(rawList[idx - 1]);
+        if (idx < rawList.length - 1) neighbors.push(rawList[idx + 1]);
+
+        const avgCurrent = Math.round(neighbors.reduce((sum, n) => sum + n.current, 0) / neighbors.length);
+        const avgProjected = Math.round(neighbors.reduce((sum, n) => sum + n.projected, 0) / neighbors.length);
+
+        return {
+          ...item,
+          current: avgCurrent,
+          projected: avgProjected
+        };
+      });
+    }
+
+    return rawList;
+  }, [weeklyLogs, capacitySmoothing]);
+  
+  // Sorted daily capacity breakdown based on selected sort order (Chronological vs Bottleneck Intensity)
+  const sortedDailyCapacityBreakdown = useMemo(() => {
+    const list = [...dailyCapacityBreakdown];
+    if (capacitySortBy === 'bottleneck') {
+      return list.sort((a, b) => b.projected - a.projected);
+    }
+    return list; // 'date' is default chronological order of weeklyLogs
+  }, [dailyCapacityBreakdown, capacitySortBy]);
+  
+  // Export Daily projected capacity as a CSV string file download
+  const handleExportCapacityCSV = () => {
+    if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
+    
+    const headers = ['Day', 'Date', 'Current Capacity (%)', 'Projected Capacity (%)'];
+    const rows = dailyCapacityBreakdown.map(item => [
+      item.day,
+      item.date,
+      item.current,
+      item.projected
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(val => `"${val}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `weekly_capacity_breakdown_${selectedWeekRange.replace(/\s+/g, '_')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export Daily projected capacity as a stunning, styled PDF summary document for reporting purposes
+  const handleExportCapacityPDF = () => {
+    if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
+
+    // Initialize portrait PDF (A4 size page dimensions: 210mm x 297mm)
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Helper color palette following the elegant Slate & Amber UI dashboard theme
+    const primaryColor = [24, 24, 27]; // Dark Slate (Zinc 900)
+    const accentColor = [249, 115, 22]; // Orange 500
+    const lightBg = [244, 244, 245]; // Light Gray (Zinc 100)
+    const alertColor = [239, 68, 68]; // Red 500
+    const amberAlert = [217, 119, 6]; // Amber 600
+    const textGray = [113, 113, 122]; // Zinc 500
+
+    // --- Page Header Background Accent Banner ---
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(0, 0, 210, 42, 'F');
+
+    // Header Metadata & Typography branding
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.text('BAKERY OPERATIONAL CORE SUITE', 15, 14);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+    doc.text('PREDICTIVE WEEKLY CAPACITY PROJECTION REPORT', 15, 20);
+
+    doc.setTextColor(161, 161, 170); // Zinc 400
+    doc.setFontSize(8);
+    doc.text(`Active Calendar Frame: ${selectedWeekRange}`, 15, 26);
+    doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US')}`, 15, 30);
+
+    // Dynamic watermarked badge
+    doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
+    doc.rect(168, 10, 27, 5, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ANALYTICS ENGINE', 170, 13.5);
+
+    // --- KPIs / Summary Metric Cards Banner ---
+    let yPos = 52;
+    
+    const totalDays = dailyCapacityBreakdown.length;
+    const avgProjected = Math.round(dailyCapacityBreakdown.reduce((sum, item) => sum + item.projected, 0) / totalDays);
+    const maxProjectedItem = [...dailyCapacityBreakdown].sort((a, b) => b.projected - a.projected)[0];
+    const bottlenecksCount = dailyCapacityBreakdown.filter(item => item.projected > bottleneckThreshold).length;
+
+    // Background container sheet for key summaries
+    doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]);
+    doc.roundedRect(15, yPos, 180, 25, 2.5, 2.5, 'F');
+
+    // KPI Box 1: Average Load
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text('AVERAGE LOAD FACTOR', 22, yPos + 7);
+    doc.setFontSize(14);
+    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+    doc.text(`${avgProjected}%`, 22, yPos + 17);
+
+    // KPI Box 2: Peak Loaded Day
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text('PEAK CAPACITY LIMIT', 80, yPos + 7);
+    doc.setFontSize(12.5);
+    doc.setTextColor(39, 39, 42); // Zinc 800
+    doc.text(`${maxProjectedItem.projected}% Load`, 80, yPos + 14.5);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+    doc.text(`On ${maxProjectedItem.day}`, 80, yPos + 19);
+
+    // KPI Box 3: Bottleneck Threshold Alarms
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.text('THRESHOLD BOTTLENECKS', 138, yPos + 7);
+    doc.setFontSize(13.5);
+    if (bottlenecksCount > 0) {
+      doc.setTextColor(alertColor[0], alertColor[1], alertColor[2]);
+      doc.text(`${bottlenecksCount} Hot Days`, 138, yPos + 17);
+    } else {
+      doc.setTextColor(16, 185, 129); // Green 500
+      doc.text('Stable Output (0)', 138, yPos + 17);
+    }
+
+    // --- Subtitle parameter summary line ---
+    yPos += 35;
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.text('7-DAY DAILY PREDICTED TIMELINE BREAKDOWN', 15, yPos);
+
+    // Thin grey spacer boundary line
+    doc.setDrawColor(228, 228, 231); // Zinc 200
+    doc.setLineWidth(0.35);
+    doc.line(15, yPos + 2, 195, yPos + 2);
+
+    // Print metadata variables 
+    yPos += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+    doc.text(`Bottleneck Limit Trigger: ${bottleneckThreshold}%`, 15, yPos);
+    doc.text(`Smoothing Mode: ${capacitySmoothing === 'smoothed' ? '3-Day Rolling Moving Average' : 'Raw Metrics (None)'}`, 72, yPos);
+    doc.text(`Sequence Filter Order: ${capacitySortBy === 'bottleneck' ? 'Bottleneck Intensity' : 'Calendar Sequence'}`, 142, yPos);
+
+    // --- Main Capacity Breakdown Table ---
+    yPos += 6;
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, yPos, 180, 8, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('WEEKDAY', 20, yPos + 5.5);
+    doc.text('DATE', 50, yPos + 5.5);
+    doc.text('BASE CURRENT (%)', 85, yPos + 5.5);
+    doc.text('PROJECTED LOAD (%)', 125, yPos + 5.5);
+    doc.text('BOTTLENECK STATE', 165, yPos + 5.5);
+
+    const rowHeight = 9.5;
+    yPos += 8;
+
+    sortedDailyCapacityBreakdown.forEach((item, idx) => {
+      const isBottleneck = item.projected > bottleneckThreshold;
+
+      // Alternating row highlighting background
+      if (idx % 2 === 1) {
+        doc.setFillColor(250, 250, 250);
+        doc.rect(15, yPos, 180, rowHeight, 'F');
+      }
+
+      // Draw light wire separators
+      doc.setDrawColor(244, 244, 245);
+      doc.setLineWidth(0.2);
+      doc.line(15, yPos + rowHeight, 195, yPos + rowHeight);
+
+      // Value rendering block
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.text(item.day, 20, yPos + 6);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(82, 82, 91);
+      doc.text(item.date, 50, yPos + 6);
+
+      doc.text(`${item.current}%`, 85, yPos + 6);
+
+      // Project highlighting styling
+      doc.setFont('helvetica', 'bold');
+      if (isBottleneck) {
+        doc.setTextColor(amberAlert[0], amberAlert[1], amberAlert[2]);
+        doc.text(`${item.projected}%`, 125, yPos + 6);
+      } else {
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text(`${item.projected}%`, 125, yPos + 6);
+      }
+
+      // Alert cell tag
+      if (isBottleneck) {
+        doc.setFillColor(254, 243, 199); // Amber 100
+        doc.roundedRect(162, yPos + 1.8, 28, 5.5, 0.8, 0.8, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(180, 83, 9); // Amber 700
+        doc.text('BOTTLENECK', 165.5, yPos + 5.6);
+      } else {
+        doc.setTextColor(113, 113, 122);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.text('NORMAL LOAD', 165, yPos + 5.6);
+      }
+
+      yPos += rowHeight;
+    });
+
+    // --- Footer Explanatory Bullet Points & Notes ---
+    yPos += 10;
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.text('EXECUTIVE INTERPRETATION GUIDELINE', 15, yPos);
+
+    doc.setDrawColor(228, 228, 231);
+    doc.setLineWidth(0.35);
+    doc.line(15, yPos + 2, 195, yPos + 2);
+
+    yPos += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(82, 82, 91);
+
+    const bulletins = [
+      '• Capacity forecasts are computed dynamically based on the active rolling index of completed production batches versus target.',
+      '• Days highlighted with yellow "BOTTLENECK" alert badges exceed your configured threshold parameter limit.',
+      '• Moving average view reduces short-term variation spikes to reveal systemic weekly production limits for senior management reporting.',
+      '• Report intended for staff duty scheduling, shifts optimization, and oven heating resource conservation.'
+    ];
+
+    bulletins.forEach(bullet => {
+      doc.text(bullet, 15, yPos);
+      yPos += 4.5;
+    });
+
+    // Ground footer copyright boundary lines
+    yPos = 282;
+    doc.setDrawColor(228, 228, 231);
+    doc.setLineWidth(0.3);
+    doc.line(15, yPos - 3, 195, yPos - 3);
+
+    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+    doc.setFontSize(7);
+    doc.text('Automated forecast projection report. Confidential & intended for Bakery Internal Operations.', 15, yPos);
+    doc.text('Page 1 of 1', 182, yPos);
+
+    // Trigger PDF browser-side download
+    doc.save(`Capacity_Projection_Report_${selectedWeekRange.replace(/\s+/g, '_')}.pdf`);
+  };
+
   const handleUpdateMetrics = (newMetrics: Partial<CoreMetrics>) => {
     setMetrics(prev => ({ ...prev, ...newMetrics }));
   };
@@ -134,7 +485,8 @@ export default function App() {
     const fullOrder: SalesOrder = {
       ...newOrder,
       id: orderId,
-      timestamp: timestampStr
+      timestamp: timestampStr,
+      branch: selectedBranch
     };
 
     setOrders(prev => [fullOrder, ...prev]);
@@ -293,10 +645,14 @@ export default function App() {
             onAddOrUpdateLog={handleUpdateWeeklyLog}
             selectedWeekRange={selectedWeekRange}
             onSelectedWeekRangeChange={setSelectedWeekRange}
+            orders={orders}
+            selectedBranch={selectedBranch}
           />
         );
-      case 'Sell':
-        return <SellTab orders={orders} onAddOrder={handleAddOrder} />;
+      case 'Sell': {
+        const filteredOrders = orders.filter(o => !o.branch || o.branch === selectedBranch);
+        return <SellTab orders={filteredOrders} onAddOrder={handleAddOrder} selectedBranch={selectedBranch} />;
+      }
       case 'Target':
         return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
       case 'Production':
@@ -339,6 +695,8 @@ export default function App() {
             onAddOrUpdateLog={handleUpdateWeeklyLog}
             selectedWeekRange={selectedWeekRange}
             onSelectedWeekRangeChange={setSelectedWeekRange}
+            orders={orders}
+            selectedBranch={selectedBranch}
           />
         );
     }
@@ -422,16 +780,318 @@ export default function App() {
         </nav>
 
         {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
-        <div className="px-4 py-2 mt-auto mb-2 hidden md:block">
-          <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-900">
-            <p className="text-[10px] text-zinc-500 uppercase font-mono font-bold tracking-wider mb-2">Weekly Capacity</p>
-            <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-orange-500 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${capacityPct}%` }}
-              ></div>
+        <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
+          <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800 relative overflow-hidden group">
+            <div className="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-orange-500/5 to-transparent rounded-full filter blur-2xl pointer-events-none" />
+            
+            <div className="flex items-center justify-between mb-2">
+              <button 
+                onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
+                className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-left focus:outline-none"
+                title="Click to view daily breakdown"
+              >
+                <p className="text-[10px] text-zinc-400 uppercase font-mono font-bold tracking-wider select-none">Weekly Capacity</p>
+                {isCapacityExpanded ? (
+                  <ChevronUp className="w-3.5 h-3.5 text-zinc-400 hover:text-white transition-all transform hover:scale-110" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hover:text-white transition-all transform hover:scale-110" />
+                )}
+              </button>
+              <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
+                Forecast AI
+              </span>
             </div>
-            <p className="text-[10px] text-zinc-400 font-mono mt-2">{capacityPct}% Production Load</p>
+
+            {/* Premium, interactive, layered capacity progress bar */}
+            <div className="relative h-3 bg-zinc-800/80 rounded-full overflow-hidden mt-3 shadow-inner">
+              {/* Optional dynamic striped extension for projected excess */}
+              {projectedCapacityPct > capacityPct && (
+                <div 
+                  className="absolute left-0 top-0 h-full bg-amber-500/40 animate-pulse transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${projectedCapacityPct}%`,
+                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(245, 158, 11, 0.2) 4px, rgba(245, 158, 11, 0.2) 8px)'
+                  }}
+                  title={`Projected 7-day load: ${projectedCapacityPct}%`}
+                />
+              )}
+              {/* Solid Current Capacity Bar */}
+              <div 
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(249,115,22,0.2)]"
+                style={{ width: `${capacityPct}%` }}
+                title={`Current load: ${capacityPct}%`}
+              />
+              
+              {/* Vertical dashed line indicator to point to the projected load */}
+              <div 
+                className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10 transition-all duration-500 ease-out"
+                style={{ left: `${projectedCapacityPct}%` }}
+                title={`7-Day Projection Target: ${projectedCapacityPct}%`}
+              />
+            </div>
+
+            {/* Text details and comparison metrics */}
+            <div className="space-y-1.5 mt-3 pt-2.5 border-t border-zinc-800/60 font-mono text-[10px] leading-relaxed">
+              <div className="flex justify-between items-center text-zinc-400">
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Current Load:</span>
+                <span className="font-bold text-white">{capacityPct}%</span>
+              </div>
+              <div className="flex justify-between items-center text-zinc-400">
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 7-Day Forecast:</span>
+                <span className={`font-bold ${projectedCapacityPct >= capacityPct ? 'text-amber-400' : 'text-emerald-400'}`}>
+                  {projectedCapacityPct}% {projectedCapacityPct >= capacityPct ? '↑' : '↓'}
+                </span>
+              </div>
+              <p className="text-[9px] text-zinc-500 leading-normal mt-1 pt-1 italic font-sans border-t border-zinc-800/20">
+                Estimated from rolling week rates & trend momentum.
+              </p>
+            </div>
+
+            {/* Expandable daily capacity breakdown block */}
+            {isCapacityExpanded && (
+              <div className="mt-4 pt-3.5 border-t border-zinc-800/80 font-mono text-[9px] space-y-3 animate-fadeIn duration-300">
+                <div className="flex items-center justify-between">
+                  <p className="text-zinc-500 font-bold uppercase tracking-wider text-[8px]">Daily Capacity Breakdown</p>
+                  <div className="flex items-center gap-1.5">
+                    <button 
+                      onClick={handleExportCapacityCSV}
+                      className="p-1 px-1.5 rounded bg-zinc-800 hover:bg-zinc-700/80 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center gap-1 border border-zinc-700/40"
+                      title="Download daily capacity report as CSV"
+                    >
+                      <Download className="w-2.5 h-2.5 text-orange-400" />
+                      <span className="text-[7.5px] font-bold text-zinc-300 uppercase tracking-wide">CSV</span>
+                    </button>
+                    <button 
+                      onClick={handleExportCapacityPDF}
+                      className="p-1 px-1.5 rounded bg-zinc-800 hover:bg-zinc-700/80 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center gap-1 border border-zinc-700/40"
+                      title="Download styled PDF projection summary report"
+                    >
+                      <Download className="w-2.5 h-2.5 text-amber-500" />
+                      <span className="text-[7.5px] font-bold text-zinc-300 uppercase tracking-wide">PDF</span>
+                    </button>
+                    <span className="text-[8px] text-zinc-650 font-semibold ml-1">[Current vs Proj]</span>
+                  </div>
+                </div>
+
+                {/* Sort Option Sorter Selector Dropdown & Smoothing Toggle */}
+                <div className="flex flex-col gap-2 bg-zinc-950/80 p-2.5 rounded-xl border border-zinc-900/60">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <span className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest">Order by:</span>
+                    <select
+                      value={capacitySortBy}
+                      onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck')}
+                      className="bg-zinc-900 hover:bg-zinc-800 text-amber-450 hover:text-amber-300 text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none border border-zinc-800/80 cursor-pointer transition-all font-bold"
+                    >
+                      <option value="date">📅 Date (Chronological)</option>
+                      <option value="bottleneck">🔥 Bottleneck Intensity</option>
+                    </select>
+                  </div>
+                  
+                  {/* Smoothing Mode Toggle */}
+                  <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-zinc-900/60">
+                    <span className="text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest" title="3-Day moving average smoothing vs raw data">Data View:</span>
+                    <div className="flex rounded bg-zinc-900 p-0.5 border border-zinc-800/80">
+                      <button
+                        onClick={() => setCapacitySmoothing('raw')}
+                        className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
+                          capacitySmoothing === 'raw' 
+                            ? 'bg-orange-500 text-white shadow-sm' 
+                            : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-800'
+                        }`}
+                      >
+                        Raw
+                      </button>
+                      <button
+                        onClick={() => setCapacitySmoothing('smoothed')}
+                        className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
+                          capacitySmoothing === 'smoothed' 
+                            ? 'bg-orange-500 text-white shadow-sm' 
+                            : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-800'
+                        }`}
+                        title="3-Day Moving Average Smoothed"
+                      >
+                        Smooth 3D
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottleneck Threshold Slider */}
+                <div className="flex flex-col gap-2 bg-zinc-950/80 p-2.5 rounded-xl border border-zinc-900/60">
+                  <div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+                    <span>Bottleneck Threshold</span>
+                    <span className="text-amber-450 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800/55">{bottleneckThreshold}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50"
+                    max="100"
+                    step="1"
+                    value={bottleneckThreshold}
+                    onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
+                    className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 focus:outline-none transition-all"
+                    style={{ accentColor: '#f97316' }}
+                  />
+                  <div className="flex justify-between text-[7px] text-zinc-650 font-mono leading-none">
+                    <span>50%</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+                
+                <div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
+                  {sortedDailyCapacityBreakdown.map((item, index) => {
+                    const isBottleneck = item.projected > bottleneckThreshold;
+                    const chronologicalIndex = dailyCapacityBreakdown.findIndex(d => d.day === item.day);
+                    
+                    // Coordinates for the 7-day sparkline (Mon -> Sun)
+                    const points = dailyCapacityBreakdown.map((d, i) => {
+                      const x = 2 + (i / 6) * 44;
+                      const y = 12 - (d.projected / 100) * 10;
+                      return `${x},${y}`;
+                    });
+                    const pointsString = points.join(' ');
+                    
+                    const activeX = 2 + (chronologicalIndex / 6) * 44;
+                    const activeY = 12 - (item.projected / 100) * 10;
+                    const fillPathD = `M 2,12 L ${points.join(' L ')} L 46,12 Z`;
+
+                    return (
+                      <div 
+                        key={index} 
+                        className={`flex flex-col gap-1.5 text-zinc-450 pb-2 border-b border-zinc-950/40 last:border-0 last:pb-0 transition-all duration-300 ${
+                          isBottleneck 
+                            ? 'bg-amber-950/20 border border-amber-500/20 p-2.5 rounded-xl my-1 shadow-[inset_0_1px_1px_rgba(245,158,11,0.05)]' 
+                            : 'px-1 pt-1'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center text-[10px] gap-2">
+                          <span className="font-sans font-bold text-zinc-350 flex items-center gap-1 flex-wrap min-w-[70px]">
+                            {item.day.substring(0, 3)} 
+                            <span className="text-[8px] text-zinc-500 font-normal font-mono">({item.date})</span>
+                            {isBottleneck && (
+                              <span className="text-[7.5px] font-mono leading-none bg-amber-500/10 text-amber-300 border border-amber-500/20 py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-amber-400 fill-amber-400" /> Hot
+                              </span>
+                            )}
+                          </span>
+
+                          {/* Center: Sparkline trend & differential */}
+                          <div className="flex-1 flex items-center justify-center gap-1.5 px-1">
+                            {/* SVG Sparkline */}
+                            <div className="relative cursor-help" title="7-Day weekly projected capacity trend line (Monday to Sunday)">
+                              <svg className="w-12 h-3.5 overflow-visible" viewBox="0 0 48 14">
+                                <defs>
+                                  <linearGradient id={`sparkline-grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor={isBottleneck ? '#f59e0b' : '#ea580c'} stopOpacity="0.15" stop={''} />
+                                    <stop offset="100%" stopColor={isBottleneck ? '#f59e0b' : '#ea580c'} stopOpacity="0.0" stop={''} />
+                                  </linearGradient>
+                                </defs>
+                                
+                                {/* Fill underneath sparkline */}
+                                <path
+                                  d={fillPathD}
+                                  fill={`url(#sparkline-grad-${index})`}
+                                />
+                                
+                                {/* Base weekly line */}
+                                <polyline
+                                  fill="none"
+                                  stroke="#3f3f46"
+                                  strokeWidth="1"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  points={pointsString}
+                                />
+                                
+                                {/* Highlight sequence up to today */}
+                                <polyline
+                                  fill="none"
+                                  stroke={isBottleneck ? '#f59e0b' : '#ea580c'}
+                                  strokeWidth="1.2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  points={points.slice(0, chronologicalIndex + 1).join(' ')}
+                                />
+                                
+                                {/* Active day pulsing dot */}
+                                {isBottleneck && (
+                                  <circle
+                                    cx={activeX}
+                                    cy={activeY}
+                                    r="2.5"
+                                    fill="#f59e0b"
+                                    className="animate-ping opacity-75"
+                                  />
+                                )}
+                                <circle
+                                  cx={activeX}
+                                  cy={activeY}
+                                  r="1.5"
+                                  fill={isBottleneck ? '#f59e0b' : '#ea580c'}
+                                />
+                              </svg>
+                            </div>
+
+                            {/* Daily trend arrow with previous day comparison */}
+                            {chronologicalIndex > 0 ? (
+                              (() => {
+                                const prevProjected = dailyCapacityBreakdown[chronologicalIndex - 1].projected;
+                                const diff = item.projected - prevProjected;
+                                if (diff > 0) {
+                                  return (
+                                    <span className="text-emerald-500 text-[8px] font-bold font-mono tracking-tighter flex items-center" title={`Up by +${diff}% from preceding day`}>
+                                      ▲{diff}%
+                                    </span>
+                                  );
+                                } else if (diff < 0) {
+                                  return (
+                                    <span className="text-rose-500 text-[8px] font-bold font-mono tracking-tighter flex items-center" title={`Down by ${diff}% from preceding day`}>
+                                      ▼{Math.abs(diff)}%
+                                    </span>
+                                  );
+                                } else {
+                                  return (
+                                    <span className="text-zinc-600 text-[8px] font-bold font-mono tracking-tighter flex items-center" title="Stable relative to preceding day">
+                                      ■0%
+                                    </span>
+                                  );
+                                }
+                              })()
+                            ) : (
+                              <span className="text-zinc-650 text-[8px] font-bold font-mono tracking-tighter" title="First day of active week sequence">
+                                •
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Right side: capacity percentages */}
+                          <div className="flex items-center gap-1 shrink-0 text-right min-w-[55px] justify-end">
+                            <span className="text-zinc-500 text-[8px]" title="Current">{item.current}%</span>
+                            <span className="text-zinc-600 text-[8px] select-none">→</span>
+                            <span className={`font-bold text-[10px] ${isBottleneck ? 'text-amber-400 font-bold' : item.projected >= item.current ? 'text-orange-400' : 'text-orange-500/80'}`} title="Projected">
+                              {item.projected}%
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Interactive miniature double graph bar indicator */}
+                        <div className="h-1 bg-zinc-950 rounded-full overflow-hidden flex">
+                          <div 
+                            className="bg-zinc-700 h-full rounded-l transition-all duration-300"
+                            style={{ width: `${item.current}%` }}
+                          />
+                          <div 
+                            className={`${isBottleneck ? 'bg-gradient-to-r from-amber-600 to-amber-400' : 'bg-gradient-to-r from-orange-600 to-orange-400'} h-full rounded-r transition-all duration-300`}
+                            style={{ width: `${Math.max(0, item.projected - item.current)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -463,13 +1123,28 @@ export default function App() {
         
         {/* Global Toolbar */}
         <header className="bg-zinc-950 h-16 border-b border-zinc-900 px-6 flex items-center justify-between shadow-md sticky top-0 z-30">
-          <div className="flex items-center gap-3">
-            <h2 className="text-sm font-sans font-bold text-white">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-xs sm:text-sm font-sans font-bold text-white shrink-0">
               {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
             </h2>
-            <span className="text-[10px] bg-zinc-900 text-zinc-400 border border-zinc-800 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+            <span className="hidden lg:inline-block text-[9px] bg-zinc-900 text-zinc-400 border border-zinc-850 font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold">
               Food chain ops portal
             </span>
+            
+            {/* Global Branch Selector Dropdown */}
+            <div className="flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded-lg border border-zinc-800 shadow-inner">
+              <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-wider font-mono shrink-0 pl-1">Store:</span>
+              <select
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value as any)}
+                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none"
+                style={{ outline: 'none' }}
+              >
+                <option value="Marks & Spencer - Cork City" className="bg-zinc-950 text-white font-bold">Marks & Spencer Cork City</option>
+                <option value="Tesco - Cork City" className="bg-zinc-950 text-white font-bold">Tesco Cork City</option>
+                <option value="Tesco - Mahon Point" className="bg-zinc-950 text-white font-bold">Tesco Mahon Point</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">

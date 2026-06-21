@@ -54,21 +54,29 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
       });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: prompt,
-      config: {
-        systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite cold-chain and premium ocean-to-table food corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies. Break down complex operational problems regarding sales, waste minimization, logistics, and labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.HIGH
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-pro-preview",
+        contents: prompt,
+        config: {
+          systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite cold-chain and premium ocean-to-table food corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies. Break down complex operational problems regarding sales, waste minimization, logistics, and labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
+          thinkingConfig: {
+            thinkingLevel: ThinkingLevel.HIGH
+          }
         }
-      }
-    });
+      });
 
-    res.json({
-      text: response.text || "No response text generated.",
-      thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
-    });
+      res.json({
+        text: response.text || "No response text generated.",
+        thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
+      });
+    } catch (apiErr: any) {
+      console.warn("Strategic Advisor API call failed. Falling back to simulation mode.", apiErr);
+      res.json({
+        text: `💡 [Simulation Mode - Fallback] Keep waste minimal by matching production targets to high-traffic rain hours, and shift Chef Skipper to peak times. Set up a valid key in Settings > Secrets to unleash deep system thinking capabilities! (API returned: ${apiErr.message || apiErr})`,
+        thinking: "Simulating high-reasoning tree gracefully on API fallback..."
+      });
+    }
   } catch (err: any) {
     console.error("Strategic Advisor error: ", err);
     res.status(500).json({ error: err.message || "An error occurred with the strategic AI advisor." });
@@ -93,17 +101,24 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
       });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: command,
-      config: {
-        systemInstruction: "You are the rapid action-response dispatcher for Food Penguin kitchen managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the floor leads with quick, direct answers."
-      }
-    });
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-flash-lite",
+        contents: command,
+        config: {
+          systemInstruction: "You are the rapid action-response dispatcher for Food Penguin kitchen managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the floor leads with quick, direct answers."
+        }
+      });
 
-    res.json({
-      text: response.text || "No response received."
-    });
+      res.json({
+        text: response.text || "No response received."
+      });
+    } catch (apiErr: any) {
+      console.warn("Low Latency Copilot API call failed. Falling back to simulation mode.", apiErr);
+      res.json({
+        text: `⚡ [Lite Simulation Mode - Fallback] (API returned error: ${apiErr.message || apiErr}). Swapping Chef Kowalski to dinner shift, increasing Arctic Burger margins by 3%, and scheduling refrigeration defrosters. Configure a valid API key for live sub-second replies!`
+      });
+    }
   } catch (err: any) {
     console.error("Low latency copilot error: ", err);
     res.status(500).json({ error: err.message || "An error occurred on the rapid copilot." });
@@ -128,32 +143,38 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
       return res.json({ imageUrl: mockSvg, simulated: true });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-image",
-      contents: {
-        parts: [{ text: `A clean, commercial studio foods advertisement banner for Food Penguin Limited. ${prompt}` }]
-      },
-      config: {
-        imageConfig: {
-          aspectRatio: aspectRatio || "1:1"
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-image",
+        contents: {
+          parts: [{ text: `A clean, commercial studio foods advertisement banner for Food Penguin Limited. ${prompt}` }]
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: aspectRatio || "1:1"
+          }
+        }
+      });
+
+      let base64Image = "";
+      if (response.candidates && response.candidates[0]?.content?.parts) {
+        for (const part of response.candidates[0].content.parts) {
+          if (part.inlineData) {
+            base64Image = part.inlineData.data;
+            break;
+          }
         }
       }
-    });
 
-    let base64Image = "";
-    if (response.candidates && response.candidates[0]?.content?.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          base64Image = part.inlineData.data;
-          break;
-        }
+      if (base64Image) {
+        res.json({ imageUrl: `data:image/png;base64,${base64Image}`, simulated: false });
+      } else {
+        throw new Error("No image data returned from Gemini flash image.");
       }
-    }
-
-    if (base64Image) {
-      res.json({ imageUrl: `data:image/png;base64,${base64Image}`, simulated: false });
-    } else {
-      throw new Error("No image data returned from Gemini flash image.");
+    } catch (apiErr: any) {
+      console.warn("Marketing Image API call failed, falling back to simulated SVG:", apiErr);
+      const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${aspectRatio || '1:1'} (Simulated on Fallback)</text></svg>`;
+      res.json({ imageUrl: mockSvg, simulated: true, explanation: `Real API call returned: ${apiErr.message || apiErr}` });
     }
   } catch (err: any) {
     console.error("Image generation error: ", err);
@@ -181,25 +202,32 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
       });
     }
 
-    const imagePart = {
-      inlineData: {
-        mimeType: mimeType || "image/png",
-        data: cleanBase64,
-      },
-    };
+    try {
+      const imagePart = {
+        inlineData: {
+          mimeType: mimeType || "image/png",
+          data: cleanBase64,
+        },
+      };
 
-    const promptPart = {
-      text: "Perform a rigorous culinary audit on this dish or ingredient delivery photo. Critique the presentation/plating, estimate the volume/weight where applicable, assess the quality/freshness markers, and estimate potential waste or trim percentages. Give actionable suggestions on how to improve kitchen margins or prevent food spoilage."
-    };
+      const promptPart = {
+        text: "Perform a rigorous culinary audit on this dish or ingredient delivery photo. Critique the presentation/plating, estimate the volume/weight where applicable, assess the quality/freshness markers, and estimate potential waste or trim percentages. Give actionable suggestions on how to improve kitchen margins or prevent food spoilage."
+      };
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: { parts: [imagePart, promptPart] }
-    });
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-pro-preview",
+        contents: { parts: [imagePart, promptPart] }
+      });
 
-    res.json({
-      analysis: response.text || "No analysis generated."
-    });
+      res.json({
+        analysis: response.text || "No analysis generated."
+      });
+    } catch (apiErr: any) {
+      console.warn("Photo analysis API call failed. Falling back to simulation.", apiErr);
+      res.json({
+        analysis: `🔍 [Photo Audit Simulation - Fallback] Your dish photo was received! It displays outstanding plating. Cod thickness appears uniform (approx. 2.4cm). Asparagus is well-steamed and color index is healthy. Estimated portion weight is 320g. Waste assessment: Negligible (<5% scrap). Configure a valid Gemini key to get live, multi-spectrometer analysis! (API returned: ${apiErr.message || apiErr})`
+      });
+    }
   } catch (err: any) {
     console.error("Dish analyzer error: ", err);
     res.status(500).json({ error: err.message || "Quality audit analysis failed." });
@@ -224,18 +252,25 @@ app.post("/api/gemini/search-trends", async (req, res) => {
       });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: query,
-      config: {
-        systemInstruction: "You are active business intelligence for Food Penguin procurement department. Answer the user's research questions accurately using the search grounding tool.",
-        tools: [{ googleSearch: {} }]
-      }
-    });
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: query,
+        config: {
+          systemInstruction: "You are active business intelligence for Food Penguin procurement department. Answer the user's research questions accurately using the search grounding tool.",
+          tools: [{ googleSearch: {} }]
+        }
+      });
 
-    res.json({
-      text: response.text || "No grounded research found."
-    });
+      res.json({
+        text: response.text || "No grounded research found."
+      });
+    } catch (apiErr: any) {
+      console.warn("Search grounding API call failed. Falling back to simulation.", apiErr);
+      res.json({
+        text: `🌐 [Search Grounding Simulation - Fallback] Searching for: "${query}" in 2026 indexes...\n\nAccording to mock 2026 data: Cold-water species like Atlantic Salmon and Halibut keep a high premium, up 4.1% MoM; plant-based seafood alternatives expand key urban channels. (API returned: ${apiErr.message || apiErr})`
+      });
+    }
   } catch (err: any) {
     console.error("Search Grounding error: ", err);
     res.status(500).json({ error: err.message || "Failed to search web statistics." });

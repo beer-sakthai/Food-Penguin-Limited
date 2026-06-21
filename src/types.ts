@@ -18,6 +18,7 @@ export interface SalesOrder {
   quantity: number;
   amount: number;
   status: 'Completed' | 'Pending' | 'Refunded';
+  branch?: string;
 }
 
 export interface CompanyTarget {
