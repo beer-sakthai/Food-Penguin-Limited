@@ -71,6 +71,8 @@ function OverviewTab({
  'focus:border-yellow-500',
  'focus:shadow-[0_0_8px_rgba(234,179,8,0.4)]'
  ].join(' ');
+ const advisorTextareaBaseClasses =
+ 'w-full min-h-[4.5rem] sm:min-h-20 max-h-28 resize-y p-3 border shadow-inner transition-all duration-200 font-sans rounded-2xl';
  const [strategicPrompt, setStrategicPrompt] = useState(
  "Synthesize an optimization plan for premium Sushi production to reduce Tazaki and Sysco transport delays by 12% while keeping active kitchen seafood waste indexes below 3% under Dublin humid weather."
  );
@@ -434,10 +436,13 @@ function OverviewTab({
  return [...rawBranchList].sort((a, b) => b.efficiencyScore - a.efficiencyScore)[0];
  }, [rawBranchList]);
 
+ const advisorTextareaThemeClasses = isLight
+ ? 'border-zinc-300 bg-white text-zinc-900'
+ : 'border-zinc-800 bg-zinc-900 text-zinc-100';
  const advisorTextareaClasses = [
- 'w-full min-h-[4.5rem] sm:min-h-20 max-h-28 resize-y p-3 border shadow-inner transition-all duration-200 font-sans rounded-2xl',
+ advisorTextareaBaseClasses,
  goldFocusRingClasses,
- isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
+ advisorTextareaThemeClasses
  ].join(' ');
 
  return (
