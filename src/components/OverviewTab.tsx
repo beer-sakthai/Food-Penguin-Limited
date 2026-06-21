@@ -430,7 +430,7 @@ function OverviewTab({
  return (
  <div id="overview-viewport" className="space-y-7">
  {/* Header Banner with Premium ambient bento design */}
- <div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
+<div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
  isLight ? 'bg-white/95 border-zinc-200 text-zinc-900 shadow-[0_12px_30px_rgba(24,24,27,0.06)]' : 'bg-zinc-900/90 border-zinc-700 text-white shadow-[0_16px_36px_rgba(0,0,0,0.45)]'
  }`}>
  <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl pointer-events-none" />
