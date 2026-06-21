@@ -1,1 +1,48 @@
 @import "tailwindcss";
+
+@layer components {
+  /* Common 3D properties */
+  .metallic-base {
+    @apply border relative overflow-hidden;
+  }
+
+  /* 3D Gold Theme */
+  .bg-3d-gold {
+    @apply bg-gradient-to-br from-[#dfa033] via-[#b67812] to-[#6a460b] border-[#e8b556] text-white;
+    box-shadow: inset 0px 1px 3px rgba(255, 230, 150, 0.5), inset 0px -2px 5px rgba(50, 30, 0, 0.8), 0 8px 15px rgba(0, 0, 0, 0.7);
+  }
+  .bg-3d-gold-dark {
+    @apply bg-gradient-to-br from-[#8a601a] via-[#452e06] to-[#1e1302] border-[#a07421] text-[#ffd700];
+    box-shadow: inset 0px 1px 2px rgba(255, 215, 0, 0.2), inset 0px -2px 4px rgba(0, 0, 0, 0.9), 0 8px 15px rgba(0, 0, 0, 0.7);
+  }
+
+  /* 3D Silver Theme */
+  .bg-3d-silver {
+    @apply bg-gradient-to-br from-[#b0b5b9] via-[#7b8388] to-[#3a4146] border-[#d8dce0] text-white;
+    box-shadow: inset 0px 1px 3px rgba(255, 255, 255, 0.6), inset 0px -2px 5px rgba(40, 40, 40, 0.8), 0 8px 15px rgba(0, 0, 0, 0.7);
+  }
+  .bg-3d-silver-dark {
+    @apply bg-gradient-to-br from-[#596066] via-[#2d3236] to-[#121415] border-[#727a80] text-[#e0e0e0];
+    box-shadow: inset 0px 1px 2px rgba(200, 200, 200, 0.2), inset 0px -2px 4px rgba(0, 0, 0, 0.9), 0 8px 15px rgba(0, 0, 0, 0.7);
+  }
+
+  /* 3D Copper Theme */
+  .bg-3d-copper {
+    @apply bg-gradient-to-br from-[#c96c42] via-[#8c3f1e] to-[#471d0b] border-[#e28c61] text-white;
+    box-shadow: inset 0px 1px 3px rgba(255, 180, 150, 0.5), inset 0px -2px 5px rgba(40, 15, 0, 0.8), 0 8px 15px rgba(0, 0, 0, 0.7);
+  }
+  .bg-3d-copper-dark {
+    @apply bg-gradient-to-br from-[#68331a] via-[#3d1a0b] to-[#1a0a03] border-[#8a421e] text-[#f4a460];
+    box-shadow: inset 0px 1px 2px rgba(255, 150, 100, 0.2), inset 0px -2px 4px rgba(0, 0, 0, 0.9), 0 8px 15px rgba(0, 0, 0, 0.7);
+  }
+  
+  .text-3d-gold {
+     @apply text-transparent bg-clip-text bg-gradient-to-b from-[#ffdf73] to-[#b67812] drop-shadow-md;
+  }
+  .text-3d-silver {
+     @apply text-transparent bg-clip-text bg-gradient-to-b from-[#f0f0f0] to-[#808080] drop-shadow-md;
+  }
+  .text-3d-copper {
+     @apply text-transparent bg-clip-text bg-gradient-to-b from-[#ffb48f] to-[#cd7f32] drop-shadow-md;
+  }
+}

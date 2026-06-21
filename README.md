@@ -21,7 +21,7 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
   * **Deep Strategic Advisor:** Built-in multi-layered logic solver using advanced reasoning (Powered by Gemini 1.5 Flash for cost-free, high-speed execution).
   * **AI Banner Illustrator:** Automated marketing asset generation with specific focal points and aspect ratios (Powered by Imagen 3.0).
   * **Waste Investigator & Recipe Generator:** Automated photo-based insights and production aids.
-  * **Real-time Shift Summary & Analytics:** Background polling automatically fetches live operations data and regenerates AI insights every 60 seconds.
+  * **Real-time Shift Summary & Analytics:** Manually generated AI insights against live operation data, kept strictly on-demand to respect API quota limits.
 
 ## 🛠 Tech Stack
 
