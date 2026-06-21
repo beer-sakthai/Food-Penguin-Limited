@@ -103,6 +103,14 @@ export default function App() {
  } catch (_) {}
  };
 
+ useEffect(() => {
+ if (typeof document === 'undefined') return;
+ const isDark = theme === 'dark';
+ document.documentElement.classList.toggle('dark', isDark);
+ document.body.classList.toggle('dark', isDark);
+ document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+ }, [theme]);
+
  const [activeTab, setActiveTab] = useState<string>('Overview');
  const [userRole, setUserRole] = useState<UserRole>('Admin');
  const [selectedBranch, setSelectedBranch] = useState<BranchName>(BRANCHES[0]);
@@ -535,7 +543,7 @@ export default function App() {
  <div 
  id="app-workspace" 
  className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-200 ${
- isLight ? 'bg-zinc-50 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900' : 'bg-black text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100'
+ isLight ? 'bg-gradient-to-br from-zinc-50 via-white to-orange-50/35 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900' : 'bg-gradient-to-br from-zinc-950 via-black to-zinc-900 text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100'
  }`}
  >
  
@@ -1187,7 +1195,7 @@ export default function App() {
  </div>
  </aside>
 
- <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-zinc-50' : 'bg-black'}`}>
+<div className="flex-1 flex flex-col min-w-0 transition-colors duration-200 bg-transparent">
  
  {/* Global Toolbar */}
  <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
@@ -1234,13 +1242,16 @@ export default function App() {
  onClick={toggleTheme}
  title={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
  aria-label={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
- className={`w-9 h-9 rounded-full flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none ${
+ className={`h-9 px-3 rounded-full flex items-center justify-center gap-1.5 transition-all focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none active:scale-[0.98] hover:-translate-y-0.5 ${
  isLight 
  ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 shadow-sm' 
  : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
  }`}
  >
- {isLight ? <Moon className="w-4.5 h-4.5 text-zinc-600" /> : <Sun className="w-4.5 h-4.5 text-amber-400" />}
+ {isLight ? <Moon className="w-4 h-4 text-zinc-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+ <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
+ {isLight ? 'Day' : 'Dark'}
+ </span>
  </button>
  </div>
  </header>

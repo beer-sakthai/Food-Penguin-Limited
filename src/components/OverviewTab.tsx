@@ -298,6 +298,10 @@ function OverviewTab({
  ].join(' ');
 
  return (
+ <div id="overview-viewport" className="space-y-7">
+ {/* Header Banner with Premium ambient bento design */}
+<div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
+ isLight ? 'bg-white/95 border-zinc-200 text-zinc-900 shadow-[0_12px_30px_rgba(24,24,27,0.06)]' : 'bg-zinc-900/90 border-zinc-700 text-white shadow-[0_16px_36px_rgba(0,0,0,0.45)]'
  <div id="overview-viewport" className="space-y-5">
  {/* Header Banner with Premium ambient bento design */}
  <div className={`rounded-3xl p-5 md:p-6 lg:p-7 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 border transition-colors duration-200 ${
@@ -322,18 +326,20 @@ function OverviewTab({
  </span>
  </div>
  <h1 className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
- isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'
+ isLight ? 'text-zinc-900' : 'text-white'
  }`}>
  Sushi Ops Strategy Center
  </h1>
- <p className={`text-sm leading-relaxed ${
- isLight ? 'text-zinc-650 text-zinc-605 text-zinc-600' : 'text-zinc-300'
+ <p className={`text-sm leading-relaxed max-w-2xl ${
+ isLight ? 'text-zinc-600' : 'text-zinc-300'
  }`}>
  Premium Sushi Production Company is currently executing at <span className="text-orange-600 dark:text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Cooking objectives are on target, and waste reports show an improvement of <span className="text-emerald-600 dark:text-emerald-400 font-semibold">18.2% vs last Friday</span>.
  </p>
  </div>
 
  {/* Date-Range Selector Box */}
+ <div className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
+ isLight ? 'bg-zinc-50/85 border-zinc-200 shadow-sm' : 'bg-zinc-950/70 border-zinc-700'
  <div className={`relative z-10 backdrop-blur-md p-4 rounded-2xl border w-full sm:max-w-sm lg:w-64 xl:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
  isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-950/60 border-zinc-800'
  }`}>
@@ -380,7 +386,7 @@ function OverviewTab({
  >
  {/* Weekday Quick Select Tabs */}
  <div className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${
- isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
+ isLight ? 'bg-white/95 border-zinc-200 shadow-sm' : 'bg-zinc-900/70 border-zinc-700'
  }`}>
  <div className="flex items-center gap-2">
  <Calendar className={`w-4 h-4 font-bold ${isLight ? 'text-orange-600' : 'text-orange-400'}`} />
@@ -391,7 +397,7 @@ function OverviewTab({
  </span>
  </div>
  <div className={`flex items-center p-1 rounded-2xl border shadow-inner transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-850'
+ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
  }`}>
  {(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const).map((day) => {
  const isActive = selectedDayTab === day;
