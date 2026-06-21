@@ -315,7 +315,7 @@ export function downloadCapacityPdf(options: {
 
   const bulletins = [
     '• Capacity forecasts are computed dynamically from completed production batches versus target output.',
-    '• The bottleneck threshold represents the projected share of available production capacity used on a given day.',
+    '• The bottleneck threshold represents the projected percentage of available production capacity used on a given day.',
     '• Yellow BOTTLENECK badges indicate days exceeding the configured threshold.',
     '• The smoothed view reduces short-term spikes so managers can spot sustained pressure.',
     '• Use this report for staffing, production balancing, and branch-level planning reviews.',
@@ -332,7 +332,7 @@ export function downloadCapacityPdf(options: {
   doc.line(15, yPos - 3, 195, yPos - 3);
   doc.setTextColor(textGray[0], textGray[1], textGray[2]);
   doc.setFontSize(7);
-  doc.text('Automated forecast projection report. Confidential & intended for Food Penguin internal operations.', 15, yPos);
+  doc.text('Automated forecast projection report. Confidential & intended for Food Penguin Internal Operations.', 15, yPos);
   doc.text('Page 1 of 1', 182, yPos);
   doc.save(`Capacity_Projection_Report_${selectedWeekRange.replace(/\s+/g, '_')}.pdf`);
 }

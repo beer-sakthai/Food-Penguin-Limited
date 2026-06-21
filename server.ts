@@ -25,8 +25,15 @@ const appLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+const aiLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 app.use(appLimiter);
+app.use('/api/gemini', aiLimiter);
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ extended: true, limit: '12mb' }));
 
