@@ -1577,7 +1577,7 @@ function OverviewTab({
  }`}>
  <div className="flex items-start gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-350 ${
- isLight ? 'bg-zinc-150 bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
+ isLight ? 'bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
  }`}>
  <Activity className="w-5 h-5 animate-pulse" />
  </div>
@@ -2154,7 +2154,7 @@ function OverviewTab({
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
- className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans rounded-2xl ${
+ className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] font-sans rounded-2xl ${
  isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
  }`}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
