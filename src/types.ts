@@ -110,3 +110,100 @@ export interface DailyOperationalLog {
     others: number;
   };
 }
+
+export type OperationalDay = DailyOperationalLog['day'];
+export type SupplierName = DailyOperationalLog['supplierName'];
+
+export interface BranchOperationalSnapshot {
+  sales: number;
+  production: number;
+  productionTarget: number;
+  wasteCost: number;
+  hours: number;
+  cogs: number;
+}
+
+export type BranchOperationalWeekMap = Record<string, Record<string, DailyOperationalLog[]>>;
+
+export interface BranchKpiSummary {
+  id: string;
+  branch: string;
+  shortLabel: string;
+  sales: number;
+  production: number;
+  productionTarget: number;
+  productionAttainmentPct: number;
+  wasteCost: number;
+  wastePct: number;
+  hours: number;
+  laborEfficiency: number;
+  cogs: number;
+  cogsRatioPct: number;
+  targetAttainmentPct: number;
+  efficiencyScore: number;
+}
+
+export interface CompanyKpiMetric {
+  id: 'sales' | 'production' | 'wasteCost' | 'wasteRate' | 'laborEfficiency' | 'cogs' | 'targetAttainment';
+  label: string;
+  value: number;
+  displayValue: string;
+  deltaPct: number;
+  deltaLabel: string;
+  status: 'healthy' | 'warning' | 'critical';
+  helperText: string;
+}
+
+export interface CompanyKpiSnapshot {
+  period: 'day' | 'week';
+  selectedDay?: OperationalDay;
+  sales: number;
+  production: number;
+  productionTarget: number;
+  productionAttainmentPct: number;
+  wasteCost: number;
+  wastePct: number;
+  hours: number;
+  laborEfficiency: number;
+  cogs: number;
+  cogsRatioPct: number;
+  targetAttainmentPct: number;
+  metrics: CompanyKpiMetric[];
+}
+
+export interface CompanyKpiTrendPoint {
+  day: OperationalDay;
+  sales: number;
+  production: number;
+  wasteCost: number;
+  hours: number;
+  cogs: number;
+  laborEfficiency: number;
+  targetAttainmentPct: number;
+}
+
+export interface CompanyTargetVariance {
+  id: string;
+  name: string;
+  category: CompanyTarget['category'];
+  metric: string;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  variance: number;
+  variancePct: number;
+  status: 'ahead' | 'at-risk' | 'behind';
+}
+
+export interface OverviewBranchComparisonItem {
+  id: string;
+  name: string;
+  fullName: string;
+  type: string;
+  sales: number;
+  production: number;
+  wastePct: number;
+  efficiencyScore: number;
+  color: string;
+  fill?: string;
+}
