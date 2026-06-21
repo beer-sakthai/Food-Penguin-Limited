@@ -420,7 +420,7 @@ export default function App() {
  { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
  { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
  { id: 'Hours', label: 'Hours', icon: <CalendarDays className="w-4 h-4" /> },
- { id: 'Supplier', label: 'Supplier COG', icon: <Boxes className="w-4 h-4" /> },
+ { id: 'Supplier', label: 'Supplier COGS', icon: <Boxes className="w-4 h-4" /> },
  { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> }
  ];
 

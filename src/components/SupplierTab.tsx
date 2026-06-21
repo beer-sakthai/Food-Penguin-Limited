@@ -111,7 +111,7 @@ export default function SupplierTab({ theme }: SupplierTabProps) {
   return (
     <section className="space-y-6">
       <div className={`rounded-3xl border p-6 transition-colors ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'}`}>
-        <p className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>COG Supplier Master List</p>
+        <p className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>COGS Supplier Master List</p>
         <h2 className={`mt-2 text-xl font-black ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Supplier Catalog</h2>
         <p className="mt-1 text-xs text-zinc-500">Centralized COG supplier and item mapping for purchasing and planning.</p>
       </div>
