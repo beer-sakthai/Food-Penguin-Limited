@@ -1,7 +1,12 @@
 import React, { memo, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import DublinClock from './DublinClock';
-import { CoreMetrics, CompanyTarget, DailyOperationalLog, SalesOrder } from '../types';
+import { CoreMetrics, CompanyTarget, DailyOperationalLog } from '../types';
+import {
+ buildBranchSummaries,
+ buildOverviewBranchComparisonData,
+ getChampionBranch,
+} from '../lib/companyKpis';
 import {
  TrendingUp,
  Package,
@@ -44,8 +49,8 @@ interface OverviewTabProps {
  onAddOrUpdateLog: (log: DailyOperationalLog) => void;
  selectedWeekRange: string;
  onSelectedWeekRangeChange: (range: string) => void;
- orders: SalesOrder[];
  selectedBranch: string;
+ branchWeeklyLogsByBranch: Record<string, DailyOperationalLog[]>;
  theme?: 'dark' | 'light';
 }
 
@@ -59,11 +64,20 @@ function OverviewTab({
  onAddOrUpdateLog,
  selectedWeekRange,
  onSelectedWeekRangeChange,
- orders,
  selectedBranch,
+ branchWeeklyLogsByBranch,
  theme = 'dark'
 }: OverviewTabProps) {
  const isLight = theme === 'light';
+ const goldFocusRingClasses = [
+ 'focus:outline-none',
+ 'focus:ring-2',
+ 'focus:ring-yellow-500',
+ 'focus:border-yellow-500',
+ 'focus:shadow-[0_0_8px_rgba(234,179,8,0.4)]'
+ ].join(' ');
+ const advisorTextareaBaseClasses =
+ 'w-full min-h-[4.5rem] sm:min-h-20 max-h-28 resize-y p-3 border shadow-inner transition-all duration-200 font-sans rounded-2xl';
  const [strategicPrompt, setStrategicPrompt] = useState(
  "Synthesize an optimization plan for premium Sushi production to reduce Tazaki and Sysco transport delays by 12% while keeping active kitchen seafood waste indexes below 3% under Dublin humid weather."
  );
@@ -252,191 +266,51 @@ function OverviewTab({
  }));
 
  // --- MULTI-BRANCH DESIGN CONCEPTS & ANALYTICS ---
- // Store branches defined in the corporate plan:
- // 1. Marks & Spencer - Cork City (Luxury selection, premier gourmet pricing premium, high efficiency)
- // 2. Tesco - Cork City (High volume urban storefront, everyday value items, moderate waste margins)
- // 3. Tesco - Mahon Point (Suburban shopping mall storefront, mixed deals & family options)
  const [branchComparePeriod, setBranchComparePeriod] = useState<'day' | 'week'>('week');
  const [branchCompareMetric, setBranchCompareMetric] = useState<'sales' | 'production' | 'waste' | 'efficiency'>('sales');
  const [vsAverageMode, setVsAverageMode] = useState<boolean>(false);
+ const branchSummaries = React.useMemo(() => (
+   buildBranchSummaries({
+     branchWeeklyLogsByBranch,
+     targets,
+     period: branchComparePeriod,
+     selectedDay: branchComparePeriod === 'day' ? selectedDayTab : undefined,
+   })
+ ), [branchWeeklyLogsByBranch, branchComparePeriod, selectedDayTab, targets]);
 
- const rawBranchList = React.useMemo(() => {
- // Determine aggregate or day-specific benchmark base values from operational logs
- let baseSales = 0;
- let baseProduction = 0;
- let baseWaste = 0;
- let baseHours = 0;
+ const branchPerformanceData = React.useMemo(() => (
+   buildOverviewBranchComparisonData({
+     branchSummaries,
+     selectedBranch,
+     vsAverageMode,
+   })
+ ), [branchSummaries, selectedBranch, vsAverageMode]);
 
- if (branchComparePeriod === 'day') {
- baseSales = activeLog.sales;
- baseProduction = activeLog.productionMade;
- baseWaste = activeLog.waste;
- baseHours = activeLog.hours;
- } else {
- baseSales = weeklyLogs.reduce((sum, log) => sum + log.sales, 0);
- baseProduction = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
- baseWaste = weeklyLogs.reduce((sum, log) => sum + log.waste, 0);
- baseHours = weeklyLogs.reduce((sum, log) => sum + log.hours, 0);
- }
+ const championBranch = React.useMemo(() => getChampionBranch(branchSummaries), [branchSummaries]);
 
- // Extract real logged customer orders matching the timeframes and stores!
- const realOrdersForStore = (branchName: string) => {
- const filtered = orders.filter(o => {
- const orderBranch = o.branch || 'Marks & Spencer - Cork City';
- return orderBranch === branchName && (o.status === 'Completed' || o.status === 'Pending');
- });
- return filtered.reduce((sum, o) => sum + o.amount, 0);
- };
-
- const realOrdersQtyForStore = (branchName: string) => {
- const filtered = orders.filter(o => {
- const orderBranch = o.branch || 'Marks & Spencer - Cork City';
- return orderBranch === branchName && (o.status === 'Completed' || o.status === 'Pending');
- });
- return filtered.reduce((sum, o) => sum + o.quantity, 0);
- };
-
- // Calculate live overrides from Sell Tab
- const msLiveSales = realOrdersForStore('Marks & Spencer - Cork City');
- const tescoCorkLiveSales = realOrdersForStore('Tesco - Cork City');
- const tescoMahonLiveSales = realOrdersForStore('Tesco - Mahon Point');
-
- const msLiveQty = realOrdersQtyForStore('Marks & Spencer - Cork City') * 10; // scale representatively to match larger daily output
- const tescoCorkLiveQty = realOrdersQtyForStore('Tesco - Cork City') * 10;
- const tescoMahonLiveQty = realOrdersQtyForStore('Tesco - Mahon Point') * 10;
-
- // Apply baseline division ratios + add real custom virtual-POS sales
- const runMS_Sales = Math.round(baseSales * 0.42) + msLiveSales;
- const runMS_Prod = Math.round(baseProduction * 0.40) + msLiveQty;
- const runMS_Waste = Math.round(baseWaste * 0.28);
- const runMS_Hours = Math.round(baseHours * 0.35);
-
- const runTescoCork_Sales = Math.round(baseSales * 0.33) + tescoCorkLiveSales;
- const runTescoCork_Prod = Math.round(baseProduction * 0.35) + tescoCorkLiveQty;
- const runTescoCork_Waste = Math.round(baseWaste * 0.36);
- const runTescoCork_Hours = Math.round(baseHours * 0.35);
-
- const runTescoMahon_Sales = Math.round(baseSales * 0.25) + tescoMahonLiveSales;
- const runTescoMahon_Prod = Math.round(baseProduction * 0.25) + tescoMahonLiveQty;
- const runTescoMahon_Waste = Math.round(baseWaste * 0.36);
- const runTescoMahon_Hours = Math.round(baseHours * 0.30);
-
- // Compute efficiency values
- const msLaborProd = Math.round(runMS_Sales / (runMS_Hours || 1));
- const tescoCorkLaborProd = Math.round(runTescoCork_Sales / (runTescoCork_Hours || 1));
- const tescoMahonLaborProd = Math.round(runTescoMahon_Sales / (runTescoMahon_Hours || 1));
-
- const msWastePct = parseFloat(((runMS_Waste / (runMS_Sales || 1)) * 100).toFixed(1));
- const tescoCorkWastePct = parseFloat(((runTescoCork_Waste / (runTescoCork_Sales || 1)) * 105).toFixed(1)); // slightly different waste multiplier profile
- const tescoMahonWastePct = parseFloat(((runTescoMahon_Waste / (runTescoMahon_Sales || 1)) * 108).toFixed(1));
-
- // Integrated Operational Efficiency Score (0-100 scale)
- const msEffScore = Math.min(100, Math.round((msLaborProd / 130) * 65 + (100 - msWastePct) * 0.35));
- const tescoCorkEffScore = Math.min(100, Math.round((tescoCorkLaborProd / 130) * 65 + (100 - tescoCorkWastePct) * 0.35));
- const tescoMahonEffScore = Math.min(100, Math.round((tescoMahonLaborProd / 130) * 65 + (100 - tescoMahonWastePct) * 0.35));
-
- return [
- {
- id: 'm_s_cork',
- name: 'M&S Cork City',
- fullName: 'Marks & Spencer - Cork City',
- type: 'Luxury Gourmet Specialty Store',
- sales: runMS_Sales,
- production: runMS_Prod,
- waste: runMS_Waste,
- hours: runMS_Hours,
- wastePct: msWastePct,
- laborProd: msLaborProd,
- efficiencyScore: msEffScore,
- color: '#f59e0b',
- fill: 'url(#gradMS)'
- },
- {
- id: 'tesco_cork',
- name: 'Tesco Cork City',
- fullName: 'Tesco - Cork City',
- type: 'High Volume Center',
- sales: runTescoCork_Sales,
- production: runTescoCork_Prod,
- waste: runTescoCork_Waste,
- hours: runTescoCork_Hours,
- wastePct: tescoCorkWastePct,
- laborProd: tescoCorkLaborProd,
- efficiencyScore: tescoCorkEffScore,
- color: '#10b981',
- fill: 'url(#gradTescoCork)'
- },
- {
- id: 'tesco_mahon',
- name: 'Tesco Mahon Point',
- fullName: 'Tesco - Mahon Point',
- type: 'Suburban Shopping Mall',
- sales: runTescoMahon_Sales,
- production: runTescoMahon_Prod,
- waste: runTescoMahon_Waste,
- hours: runTescoMahon_Hours,
- wastePct: tescoMahonWastePct,
- laborProd: tescoMahonLaborProd,
- efficiencyScore: tescoMahonEffScore,
- color: '#a855f7',
- fill: 'url(#gradTescoMahon)'
- }
- ];
- }, [activeLog, weeklyLogs, orders, branchComparePeriod]);
-
- // Derived Performance comparison list (can be all branches or selected vs company average)
- const branchPerformanceData = React.useMemo(() => {
- if (!vsAverageMode) {
- return rawBranchList;
- }
-
- // Company averages
- const avgSales = Math.round(rawBranchList.reduce((sum, b) => sum + b.sales, 0) / rawBranchList.length);
- const avgProduction = Math.round(rawBranchList.reduce((sum, b) => sum + b.production, 0) / rawBranchList.length);
- const avgWaste = Math.round(rawBranchList.reduce((sum, b) => sum + b.waste, 0) / rawBranchList.length);
- const avgHours = Math.round(rawBranchList.reduce((sum, b) => sum + b.hours, 0) / rawBranchList.length);
- const avgWastePct = parseFloat((rawBranchList.reduce((sum, b) => sum + b.wastePct, 0) / rawBranchList.length).toFixed(1));
- const avgLaborProd = Math.round(rawBranchList.reduce((sum, b) => sum + b.laborProd, 0) / rawBranchList.length);
- const avgEfficiencyScore = Math.round(rawBranchList.reduce((sum, b) => sum + b.efficiencyScore, 0) / rawBranchList.length);
-
- // Selected branch
- const activeBranch = rawBranchList.find(b => b.fullName === selectedBranch) || rawBranchList[0];
-
- // Company Average Item
- const companyAvgItem = {
- id: 'company_avg',
- name: 'Company Average',
- fullName: 'Standard Company Average',
- type: 'Combined Corporate Benchmark',
- sales: avgSales,
- production: avgProduction,
- waste: avgWaste,
- hours: avgHours,
- wastePct: avgWastePct,
- laborProd: avgLaborProd,
- efficiencyScore: avgEfficiencyScore,
- color: '#3b82f6', // brand blue for benchmark comparisons
- fill: 'url(#gradAvg)'
- };
-
- return [activeBranch, companyAvgItem];
- }, [rawBranchList, vsAverageMode, selectedBranch]);
-
- // Determine peak efficiency branch (calculating exclusively from actual real branches to avoid company average bias)
- const championBranch = React.useMemo(() => {
- return [...rawBranchList].sort((a, b) => b.efficiencyScore - a.efficiencyScore)[0];
- }, [rawBranchList]);
+ const advisorTextareaThemeClasses = isLight
+ ? 'border-zinc-300 bg-white text-zinc-900'
+ : 'border-zinc-800 bg-zinc-900 text-zinc-100';
+ const advisorTextareaClasses = [
+ advisorTextareaBaseClasses,
+ goldFocusRingClasses,
+ advisorTextareaThemeClasses
+ ].join(' ');
 
  return (
  <div id="overview-viewport" className="space-y-7">
  {/* Header Banner with Premium ambient bento design */}
 <div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
  isLight ? 'bg-white/95 border-zinc-200 text-zinc-900 shadow-[0_12px_30px_rgba(24,24,27,0.06)]' : 'bg-zinc-900/90 border-zinc-700 text-white shadow-[0_16px_36px_rgba(0,0,0,0.45)]'
+ <div id="overview-viewport" className="space-y-5">
+ {/* Header Banner with Premium ambient bento design */}
+ <div className={`rounded-3xl p-5 md:p-6 lg:p-7 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 border transition-colors duration-200 ${
+ isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}>
  <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
  
- <div className="relative z-10 max-w-2xl">
+ <div className="relative z-10 max-w-xl xl:max-w-2xl">
  <div className="flex flex-wrap items-center gap-2.5 mb-4">
  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono transition-colors ${
  isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-800 border-zinc-700/60 text-orange-400'
@@ -466,6 +340,8 @@ function OverviewTab({
  {/* Date-Range Selector Box */}
  <div className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
  isLight ? 'bg-zinc-50/85 border-zinc-200 shadow-sm' : 'bg-zinc-950/70 border-zinc-700'
+ <div className={`relative z-10 backdrop-blur-md p-4 rounded-2xl border w-full sm:max-w-sm lg:w-64 xl:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
+ isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-950/60 border-zinc-800'
  }`}>
  <div className={`flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider ${
  isLight ? 'text-zinc-700' : 'text-zinc-400'
@@ -813,7 +689,7 @@ function OverviewTab({
  </div>
 
  {/* Real-time AI Operations Shift Summary */}
- <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
+ <div id="ai-shift-summary" className={`rounded-3xl border p-5 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
  isLight ? 'bg-orange-50/50 border border-orange-200' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'
  }`}>
  <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
@@ -1577,7 +1453,8 @@ function OverviewTab({
  }`}>
  <div className="flex items-start gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-350 ${
- isLight ? 'bg-zinc-150 bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
+ <div className={`p-3 border rounded-2xl transition-all duration-200 ${
+ isLight ? 'bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
  }`}>
  <Activity className="w-5 h-5 animate-pulse" />
  </div>
@@ -1835,15 +1712,15 @@ function OverviewTab({
  }`}>
  <span>🏆</span> Peak Efficiency Store
  </span>
- <span className={`font-mono font-extrabold text-[13px] ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch.efficiencyScore}%</span>
+ <span className={`font-mono font-extrabold text-[13px] ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch?.efficiencyScore ?? 0}%</span>
  </div>
 
  <div className="mt-4">
- <h4 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{championBranch.fullName}</h4>
- <p className="text-[10px] text-zinc-500 font-mono mt-0.5 leading-none">{championBranch.type}</p>
+ <h4 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{championBranch?.branch || 'No branch selected'}</h4>
+ <p className="text-[10px] text-zinc-500 font-mono mt-0.5 leading-none">Highest current efficiency score</p>
  
  <p className={`text-xs mt-3 leading-relaxed ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>
- Analyzing overall labor costs, high-premium customer transaction margins, and minimal seafood waste, <strong className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch.name}</strong> holds the highest corporate return ratio at <strong className={`font-mono ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>€{championBranch.laborProd}/hr</strong> yield per employee hour.
+ Analyzing overall labor costs, high-premium customer transaction margins, and minimal seafood waste, <strong className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch?.shortLabel || 'the leading branch'}</strong> holds the highest corporate return ratio at <strong className={`font-mono ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{championBranch?.laborEfficiency.toFixed(1) || '0.0'} units/hr</strong> yield per employee hour.
  </p>
  </div>
  </div>
@@ -1851,11 +1728,11 @@ function OverviewTab({
  <div className={`mt-4 pt-3.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? 'border-zinc-200' : 'border-zinc-900/80'}`}>
  <div>
  <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">Labor Yield</span>
- <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-zinc-800' : 'text-white'}`}>€{championBranch.laborProd}/hr</span>
+ <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-zinc-800' : 'text-white'}`}>{championBranch?.laborEfficiency.toFixed(1) || '0.0'} units/hr</span>
  </div>
  <div>
  <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">Waste Control</span>
- <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{Math.max(0, Math.round(100 - championBranch.wastePct))}% Control</span>
+ <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{Math.max(0, Math.round(100 - (championBranch?.wastePct || 0)))}% Control</span>
  </div>
  </div>
  </div>
@@ -2119,7 +1996,7 @@ function OverviewTab({
  </form>
  </div>
 
- {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
+ {/* Deep Advisor: "Enable high thinking" with gemini-1.5-flash */}
  <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
  }`}>
@@ -2138,7 +2015,7 @@ function OverviewTab({
  <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
  isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300'
  }`}>
- gemini-3.1-pro-preview
+ gemini-1.5-flash
  </span>
  <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
  Thinking Level: HIGH
@@ -2150,15 +2027,18 @@ function OverviewTab({
  <span className="text-[11px] text-zinc-500 font-mono sm:text-right">Uses deep thinking tree solver</span>
  </div>
 
- <div className="space-y-4 mt-4">
+ <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+ <div>
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
- className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans rounded-2xl ${
+ className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] font-sans rounded-2xl ${
  isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
  }`}
+ className={advisorTextareaClasses}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
  />
+ </div>
 
  <div className="flex justify-end items-center">
  <button
