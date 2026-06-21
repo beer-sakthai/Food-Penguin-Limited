@@ -435,7 +435,7 @@ function OverviewTab({
  }, [rawBranchList]);
 
  const advisorTextareaClasses = [
- 'w-full min-h-[72px] sm:min-h-[80px] max-h-28 resize-y p-3 border shadow-inner transition-all duration-300 font-sans rounded-2xl',
+ 'w-full min-h-[72px] sm:min-h-[80px] max-h-28 resize-y p-3 border shadow-inner transition-all duration-200 font-sans rounded-2xl',
  goldFocusRingClasses,
  isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
  ].join(' ');
