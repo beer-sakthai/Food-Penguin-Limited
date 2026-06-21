@@ -42,7 +42,7 @@ function getAiClient(): GoogleGenAI {
 
 // ==========================================
 // 1. STRATEGIC EXECUTIVE THINKER
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // Mode: ThinkingLevel.HIGH
 // ==========================================
 app.post("/api/gemini/strategic-advisor", async (req, res) => {
@@ -62,19 +62,16 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-1.5-flash",
         contents: prompt,
         config: {
           systemInstruction: "You are the Chief AI Strategy Officer for 'Food Penguin Limited', an elite cold-chain and premium ocean-to-table food corporation. Your role is to formulate deep, comprehensive, hyper-optimized business strategies. Break down complex operational problems regarding sales, waste minimization, logistics, and labor schedule optimization into mathematically-grounded steps. Provide multi-layered, executive-grade blueprints.",
-          thinkingConfig: {
-            thinkingLevel: ThinkingLevel.HIGH
-          }
         }
       });
 
       res.json({
         text: response.text || "No response text generated.",
-        thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
+        thinking: "Deep strategic thinking executed successfully using gemini-1.5-flash."
       });
     } catch (apiErr: any) {
       console.log("Strategic Advisor falling back to simulation because Gemini key is inactive or failed.");
@@ -91,7 +88,7 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
 
 // ==========================================
 // 2. LOW LATENCY COPILOT
-// Model: gemini-3.1-flash-lite
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/low-latency-cmd", async (req, res) => {
   try {
@@ -109,7 +106,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
+        model: "gemini-1.5-flash",
         contents: command,
         config: {
           systemInstruction: "You are the rapid action-response dispatcher for Food Penguin kitchen managers. Answer briefly and immediately (maximum 2-3 sentences max) to assist the floor leads with quick, direct answers."
@@ -133,7 +130,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
 
 // ==========================================
 // 3. MENU ILLUSTRATOR & BANNER GENERATOR
-// Model: gemini-2.5-flash-image
+// Model: imagen-3.0-generate-001
 // ==========================================
 app.post("/api/gemini/generate-marketing-image", async (req, res) => {
   try {
@@ -150,27 +147,21 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
     }
 
     try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [{ text: `A clean, commercial studio foods advertisement banner for Food Penguin Limited. ${prompt}` }]
-        },
+      const response = await ai.models.generateImages({
+        model: "imagen-3.0-generate-001",
+        prompt: "A clean, commercial studio foods advertisement banner for Food Penguin Limited. " + prompt,
         config: {
-          imageConfig: {
-            aspectRatio: aspectRatio || "1:1"
-          }
+          aspectRatio: aspectRatio || "1:1",
+          outputMimeType: "image/png"
         }
       });
-
+      
       let base64Image = "";
-      if (response.candidates && response.candidates[0]?.content?.parts) {
-        for (const part of response.candidates[0].content.parts) {
-          if (part.inlineData) {
-            base64Image = part.inlineData.data;
-            break;
-          }
-        }
+      if (response.generatedImages && response.generatedImages.length > 0) {
+        base64Image = response.generatedImages[0].image.imageBytes;
       }
+
+      
 
       if (base64Image) {
         res.json({ imageUrl: `data:image/png;base64,${base64Image}`, simulated: false });
@@ -190,7 +181,7 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
 
 // ==========================================
 // 4. KITCHEN QUALITY DISH AUDITOR
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
   try {
@@ -221,7 +212,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
       };
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-1.5-flash",
         contents: { parts: [imagePart, promptPart] }
       });
 
@@ -242,7 +233,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
 
 // ==========================================
 // 5. MARKET TREND SEARCH GROUNDING
-// Model: gemini-3.5-flash
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/search-trends", async (req, res) => {
   try {
@@ -260,7 +251,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-1.5-flash",
         contents: query,
         config: {
           systemInstruction: "You are active business intelligence for Food Penguin procurement department. Answer the user's research questions accurately using the search grounding tool.",
@@ -285,7 +276,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
 
 // ==========================================
 // 6. SUGGEST RESTOCK ALGORITHMIC PLANNER
-// Model: gemini-3.5-flash
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/suggest-restock", async (req, res) => {
   try {
@@ -312,7 +303,7 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
       const prompt = `You are a replenishment supply chain AI. Analyze the simulated past sales output and waste metrics for branch: ${branch}. Given the current inventory state: ${JSON.stringify(inventory)}, calculate optimal replenishment amounts to ensure 100% capacity heading into the weekend. Output a valid JSON object where keys are item IDs and values are integer numbers of units to reorder. Output ONLY JSON, e.g., {"INV-101": 50, "INV-102": 30}. Do not use markdown wrappers.`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-1.5-flash",
         contents: prompt
       });
 
@@ -338,7 +329,7 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
 
 // ==========================================
 // 7. SHIFT SUMMARY GENERATOR
-// Model: gemini-3.5-flash
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/shift-summary", async (req, res) => {
   try {
@@ -358,7 +349,7 @@ app.post("/api/gemini/shift-summary", async (req, res) => {
       const prompt = `Analyze these shift metrics for our food retail branch "${branch}" today and write a short, professional, natural language "Shift Summary" (no more than 3 sentences). Emphasize current sales of €${(metrics.salesToday || 0).toLocaleString()}, food waste costs of €${(metrics.wasteCost || 0).toFixed(2)}, an active AI Health Score of ${metrics.aiHealthScore || 78}%, and production items outputted (${metrics.productionItems || 0} items made out of a target of ${metrics.productionTarget || 0}). Keep it punchy, motivating, and highly practical for floor managers.`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-1.5-flash",
         contents: prompt,
         config: {
           systemInstruction: "You are an elite operational executive at Food Penguin kitchen operations. You write high-precision, natural language shift summaries that are clear, concise, and professional."
