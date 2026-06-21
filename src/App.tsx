@@ -1198,7 +1198,7 @@ export default function App() {
  </div>
  </aside>
 
- <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-transparent' : 'bg-transparent'}`}>
+<div className="flex-1 flex flex-col min-w-0 transition-colors duration-200 bg-transparent">
  
  {/* Global Toolbar */}
  <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
