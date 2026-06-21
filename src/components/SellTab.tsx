@@ -112,16 +112,16 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
         
         {/* Quick Menu Overview */}
         <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm">
-          <h2 className="text-sans font-bold text-white">Food Penguin Limited Specialties</h2>
-          <p className="text-xs text-zinc-500 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary cold-chain product groups</p>
+          <h2 className="text-sans font-bold text-white">Food Penguin Sushi Specialties</h2>
+          <p className="text-xs text-zinc-500 uppercase font-semibold mt-0.5 mb-4">Standard pricing margins on primary sushi and sashimi product lines</p>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'Arctic Burgers', price: '€12.90', margin: '68% margin' },
-              { name: 'Glacier Pizzas', price: '€18.50', margin: '72% margin' },
-              { name: 'Cold Desserts', price: '€6.50', margin: '80% margin' },
-              { name: 'Glacier Drinks', price: '€5.80', margin: '85% margin' },
-              { name: 'Marine Platters', price: '€24.90', margin: '65% margin' }
+              { name: 'Sushi Rolls', price: '€14.50', margin: '75% margin' },
+              { name: 'Sashimi & Platters', price: '€28.90', margin: '70% margin' },
+              { name: 'Specialty Rolls', price: '€19.00', margin: '78% margin' },
+              { name: 'Nigiri Selections', price: '€16.00', margin: '82% margin' },
+              { name: 'Bento Lunch Sets', price: '€22.50', margin: '68% margin' }
             ].map((cat, idx) => (
               <div key={idx} className="bg-zinc-950 border border-zinc-850 p-4 rounded-2xl flex flex-col justify-between transition-all hover:bg-zinc-900 hover:shadow-md hover:border-orange-500/40">
                 <span className="text-xs font-bold text-zinc-200">{cat.name}</span>
@@ -213,7 +213,7 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                 required
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
-                placeholder="e.g. Glacier Cod burger Double"
+                placeholder="e.g. Kyoto Spicy Tuna Roll"
                 className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
@@ -226,11 +226,11 @@ export default function SellTab({ orders, onAddOrder }: SellTabProps) {
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full mt-1.5 p-2.5 text-xs bg-zinc-950 border border-zinc-800 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500"
                 >
-                  <option>Arctic Burgers</option>
-                  <option>Glacier Pizzas</option>
-                  <option>Desserts</option>
-                  <option>Glacier Drinks</option>
-                  <option>Arctic Platters</option>
+                  <option>Sushi Rolls</option>
+                  <option>Sashimi & Platters</option>
+                  <option>Specialty Rolls</option>
+                  <option>Nigiri Selections</option>
+                  <option>Bento Lunch Sets</option>
                 </select>
               </div>
 

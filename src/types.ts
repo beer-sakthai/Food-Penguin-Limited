@@ -90,3 +90,21 @@ export interface RealtimeAlert {
   status: 'normal' | 'warning' | 'critical';
   message: string;
 }
+
+export interface DailyOperationalLog {
+  day: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
+  date: string;
+  sales: number;
+  waste: number;
+  hours: number;
+  productionTarget: number;
+  productionMade: number;
+  supplierName: 'Tazaki' | 'Sysco' | 'Bulza' | 'Sticker' | 'Others';
+  cogs: {
+    tazaki: number;
+    sysco: number;
+    bulza: number;
+    sticker: number;
+    others: number;
+  };
+}

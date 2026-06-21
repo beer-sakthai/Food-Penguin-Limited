@@ -8,7 +8,8 @@ import {
   initialWaste,
   initialHours,
   initialInventory,
-  initialAlerts
+  initialWeeklyLogs,
+  alternativeWeeklyLogsMap
 } from './data';
 import {
   CoreMetrics,
@@ -19,7 +20,7 @@ import {
   WasteRecord,
   EmployeeHour,
   InventoryItem,
-  RealtimeAlert
+  DailyOperationalLog
 } from './types';
 
 // Tab Views
@@ -30,7 +31,7 @@ import ProductionTab from './components/ProductionTab';
 import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
-import RealtimeTab from './components/RealtimeTab';
+
 
 // Main Icons
 import {
@@ -49,9 +50,9 @@ import {
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
-  Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Real-time'],
-  Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Real-time'],
-  Staff: ['Overview', 'Sell', 'Production', 'Waste', 'Real-time']
+  Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning'],
+  Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning'],
+  Staff: ['Overview', 'Sell', 'Production', 'Waste']
 };
 
 export default function App() {
@@ -66,7 +67,50 @@ export default function App() {
   const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
   const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
-  const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
+  const [selectedWeekRange, setSelectedWeekRange] = useState<string>('2026-06-15 to 2026-06-21');
+  const [weeklyLogsMap, setWeeklyLogsMap] = useState<Record<string, DailyOperationalLog[]>>(alternativeWeeklyLogsMap);
+
+  const weeklyLogs = weeklyLogsMap[selectedWeekRange] || alternativeWeeklyLogsMap['2026-06-15 to 2026-06-21'];
+
+  // Keep metrics in perfect alignment with selected week range and logs
+  useEffect(() => {
+    const sundayLog = weeklyLogs.find(l => l.day === 'Sun') || weeklyLogs[6];
+    if (sundayLog) {
+      setMetrics(prev => ({
+        ...prev,
+        salesToday: sundayLog.sales,
+        wasteCost: sundayLog.waste,
+        hoursScheduled: sundayLog.hours,
+        productionTarget: sundayLog.productionTarget,
+        productionItems: sundayLog.productionMade,
+        aiHealthScore: Math.round(Math.min(100, Math.max(50, 90 + (sundayLog.productionMade / sundayLog.productionTarget) * 10 - (sundayLog.waste / sundayLog.sales) * 50)))
+      }));
+    }
+  }, [selectedWeekRange, weeklyLogsMap]);
+
+  // Ireland real-time Clock state (Dublin)
+  const [irelandTime, setIrelandTime] = useState<string>('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-IE', {
+        timeZone: 'Europe/Dublin',
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      setIrelandTime(formatter.format(now));
+    };
+    updateTime();
+    const intervalId = setInterval(updateTime, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Sync core metrics periodically if mock transactions run
   const totalWasteCost = wasteRecords.reduce((acc, row) => acc + row.cost, 0);
@@ -192,26 +236,28 @@ export default function App() {
     }));
   };
 
-  // Live simulation tick every few seconds to append background transactions/alerts
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // 10% chance to report a normal sensory ping or clear status
-      if (Math.random() < 0.15) {
-        const timestampStr = new Date().toLocaleTimeString('en-US', { hour12: false });
-        const newAlert: RealtimeAlert = {
-          id: `A-${Math.floor(50 + Math.random() * 100)}`,
-          timestamp: timestampStr,
-          sensor: 'Sub-Zero Shelf Guard-02',
-          value: '-18.1°C',
-          status: 'normal',
-          message: 'Sensory threshold scan completed: optimal shelf preservation.'
-        };
-        setAlerts(prev => [newAlert, ...prev.slice(0, 15)]);
-      }
-    }, 15000);
+  const handleUpdateWeeklyLog = (updatedLog: DailyOperationalLog) => {
+    setWeeklyLogsMap(prev => {
+      const currentWeekLogs = prev[selectedWeekRange] || [];
+      const updatedWeekLogs = currentWeekLogs.map(log => log.day === updatedLog.day ? updatedLog : log);
+      return {
+        ...prev,
+        [selectedWeekRange]: updatedWeekLogs
+      };
+    });
 
-    return () => clearInterval(interval);
-  }, []);
+    // Sync Sunday's log with active today metrics
+    if (updatedLog.day === 'Sun') {
+      setMetrics(prev => ({
+        ...prev,
+        salesToday: updatedLog.sales,
+        wasteCost: updatedLog.waste,
+        hoursScheduled: updatedLog.hours,
+        productionTarget: updatedLog.productionTarget,
+        productionItems: updatedLog.productionMade
+      }));
+    }
+  };
 
   const allTabMeta = [
     { id: 'Overview', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -220,8 +266,7 @@ export default function App() {
     { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
     { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
     { id: 'Hours', label: 'Hours', icon: <CalendarDays className="w-4 h-4" /> },
-    { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> },
-    { id: 'Real-time', label: 'Real-time', icon: <Activity className="w-4 h-4" /> }
+    { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> }
   ];
 
   const tabMeta = allTabMeta.filter(tab => rolePermissions[userRole].includes(tab.id));
@@ -243,6 +288,11 @@ export default function App() {
             targets={targets}
             userRole={userRole}
             onUpdateMetrics={handleUpdateMetrics}
+            irelandTime={irelandTime}
+            weeklyLogs={weeklyLogs}
+            onAddOrUpdateLog={handleUpdateWeeklyLog}
+            selectedWeekRange={selectedWeekRange}
+            onSelectedWeekRangeChange={setSelectedWeekRange}
           />
         );
       case 'Sell':
@@ -276,8 +326,6 @@ export default function App() {
         );
       case 'Planning':
         return <PlanningTab inventory={inventory} onOrderRestock={handleOrderRestock} />;
-      case 'Real-time':
-        return <RealtimeTab alerts={alerts} />;
       default:
         return (
           <OverviewTab 
@@ -286,10 +334,38 @@ export default function App() {
             targets={targets} 
             userRole={userRole}
             onUpdateMetrics={handleUpdateMetrics}
+            irelandTime={irelandTime}
+            weeklyLogs={weeklyLogs}
+            onAddOrUpdateLog={handleUpdateWeeklyLog}
+            selectedWeekRange={selectedWeekRange}
+            onSelectedWeekRangeChange={setSelectedWeekRange}
           />
         );
     }
   };
+
+  // Dynamic production system health calculation
+  const lowStockCount = inventory.filter(item => item.status === 'Low').length;
+  const targetDeficitCount = targets.filter(t => t.currentValue < t.targetValue * 0.7).length;
+  
+  let healthLabel = 'Healthy';
+  let healthColorClass = 'bg-emerald-500';
+  let healthTextClass = 'text-emerald-400';
+  let healthBgClass = 'bg-emerald-500/10 border-emerald-550/20';
+
+  if (metrics.aiHealthScore < 75 || lowStockCount >= 3 || targetDeficitCount >= 3) {
+    healthLabel = 'Critical';
+    healthColorClass = 'bg-rose-500';
+    healthTextClass = 'text-rose-400';
+    healthBgClass = 'bg-rose-500/10 border-rose-550/20';
+  } else if (metrics.aiHealthScore < 90 || lowStockCount > 0 || targetDeficitCount > 0) {
+    healthLabel = 'Warning';
+    healthColorClass = 'bg-amber-500';
+    healthTextClass = 'text-amber-400';
+    healthBgClass = 'bg-amber-500/10 border-amber-550/20';
+  }
+
+  const healthTooltip = `System Health Status: ${healthLabel}\n• Operations Score: ${metrics.aiHealthScore}%\n• Low Stock Ingredients: ${lowStockCount}\n• Lagging Goals: ${targetDeficitCount}`;
 
   return (
     <div id="app-workspace" className="min-h-screen bg-black flex flex-col md:flex-row font-sans text-zinc-100 antialiased selection:bg-zinc-800">
@@ -300,10 +376,19 @@ export default function App() {
         <div className="p-6 border-b border-zinc-900 flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group">
             <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-black animate-pulse" />
+            <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${healthColorClass} rounded-full border border-black animate-pulse`} title={healthTooltip} />
           </div>
-          <div>
-            <h1 className="text-sm font-bold font-sans tracking-tight text-white leading-tight">Food Penguin</h1>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-1">
+              <h1 className="text-sm font-bold font-sans tracking-tight text-white leading-tight truncate">Food Penguin</h1>
+              <span 
+                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
+                title={healthTooltip}
+              >
+                <span className={`w-1 h-1 rounded-full ${healthColorClass} animate-pulse`} />
+                {healthLabel}
+              </span>
+            </div>
             <span className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase leading-none block mt-0.5">Limited</span>
           </div>
         </div>
@@ -389,9 +474,9 @@ export default function App() {
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-zinc-550 uppercase tracking-widest block leading-none">Local time</span>
-              <span className="text-sm font-mono font-bold text-zinc-300 block mt-1">
-                {new Date().toISOString().split('T')[0]} 14:13 UTC
+              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest block leading-none">🇮🇪 Ireland Time (Dublin)</span>
+              <span className="text-xs font-mono font-bold text-zinc-100 block mt-1">
+                {irelandTime || 'Updating live...'}
               </span>
             </div>
 

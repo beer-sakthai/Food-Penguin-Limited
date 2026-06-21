@@ -244,7 +244,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Glacier Cod burger goal"
+              placeholder="e.g. Kyoto Salmon goal"
               className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
             />
           </div>
