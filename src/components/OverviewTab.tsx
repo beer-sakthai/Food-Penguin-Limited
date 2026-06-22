@@ -259,7 +259,9 @@ export default function OverviewTab({
  // 3. Tesco - Mahon Point (Suburban shopping mall storefront, mixed deals & family options)
  const [branchComparePeriod, setBranchComparePeriod] = useState<'day' | 'week'>('week');
  const [branchCompareMetric, setBranchCompareMetric] = useState<'sales' | 'production' | 'waste' | 'efficiency'>('sales');
- const [vsAverageMode, setVsAverageMode] = useState<boolean>(false);
+ const [compareMode, setCompareMode] = useState<'all' | 'vsAverage' | 'twoBranches'>('twoBranches');
+  const [compareBranchA, setCompareBranchA] = useState<string>('m_s_cork');
+  const [compareBranchB, setCompareBranchB] = useState<string>('tesco_cork');
 
  const rawBranchList = React.useMemo(() => {
  // Determine aggregate or day-specific benchmark base values from operational logs
@@ -386,42 +388,19 @@ export default function OverviewTab({
  }, [activeLog, weeklyLogs, orders, branchComparePeriod]);
 
  // Derived Performance comparison list (can be all branches or selected vs company average)
- const branchPerformanceData = React.useMemo(() => {
- if (!vsAverageMode) {
- return rawBranchList;
- }
-
- // Company averages
- const avgSales = Math.round(rawBranchList.reduce((sum, b) => sum + b.sales, 0) / rawBranchList.length);
- const avgProduction = Math.round(rawBranchList.reduce((sum, b) => sum + b.production, 0) / rawBranchList.length);
- const avgWaste = Math.round(rawBranchList.reduce((sum, b) => sum + b.waste, 0) / rawBranchList.length);
- const avgHours = Math.round(rawBranchList.reduce((sum, b) => sum + b.hours, 0) / rawBranchList.length);
- const avgWastePct = parseFloat((rawBranchList.reduce((sum, b) => sum + b.wastePct, 0) / rawBranchList.length).toFixed(1));
- const avgLaborProd = Math.round(rawBranchList.reduce((sum, b) => sum + b.laborProd, 0) / rawBranchList.length);
- const avgEfficiencyScore = Math.round(rawBranchList.reduce((sum, b) => sum + b.efficiencyScore, 0) / rawBranchList.length);
-
- // Selected branch
- const activeBranch = rawBranchList.find(b => b.fullName === selectedBranch) || rawBranchList[0];
-
- // Company Average Item
- const companyAvgItem = {
- id: 'company_avg',
- name: 'Company Average',
- fullName: 'Standard Company Average',
- type: 'Combined Corporate Benchmark',
- sales: avgSales,
- production: avgProduction,
- waste: avgWaste,
- hours: avgHours,
- wastePct: avgWastePct,
- laborProd: avgLaborProd,
- efficiencyScore: avgEfficiencyScore,
- color: '#3b82f6', // brand blue for benchmark comparisons
- fill: 'url(#gradAvg)'
- };
-
- return [activeBranch, companyAvgItem];
- }, [rawBranchList, vsAverageMode, selectedBranch]);
+  const branchPerformanceData = React.useMemo(() => {
+    if (compareMode === 'all') {
+      return rawBranchList;
+    }
+    
+    if (compareMode === 'twoBranches') {
+      const bA = rawBranchList.find(b => b.id === compareBranchA) || rawBranchList[0];
+      const bB = rawBranchList.find(b => b.id === compareBranchB) || rawBranchList[1];
+      return [bA, bB];
+    }
+    
+    return rawBranchList;
+  }, [rawBranchList, compareMode, selectedBranch, compareBranchA, compareBranchB]);
 
  // Determine peak efficiency branch (calculating exclusively from actual real branches to avoid company average bias)
  const championBranch = React.useMemo(() => {
@@ -914,785 +893,140 @@ export default function OverviewTab({
 
  {/* Main Stats Charts & Active Targets */}
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
- {/* Interactive Production & Revenue Chart */}
- <div className={`lg:col-span-2 rounded-3xl p-6 transition-all duration-300 ${isLight ? 'bg-amber-50/50 border border-amber-200' : 'bg-3d-gold-dark metallic-base drop-shadow-xl'}`}>
- <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
- <div>
- <div className="flex items-center gap-2">
- <h3 className={`text-lg font-sans font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Performance Index</h3>
- <span className={`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
- isLight 
- ? 'bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200' 
- : 'bg-emerald-950/40 text-emerald-400 border-emerald-900/40'
- }`}>
- {chartView === 'weekly' ? 'Week Overview' : 'Today Overview'}
- </span>
- </div>
- <p className="subtitle text-xs text-zinc-500 uppercase font-semibold">
- {chartView === 'weekly' ? '7-Day operational flow analysis' : 'Correlated hourly view of cumulative metrics'}
- </p>
- </div>
  
- <div className="flex flex-wrap items-center gap-4">
- <div className={`flex p-1 rounded-xl border transition-colors ${isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'}`}>
- <button
- type="button"
- onClick={() => setChartView('weekly')}
- className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
- chartView === 'weekly'
- ? 'bg-orange-500 text-white shadow-md'
- : isLight 
- ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800' 
- : 'text-zinc-400 hover:text-white'
- }`}
- >
- Weekly View
- </button>
- <button
- type="button"
- onClick={() => setChartView('hourly')}
- className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
- chartView === 'hourly'
- ? 'bg-orange-500 text-white shadow-md'
- : isLight 
- ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800' 
- : 'text-zinc-400 hover:text-white'
- }`}
- >
- Hourly View
- </button>
- </div>
-
- <div className="flex gap-3 font-mono text-[11px]">
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-2.5 bg-orange-500 rounded-sm" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Sales</span>
- </div>
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-2.5 bg-emerald-500 rounded-sm" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production</span>
- </div>
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-2.5 bg-purple-500 rounded-sm" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>COGS</span>
- </div>
- </div>
- </div>
- </div>
- <div className="h-72 w-full">
- <ResponsiveContainer width="100%" height="100%">
- <AreaChart data={chartView === 'weekly' ? weeklyData : hourlyData} margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
- <defs>
- <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/>
- <stop offset="95%" stopColor="#f97316" stopOpacity={0.01}/>
- </linearGradient>
- <linearGradient id="colorProd" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
- <stop offset="95%" stopColor="#10b981" stopOpacity={0.01}/>
- </linearGradient>
- <linearGradient id="colorCogs" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#a855f7" stopOpacity={0.15}/>
- <stop offset="95%" stopColor="#a855f7" stopOpacity={0.01}/>
- </linearGradient>
- </defs>
- <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
- <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} />
- <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} />
- <Tooltip 
- contentStyle={{ 
- backgroundColor: isLight ? '#ffffff' : '#09090b', 
- borderRadius: '16px', 
- color: isLight ? '#18181b' : '#fff', 
- border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
- boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' 
- }}
- labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa' }}
- />
- <Area type="monotone" dataKey="Sales" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
- <Area type="monotone" dataKey="Production" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProd)" />
- <Area type="monotone" dataKey="COGS" stroke="#a855f7" strokeWidth={2} fillOpacity={1} fill="url(#colorCogs)" />
- </AreaChart>
- </ResponsiveContainer>
- </div>
- </div>
-
- {/* Urgent Core Targets Summary */}
- <div className={`rounded-3xl p-6 flex flex-col transition-all duration-300 ${isLight ? 'bg-orange-50/50 border border-orange-200' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'}`}>
- <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
- <div>
- <h3 className={`text-lg font-sans font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Today's Key Milestones</h3>
- <p className="text-xs text-zinc-500">Urgent target progress metrics</p>
- </div>
- <button 
- onClick={() => onNavigateTab('Target')}
- className={`text-xs font-bold inline-flex items-center gap-0.5  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:underline ${isLight ? 'text-orange-655 text-orange-600 hover:text-orange-700' : 'text-orange-400 hover:text-orange-355'}`}
- >
- Manage
- <ChevronRight className="w-3.5 h-3.5" />
- </button>
- </div>
-
- <div className="space-y-4 flex-1 overflow-y-auto max-h-72 pr-1 mt-4">
- {targets.slice(0, 4).map((target) => {
- const pct = Math.min((target.currentValue / target.targetValue) * 100, 100);
- const isHours = target.category === 'Hours';
- const isComplete = target.currentValue >= target.targetValue;
- return (
- <div key={target.id} className={`p-3 border rounded-2xl transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-800'
- }`}>
- <div className="flex justify-between text-xs mb-1.5 font-sans">
- <span className={`font-semibold ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>{target.name}</span>
- <span className={`font-mono text-[10px] uppercase tracking-wider font-extrabold ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>{target.category}</span>
- </div>
- <div className="flex items-center justify-between text-[11px] mb-2 font-mono">
- <span className={isLight ? 'text-zinc-600 font-semibold' : 'text-zinc-404 text-zinc-430 text-zinc-400'}>
- {target.currentValue.toLocaleString()} {isHours ? 'hrs' : 'units'} ({Math.round(pct)}%)
- </span>
- <span className={isLight ? 'text-zinc-500' : 'text-zinc-500'}>Goal: {target.targetValue.toLocaleString()}</span>
- </div>
- <div className={`w-full h-1.5 rounded-full overflow-hidden transition-colors ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
- <div 
- className={`h-full rounded-full transition-all duration-500 ${
- isComplete ? 'bg-emerald-500' : 'bg-orange-500'
- }`}
- style={{ width: `${pct}%` }}
- />
- </div>
- </div>
- );
- })}
- </div>
- </div>
- </div>
-
- {/* Weekly Operational Logs & Suppliers Table */}
- <div className={`rounded-3xl p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-3d-silver-dark metallic-base drop-shadow-xl'}`}>
- <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
- 
- <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
- isLight ? 'border-zinc-200' : 'border-zinc-805'
- }`}>
- <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-950 border-zinc-800 text-orange-400'
- }`}>
- <Activity className="w-5 h-5 flex-shrink-0" />
- </div>
- <div>
- <h3 className={`text-lg font-sans font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
- Weekly Operational Audit & Suppliers Log
- </h3>
- <p className="text-xs text-zinc-500">Overview of the 7-day operational loop, baseline performance metrics, and primary registered suppliers</p>
- </div>
- </div>
- </div>
-
- <div className="mt-5 overflow-x-auto">
- <table className="w-full text-left text-xs text-zinc-300 border-collapse">
- <thead>
- <tr className={`border-b font-mono text-[10px] uppercase tracking-wider ${
- isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-500'
- }`}>
- <th className="py-3 px-4">Day</th>
- <th className="py-3 px-4">Calendar Date</th>
- <th className="py-3 px-4 text-right">Revenue</th>
- <th className="py-3 px-4 text-right">Seafood Waste</th>
- <th className="py-3 px-4 text-right">Hours</th>
- <th className="py-3 px-4 text-right">Throughput</th>
- <th className="py-3 px-4 text-right">Total COGS</th>
- <th className="py-3 px-4">Primary Supplier Name</th>
- </tr>
- </thead>
- <tbody className={`divide-y ${isLight ? 'divide-zinc-200' : 'divide-zinc-900'}`}>
- {weeklyLogs.map((log) => {
- const totalCogs = log.cogs.tazaki + log.cogs.sysco + log.cogs.bulza + log.cogs.sticker + log.cogs.others;
- const isSelected = selectedDayTab === log.day;
- return (
- <tr 
- key={log.day}
- className={`transition-colors group ${
- isSelected 
- ? 'bg-orange-500/5' 
- : isLight 
- ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' 
- : 'hover:bg-zinc-800/50'
- }`}
- >
- <td className="py-3.5 px-4 font-semibold text-zinc-250">
- <button
- type="button"
- onClick={() => setSelectedDayTab(log.day)}
- className={`font-mono text-xs px-2 py-1 rounded-lg transition-all ${
- isSelected 
- ? 'bg-orange-500 text-white' 
- : isLight 
- ? 'text-orange-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' 
- : 'text-orange-400 hover:bg-zinc-800'
- }`}
- >
- {log.day}
- </button>
- </td>
- <td className={`py-3.5 px-4 font-mono text-[11px] ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>{log.date}</td>
- <td className={`py-3.5 px-4 text-right font-mono font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>€{log.sales.toLocaleString()}</td>
- <td className="py-3.5 px-4 text-right font-mono font-semibold text-rose-605 dark:text-rose-400">€{log.waste.toFixed(2)}</td>
- <td className="py-3.5 px-4 text-right font-mono font-semibold text-amber-600 dark:text-amber-400">{log.hours} <span className="text-[10px] text-zinc-500 font-normal">h</span></td>
- <td className="py-3.5 px-4 text-right font-mono">
- <span className={`font-semibold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{log.productionMade.toLocaleString()}</span>
- <span className="text-zinc-500 text-[10px5] text-[10px]"> / {log.productionTarget.toLocaleString()}</span>
- </td>
- <td className="py-3.5 px-4 text-right font-mono text-purple-600 dark:text-purple-400 font-bold">€{totalCogs.toLocaleString()}</td>
- <td className="py-3.5 px-4">
- <select
- value={log.supplierName || 'Others'}
- onChange={(e) => {
- const val = e.target.value as 'Tazaki' | 'Sysco' | 'Bulza' | 'Sticker' | 'Others';
- onAddOrUpdateLog({
- ...log,
- supplierName: val
- });
- }}
- className={`border rounded-lg py-1 px-2.5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 transition-colors text-xs font-semibold cursor-pointer ${
- isLight 
- ? 'bg-zinc-50 border-zinc-200 text-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-white' 
- : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
- }`}
- >
- <option value="Tazaki">Tazaki</option>
- <option value="Sysco">Sysco</option>
- <option value="Bulza">Bulza</option>
- <option value="Sticker">Sticker</option>
- <option value="Others">Others</option>
- </select>
- </td>
- </tr>
- );
- })}
- </tbody>
- </table>
- </div>
- </div>
-
- {/* Weekly Production Made vs Target Bar Chart */}
- <div id="weekly-production-comparison" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
- isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-3d-silver-dark metallic-base drop-shadow-xl'
- }`}>
- <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
- 
- <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
- isLight ? 'border-zinc-200' : 'border-zinc-800'
- }`}>
- <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-emerald-650 text-emerald-600' : 'bg-zinc-950 border-zinc-800 text-emerald-400'
- }`}>
- <Package className="w-5 h-5 flex-shrink-0" />
- </div>
- <div>
- <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
- Weekly Production Benchmarks (Made vs Target)
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
- : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
- }`}>
- Weekly Output Analysis
- </span>
- </h3>
- <p className="subtitle text-xs text-zinc-500">Live dual-axis visual comparison of daily production targets against actual rolled batches</p>
- </div>
- </div>
- 
- <div className="flex gap-4 font-mono text-[11px] items-center">
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: isLight ? '#a1a1aa' : '#4b5563' }} />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production Target</span>
- </div>
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-2.5 bg-emerald-500 rounded-sm" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production Made</span>
- </div>
- </div>
- </div>
-
- <div className="h-80 w-full mt-6">
- <ResponsiveContainer width="100%" height="100%">
- <BarChart
- data={weeklyLogs}
- margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
- barGap={6}
- >
- <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
- <XAxis 
- dataKey="day" 
- axisLine={false} 
- tickLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
- />
- <YAxis 
- axisLine={false} 
- tickLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
- />
- <Tooltip 
- contentStyle={{ 
- backgroundColor: isLight ? '#ffffff' : '#09090b', 
- borderRadius: '16px', 
- color: isLight ? '#18181b' : '#fff', 
- border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
- boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' 
- }}
- labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
- cursor={{ fill: isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.03)' }}
- />
- <Legend 
- verticalAlign="bottom" 
- height={36} 
- content={({ payload }) => (
- <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
- {payload?.map((entry: any, index: number) => (
- <div key={`item-${index}`} className="flex items-center gap-2">
- <span 
- className="w-2.5 h-2.5 rounded-sm" 
- style={{ backgroundColor: entry.color }} 
- />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
- {entry.value === 'productionTarget' ? 'Production Target' : 'Production Made'}
- </span>
- </div>
- ))}
- </div>
- )}
- />
- <Bar 
- dataKey="productionTarget" 
- name="productionTarget" 
- fill={isLight ? '#a1a1aa' : '#4b5563'} 
- radius={[4, 4, 0, 0]} 
- maxBarSize={45}
- />
- <Bar 
- dataKey="productionMade" 
- name="productionMade" 
- fill="#10b981" 
- radius={[4, 4, 0, 0]} 
- maxBarSize={45}
- />
- </BarChart>
- </ResponsiveContainer>
- </div>
- </div>
-
- {/* Weekly Production Made vs Target Line Chart */}
- <div id="weekly-production-trend" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
- isLight ? 'bg-amber-50/50 border border-amber-200' : 'bg-3d-gold-dark metallic-base drop-shadow-xl'
- }`}>
- <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
- 
- <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
- isLight ? 'border-zinc-200' : 'border-zinc-800'
- }`}>
- <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-yellow-600' : 'bg-zinc-950 border-zinc-800 text-yellow-400'
- }`}>
- <TrendingUp className="w-5 h-5 flex-shrink-0" />
- </div>
- <div>
- <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
- Weekly Production Run-Rate (Trend Line)
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-yellow-50 border-yellow-200 text-yellow-700' 
- : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400'
- }`}>
- Trend Analysis
- </span>
- </h3>
- <p className="subtitle text-xs text-zinc-500">Chronological trend progression of actual production output against weekly target goals</p>
- </div>
- </div>
- 
- <div className="flex gap-4 font-mono text-[11px] items-center">
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-0.5 border-t-2 border-dashed" style={{ borderColor: isLight ? '#71717a' : '#9ca3af' }} />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production Target</span>
- </div>
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-0.5 bg-emerald-500" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Production Made</span>
- </div>
- </div>
- </div>
-
- <div className="h-80 w-full mt-6">
- <ResponsiveContainer width="100%" height="100%">
- <LineChart
- data={weeklyLogs}
- margin={{ top: 15, right: 15, left: 10, bottom: 5 }}
- >
- <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
- <XAxis 
- dataKey="day" 
- axisLine={false} 
- tickLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
- />
- <YAxis 
- axisLine={false} 
- tickLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
- />
- <Tooltip 
- contentStyle={{ 
- backgroundColor: isLight ? '#ffffff' : '#09090b', 
- borderRadius: '16px', 
- color: isLight ? '#18181b' : '#fff', 
- border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
- boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' 
- }}
- labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
- cursor={{ stroke: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', strokeWidth: 1 }}
- />
- <Legend 
- verticalAlign="bottom" 
- height={36} 
- content={({ payload }) => (
- <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
- {payload?.map((entry: any, index: number) => (
- <div key={`item-${index}`} className="flex items-center gap-2">
- <span 
- className={`w-2.5 h-0.5 ${entry.value === 'productionTarget' ? 'border-t border-dashed' : 'bg-emerald-500'}`}
- style={{ borderColor: entry.value === 'productionTarget' ? (isLight ? '#71717a' : '#9ca3af') : undefined }} 
- />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
- {entry.value === 'productionTarget' ? 'Production Target' : 'Production Made'}
- </span>
- </div>
- ))}
- </div>
- )}
- />
- <Line 
- type="monotone"
- dataKey="productionTarget" 
- name="productionTarget" 
- stroke={isLight ? '#71717a' : '#4b5563'} 
- strokeDasharray="5 5"
- strokeWidth={2}
- dot={{ r: 3, strokeWidth: 1 }}
- activeDot={{ r: 5 }}
- />
- <Line 
- type="monotone"
- dataKey="productionMade" 
- name="productionMade" 
- stroke="#10b981" 
- strokeWidth={3}
- dot={{ r: 4, strokeWidth: 1 }}
- activeDot={{ r: 6 }}
- />
- </LineChart>
- </ResponsiveContainer>
- </div>
- </div>
-
- {/* Live Estimated Profit Trajectory Line Chart */}
- <div id="live-profit-trajectory" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
- isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-3d-silver-dark metallic-base drop-shadow-xl'
- }`}>
- <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
- 
- <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
- isLight ? 'border-zinc-200' : 'border-zinc-800'
- }`}>
- <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-emerald-600' : 'bg-zinc-950 border-zinc-800 text-emerald-400'
- }`}>
- <Activity className="w-5 h-5 flex-shrink-0" />
- </div>
- <div>
- <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
- Real-Time Intra-Day Profit Trajectory
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
- : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
- }`}>
- Live Projection
- </span>
- </h3>
- <p className="subtitle text-xs text-zinc-500">
- Prorated hourly cumulative trajectory using live sales (€{metrics.salesToday.toLocaleString()}) and active waste costs (€{metrics.wasteCost.toFixed(2)})
- </p>
- </div>
- </div>
- 
- <div className="flex gap-4 font-mono text-[11px] items-center">
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-0.5" style={{ backgroundColor: isLight ? '#71717a' : '#9ca3af' }} />
- <span className={`font-semibold ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>Est. Sales</span>
- </div>
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-0.5 bg-rose-500" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>Est. Waste</span>
- </div>
- <div className="flex items-center gap-1.5 font-sans">
- <span className="w-2.5 h-0.5 bg-emerald-500 font-extrabold" />
- <span className={`font-semibold ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>Est. Cumulative Profit</span>
- </div>
- </div>
- </div>
-
- <div className="h-80 w-full mt-6">
- <ResponsiveContainer width="100%" height="100%">
- <LineChart
- data={(() => {
- const hourlyRatios = [
- { time: '08:00', salesPct: 0.05, wastePct: 0.12 },
- { time: '10:00', salesPct: 0.15, wastePct: 0.22 },
- { time: '12:00', salesPct: 0.40, wastePct: 0.38 },
- { time: '14:00', salesPct: 0.55, wastePct: 0.52 },
- { time: '16:00', salesPct: 0.65, wastePct: 0.62 },
- { time: '18:00', salesPct: 0.85, wastePct: 0.78 },
- { time: '20:00', salesPct: 0.95, wastePct: 0.90 },
- { time: '22:00', salesPct: 1.00, wastePct: 1.00 },
- ];
- return hourlyRatios.map(pt => {
- const cumSales = pt.salesPct * metrics.salesToday;
- const cumWaste = pt.wastePct * metrics.wasteCost;
- const cumProfit = cumSales - cumWaste;
- return {
- time: pt.time,
- Sales: Math.round(cumSales),
- Waste: Math.round(cumWaste),
- Profit: Math.round(cumProfit)
- };
- });
- })()}
- margin={{ top: 15, right: 15, left: 10, bottom: 5 }}
- >
- <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
- <XAxis 
- dataKey="time" 
- axisLine={false} 
- tickLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
- />
- <YAxis 
- axisLine={false} 
- tickLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }}
- unit="€"
- />
- <Tooltip 
- contentStyle={{ 
- backgroundColor: isLight ? '#ffffff' : '#09090b', 
- borderRadius: '16px', 
- color: isLight ? '#18181b' : '#fff', 
- border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
- boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' 
- }}
- labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
- cursor={{ stroke: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)', strokeWidth: 1 }}
- formatter={(value: any, name: any) => [`€${Number(value).toLocaleString()}`, name]}
- />
- <Legend 
- verticalAlign="bottom" 
- height={36} 
- content={({ payload }) => (
- <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
- {payload?.map((entry: any, index: number) => {
- let strokeColor = entry.color;
- let label = entry.value;
- if (entry.value === 'Profit') {
- strokeColor = '#10b981';
- label = 'Est. Cumulative Profit';
- } else if (entry.value === 'Sales') {
- strokeColor = isLight ? '#71717a' : '#9ca3af';
- label = 'Est. Sales';
- } else if (entry.value === 'Waste') {
- strokeColor = '#f43f5e';
- label = 'Est. Waste';
- }
- return (
- <div key={`item-${index}`} className="flex items-center gap-2">
- <span 
- className="w-2.5 h-0.5"
- style={{ backgroundColor: strokeColor }} 
- />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
- {label}
- </span>
- </div>
- );
- })}
- </div>
- )}
- />
- <Line 
- type="monotone"
- dataKey="Sales" 
- name="Sales" 
- stroke={isLight ? '#71717a' : '#9ca3af'} 
- strokeWidth={2}
- dot={{ r: 3, strokeWidth: 1 }}
- activeDot={{ r: 5 }}
- />
- <Line 
- type="monotone"
- dataKey="Waste" 
- name="Waste" 
- stroke="#f43f5e" 
- strokeWidth={2}
- dot={{ r: 3, strokeWidth: 1 }}
- activeDot={{ r: 5 }}
- />
- <Line 
- type="monotone"
- dataKey="Profit" 
- name="Profit" 
- stroke="#10b981" 
- strokeWidth={3}
- dot={{ r: 4, strokeWidth: 1 }}
- activeDot={{ r: 6 }}
- />
- </LineChart>
- </ResponsiveContainer>
- </div>
- </div>
-
- {/* Dynamic Multi-Branch Performance & Store Efficiency Hub */}
- <div id="multi-branch-perf-hub" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
- isLight ? 'bg-amber-50/50 border border-amber-200' : 'bg-3d-gold-dark metallic-base drop-shadow-xl'
- }`}>
- {/* Subtle background decorative element */}
- <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-transparent rounded-full filter blur-3xl pointer-events-none" />
- <div className="absolute left-1/3 bottom-0 w-60 h-60 bg-gradient-to-tr from-emerald-500/5 to-transparent rounded-full filter blur-2xl pointer-events-none" />
-
- {/* Tab Header Banner */}
- <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b z-10 relative ${
- isLight ? 'border-zinc-200' : 'border-zinc-800/95'
- }`}>
- <div className="flex items-start gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-350 ${
- isLight ? 'bg-zinc-150 bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-800 text-amber-500'
- }`}>
- <Activity className="w-5 h-5 animate-pulse" />
- </div>
- <div>
- <div className="flex flex-wrap items-center gap-2">
- <h3 className={`text-lg font-sans font-bold leading-tight ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
- Multi-Branch Performance Comparison
- </h3>
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-amber-50 border-amber-250 border-amber-200 text-amber-700' 
- : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
- }`}>
- Corporate Branch Analyzer
- </span>
- </div>
- <p className="subtitle text-xs text-zinc-500 mt-1.5 leading-relaxed">
- Visualizing operational efficiency, value sales, rolled throughput, and waste across the M&S and Tesco locations of the brand.
- </p>
- </div>
- </div>
-
- {/* Interactive Comparison Period & Metric Selectors */}
- <div className="flex flex-wrap items-center gap-3 mt-2 lg:mt-0 font-sans">
- {/* Comparison Mode Toggle */}
- <div className={`flex p-1 rounded-xl border transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
- }`} id="selected-branch-toggle-container">
- <button
- type="button"
- id="comparison-toggle-all-branches"
- onClick={() => setVsAverageMode(false)}
- className={`px-3 py-1.5 text-[9px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
- !vsAverageMode
- ? 'bg-amber-600 text-white shadow-md'
- : isLight 
- ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
- : 'text-zinc-400 hover:text-white'
- }`}
- >
- All Branches
- </button>
- <button
- type="button"
- id="comparison-toggle-vs-average"
- onClick={() => setVsAverageMode(true)}
- className={`px-3 py-1.5 text-[9px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
- vsAverageMode
- ? 'bg-blue-600 text-white shadow-md'
- : isLight 
- ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
- : 'text-zinc-400 hover:text-white'
- }`}
- title={`Exclusively compare the selected branch (${selectedBranch}) against standard Company Average`}
- >
- Vs Company Avg
- </button>
- </div>
-
- {/* Period selector */}
- <div className={`flex p-1 rounded-xl border transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
- }`}>
- <button
- type="button"
- onClick={() => setBranchComparePeriod('day')}
- className={`px-3 py-1.5 text-[9px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
- branchComparePeriod === 'day'
- ? 'bg-amber-600 text-white shadow-md'
- : isLight 
- ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
- : 'text-zinc-400 hover:text-white'
- }`}
- >
- Day View ({activeLog.day})
- </button>
- <button
- type="button"
- onClick={() => setBranchComparePeriod('week')}
- className={`px-3 py-1.5 text-[9px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
- branchComparePeriod === 'week'
- ? 'bg-amber-600 text-white shadow-md'
- : isLight 
- ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
- : 'text-zinc-400 hover:text-white'
- }`}
- >
- Weekly Total
- </button>
- </div>
-
- {/* Metric Selector Dropdown */}
- <div className={`flex items-center gap-1.5 border rounded-xl px-2.5 py-1.5 shadow-sm transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-200 border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-800'
- }`}>
- <span className={`text-[9px] font-bold uppercase tracking-wider font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-505 text-zinc-500'}`}>Measure:</span>
- <select
- value={branchCompareMetric}
- onChange={(e) => setBranchCompareMetric(e.target.value as any)}
- className={`bg-transparent font-bold text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans outline-none font-bold ${
- isLight ? 'text-orange-700' : 'text-amber-400  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300'
- }`}
- >
- <option value="sales" className={isLight ? 'text-zinc-900 bg-white font-bold' : 'bg-zinc-950 text-white font-bold'}>Gross Sales revenue (€)</option>
- <option value="production" className={isLight ? 'text-zinc-900 bg-white font-bold' : 'bg-zinc-950 text-white font-bold'}>Rolled Sushi throughput (Pcs)</option>
- <option value="waste" className={isLight ? 'text-zinc-900 bg-white font-bold' : 'bg-zinc-950 text-white font-bold'}>Seafood Ingredient Waste (%)</option>
- <option value="efficiency" className={isLight ? 'text-zinc-900 bg-white font-bold' : 'bg-zinc-950 text-white font-bold'}>Store Efficiency Score (0-100)</option>
- </select>
- </div>
- </div>
- </div>
-
- {/* Comparison Dashboard Grid */}
+{/* Interactive Production & Revenue Chart */}
+        <div className={`lg:col-span-2 rounded-3xl p-6 transition-all duration-300 ${isLight ? 'bg-amber-50/50 border border-amber-200' : 'bg-3d-gold-dark metallic-base drop-shadow-xl'}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className={`text-lg font-sans font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Performance Index</h3>
+                <span className={`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                  isLight 
+                    ? 'bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200' 
+                    : 'bg-emerald-950/40 text-emerald-400 border-emerald-900/40'
+                }`}>
+                  {chartView === 'weekly' ? 'Week Overview' : 'Today Overview'}
+                </span>
+              </div>
+              <p className="subtitle text-xs text-zinc-500 uppercase font-semibold">
+                {chartView === 'weekly' ? '7-Day operational flow analysis' : 'Correlated hourly view of cumulative metrics'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+               <button
+                  type="button"
+                  onClick={() => setChartView('hourly')}
+                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
+                    chartView === 'hourly'
+                      ? 'bg-amber-500 text-zinc-950 shadow-md'
+                      : isLight ? 'text-zinc-500 hover:text-amber-700 hover:bg-white' : 'text-zinc-400 hover:bg-zinc-800'
+                  }`}
+                >
+                  Hourly
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChartView('weekly')}
+                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
+                    chartView === 'weekly'
+                      ? 'bg-amber-500 text-zinc-950 shadow-md'
+                      : isLight ? 'text-zinc-500 hover:text-amber-700 hover:bg-white' : 'text-zinc-400 hover:bg-zinc-800'
+                  }`}
+                >
+                  Weekly
+                </button>
+            </div>
+          </div>
+          <div className="h-72 w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartView === 'weekly' ? weeklyData : hourlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorProd" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#27272a'} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 11 }} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 11 }} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '12px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}` }} />
+                <Line yAxisId="left" type="monotone" dataKey="Sales" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} />
+                <Area yAxisId="left" type="monotone" dataKey="Sales" stroke="none" fill="url(#colorSales)" />
+                <Line yAxisId="right" type="monotone" dataKey="Production" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} />
+                <Area yAxisId="right" type="monotone" dataKey="Production" stroke="none" fill="url(#colorProd)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        {/* Branch Compare Config Header */}
+        <div className={`lg:col-span-1 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 ${isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl shadow-amber-500/5'}`}>
+          <div>
+            <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+              <Layers className="w-5 h-5 text-amber-500" />
+              Branch Compare
+            </h3>
+            <p className="text-xs text-zinc-500 mt-2">Measure relative performance between individual stores and benchmarks.</p>
+            
+            <div className="mt-6 space-y-4">
+              <div>
+                <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">Branch A</label>
+                <select
+                  value={compareBranchA}
+                  onChange={(e) => {
+                    setCompareBranchA(e.target.value);
+                    setCompareMode('twoBranches');
+                  }}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                    isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
+                  }`}
+                >
+                  <option value="m_s_cork">M&S Cork</option>
+                  <option value="tesco_cork">Tesco Cork</option>
+                  <option value="tesco_mahon">Tesco Mahon</option>
+                </select>
+              </div>
+              <div className="flex justify-center">
+                <span className="text-zinc-400 font-mono text-xs font-bold bg-zinc-100 dark:bg-zinc-900 px-3 py-1 rounded-full">VS</span>
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">Branch B</label>
+                <select
+                  value={compareBranchB}
+                  onChange={(e) => {
+                    setCompareBranchB(e.target.value);
+                    setCompareMode('twoBranches');
+                  }}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                    isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
+                  }`}
+                >
+                  <option value="m_s_cork">M&S Cork</option>
+                  <option value="tesco_cork">Tesco Cork</option>
+                  <option value="tesco_mahon">Tesco Mahon</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setCompareMode(compareMode === 'all' ? 'twoBranches' : 'all')}
+            className={`w-full mt-6 px-4 py-3 rounded-xl border font-bold text-sm transition-all ${
+              compareMode === 'all'
+                ? 'bg-amber-500 text-zinc-950 border-amber-600'
+                : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900 bg-opacity-60 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white'
+            }`}
+          >
+            {compareMode === 'all' ? 'Viewing All Active Branches' : 'View All Global Branches'}
+          </button>
+        </div>
+      </div>
+      
+      <div className="mt-10">
+      {/* Comparison Dashboard Grid */}
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 z-10 relative">
  
  {/* Left Column: Recharts Comparison Visualizer BarChart */}

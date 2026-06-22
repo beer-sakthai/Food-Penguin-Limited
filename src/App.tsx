@@ -36,6 +36,8 @@ import PlanningTab from './components/PlanningTab';
 import EnergyTab from './components/EnergyTab';
 import SuppliersTab from './components/SuppliersTab';
 import FinanceTab from './components/FinanceTab';
+import RealtimeTab from './components/RealtimeTab';
+import LoginScreen from './components/LoginScreen';
 import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
 
@@ -70,10 +72,11 @@ import {
  Store
 } from 'lucide-react';
 
-const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
- Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
- Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
- Staff: ['Overview', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers']
+const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
+  Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
+  Manager: ['Overview', 'Realtime', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
+  Staff: ['Overview', 'Realtime', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers'],
+  User: ['Overview', 'Realtime'] // User can only view data
 };
 
 export default function App() {
@@ -96,7 +99,8 @@ export default function App() {
 
  const [activeTab, setActiveTab] = useState<string>('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
- const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff'>('Admin');
+ const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff' | 'User'>('Admin');
+  const [currentUser, setCurrentUser] = useState<{username: string, role: string} | null>(null);
  const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
  const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
@@ -815,6 +819,7 @@ export default function App() {
 
  const allTabMeta = [
  { id: 'Overview', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'Realtime', label: 'Real-time', icon: <Activity className="w-4 h-4" /> },
  { id: 'Sell', label: 'Branch Product', icon: <Coins className="w-4 h-4" /> },
  { id: 'Target', label: 'Target', icon: <ShieldCheck className="w-4 h-4" /> },
  { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
@@ -1383,7 +1388,45 @@ export default function App() {
  <CapacityVarianceChart weeklyLogs={weeklyLogs} isLight={isLight} />
  </div>
  
- <div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
+ {/* Active Bottleneck Jump Button */}
+          {(() => {
+            const maxProjectedItem = [...dailyCapacityBreakdown].sort((a, b) => b.projected - a.projected)[0];
+            const hasBottleneck = maxProjectedItem && maxProjectedItem.projected > bottleneckThreshold;
+            if (hasBottleneck) {
+              return (
+                <button
+                  onClick={() => {
+                    const el = document.getElementById(`bottleneck-day-${maxProjectedItem.day}`);
+                    // Using modern scrollIntoView with smooth behavior
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Add a brief highlight flash when scrolled
+                    if (el) {
+                      el.classList.add('ring-2', 'ring-amber-500', 'ring-offset-2', 'ring-offset-zinc-900', 'rounded-xl');
+                      setTimeout(() => {
+                        el.classList.remove('ring-2', 'ring-amber-500', 'ring-offset-2', 'ring-offset-zinc-900', 'rounded-xl');
+                      }, 2000);
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between mt-1 mb-2 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-sm group ${
+                    isLight 
+                      ? 'bg-amber-100/80 text-amber-900 border border-amber-200 hover:bg-amber-100 hover:shadow-md' 
+                      : 'bg-amber-900/30 text-amber-500 border border-amber-900/50 hover:bg-amber-900/50 hover:border-amber-500/50 hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className={isLight ? 'text-amber-600' : 'text-amber-400'}>🔥</span>
+                    Threshold Exceeded ({maxProjectedItem.projected}%)
+                  </span>
+                  <span className={`flex items-center gap-1 transition-transform group-hover:translate-x-1 ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>
+                    Jump to {maxProjectedItem.day} →
+                  </span>
+                </button>
+              );
+            }
+            return null;
+          })()}
+          <div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
             {(() => {
               const avgWeeklyProjected = Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / (dailyCapacityBreakdown.length || 1));
               return sortedDailyCapacityBreakdown.map((item, index) => {
@@ -1404,17 +1447,18 @@ export default function App() {
 
  return (
  <div 
- key={index} 
- className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-300 ${
- isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40'
- } ${
- isBottleneck 
- ? isLight 
- ? 'bg-amber-50/70 border border-amber-200 p-2.5 rounded-xl my-1 text-zinc-900' 
- : 'bg-amber-950/20 border border-amber-500/20 p-2.5 rounded-xl my-1 shadow-[inset_0_1px_1px_rgba(245,158,11,0.05)] text-zinc-300' 
- : 'px-1 pt-1'
- }`}
- >
+                            key={index} 
+                            id={`bottleneck-day-${item.day}`}
+                            className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${
+                              isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40'
+                            } ${
+                              isBottleneck 
+                                ? isLight 
+                                  ? 'bg-amber-50 border-2 border-amber-400 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_12px_rgba(245,158,11,0.4)] animate-[pulse_2s_ease-in-out_infinite]' 
+                                  : 'bg-amber-900/10 border-2 border-amber-500/60 p-2.5 rounded-xl my-1 shadow-[0_0_15px_rgba(245,158,11,0.3)] text-zinc-300 animate-[pulse_2s_ease-in-out_infinite]' 
+                                : 'px-1 pt-1'
+                            }`}
+                          >
  <div className="flex justify-between items-center text-[10px] gap-2">
  <span className={`font-sans font-bold flex items-center gap-1 flex-wrap min-w-[70px] ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>
  {item.day.substring(0, 3)} 
