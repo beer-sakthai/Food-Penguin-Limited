@@ -17,6 +17,9 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
   * **Waste Module:** Financial leakage tracking with interactive pie chart distributions and safety allowance thresholds.
   * **Hours Module:** Workforce scheduling, clocked-in time tracking, planned hour comparison vs logged times and variance tracking analysis.
   * **Target Module:** Corporate-wide milestone tracking, completion bar charts, progress validations, and AI-optimized targets.
+  * **Energy Module [NEW]:** Real-time sustainability reporting visualizing oven energy consumption vs production volume to hit ESG compliance KPIs.
+  * **Suppliers Module [NEW]:** Organized directory of authorized vendors (Tazaki, BUNZL, Asia Market, VS Direct), offering quick text search for specific ingredients, packaging materials, and labeling.
+  * **Finance Module [NEW]:** Interactive P&L audit comparing the Target Plan (COG 30%, Staff 20%, etc.) vs Actual Use, highlighting structural variance and margin erosion.
   * **Studio Module [NEW]:** High-end AI Operations Studio featuring:
     * **Ad Generator:** Dynamically generate ultra-realistic food production imagery and marketing material with varied aspect ratios (Powered by Imagen 3.0), downloading, and direct output previews.
     * **Plating & Quality Dish Auditor:** Upload or drag & drop food images so the AI can run a culinary audit on presentation, freshness markers, trim waste estimates, and margin improvements.
@@ -24,6 +27,8 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
   * **Deep Strategic Advisor:** Built-in multi-layered logic solver managed by Jules, Google's advanced operational AI. (Powered by Gemini 1.5 Flash).
   * **AI Banner Illustrator:** Automated marketing asset generation with specific focal points and aspect ratios (Powered by Imagen 3.0).
   * **Waste Investigator & Recipe Generator:** Automated photo-based insights and production aids.
+  * **Financial Margin & P&L Auditor:** Structural variance analysis between expected cost limits and actual expenses.
+  * **Sustainability ESG Analyst:** Provides actionable adjustments for peak energy draw against kitchen throughput.
   * **Real-time Shift Summary & Analytics:** Manually generated AI insights against live operation data, kept strictly on-demand to respect API quota limits.
 
 ## 🛠 Tech Stack

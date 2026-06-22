@@ -34,17 +34,21 @@ import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
 import EnergyTab from './components/EnergyTab';
+import SuppliersTab from './components/SuppliersTab';
+import FinanceTab from './components/FinanceTab';
 import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
 
 
 // Main Icons
 import {
- LayoutDashboard, Camera, Menu, X,
- Coins,
- Zap,
- ShieldCheck,
- ChefHat,
+  LayoutDashboard, Camera, Menu, X,
+  Coins,
+  Zap,
+  Package,
+  DollarSign,
+  ShieldCheck,
+  ChefHat,
  Trash2,
  CalendarDays,
  Boxes,
@@ -67,9 +71,9 @@ import {
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
- Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Studio'],
- Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Studio'],
- Staff: ['Overview', 'Sell', 'Production', 'Energy', 'Waste']
+ Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
+ Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
+ Staff: ['Overview', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers']
 };
 
 export default function App() {
@@ -817,7 +821,9 @@ export default function App() {
  { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
  { id: 'Hours', label: 'Hours', icon: <CalendarDays className="w-4 h-4" /> },
  { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> },
-    { id: 'Energy', label: 'Energy', icon: <Zap className="w-4 h-4" /> }
+    { id: 'Energy', label: 'Energy', icon: <Zap className="w-4 h-4" /> },
+    { id: 'Suppliers', label: 'Suppliers', icon: <Package className="w-4 h-4" /> },
+    { id: 'Finance', label: 'Finance', icon: <DollarSign className="w-4 h-4" /> }
  ];
 
  const tabMeta = allTabMeta.filter(tab => rolePermissions[userRole].includes(tab.id));
@@ -888,6 +894,12 @@ export default function App() {
  );
  case 'Planning':
  return <PlanningTab inventory={inventory} onOrderRestock={handleOrderRestock} selectedBranch={selectedBranch} theme={theme} weeklyLogs={weeklyLogs} />;
+      case 'Energy':
+        return <EnergyTab theme={theme} weeklyLogs={weeklyLogs} />;
+      case 'Suppliers':
+        return <SuppliersTab theme={theme} />;
+      case 'Finance':
+        return <FinanceTab theme={theme} />;
  default:
  return (
  <OverviewTab 
@@ -1084,36 +1096,60 @@ export default function App() {
  </div>
 
  {/* Premium, interactive, layered capacity progress bar */}
- <div className={`relative h-3 rounded-full overflow-hidden mt-3 shadow-inner ${
- isLight ? 'bg-zinc-200' : 'bg-zinc-800/80'
- }`}>
- {/* Optional dynamic striped extension for projected excess */}
- {projectedCapacityPct > capacityPct && (
- <div 
- className="absolute left-0 top-0 h-full bg-amber-500/40 animate-pulse transition-all duration-500 ease-out"
- style={{ 
- width: `${projectedCapacityPct}%`,
- backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(245, 158, 11, 0.2) 4px, rgba(245, 158, 11, 0.2) 8px)'
- }}
- title={`Projected 7-day load: ${projectedCapacityPct}%`}
- />
- )}
- {/* Solid Current Capacity Bar */}
- <div 
- className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(249,115,22,0.2)]"
- style={{ width: `${capacityPct}%` }}
- title={`Current load: ${capacityPct}%`}
- />
- 
- {/* Vertical dashed line indicator to point to the projected load */}
- <div 
- className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10 transition-all duration-500 ease-out"
- style={{ left: `${projectedCapacityPct}%` }}
- title={`7-Day Projection Target: ${projectedCapacityPct}%`}
- />
- </div>
+        <div className={`relative h-3 rounded-full overflow-hidden mt-3 shadow-inner ${
+          isLight ? 'bg-zinc-200' : 'bg-zinc-800/80'
+        }`}>
+          {/* Visual range indicator: Distance from Projected to Bottleneck Threshold */}
+          {projectedCapacityPct <= bottleneckThreshold ? (
+            <div 
+              className={`absolute top-0 h-full transition-all duration-500 ease-out ${isLight ? 'bg-emerald-500/20' : 'bg-emerald-500/30'}`}
+              style={{ left: `${projectedCapacityPct}%`, width: `${bottleneckThreshold - projectedCapacityPct}%` }}
+              title={`Safe Buffer: ${bottleneckThreshold - projectedCapacityPct}%`}
+            />
+          ) : (
+            <div 
+              className={`absolute top-0 h-full animate-pulse transition-all duration-500 ease-out ${isLight ? 'bg-rose-500/40' : 'bg-rose-500/50'}`}
+              style={{ left: `${bottleneckThreshold}%`, width: `${projectedCapacityPct - bottleneckThreshold}%` }}
+              title={`Threshold Overflow: ${projectedCapacityPct - bottleneckThreshold}%`}
+            />
+          )}
 
- {/* Text details and comparison metrics */}
+          {/* Solid Current Capacity Bar */}
+          <div 
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(249,115,22,0.2)]"
+            style={{ width: `${capacityPct}%` }}
+            title={`Current load: ${capacityPct}%`}
+          />
+
+          {/* Optional dynamic striped extension for projected excess over current */}
+          {projectedCapacityPct > capacityPct && (
+            <div 
+              className="absolute left-0 top-0 h-full bg-amber-500/40 transition-all duration-500 ease-out"
+              style={{ 
+                left: `${capacityPct}%`,
+                width: `${projectedCapacityPct - capacityPct}%`,
+                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(245, 158, 11, 0.2) 4px, rgba(245, 158, 11, 0.2) 8px)'
+              }}
+              title={`Projected increase: ${projectedCapacityPct - capacityPct}%`}
+            />
+          )}
+          
+          {/* Vertical dashed line indicator to point to the projected load */}
+          <div 
+            className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10 transition-all duration-500 ease-out"
+            style={{ left: `${projectedCapacityPct}%` }}
+            title={`7-Day Projection Target: ${projectedCapacityPct}%`}
+          />
+
+          {/* Vertical marker for User-set Bottleneck Threshold */}
+          <div 
+            className="absolute top-0 h-full w-0.5 bg-rose-500 z-20 transition-all duration-500"
+            style={{ left: `${bottleneckThreshold}%` }}
+            title={`Bottleneck Threshold: ${bottleneckThreshold}%`}
+          />
+        </div>
+
+        {/* Text details and comparison metrics */}
  <div className={`space-y-1.5 mt-3 pt-2.5 border-t font-mono text-[10px] leading-relaxed ${
  isLight ? 'border-zinc-200' : 'border-zinc-800/60'
  }`}>
@@ -1348,7 +1384,9 @@ export default function App() {
  </div>
  
  <div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
- {sortedDailyCapacityBreakdown.map((item, index) => {
+            {(() => {
+              const avgWeeklyProjected = Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / (dailyCapacityBreakdown.length || 1));
+              return sortedDailyCapacityBreakdown.map((item, index) => {
  const isBottleneck = item.projected > bottleneckThreshold;
  const chronologicalIndex = dailyCapacityBreakdown.findIndex(d => d.day === item.day);
  
@@ -1482,9 +1520,18 @@ export default function App() {
  <span className="text-zinc-500 text-[8px]" title="Current">{item.current}%</span>
  <span className="text-zinc-600 text-[8px] select-none">→</span>
  <span className={`font-bold text-[10px] ${isBottleneck ? 'text-amber-400 font-bold' : item.projected >= item.current ? 'text-orange-400' : 'text-orange-500/80'}`} title="Projected">
- {item.projected}%
- </span>
- </div>
+                            {item.projected}%
+                          </span>
+                          <span className="ml-0.5 text-[10px] font-bold" title={`Trend relative to weekly average (${avgWeeklyProjected}%)`}>
+                            {item.projected > avgWeeklyProjected ? (
+                                <span className="text-rose-500" title="Trending Up (Above avg)">↑</span>
+                            ) : item.projected < avgWeeklyProjected ? (
+                                <span className="text-emerald-500" title="Trending Down (Below avg)">↓</span>
+                            ) : (
+                                <span className="text-zinc-500" title="At weekly average">-</span>
+                            )}
+                          </span>
+                        </div>
  </div>
  
  {/* Interactive miniature double graph bar indicator */}
@@ -1572,10 +1619,11 @@ export default function App() {
  )}
  </div>
  );
- })}
- </div>
- </div>
- )}
+                  });
+                })()}
+              </div>
+            </div>
+          )}
  </div>
  </div>
 
