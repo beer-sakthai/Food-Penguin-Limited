@@ -1,12 +1,6 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import DublinClock from './DublinClock';
-import { CoreMetrics, CompanyTarget, DailyOperationalLog } from '../types';
-import {
- buildBranchSummaries,
- buildOverviewBranchComparisonData,
- getChampionBranch,
-} from '../lib/companyKpis';
+import { CoreMetrics, CompanyTarget, DailyOperationalLog, SalesOrder } from '../types';
 import {
  TrendingUp,
  Package,
@@ -45,39 +39,32 @@ interface OverviewTabProps {
  targets: CompanyTarget[];
  userRole: 'Admin' | 'Manager' | 'Staff';
  onUpdateMetrics: (newMetrics: Partial<CoreMetrics>) => void;
+ irelandTime?: string;
  weeklyLogs: DailyOperationalLog[];
  onAddOrUpdateLog: (log: DailyOperationalLog) => void;
  selectedWeekRange: string;
  onSelectedWeekRangeChange: (range: string) => void;
+ orders: SalesOrder[];
  selectedBranch: string;
- branchWeeklyLogsByBranch: Record<string, DailyOperationalLog[]>;
  theme?: 'dark' | 'light';
 }
 
-function OverviewTab({
+export default function OverviewTab({ 
  metrics, 
  onNavigateTab, 
  targets, 
  userRole, 
  onUpdateMetrics, 
+ irelandTime,
  weeklyLogs,
  onAddOrUpdateLog,
  selectedWeekRange,
  onSelectedWeekRangeChange,
+ orders,
  selectedBranch,
- branchWeeklyLogsByBranch,
  theme = 'dark'
 }: OverviewTabProps) {
  const isLight = theme === 'light';
- const goldFocusRingClasses = [
- 'focus:outline-none',
- 'focus:ring-2',
- 'focus:ring-yellow-500',
- 'focus:border-yellow-500',
- 'focus:shadow-[0_0_8px_rgba(234,179,8,0.4)]'
- ].join(' ');
- const advisorTextareaBaseClasses =
- 'w-full min-h-[4.5rem] sm:min-h-20 max-h-28 resize-y p-3 border shadow-inner transition-all duration-200 font-sans rounded-2xl';
  const [strategicPrompt, setStrategicPrompt] = useState(
  "Synthesize an optimization plan for premium Sushi production to reduce Tazaki and Sysco transport delays by 12% while keeping active kitchen seafood waste indexes below 3% under Dublin humid weather."
  );
@@ -266,51 +253,191 @@ function OverviewTab({
  }));
 
  // --- MULTI-BRANCH DESIGN CONCEPTS & ANALYTICS ---
+ // Store branches defined in the corporate plan:
+ // 1. Marks & Spencer - Cork City (Luxury selection, premier gourmet pricing premium, high efficiency)
+ // 2. Tesco - Cork City (High volume urban storefront, everyday value items, moderate waste margins)
+ // 3. Tesco - Mahon Point (Suburban shopping mall storefront, mixed deals & family options)
  const [branchComparePeriod, setBranchComparePeriod] = useState<'day' | 'week'>('week');
  const [branchCompareMetric, setBranchCompareMetric] = useState<'sales' | 'production' | 'waste' | 'efficiency'>('sales');
  const [vsAverageMode, setVsAverageMode] = useState<boolean>(false);
- const branchSummaries = React.useMemo(() => (
-   buildBranchSummaries({
-     branchWeeklyLogsByBranch,
-     targets,
-     period: branchComparePeriod,
-     selectedDay: branchComparePeriod === 'day' ? selectedDayTab : undefined,
-   })
- ), [branchWeeklyLogsByBranch, branchComparePeriod, selectedDayTab, targets]);
 
- const branchPerformanceData = React.useMemo(() => (
-   buildOverviewBranchComparisonData({
-     branchSummaries,
-     selectedBranch,
-     vsAverageMode,
-   })
- ), [branchSummaries, selectedBranch, vsAverageMode]);
+ const rawBranchList = React.useMemo(() => {
+ // Determine aggregate or day-specific benchmark base values from operational logs
+ let baseSales = 0;
+ let baseProduction = 0;
+ let baseWaste = 0;
+ let baseHours = 0;
 
- const championBranch = React.useMemo(() => getChampionBranch(branchSummaries), [branchSummaries]);
+ if (branchComparePeriod === 'day') {
+ baseSales = activeLog.sales;
+ baseProduction = activeLog.productionMade;
+ baseWaste = activeLog.waste;
+ baseHours = activeLog.hours;
+ } else {
+ baseSales = weeklyLogs.reduce((sum, log) => sum + log.sales, 0);
+ baseProduction = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
+ baseWaste = weeklyLogs.reduce((sum, log) => sum + log.waste, 0);
+ baseHours = weeklyLogs.reduce((sum, log) => sum + log.hours, 0);
+ }
 
- const advisorTextareaThemeClasses = isLight
- ? 'border-zinc-300 bg-white text-zinc-900'
- : 'border-zinc-800 bg-zinc-900 text-zinc-100';
- const advisorTextareaClasses = [
- advisorTextareaBaseClasses,
- goldFocusRingClasses,
- advisorTextareaThemeClasses
- ].join(' ');
+ // Extract real logged customer orders matching the timeframes and stores!
+ const realOrdersForStore = (branchName: string) => {
+ const filtered = orders.filter(o => {
+ const orderBranch = o.branch || 'Marks & Spencer - Cork City';
+ return orderBranch === branchName && (o.status === 'Completed' || o.status === 'Pending');
+ });
+ return filtered.reduce((sum, o) => sum + o.amount, 0);
+ };
+
+ const realOrdersQtyForStore = (branchName: string) => {
+ const filtered = orders.filter(o => {
+ const orderBranch = o.branch || 'Marks & Spencer - Cork City';
+ return orderBranch === branchName && (o.status === 'Completed' || o.status === 'Pending');
+ });
+ return filtered.reduce((sum, o) => sum + o.quantity, 0);
+ };
+
+ // Calculate live overrides from Sell Tab
+ const msLiveSales = realOrdersForStore('Marks & Spencer - Cork City');
+ const tescoCorkLiveSales = realOrdersForStore('Tesco - Cork City');
+ const tescoMahonLiveSales = realOrdersForStore('Tesco - Mahon Point');
+
+ const msLiveQty = realOrdersQtyForStore('Marks & Spencer - Cork City') * 10; // scale representatively to match larger daily output
+ const tescoCorkLiveQty = realOrdersQtyForStore('Tesco - Cork City') * 10;
+ const tescoMahonLiveQty = realOrdersQtyForStore('Tesco - Mahon Point') * 10;
+
+ // Apply baseline division ratios + add real custom virtual-POS sales
+ const runMS_Sales = Math.round(baseSales * 0.42) + msLiveSales;
+ const runMS_Prod = Math.round(baseProduction * 0.40) + msLiveQty;
+ const runMS_Waste = Math.round(baseWaste * 0.28);
+ const runMS_Hours = Math.round(baseHours * 0.35);
+
+ const runTescoCork_Sales = Math.round(baseSales * 0.33) + tescoCorkLiveSales;
+ const runTescoCork_Prod = Math.round(baseProduction * 0.35) + tescoCorkLiveQty;
+ const runTescoCork_Waste = Math.round(baseWaste * 0.36);
+ const runTescoCork_Hours = Math.round(baseHours * 0.35);
+
+ const runTescoMahon_Sales = Math.round(baseSales * 0.25) + tescoMahonLiveSales;
+ const runTescoMahon_Prod = Math.round(baseProduction * 0.25) + tescoMahonLiveQty;
+ const runTescoMahon_Waste = Math.round(baseWaste * 0.36);
+ const runTescoMahon_Hours = Math.round(baseHours * 0.30);
+
+ // Compute efficiency values
+ const msLaborProd = Math.round(runMS_Sales / (runMS_Hours || 1));
+ const tescoCorkLaborProd = Math.round(runTescoCork_Sales / (runTescoCork_Hours || 1));
+ const tescoMahonLaborProd = Math.round(runTescoMahon_Sales / (runTescoMahon_Hours || 1));
+
+ const msWastePct = parseFloat(((runMS_Waste / (runMS_Sales || 1)) * 100).toFixed(1));
+ const tescoCorkWastePct = parseFloat(((runTescoCork_Waste / (runTescoCork_Sales || 1)) * 105).toFixed(1)); // slightly different waste multiplier profile
+ const tescoMahonWastePct = parseFloat(((runTescoMahon_Waste / (runTescoMahon_Sales || 1)) * 108).toFixed(1));
+
+ // Integrated Operational Efficiency Score (0-100 scale)
+ const msEffScore = Math.min(100, Math.round((msLaborProd / 130) * 65 + (100 - msWastePct) * 0.35));
+ const tescoCorkEffScore = Math.min(100, Math.round((tescoCorkLaborProd / 130) * 65 + (100 - tescoCorkWastePct) * 0.35));
+ const tescoMahonEffScore = Math.min(100, Math.round((tescoMahonLaborProd / 130) * 65 + (100 - tescoMahonWastePct) * 0.35));
+
+ return [
+ {
+ id: 'm_s_cork',
+ name: 'M&S Cork City',
+ fullName: 'Marks & Spencer - Cork City',
+ type: 'Luxury Gourmet Specialty Store',
+ sales: runMS_Sales,
+ production: runMS_Prod,
+ waste: runMS_Waste,
+ hours: runMS_Hours,
+ wastePct: msWastePct,
+ laborProd: msLaborProd,
+ efficiencyScore: msEffScore,
+ color: '#f59e0b',
+ fill: 'url(#gradMS)'
+ },
+ {
+ id: 'tesco_cork',
+ name: 'Tesco Cork City',
+ fullName: 'Tesco - Cork City',
+ type: 'High Volume Center',
+ sales: runTescoCork_Sales,
+ production: runTescoCork_Prod,
+ waste: runTescoCork_Waste,
+ hours: runTescoCork_Hours,
+ wastePct: tescoCorkWastePct,
+ laborProd: tescoCorkLaborProd,
+ efficiencyScore: tescoCorkEffScore,
+ color: '#10b981',
+ fill: 'url(#gradTescoCork)'
+ },
+ {
+ id: 'tesco_mahon',
+ name: 'Tesco Mahon Point',
+ fullName: 'Tesco - Mahon Point',
+ type: 'Suburban Shopping Mall',
+ sales: runTescoMahon_Sales,
+ production: runTescoMahon_Prod,
+ waste: runTescoMahon_Waste,
+ hours: runTescoMahon_Hours,
+ wastePct: tescoMahonWastePct,
+ laborProd: tescoMahonLaborProd,
+ efficiencyScore: tescoMahonEffScore,
+ color: '#a855f7',
+ fill: 'url(#gradTescoMahon)'
+ }
+ ];
+ }, [activeLog, weeklyLogs, orders, branchComparePeriod]);
+
+ // Derived Performance comparison list (can be all branches or selected vs company average)
+ const branchPerformanceData = React.useMemo(() => {
+ if (!vsAverageMode) {
+ return rawBranchList;
+ }
+
+ // Company averages
+ const avgSales = Math.round(rawBranchList.reduce((sum, b) => sum + b.sales, 0) / rawBranchList.length);
+ const avgProduction = Math.round(rawBranchList.reduce((sum, b) => sum + b.production, 0) / rawBranchList.length);
+ const avgWaste = Math.round(rawBranchList.reduce((sum, b) => sum + b.waste, 0) / rawBranchList.length);
+ const avgHours = Math.round(rawBranchList.reduce((sum, b) => sum + b.hours, 0) / rawBranchList.length);
+ const avgWastePct = parseFloat((rawBranchList.reduce((sum, b) => sum + b.wastePct, 0) / rawBranchList.length).toFixed(1));
+ const avgLaborProd = Math.round(rawBranchList.reduce((sum, b) => sum + b.laborProd, 0) / rawBranchList.length);
+ const avgEfficiencyScore = Math.round(rawBranchList.reduce((sum, b) => sum + b.efficiencyScore, 0) / rawBranchList.length);
+
+ // Selected branch
+ const activeBranch = rawBranchList.find(b => b.fullName === selectedBranch) || rawBranchList[0];
+
+ // Company Average Item
+ const companyAvgItem = {
+ id: 'company_avg',
+ name: 'Company Average',
+ fullName: 'Standard Company Average',
+ type: 'Combined Corporate Benchmark',
+ sales: avgSales,
+ production: avgProduction,
+ waste: avgWaste,
+ hours: avgHours,
+ wastePct: avgWastePct,
+ laborProd: avgLaborProd,
+ efficiencyScore: avgEfficiencyScore,
+ color: '#3b82f6', // brand blue for benchmark comparisons
+ fill: 'url(#gradAvg)'
+ };
+
+ return [activeBranch, companyAvgItem];
+ }, [rawBranchList, vsAverageMode, selectedBranch]);
+
+ // Determine peak efficiency branch (calculating exclusively from actual real branches to avoid company average bias)
+ const championBranch = React.useMemo(() => {
+ return [...rawBranchList].sort((a, b) => b.efficiencyScore - a.efficiencyScore)[0];
+ }, [rawBranchList]);
 
  return (
- <div id="overview-viewport" className="space-y-7">
+ <div id="overview-viewport" className="space-y-6">
  {/* Header Banner with Premium ambient bento design */}
-<div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
- isLight ? 'bg-white/95 border-zinc-200 text-zinc-900 shadow-[0_12px_30px_rgba(24,24,27,0.06)]' : 'bg-zinc-900/90 border-zinc-700 text-white shadow-[0_16px_36px_rgba(0,0,0,0.45)]'
- <div id="overview-viewport" className="space-y-5">
- {/* Header Banner with Premium ambient bento design */}
- <div className={`rounded-3xl p-5 md:p-6 lg:p-7 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 border transition-colors duration-200 ${
+ <div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
  isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}>
  <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
  
- <div className="relative z-10 max-w-xl xl:max-w-2xl">
+ <div className="relative z-10 max-w-2xl">
  <div className="flex flex-wrap items-center gap-2.5 mb-4">
  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono transition-colors ${
  isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-800 border-zinc-700/60 text-orange-400'
@@ -318,20 +445,21 @@ function OverviewTab({
  <Sparkles className="w-3 h-3 animate-pulse" />
  Sushi Intelligence Portal Active
  </div>
-
+ {irelandTime && (
  <span className={`text-xs px-3.5 py-1 font-mono tracking-tight font-semibold border rounded-full inline-flex items-center gap-1.5 transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-855 text-zinc-400'
+ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-400'
  }`}>
- <DublinClock prefix="Dublin Clock (IE): " />
+ Dublin Clock (IE): {irelandTime}
  </span>
+ )}
  </div>
  <h1 className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
- isLight ? 'text-zinc-900' : 'text-white'
+ isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'
  }`}>
  Sushi Ops Strategy Center
  </h1>
- <p className={`text-sm leading-relaxed max-w-2xl ${
- isLight ? 'text-zinc-600' : 'text-zinc-300'
+ <p className={`text-sm leading-relaxed ${
+ isLight ? 'text-zinc-600 text-zinc-600 text-zinc-600' : 'text-zinc-300'
  }`}>
  Premium Sushi Production Company is currently executing at <span className="text-orange-600 dark:text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Cooking objectives are on target, and waste reports show an improvement of <span className="text-emerald-600 dark:text-emerald-400 font-semibold">18.2% vs last Friday</span>.
  </p>
@@ -339,8 +467,6 @@ function OverviewTab({
 
  {/* Date-Range Selector Box */}
  <div className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
- isLight ? 'bg-zinc-50/85 border-zinc-200 shadow-sm' : 'bg-zinc-950/70 border-zinc-700'
- <div className={`relative z-10 backdrop-blur-md p-4 rounded-2xl border w-full sm:max-w-sm lg:w-64 xl:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
  isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-950/60 border-zinc-800'
  }`}>
  <div className={`flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider ${
@@ -353,8 +479,8 @@ function OverviewTab({
  <select
  value={selectedWeekRange}
  onChange={(e) => onSelectedWeekRangeChange(e.target.value)}
- className={`w-full focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 rounded-xl px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
- isLight ? 'bg-white border-zinc-200 text-orange-600 hover:text-orange-700' : 'bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-355'
+ className={`w-full focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 rounded-xl px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
+ isLight ? 'bg-white border-zinc-200 text-orange-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-700' : 'bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-355'
  }`}
  >
  <option value="2026-06-15 to 2026-06-21" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950'} font-mono text-xs`}>
@@ -386,18 +512,18 @@ function OverviewTab({
  >
  {/* Weekday Quick Select Tabs */}
  <div className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${
- isLight ? 'bg-white/95 border-zinc-200 shadow-sm' : 'bg-zinc-900/70 border-zinc-700'
+ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
  }`}>
  <div className="flex items-center gap-2">
  <Calendar className={`w-4 h-4 font-bold ${isLight ? 'text-orange-600' : 'text-orange-400'}`} />
  <span className={`text-xs font-mono uppercase tracking-wider font-bold ${
- isLight ? 'text-zinc-700' : 'text-zinc-350'
+ isLight ? 'text-zinc-700' : 'text-zinc-300'
  }`}>
  Display Mode: {activeLog.date} ({activeLog.day}) Audit
  </span>
  </div>
  <div className={`flex items-center p-1 rounded-2xl border shadow-inner transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
+ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800'
  }`}>
  {(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const).map((day) => {
  const isActive = selectedDayTab === day;
@@ -410,7 +536,7 @@ function OverviewTab({
  isActive
  ? 'bg-orange-500 text-white shadow-md'
  : isLight
- ? 'text-zinc-550 text-zinc-500 hover:text-orange-600 hover:bg-white'
+ ? 'text-zinc-500 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-600 hover:bg-white'
  : 'text-zinc-400 hover:text-white'
  }`}
  >
@@ -428,7 +554,7 @@ function OverviewTab({
  onClick={() => onNavigateTab('Sell')}
  className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
-                ? 'bg-amber-100/50 border-amber-300 hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
+                ? 'bg-amber-100/50 border-amber-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
                 : 'bg-3d-gold-dark metallic-base hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] text-white'
  }`}
  >
@@ -447,7 +573,7 @@ function OverviewTab({
  <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
  isLight 
  ? 'bg-zinc-100 border-zinc-200 text-orange-600 group-hover:bg-orange-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-850 text-orange-550 group-hover:bg-orange-500 group-hover:text-white'
+ : 'bg-zinc-950 border-zinc-800 text-orange-500 group-hover:bg-orange-500 group-hover:text-white'
  }`}>
  <TrendingUp className="w-4 h-4" />
  </div>
@@ -476,7 +602,7 @@ function OverviewTab({
  onClick={() => onNavigateTab('Production')}
  className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
-                ? 'bg-zinc-100/50 border-zinc-300 hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
+                ? 'bg-zinc-100/50 border-zinc-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
                 : 'bg-3d-silver-dark metallic-base hover:shadow-[0_0_20px_rgba(200,200,200,0.3)] text-white'
  }`}
  >
@@ -487,14 +613,14 @@ function OverviewTab({
  <h3 className={`text-2xl font-sans font-black mt-1.5 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
  {activeLog.productionMade.toLocaleString()} <span className="text-[10px] text-zinc-500 font-normal">units</span>
  </h3>
- <span className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-401 text-zinc-400'}`}>
+ <span className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400 text-zinc-400'}`}>
  Target: {activeLog.productionTarget.toLocaleString()}
  </span>
  </div>
  <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
  isLight 
  ? 'bg-zinc-100 border-zinc-200 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-850 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white'
+ : 'bg-zinc-950 border-zinc-800 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white'
  }`}>
  <Package className="w-4 h-4" />
  </div>
@@ -523,7 +649,7 @@ function OverviewTab({
  onClick={() => onNavigateTab('Waste')}
  className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
-                ? 'bg-orange-100/50 border-orange-300 hover:border-orange-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
+                ? 'bg-orange-100/50 border-orange-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-orange-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
                 : 'bg-3d-copper-dark metallic-base hover:shadow-[0_0_20px_rgba(255,150,100,0.3)] text-white'
  }`}
  >
@@ -542,7 +668,7 @@ function OverviewTab({
  <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
  isLight 
  ? 'bg-zinc-100 border-zinc-200 text-rose-600 group-hover:bg-rose-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-850 text-rose-455 group-hover:bg-rose-500 group-hover:text-white'
+ : 'bg-zinc-950 border-zinc-800 text-rose-455 group-hover:bg-rose-500 group-hover:text-white'
  }`}>
  <Trash2 className="w-4 h-4" />
  </div>
@@ -571,7 +697,7 @@ function OverviewTab({
  onClick={() => onNavigateTab('Hours')}
  className={`p-5 rounded-3xl border transition-all shadow-md cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
-                ? 'bg-zinc-100/50 border-zinc-300 hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
+                ? 'bg-zinc-100/50 border-zinc-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
                 : 'bg-3d-silver-dark metallic-base hover:shadow-[0_0_20px_rgba(200,200,200,0.3)] text-white'
  }`}
  >
@@ -589,7 +715,7 @@ function OverviewTab({
  <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
  isLight 
  ? 'bg-zinc-100 border-zinc-200 text-amber-600 group-hover:bg-amber-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-850 text-amber-400 group-hover:bg-amber-500 group-hover:text-white'
+ : 'bg-zinc-950 border-zinc-800 text-amber-400 group-hover:bg-amber-500 group-hover:text-white'
  }`}>
  <Clock className="w-4 h-4" />
  </div>
@@ -617,7 +743,7 @@ function OverviewTab({
  <div 
  className={`p-5 rounded-3xl border transition-all shadow-md group relative overflow-hidden flex flex-col justify-between ${
  isLight
-                ? 'bg-amber-100/50 border-amber-300 hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
+                ? 'bg-amber-100/50 border-amber-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
                 : 'bg-3d-gold-dark metallic-base hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] text-white'
  }`}
  >
@@ -635,7 +761,7 @@ function OverviewTab({
  <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
  isLight 
  ? 'bg-zinc-100 border-zinc-200 text-purple-600 group-hover:bg-purple-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-850 text-purple-400 group-hover:bg-purple-500 group-hover:text-white'
+ : 'bg-zinc-950 border-zinc-800 text-purple-400 group-hover:bg-purple-500 group-hover:text-white'
  }`}>
  <Settings className="w-4 h-4" />
  </div>
@@ -644,7 +770,7 @@ function OverviewTab({
  {/* Supplier Breakdowns */}
  <div className="mt-4 space-y-2 text-[9px] font-sans">
  <div>
- <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
+ <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-600 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
  <span>Tazaki (Ingredients)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.tazaki.toLocaleString()}</span>
  </div>
@@ -654,8 +780,8 @@ function OverviewTab({
  </div>
 
  <div>
- <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
- <span>BUNZL (Packaging)</span>
+ <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-600 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
+ <span>Sysco (Ssh Grains)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.sysco.toLocaleString()}</span>
  </div>
  <div className={`w-full h-1 rounded-full overflow-hidden mt-0.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
@@ -664,8 +790,8 @@ function OverviewTab({
  </div>
 
  <div>
- <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
- <span>Asia Market (Food & Condiments)</span>
+ <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-600 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
+ <span>Bulza (Display Box)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.bulza.toLocaleString()}</span>
  </div>
  <div className={`w-full h-1 rounded-full overflow-hidden mt-0.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
@@ -674,8 +800,8 @@ function OverviewTab({
  </div>
 
  <div>
- <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-650 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
- <span>VS Direct (Stickers)</span>
+ <div className={`flex justify-between font-mono ${isLight ? 'text-zinc-600 text-zinc-600 font-semibold' : 'text-zinc-400'}`}>
+ <span>Sticker (Thermal Label)</span>
  <span className={`font-semibold ${isLight ? 'text-zinc-905 text-zinc-900' : 'text-zinc-200'}`}>€{activeLog.cogs.sticker.toLocaleString()}</span>
  </div>
  <div className={`w-full h-1 rounded-full overflow-hidden mt-0.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-900'}`}>
@@ -689,7 +815,7 @@ function OverviewTab({
  </div>
 
  {/* Real-time AI Operations Shift Summary */}
- <div id="ai-shift-summary" className={`rounded-3xl border p-5 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
+ <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
  isLight ? 'bg-orange-50/50 border border-orange-200' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'
  }`}>
  <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
@@ -724,10 +850,10 @@ function OverviewTab({
  onClick={fetchShiftSummary}
  disabled={summaryLoading}
  type="button"
- className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border hover:shadow-md disabled:opacity-50 ${
+ className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${
  isLight 
  ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' 
- : 'bg-zinc-950 border-zinc-800 text-zinc-350 hover:bg-zinc-900 hover:text-white'
+ : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white'
  }`}
  >
  {summaryLoading ? (
@@ -768,7 +894,7 @@ function OverviewTab({
  "{shiftSummary || 'Selecting metrics and compiling the shift trajectory summary...'}"
  </p>
  
- <div className="flex flex-wrap items-center gap-6 mt-4 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-850 font-mono text-[10px] text-zinc-500">
+ <div className="flex flex-wrap items-center gap-6 mt-4 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-[10px] text-zinc-500">
  <div className="flex items-center gap-1.5">
  <span className={`w-2 h-2 rounded-full ${
  Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110))) >= 80 
@@ -816,7 +942,7 @@ function OverviewTab({
  chartView === 'weekly'
  ? 'bg-orange-500 text-white shadow-md'
  : isLight 
- ? 'text-zinc-500 hover:text-zinc-800' 
+ ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800' 
  : 'text-zinc-400 hover:text-white'
  }`}
  >
@@ -829,7 +955,7 @@ function OverviewTab({
  chartView === 'hourly'
  ? 'bg-orange-500 text-white shadow-md'
  : isLight 
- ? 'text-zinc-500 hover:text-zinc-800' 
+ ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800' 
  : 'text-zinc-400 hover:text-white'
  }`}
  >
@@ -900,7 +1026,7 @@ function OverviewTab({
  </div>
  <button 
  onClick={() => onNavigateTab('Target')}
- className={`text-xs font-bold inline-flex items-center gap-0.5 hover:underline ${isLight ? 'text-orange-655 text-orange-600 hover:text-orange-700' : 'text-orange-400 hover:text-orange-355'}`}
+ className={`text-xs font-bold inline-flex items-center gap-0.5  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:underline ${isLight ? 'text-orange-655 text-orange-600 hover:text-orange-700' : 'text-orange-400 hover:text-orange-355'}`}
  >
  Manage
  <ChevronRight className="w-3.5 h-3.5" />
@@ -914,7 +1040,7 @@ function OverviewTab({
  const isComplete = target.currentValue >= target.targetValue;
  return (
  <div key={target.id} className={`p-3 border rounded-2xl transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-850'
+ isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-800'
  }`}>
  <div className="flex justify-between text-xs mb-1.5 font-sans">
  <span className={`font-semibold ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>{target.name}</span>
@@ -943,14 +1069,14 @@ function OverviewTab({
 
  {/* Weekly Operational Logs & Suppliers Table */}
  <div className={`rounded-3xl p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-3d-silver-dark metallic-base drop-shadow-xl'}`}>
- <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+ <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  
  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
  isLight ? 'border-zinc-200' : 'border-zinc-805'
  }`}>
  <div className="flex items-center gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-950 border-zinc-850 text-orange-400'
+ isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-950 border-zinc-800 text-orange-400'
  }`}>
  <Activity className="w-5 h-5 flex-shrink-0" />
  </div>
@@ -990,8 +1116,8 @@ function OverviewTab({
  isSelected 
  ? 'bg-orange-500/5' 
  : isLight 
- ? 'hover:bg-zinc-50' 
- : 'hover:bg-zinc-850/50'
+ ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' 
+ : 'hover:bg-zinc-800/50'
  }`}
  >
  <td className="py-3.5 px-4 font-semibold text-zinc-250">
@@ -1002,14 +1128,14 @@ function OverviewTab({
  isSelected 
  ? 'bg-orange-500 text-white' 
  : isLight 
- ? 'text-orange-600 hover:bg-zinc-100' 
+ ? 'text-orange-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' 
  : 'text-orange-400 hover:bg-zinc-800'
  }`}
  >
  {log.day}
  </button>
  </td>
- <td className={`py-3.5 px-4 font-mono text-[11px] ${isLight ? 'text-zinc-650 text-zinc-605' : 'text-zinc-400'}`}>{log.date}</td>
+ <td className={`py-3.5 px-4 font-mono text-[11px] ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>{log.date}</td>
  <td className={`py-3.5 px-4 text-right font-mono font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>€{log.sales.toLocaleString()}</td>
  <td className="py-3.5 px-4 text-right font-mono font-semibold text-rose-605 dark:text-rose-400">€{log.waste.toFixed(2)}</td>
  <td className="py-3.5 px-4 text-right font-mono font-semibold text-amber-600 dark:text-amber-400">{log.hours} <span className="text-[10px] text-zinc-500 font-normal">h</span></td>
@@ -1028,16 +1154,16 @@ function OverviewTab({
  supplierName: val
  });
  }}
- className={`border rounded-lg py-1 px-2.5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 transition-colors text-xs font-semibold cursor-pointer ${
+ className={`border rounded-lg py-1 px-2.5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 transition-colors text-xs font-semibold cursor-pointer ${
  isLight 
- ? 'bg-zinc-50 border-zinc-200 text-zinc-800 hover:bg-white' 
+ ? 'bg-zinc-50 border-zinc-200 text-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-white' 
  : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
  }`}
  >
  <option value="Tazaki">Tazaki</option>
- <option value="Sysco">BUNZL</option>
- <option value="Bulza">Asia Market</option>
- <option value="Sticker">VS Direct - Stickers</option>
+ <option value="Sysco">Sysco</option>
+ <option value="Bulza">Bulza</option>
+ <option value="Sticker">Sticker</option>
  <option value="Others">Others</option>
  </select>
  </td>
@@ -1132,7 +1258,7 @@ function OverviewTab({
  className="w-2.5 h-2.5 rounded-sm" 
  style={{ backgroundColor: entry.color }} 
  />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-650' : 'text-zinc-400'}`}>
+ <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
  {entry.value === 'productionTarget' ? 'Production Target' : 'Production Made'}
  </span>
  </div>
@@ -1163,14 +1289,14 @@ function OverviewTab({
  <div id="weekly-production-trend" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
  isLight ? 'bg-amber-50/50 border border-amber-200' : 'bg-3d-gold-dark metallic-base drop-shadow-xl'
  }`}>
- <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+ <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  
  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
  isLight ? 'border-zinc-200' : 'border-zinc-800'
  }`}>
  <div className="flex items-center gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-indigo-600' : 'bg-zinc-950 border-zinc-800 text-indigo-400'
+ isLight ? 'bg-zinc-100 border-zinc-200 text-yellow-600' : 'bg-zinc-950 border-zinc-800 text-yellow-400'
  }`}>
  <TrendingUp className="w-5 h-5 flex-shrink-0" />
  </div>
@@ -1179,8 +1305,8 @@ function OverviewTab({
  Weekly Production Run-Rate (Trend Line)
  <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
  isLight 
- ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
- : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
+ ? 'bg-yellow-50 border-yellow-200 text-yellow-700' 
+ : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400'
  }`}>
  Trend Analysis
  </span>
@@ -1241,7 +1367,7 @@ function OverviewTab({
  className={`w-2.5 h-0.5 ${entry.value === 'productionTarget' ? 'border-t border-dashed' : 'bg-emerald-500'}`}
  style={{ borderColor: entry.value === 'productionTarget' ? (isLight ? '#71717a' : '#9ca3af') : undefined }} 
  />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-650' : 'text-zinc-400'}`}>
+ <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
  {entry.value === 'productionTarget' ? 'Production Target' : 'Production Made'}
  </span>
  </div>
@@ -1308,15 +1434,15 @@ function OverviewTab({
  <div className="flex gap-4 font-mono text-[11px] items-center">
  <div className="flex items-center gap-1.5 font-sans">
  <span className="w-2.5 h-0.5" style={{ backgroundColor: isLight ? '#71717a' : '#9ca3af' }} />
- <span className={`font-semibold ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>Est. Sales</span>
+ <span className={`font-semibold ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>Est. Sales</span>
  </div>
  <div className="flex items-center gap-1.5 font-sans">
  <span className="w-2.5 h-0.5 bg-rose-500" />
- <span className={`font-semibold ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>Est. Waste</span>
+ <span className={`font-semibold ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>Est. Waste</span>
  </div>
  <div className="flex items-center gap-1.5 font-sans">
  <span className="w-2.5 h-0.5 bg-emerald-500 font-extrabold" />
- <span className={`font-semibold ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>Est. Cumulative Profit</span>
+ <span className={`font-semibold ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>Est. Cumulative Profit</span>
  </div>
  </div>
  </div>
@@ -1398,7 +1524,7 @@ function OverviewTab({
  className="w-2.5 h-0.5"
  style={{ backgroundColor: strokeColor }} 
  />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-650' : 'text-zinc-400'}`}>
+ <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
  {label}
  </span>
  </div>
@@ -1453,8 +1579,7 @@ function OverviewTab({
  }`}>
  <div className="flex items-start gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-350 ${
- <div className={`p-3 border rounded-2xl transition-all duration-200 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-850 text-amber-500'
+ isLight ? 'bg-zinc-150 bg-zinc-100 border-zinc-200 text-amber-600' : 'bg-zinc-950 border-zinc-800 text-amber-500'
  }`}>
  <Activity className="w-5 h-5 animate-pulse" />
  </div>
@@ -1491,7 +1616,7 @@ function OverviewTab({
  !vsAverageMode
  ? 'bg-amber-600 text-white shadow-md'
  : isLight 
- ? 'text-zinc-500 hover:text-amber-700' 
+ ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
  : 'text-zinc-400 hover:text-white'
  }`}
  >
@@ -1505,7 +1630,7 @@ function OverviewTab({
  vsAverageMode
  ? 'bg-blue-600 text-white shadow-md'
  : isLight 
- ? 'text-zinc-500 hover:text-amber-700' 
+ ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
  : 'text-zinc-400 hover:text-white'
  }`}
  title={`Exclusively compare the selected branch (${selectedBranch}) against standard Company Average`}
@@ -1525,7 +1650,7 @@ function OverviewTab({
  branchComparePeriod === 'day'
  ? 'bg-amber-600 text-white shadow-md'
  : isLight 
- ? 'text-zinc-500 hover:text-amber-700' 
+ ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
  : 'text-zinc-400 hover:text-white'
  }`}
  >
@@ -1538,7 +1663,7 @@ function OverviewTab({
  branchComparePeriod === 'week'
  ? 'bg-amber-600 text-white shadow-md'
  : isLight 
- ? 'text-zinc-500 hover:text-amber-700' 
+ ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-700' 
  : 'text-zinc-400 hover:text-white'
  }`}
  >
@@ -1548,14 +1673,14 @@ function OverviewTab({
 
  {/* Metric Selector Dropdown */}
  <div className={`flex items-center gap-1.5 border rounded-xl px-2.5 py-1.5 shadow-sm transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-250 border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-800'
+ isLight ? 'bg-zinc-50 border-zinc-200 border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-800'
  }`}>
  <span className={`text-[9px] font-bold uppercase tracking-wider font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-505 text-zinc-500'}`}>Measure:</span>
  <select
  value={branchCompareMetric}
  onChange={(e) => setBranchCompareMetric(e.target.value as any)}
  className={`bg-transparent font-bold text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans outline-none font-bold ${
- isLight ? 'text-orange-700' : 'text-amber-400 hover:text-amber-300'
+ isLight ? 'text-orange-700' : 'text-amber-400  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300'
  }`}
  >
  <option value="sales" className={isLight ? 'text-zinc-900 bg-white font-bold' : 'bg-zinc-950 text-white font-bold'}>Gross Sales revenue (€)</option>
@@ -1580,7 +1705,7 @@ function OverviewTab({
  Dynamic Comparison Bar
  </span>
  <span className={`text-[10px] border rounded px-2.5 py-0.5 font-mono ${
- isLight ? 'bg-white border-zinc-200 text-zinc-700 shadow-sm' : 'bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-350'
+ isLight ? 'bg-white border-zinc-200 text-zinc-700 shadow-sm' : 'bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300'
  }`}>
  Scale: {branchCompareMetric === 'sales' ? 'Euro (€)' : branchCompareMetric === 'production' ? 'Units (Pcs)' : branchCompareMetric === 'waste' ? 'Percentage (%)' : 'Index Points (0-100)'}
  </span>
@@ -1646,7 +1771,7 @@ function OverviewTab({
  <span className="font-bold text-rose-600 dark:text-rose-450">{data.wastePct}%</span>
  </div>
  <div className={`flex justify-between gap-8 pt-1 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900'}`}>
- <span className={isLight ? 'text-zinc-605 text-zinc-600' : 'text-zinc-350'}>Efficiency Score:</span>
+ <span className={isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-300'}>Efficiency Score:</span>
  <span className="font-extrabold text-blue-600 dark:text-blue-400">{data.efficiencyScore}/100</span>
  </div>
  </div>
@@ -1712,15 +1837,15 @@ function OverviewTab({
  }`}>
  <span>🏆</span> Peak Efficiency Store
  </span>
- <span className={`font-mono font-extrabold text-[13px] ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch?.efficiencyScore ?? 0}%</span>
+ <span className={`font-mono font-extrabold text-[13px] ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch.efficiencyScore}%</span>
  </div>
 
  <div className="mt-4">
- <h4 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{championBranch?.branch || 'No branch selected'}</h4>
- <p className="text-[10px] text-zinc-500 font-mono mt-0.5 leading-none">Highest current efficiency score</p>
+ <h4 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{championBranch.fullName}</h4>
+ <p className="text-[10px] text-zinc-500 font-mono mt-0.5 leading-none">{championBranch.type}</p>
  
- <p className={`text-xs mt-3 leading-relaxed ${isLight ? 'text-zinc-650 text-zinc-600' : 'text-zinc-400'}`}>
- Analyzing overall labor costs, high-premium customer transaction margins, and minimal seafood waste, <strong className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch?.shortLabel || 'the leading branch'}</strong> holds the highest corporate return ratio at <strong className={`font-mono ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{championBranch?.laborEfficiency.toFixed(1) || '0.0'} units/hr</strong> yield per employee hour.
+ <p className={`text-xs mt-3 leading-relaxed ${isLight ? 'text-zinc-600 text-zinc-600' : 'text-zinc-400'}`}>
+ Analyzing overall labor costs, high-premium customer transaction margins, and minimal seafood waste, <strong className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch.name}</strong> holds the highest corporate return ratio at <strong className={`font-mono ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>€{championBranch.laborProd}/hr</strong> yield per employee hour.
  </p>
  </div>
  </div>
@@ -1728,11 +1853,11 @@ function OverviewTab({
  <div className={`mt-4 pt-3.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? 'border-zinc-200' : 'border-zinc-900/80'}`}>
  <div>
  <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">Labor Yield</span>
- <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-zinc-800' : 'text-white'}`}>{championBranch?.laborEfficiency.toFixed(1) || '0.0'} units/hr</span>
+ <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-zinc-800' : 'text-white'}`}>€{championBranch.laborProd}/hr</span>
  </div>
  <div>
  <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">Waste Control</span>
- <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{Math.max(0, Math.round(100 - (championBranch?.wastePct || 0)))}% Control</span>
+ <span className={`text-xs font-mono font-extrabold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{Math.max(0, Math.round(100 - championBranch.wastePct))}% Control</span>
  </div>
  </div>
  </div>
@@ -1788,7 +1913,7 @@ function OverviewTab({
  <select
  value={entryDay}
  onChange={(e) => setEntryDay(e.target.value as any)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}
  >
@@ -1808,7 +1933,7 @@ function OverviewTab({
  required
  value={entryDate}
  onChange={(e) => setEntryDate(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}
  />
@@ -1818,14 +1943,14 @@ function OverviewTab({
  <select
  value={entrySupplierName}
  onChange={(e) => setEntrySupplierName(e.target.value as any)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}
  >
  <option value="Tazaki">Tazaki</option>
- <option value="Sysco">BUNZL</option>
- <option value="Bulza">Asia Market</option>
- <option value="Sticker">VS Direct - Stickers</option>
+ <option value="Sysco">Sysco</option>
+ <option value="Bulza">Bulza</option>
+ <option value="Sticker">Sticker</option>
  <option value="Others">Others</option>
  </select>
  </div>
@@ -1835,7 +1960,7 @@ function OverviewTab({
  {/* Column A: Productivity Metrics */}
  <div className="space-y-4">
  <h4 className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
- isLight ? 'border-zinc-200 text-zinc-650 text-zinc-605' : 'border-zinc-800 text-zinc-400'
+ isLight ? 'border-zinc-200 text-zinc-600 text-zinc-600' : 'border-zinc-800 text-zinc-400'
  }`}>
  <Layers className="w-3.5 h-3.5 text-orange-400" />
  Operational & Yield Inputs
@@ -1849,7 +1974,7 @@ function OverviewTab({
  required
  value={entrySales}
  onChange={(e) => setEntrySales(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1862,7 +1987,7 @@ function OverviewTab({
  required
  value={entryWaste}
  onChange={(e) => setEntryWaste(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1874,7 +1999,7 @@ function OverviewTab({
  required
  value={entryHours}
  onChange={(e) => setEntryHours(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1886,7 +2011,7 @@ function OverviewTab({
  required
  value={entryProdTarget}
  onChange={(e) => setEntryProdTarget(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1898,7 +2023,7 @@ function OverviewTab({
  required
  value={entryProdMade}
  onChange={(e) => setEntryProdMade(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1909,7 +2034,7 @@ function OverviewTab({
  {/* Column B: Supplier COGS breakdown */}
  <div className="space-y-4">
  <h4 className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
- isLight ? 'border-zinc-200 text-zinc-650 text-zinc-605' : 'border-zinc-800 text-zinc-400'
+ isLight ? 'border-zinc-200 text-zinc-600 text-zinc-600' : 'border-zinc-800 text-zinc-400'
  }`}>
  <Settings className="w-3.5 h-3.5 text-emerald-400" />
  Supplier COGS Breakdown (GOC)
@@ -1923,46 +2048,46 @@ function OverviewTab({
  required
  value={entryTazaki}
  onChange={(e) => setEntryTazaki(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
  </div>
  <div>
- <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>BUNZL Supplier (€)</label>
+ <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Sysco Supplier (€)</label>
  <input
  type="number"
  step="0.01"
  required
  value={entrySysco}
  onChange={(e) => setEntrySysco(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
  </div>
  <div>
- <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Asia Market Supplier (€)</label>
+ <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Bulza Supplier (€)</label>
  <input
  type="number"
  step="0.01"
  required
  value={entryBulza}
  onChange={(e) => setEntryBulza(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
  </div>
  <div>
- <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>VS Direct Supplier (€)</label>
+ <label className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Sticker Supplier (€)</label>
  <input
  type="number"
  step="0.01"
  required
  value={entrySticker}
  onChange={(e) => setEntrySticker(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1975,7 +2100,7 @@ function OverviewTab({
  required
  value={entryOthers}
  onChange={(e) => setEntryOthers(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
  isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
  }`}
  />
@@ -1996,12 +2121,12 @@ function OverviewTab({
  </form>
  </div>
 
- {/* Deep Advisor: "Enable high thinking" with gemini-1.5-flash */}
+ {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
  <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
  }`}>
  <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b ${
- isLight ? 'border-zinc-250 border-zinc-200' : 'border-zinc-900'
+ isLight ? 'border-zinc-200 border-zinc-200' : 'border-zinc-900'
  }`}>
  <div className="flex items-center gap-3">
  <div className={`p-3 border rounded-2xl text-orange-400 shadow-md ${
@@ -2015,7 +2140,7 @@ function OverviewTab({
  <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
  isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300'
  }`}>
- gemini-1.5-flash
+ gemini-3.1-pro-preview
  </span>
  <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
  Thinking Level: HIGH
@@ -2027,27 +2152,24 @@ function OverviewTab({
  <span className="text-[11px] text-zinc-500 font-mono sm:text-right">Uses deep thinking tree solver</span>
  </div>
 
- <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
- <div>
+ <div className="space-y-4 mt-4">
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
- className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] font-sans rounded-2xl ${
+ className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans rounded-2xl ${
  isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
  }`}
- className={advisorTextareaClasses}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
  />
- </div>
 
  <div className="flex justify-end items-center">
  <button
  onClick={handleAskAdvisor}
  disabled={loading}
- className={`px-5 py-2.5 border rounded-xl transition-all inline-flex items-center gap-2 shadow-md hover:scale-[1.01] ${
+ className={`px-5 py-2.5 border rounded-xl transition-all inline-flex items-center gap-2 shadow-md  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-[1.01] ${
  isLight 
- ? 'bg-zinc-100 hover:bg-zinc-200 border-zinc-350 border-zinc-300 text-zinc-850 hover:text-zinc-900 font-bold text-xs' 
- : 'bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs'
+ ? 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 border-zinc-300 text-zinc-800 hover:text-zinc-900 font-bold text-xs' 
+ : 'bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs'
  }`}
  >
  {loading ? (
@@ -2077,7 +2199,7 @@ function OverviewTab({
  🧠 Thinking Process Summary (Reasoning Path):
  </span>
  <p className={`text-xs font-mono leading-relaxed whitespace-pre-wrap ${
- isLight ? 'text-zinc-650' : 'text-orange-200'
+ isLight ? 'text-zinc-600' : 'text-orange-200'
  }`}>
  {thinkingProcess}
  </p>
@@ -2107,5 +2229,3 @@ function OverviewTab({
  </div>
  );
 }
-
-export default memo(OverviewTab);

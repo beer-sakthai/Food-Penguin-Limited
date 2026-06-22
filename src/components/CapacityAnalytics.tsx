@@ -52,7 +52,7 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  <div className={`rounded-xl border p-5 shadow-sm transition-all mt-6 relative overflow-hidden ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900 text-white'
  }`}>
- <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${isLight ? 'from-indigo-400 to-indigo-300' : 'from-indigo-600 to-indigo-500'}`} />
+ <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${isLight ? 'from-yellow-400 to-yellow-300' : 'from-yellow-600 to-yellow-500'}`} />
  
  <div className="pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
@@ -70,7 +70,7 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  </div>
  <div className={`p-4 rounded-xl border flex flex-col justify-center ${isLight ? 'bg-zinc-50/80 border-zinc-200' : 'bg-zinc-900/50 border-zinc-850'}`}>
  <span className={`text-[9.5px] font-mono tracking-widest uppercase mb-1.5 opacity-80 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Avg Labor Efficiency</span>
- <div className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>
+ <div className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-yellow-600' : 'text-yellow-400'}`}>
  {avgLabor.toFixed(1)} <span className={`text-[10px] ml-0.5 tracking-normal font-sans opacity-75`}>units/hour</span>
  </div>
  </div>
@@ -107,7 +107,7 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  <span className="font-bold">{d.day}</span>
  <div className="mt-1 flex items-center gap-2">
  <span>Perf: <span className={isOver ? 'text-emerald-400' : 'text-amber-400'}>{d.perfPct.toFixed(1)}%</span></span>
- <span>Eff: <span className="text-indigo-400">{d.laborEff.toFixed(1)}</span></span>
+ <span>Eff: <span className="text-yellow-400">{d.laborEff.toFixed(1)}</span></span>
  </div>
  </div>
  <div className={`w-2 h-2 rotate-45 -mt-1 border-b border-r ${

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { useState } from 'react';
 import { InventoryItem, DailyOperationalLog } from '../types';
 import CapacityAnalytics from './CapacityAnalytics';
@@ -22,7 +21,7 @@ interface PlanningTabProps {
  weeklyLogs: DailyOperationalLog[];
 }
 
-function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyLogs }: PlanningTabProps) {
+export default function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyLogs }: PlanningTabProps) {
  const isLight = theme === 'light';
  
  // Search Grounding states
@@ -124,12 +123,12 @@ function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyL
  disabled={isSuggesting}
  className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm ${
  isLight 
- ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200'
- : 'bg-indigo-950/40 hover:bg-indigo-900/60 text-indigo-400 border border-indigo-900/50'
+ ? 'bg-yellow-50  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-yellow-100 text-yellow-700 border border-yellow-200'
+ : 'bg-yellow-950/40 hover:bg-yellow-900/60 text-yellow-400 border border-yellow-900/50'
  }`}
  >
  {isSuggesting ? (
- <span className="w-3.5 h-3.5 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+ <span className="w-3.5 h-3.5 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
  ) : (
  <BrainCircuit className="w-4 h-4" />
  )}
@@ -155,7 +154,7 @@ function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyL
  }`}>
  <div className="space-y-1 md:w-1/3">
  <div className="flex items-center gap-2">
- <span className={`font-sans font-bold text-sm ${isLight ? 'text-zinc-850' : 'text-white'}`}>{item.name}</span>
+ <span className={`font-sans font-bold text-sm ${isLight ? 'text-zinc-800' : 'text-white'}`}>{item.name}</span>
  <span className={`px-2 py-0.2 rounded font-mono text-[9px] font-bold ${statusColors(item.status)}`}>
  {item.status}
  </span>
@@ -168,7 +167,7 @@ function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyL
  <span>Reorder alert threshold: {item.reorderLevel} {item.unit}</span>
  <span className={`font-bold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>{item.currentQty} {item.unit} ({item.stockLevel}%)</span>
  </div>
- <div className={`w-full h-2 rounded-full overflow-hidden border ${isLight ? 'bg-zinc-200 border-zinc-300' : 'bg-zinc-900/80 border-zinc-850'}`}>
+ <div className={`w-full h-2 rounded-full overflow-hidden border ${isLight ? 'bg-zinc-200 border-zinc-300' : 'bg-zinc-900/80 border-zinc-800'}`}>
  <div 
  className={`h-full rounded-full transition-all duration-300 ${
  item.stockLevel <= 20 ? 'bg-rose-500' : item.stockLevel <= 50 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -180,7 +179,7 @@ function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyL
 
  <div className="md:w-40 text-right flex flex-col items-end gap-2">
  {suggestedValue != null && (
- <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${isLight ? 'bg-indigo-100 text-indigo-700' : 'bg-indigo-950/80 text-indigo-400'}`}>
+ <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${isLight ? 'bg-yellow-100 text-yellow-700' : 'bg-yellow-950/80 text-yellow-400'}`}>
  Suggest: +{suggestedValue}{item.unit}
  </span>
  )}
@@ -190,7 +189,7 @@ function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyL
  className={`px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${
  item.status === 'Healthy'
  ? isLight 
- ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200 hover:bg-zinc-100' 
+ ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' 
  : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50'
  : isLight
  ? 'bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 shadow'
@@ -214,4 +213,3 @@ function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyL
  </div>
  );
 }
-export default memo(PlanningTab);

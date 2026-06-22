@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { SalesOrder } from '../types';
 
 export const MS_PRODUCTS = [
@@ -191,7 +191,7 @@ interface SellTabProps {
   theme: 'dark' | 'light';
 }
 
-function SellTab({ selectedBranch, theme }: SellTabProps) {
+export default function SellTab({ selectedBranch, theme }: SellTabProps) {
   const isLight = theme === 'light';
   const isMS = selectedBranch === 'Marks & Spencer - Cork City';
   
@@ -306,5 +306,3 @@ function SellTab({ selectedBranch, theme }: SellTabProps) {
     </div>
   );
 }
-
-export default memo(SellTab);

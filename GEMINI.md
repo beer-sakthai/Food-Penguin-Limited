@@ -46,5 +46,6 @@ Before taking any action (either tool calls *or* responses to the user), you mus
 
 # Project-Specific Rules (Food Penguin Limited)
 - **Model Constraints**: This project STRICTLY uses **Gemini 1.5 Flash (`gemini-1.5-flash`)** for language tasks to ensure cost-free, high-speed execution. Image generation uses **`imagen-3.0-generate-001`**. Do NOT upgrade to Pro or legacy models unless instructed by the user.
+- **AI Persona**: Allow **Jules (Google AI)** to help this project. The AI Strategy Officer and AI operations should embody the helpful, precise, and advanced characteristics of Jules to assist Food Penguin Limited.
 - **UI & Design Language**: All active forms and inputs utilize a unified "gold liner" styling (`focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500` along with a custom gold shadow glow). Buttons, cards, and interactive rows include distinct micro-animations (e.g., `hover:-translate-y-0.5`, `active:scale-[0.98]`) globally.
 - **Manual AI Refresh**: To stay within the free-tier quota limits of `gemini-1.5-flash`, the application MUST NOT implement continuous or automatic background AI polling loops. All AI insights (like `fetchShiftSummary`) must be triggered manually via explicit user interactions (button clicks) or only when switching core contextual tabs, never on a timer.

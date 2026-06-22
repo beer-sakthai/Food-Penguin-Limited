@@ -1,4 +1,4 @@
-import React, { memo, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Recipe, ProductionTask } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { 
@@ -40,7 +40,7 @@ const SAMPLE_MOCK_DISHES = [
  }
 ];
 
-function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: ProductionTabProps) {
+export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: ProductionTabProps) {
  // New production cooker task form
  const [taskItem, setTaskItem] = useState('');
  const [assignedTo, setAssignedTo] = useState('Chef Skipper');
@@ -128,7 +128,7 @@ function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: Produc
  <div className="space-y-6">
  
  {/* Active Cooking Grid */}
- <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
+ <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-805 border-zinc-800">
  <div>
  <h2 className="text-base font-sans font-semibold text-white">Kitchen Thru-rate Monitoring</h2>
@@ -184,7 +184,7 @@ function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: Produc
  {task.status === 'In Queue' && (
  <button
  onClick={() => onUpdateTaskStatus(task.id, 'Cooking')}
- className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800 hover:bg-zinc-850 text-white"
+ className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white"
  >
  Cook
  </button>
@@ -192,7 +192,7 @@ function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: Produc
  {task.status === 'Cooking' && (
  <button
  onClick={() => onUpdateTaskStatus(task.id, 'Prepared')}
- className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800 hover:bg-zinc-850 text-white font-semibold"
+ className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white font-semibold"
  >
  Finish
  </button>
@@ -205,7 +205,7 @@ function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: Produc
  </div>
 
  {/* Master Recipes Catalogue */}
- <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
+ <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
  <h2 className="text-base font-sans font-semibold text-white pb-1">Ocean-to-Plate Recipe Standard</h2>
  <p className="text-xs text-zinc-500 pb-4">Approved corporate dish compositions and prep profiles</p>
 
@@ -238,5 +238,3 @@ function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskStatus }: Produc
  </div>
  );
 }
-
-export default memo(ProductionTab);

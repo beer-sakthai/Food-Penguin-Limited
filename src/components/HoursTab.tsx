@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { useState } from 'react';
 import { EmployeeHour } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
@@ -18,7 +17,7 @@ interface HoursTabProps {
  totalHoursScheduled: number;
 }
 
-function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
+export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
  // Roster AI analyzer states
  const [schedulerPrompt, setSchedulerPrompt] = useState(
  "Junior Chef Private is scheduled to open tomorrow (08:00) but requires swap with Kitchen Aide Rico, who is scheduled for the night closing. Kowalski is supervisor. Review viability."
@@ -120,7 +119,7 @@ function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: Hours
                 {hoursData.map((emp) => {
                   const variance = emp.scheduledHours - emp.actualHours;
                   return (
-                    <tr key={emp.id} className="bg-zinc-900 hover:bg-zinc-800/50 transition-colors">
+                    <tr key={emp.id} className="bg-zinc-900  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800/50 transition-colors">
                       <td className="px-4 py-3 font-medium text-zinc-200">{emp.name}</td>
                       <td className="px-4 py-3 text-[10px] font-mono text-zinc-400">
                         <span className="uppercase font-bold">{emp.role}</span>
@@ -148,5 +147,3 @@ function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: Hours
     </div>
   );
 }
-
-export default memo(HoursTab);

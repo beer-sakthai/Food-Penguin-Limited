@@ -1,5 +1,4 @@
 import {
-  BranchOperationalWeekMap,
   CoreMetrics,
   SalesOrder,
   CompanyTarget,
@@ -9,9 +8,7 @@ import {
   EmployeeHour,
   InventoryItem,
   RealtimeAlert,
-  DailyOperationalLog,
-  OperationalDay,
-  SupplierName
+  DailyOperationalLog
 } from './types';
 
 export const initialMetrics: CoreMetrics = {
@@ -384,152 +381,3 @@ export const alternativeWeeklyLogsMap: Record<string, DailyOperationalLog[]> = {
   ]
 };
 
-export const WEEK_RANGE_OPTIONS = [
-  '2026-06-15 to 2026-06-21',
-  '2026-06-22 to 2026-06-28',
-  '2026-06-08 to 2026-06-14',
-] as const;
-
-export const DEFAULT_WEEK_RANGE = WEEK_RANGE_OPTIONS[0];
-
-const BRANCH_SPLIT_PROFILES: Record<string, {
-  shortLabel: string;
-  salesWeights: number[];
-  productionWeights: number[];
-  targetWeights: number[];
-  wasteWeights: number[];
-  hoursWeights: number[];
-  cogsWeights: number[];
-  supplierCycle: SupplierName[];
-}> = {
-  'Marks & Spencer - Cork City': {
-    shortLabel: 'M&S Cork',
-    salesWeights: [0.44, 0.43, 0.42, 0.43, 0.44, 0.45, 0.44],
-    productionWeights: [0.39, 0.39, 0.38, 0.39, 0.40, 0.40, 0.39],
-    targetWeights: [0.39, 0.39, 0.39, 0.39, 0.40, 0.40, 0.39],
-    wasteWeights: [0.27, 0.26, 0.25, 0.25, 0.26, 0.26, 0.27],
-    hoursWeights: [0.35, 0.35, 0.34, 0.34, 0.35, 0.35, 0.34],
-    cogsWeights: [0.42, 0.41, 0.41, 0.42, 0.42, 0.43, 0.42],
-    supplierCycle: ['Tazaki', 'Tazaki', 'Sysco', 'Tazaki', 'Tazaki', 'Tazaki', 'Others'],
-  },
-  'Tesco - Cork City': {
-    shortLabel: 'Tesco Cork',
-    salesWeights: [0.32, 0.33, 0.34, 0.33, 0.33, 0.32, 0.33],
-    productionWeights: [0.36, 0.36, 0.37, 0.36, 0.35, 0.35, 0.36],
-    targetWeights: [0.36, 0.36, 0.36, 0.36, 0.35, 0.35, 0.36],
-    wasteWeights: [0.36, 0.36, 0.37, 0.37, 0.36, 0.36, 0.36],
-    hoursWeights: [0.35, 0.35, 0.36, 0.35, 0.35, 0.35, 0.35],
-    cogsWeights: [0.34, 0.34, 0.35, 0.34, 0.34, 0.33, 0.34],
-    supplierCycle: ['Sysco', 'Sysco', 'Bulza', 'Sysco', 'Others', 'Sysco', 'Others'],
-  },
-  'Tesco - Mahon Point': {
-    shortLabel: 'Tesco Mahon',
-    salesWeights: [0.24, 0.24, 0.24, 0.24, 0.23, 0.23, 0.23],
-    productionWeights: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
-    targetWeights: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
-    wasteWeights: [0.37, 0.38, 0.38, 0.38, 0.38, 0.38, 0.37],
-    hoursWeights: [0.30, 0.30, 0.30, 0.31, 0.30, 0.30, 0.31],
-    cogsWeights: [0.24, 0.25, 0.24, 0.24, 0.24, 0.24, 0.24],
-    supplierCycle: ['Others', 'Bulza', 'Others', 'Sticker', 'Others', 'Tazaki', 'Others'],
-  },
-};
-
-function roundMoney(value: number): number {
-  return Number(value.toFixed(2));
-}
-
-function scaleCogs(log: DailyOperationalLog, weight: number) {
-  return {
-    tazaki: roundMoney(log.cogs.tazaki * weight),
-    sysco: roundMoney(log.cogs.sysco * weight),
-    bulza: roundMoney(log.cogs.bulza * weight),
-    sticker: roundMoney(log.cogs.sticker * weight),
-    others: roundMoney(log.cogs.others * weight),
-  };
-}
-
-function buildBranchWeekLogs(baseWeekLogs: DailyOperationalLog[], branch: keyof typeof BRANCH_SPLIT_PROFILES): DailyOperationalLog[] {
-  const profile = BRANCH_SPLIT_PROFILES[branch];
-
-  return baseWeekLogs.map((log, index) => ({
-    day: log.day,
-    date: log.date,
-    sales: Math.round(log.sales * profile.salesWeights[index]),
-    waste: roundMoney(log.waste * profile.wasteWeights[index]),
-    hours: roundMoney(log.hours * profile.hoursWeights[index]),
-    productionTarget: Math.round(log.productionTarget * profile.targetWeights[index]),
-    productionMade: Math.round(log.productionMade * profile.productionWeights[index]),
-    supplierName: profile.supplierCycle[index] || log.supplierName,
-    cogs: scaleCogs(log, profile.cogsWeights[index]),
-  }));
-}
-
-export const branchWeeklyLogsMap: BranchOperationalWeekMap = Object.fromEntries(
-  WEEK_RANGE_OPTIONS.map((range) => {
-    const baseLogs = alternativeWeeklyLogsMap[range];
-    return [
-      range,
-      Object.fromEntries(
-        Object.keys(BRANCH_SPLIT_PROFILES).map((branch) => [
-          branch,
-          buildBranchWeekLogs(baseLogs, branch as keyof typeof BRANCH_SPLIT_PROFILES),
-        ]),
-      ),
-    ];
-  }),
-);
-
-export function buildCoreMetricsFromLog(log: DailyOperationalLog): CoreMetrics {
-  return {
-    salesToday: log.sales,
-    salesGrowth: 12.4,
-    productionItems: log.productionMade,
-    productionTarget: log.productionTarget,
-    wasteCost: log.waste,
-    wasteReduction: 18.2,
-    hoursScheduled: log.hours,
-    overtimeHours: 0,
-    aiHealthScore: Math.round(
-      Math.min(
-        100,
-        Math.max(50, 90 + (log.productionMade / (log.productionTarget || 1)) * 10 - (log.waste / (log.sales || 1)) * 50),
-      ),
-    ),
-  };
-}
-
-export function aggregateDailyLogs(logsByBranch: Record<string, DailyOperationalLog[]>, day: OperationalDay): DailyOperationalLog {
-  const branchLogs = Object.values(logsByBranch)
-    .map((logs) => logs.find((log) => log.day === day))
-    .filter((log): log is DailyOperationalLog => Boolean(log));
-
-  const firstLog = branchLogs[0];
-  const totalCogs = branchLogs.reduce(
-    (acc, log) => ({
-      tazaki: acc.tazaki + log.cogs.tazaki,
-      sysco: acc.sysco + log.cogs.sysco,
-      bulza: acc.bulza + log.cogs.bulza,
-      sticker: acc.sticker + log.cogs.sticker,
-      others: acc.others + log.cogs.others,
-    }),
-    { tazaki: 0, sysco: 0, bulza: 0, sticker: 0, others: 0 },
-  );
-
-  return {
-    day,
-    date: firstLog?.date || '',
-    sales: Math.round(branchLogs.reduce((sum, log) => sum + log.sales, 0)),
-    waste: roundMoney(branchLogs.reduce((sum, log) => sum + log.waste, 0)),
-    hours: roundMoney(branchLogs.reduce((sum, log) => sum + log.hours, 0)),
-    productionTarget: Math.round(branchLogs.reduce((sum, log) => sum + log.productionTarget, 0)),
-    productionMade: Math.round(branchLogs.reduce((sum, log) => sum + log.productionMade, 0)),
-    supplierName: firstLog?.supplierName || 'Others',
-    cogs: {
-      tazaki: roundMoney(totalCogs.tazaki),
-      sysco: roundMoney(totalCogs.sysco),
-      bulza: roundMoney(totalCogs.bulza),
-      sticker: roundMoney(totalCogs.sticker),
-      others: roundMoney(totalCogs.others),
-    },
-  };
-}

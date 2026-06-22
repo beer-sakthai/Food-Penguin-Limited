@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WasteRecord, DailyOperationalLog, CompanyTarget } from '../types';
 import { 
  PieChart, 
@@ -35,7 +35,7 @@ interface WasteTabProps {
  theme?: 'light' | 'dark';
 }
 
-function WasteTab({
+export default function WasteTab({ 
  wasteRecords, 
  onAddWaste, 
  totalCostToday, 
@@ -100,7 +100,7 @@ function WasteTab({
  const PIE_COLORS: Record<string, string> = {
  'Expired': '#f43f5e', // rose-500
  'Overproduced': '#f59e0b', // amber-500
- 'Quality Issue': '#6366f1', // indigo-500
+ 'Quality Issue': '#6366f1', // yellow-500
  'Spill/Accident': '#64748b' // slate-500
  };
 
@@ -164,7 +164,7 @@ function WasteTab({
  switch (reasonStr) {
  case 'Expired': return isLight ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-rose-950/40 text-rose-400 border border-rose-900/40';
  case 'Overproduced': return isLight ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-amber-950/40 text-amber-450 border border-amber-900/40';
- case 'Quality Issue': return isLight ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-indigo-950/40 text-indigo-400 border border-indigo-900/40';
+ case 'Quality Issue': return isLight ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-yellow-950/40 text-yellow-400 border border-yellow-900/40';
  case 'Spill/Accident': return isLight ? 'bg-zinc-100 text-zinc-700 border border-zinc-300' : 'bg-zinc-950 text-zinc-400 border border-zinc-800';
  default: return isLight ? 'bg-zinc-100 text-zinc-700' : 'bg-zinc-950 text-zinc-400';
  }
@@ -204,7 +204,7 @@ function WasteTab({
 
  <div className="mt-8">
  <div className={`w-full h-2 rounded-full overflow-hidden border ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-850'
+ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
  }`}>
  <div 
  className="bg-rose-500 h-full rounded-full transition-all duration-500"
@@ -273,7 +273,7 @@ function WasteTab({
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-dashed border-zinc-700/20">
  <div className="flex items-center gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-rose-600' : 'bg-zinc-950 border-zinc-850 text-rose-400'
+ isLight ? 'bg-zinc-100 border-zinc-200 text-rose-600' : 'bg-zinc-950 border-zinc-800 text-rose-400'
  }`}>
  <TrendingDown className="w-5 h-5 flex-shrink-0" />
  </div>
@@ -371,7 +371,7 @@ function WasteTab({
  <div className="overflow-x-auto">
  <table className="w-full text-left text-xs">
  <thead className={`font-mono text-[10px] uppercase tracking-wider border-b ${
- isLight ? 'bg-zinc-50 text-zinc-650 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800'
+ isLight ? 'bg-zinc-50 text-zinc-600 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800'
  }`}>
  <tr>
  <th className="py-3 px-4">Waste Item</th>
@@ -383,7 +383,7 @@ function WasteTab({
  </thead>
  <tbody className={`divide-y ${isLight ? 'divide-zinc-200' : 'divide-zinc-805/60'}`}>
  {wasteRecords.map((rec) => (
- <tr key={rec.id} className={`transition-colors ${isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-950/50'}`}>
+ <tr key={rec.id} className={`transition-colors ${isLight ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' : 'hover:bg-zinc-950/50'}`}>
  <td className={`py-3 px-4 font-bold ${isLight ? 'text-zinc-900' : 'text-white'}`}>{rec.item}</td>
  <td className={`py-3 px-4 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{rec.category}</td>
  <td className="py-3 px-4 text-center font-mono font-medium">{rec.weight.toFixed(1)} kg</td>
@@ -404,5 +404,3 @@ function WasteTab({
  </div>
  );
 }
-
-export default memo(WasteTab);

@@ -1,17 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
+import { jsPDF } from 'jspdf';
 import {
+ initialMetrics,
  initialOrders,
  initialTargets,
+ initialRecipes,
+ initialTasks,
  initialWaste,
  initialHours,
  initialInventory,
- branchWeeklyLogsMap as seededBranchWeeklyLogsMap,
- buildCoreMetricsFromLog,
- DEFAULT_WEEK_RANGE,
- WEEK_RANGE_OPTIONS,
+ initialWeeklyLogs,
+ alternativeWeeklyLogsMap
 } from './data';
 import {
- BranchOperationalWeekMap,
  CoreMetrics,
  SalesOrder,
  CompanyTarget,
@@ -32,36 +33,16 @@ import ProductionTab from './components/ProductionTab';
 import WasteTab from './components/WasteTab';
 import HoursTab from './components/HoursTab';
 import PlanningTab from './components/PlanningTab';
-import SupplierTab from './components/SupplierTab';
-import CompanyKpiTab from './components/CompanyKpiTab';
+import EnergyTab from './components/EnergyTab';
+import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
-import DublinClock from './components/DublinClock';
-import {
-  BRANCHES,
-  buildRecipesForBranch,
-  buildTasksForBranch,
-  formatBranchLabel,
-  formatBranchOptionLabel,
-  rolePermissions,
-  type BranchName,
-  type UserRole,
-} from './lib/branchConfig';
-import {
-  buildDailyCapacityBreakdown,
-  calculateProjectedCapacityPct,
-  downloadCapacityCsv,
-  downloadCapacityPdf,
-  sortDailyCapacityBreakdown,
-  type CapacityOverride,
-  type CapacitySortBy,
-  type CapacitySmoothing,
-} from './lib/capacityReports';
 
 
 // Main Icons
 import {
- LayoutDashboard, Camera,
+ LayoutDashboard, Camera, Menu, X,
  Coins,
+ Zap,
  ShieldCheck,
  ChefHat,
  Trash2,
@@ -85,6 +66,11 @@ import {
  Store
 } from 'lucide-react';
 
+const rolePermissions: Record<'Admin' | 'Manager' | 'Staff', string[]> = {
+ Admin: ['Overview', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Studio'],
+ Manager: ['Overview', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Studio'],
+ Staff: ['Overview', 'Sell', 'Production', 'Energy', 'Waste']
+};
 
 export default function App() {
  // App States
@@ -104,43 +90,99 @@ export default function App() {
  } catch (_) {}
  };
 
- useEffect(() => {
- if (typeof document === 'undefined') return;
- const isDark = theme === 'dark';
- document.documentElement.classList.toggle('dark', isDark);
- document.body.classList.toggle('dark', isDark);
- document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
- }, [theme]);
-
  const [activeTab, setActiveTab] = useState<string>('Overview');
- const [userRole, setUserRole] = useState<UserRole>('Admin');
- const [selectedBranch, setSelectedBranch] = useState<BranchName>(BRANCHES[0]);
- const [metrics, setMetrics] = useState<CoreMetrics>(() => buildCoreMetricsFromLog(seededBranchWeeklyLogsMap[DEFAULT_WEEK_RANGE][BRANCHES[0]][6]));
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+ const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff'>('Admin');
+ const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
+ const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
  const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
 
- const recipes = useMemo<Recipe[]>(() => buildRecipesForBranch(selectedBranch), [selectedBranch]);
+ const recipes = useMemo<Recipe[]>(() => {
+ const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+ const activeProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
 
- const [tasks, setTasks] = useState<ProductionTask[]>(() => buildTasksForBranch(selectedBranch));
-
- const handleSelectBranch = (branch: BranchName) => {
- setSelectedBranch(branch);
- setTasks(buildTasksForBranch(branch));
+ const getIngredients = (category: string, name: string) => {
+ const lowerName = name.toLowerCase();
+ if (lowerName.includes('salmon')) {
+ return ['Atlantic Salmon Fillet', 'Fresh Wasabi Paste', 'Premium Sushi Rice', 'Grated Daikon Radish', 'Soy Sauce'];
+ }
+ if (lowerName.includes('chicken')) {
+ return ['Free-range Chicken Fillet', 'Katsu Curry Sauce', 'Panko Breadcrumbs', 'Seasoned Jasmine Rice', 'Spring Onions'];
+ }
+ if (lowerName.includes('tofu') || lowerName.includes('veggie') || lowerName.includes('plant')) {
+ return ['Pressed Silken Tofu', 'Fresh Avocado', 'Cucumber ribbon', 'Mixed Sesame seeds', 'Sweet Glaze Drizzle'];
+ }
+ if (category === 'Sushi Rolls' || category === 'Maki Rolls' || category === 'Nigiri Duos') {
+ return ['Seasoned Hinohikari Rice', 'Premium Toasted Nori Sheets', 'Crispy Cucumber', 'Kyoto Japanese Mayo', 'Soy Glaze'];
+ }
+ if (category === 'Noodles & Sides' || lowerName.includes('noodles')) {
+ return ['Fresh Udon Grains', 'Julienned Sweet Peppers', 'Savory Soy Brew sauce', 'Crushed Peanuts', 'Chili Flakes'];
+ }
+ if (category === 'Desserts & Sweets' || lowerName.includes('mochi')) {
+ return ['Sweetened Rice Flour Paste', 'Artisanal Ice Cream Core', 'Powdered Starch coating', 'Natural Strawberry syrup'];
+ }
+ return ['Hand-picked Nori', 'Select Sushi Rice', 'Signature Dipping Sauce', 'Crisp Cucumber slice'];
  };
+
+ const getAllergens = (category: string, name: string) => {
+ const lowerName = name.toLowerCase();
+ const allergens: string[] = [];
+ if (lowerName.includes('salmon') || lowerName.includes('fish')) allergens.push('Fish');
+ if (lowerName.includes('chicken')) allergens.push('Gluten');
+ if (lowerName.includes('tofu') || lowerName.includes('veggie')) allergens.push('Soya');
+ if (lowerName.includes('noodles') || lowerName.includes('gyoza') || lowerName.includes('katsu')) {
+ if (!allergens.includes('Gluten')) allergens.push('Gluten');
+ }
+ if (lowerName.includes('mochi')) allergens.push('Milk');
+ if (category.toLowerCase().includes('roll')) {
+ allergens.push('Sesame');
+ }
+ if (allergens.length === 0) allergens.push('Soya');
+ return allergens;
+ };
+
+ return activeProducts.map((p, idx) => ({
+ id: `${isMS ? 'R-MS' : 'R-T'}-${idx + 1}`,
+ name: p.name,
+ category: p.category,
+ status: 'active' as const,
+ prepTime: Math.min(15, Math.max(3, Math.round(p.price * 1.2))),
+ ingredients: getIngredients(p.category, p.name),
+ allergens: getAllergens(p.category, p.name)
+ }));
+ }, [selectedBranch]);
+
+ const [tasks, setTasks] = useState<ProductionTask[]>(initialTasks);
+
+ // Sync tasks list with active branch products on branch switch
+ useEffect(() => {
+ const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+ const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+
+ if (products.length >= 4) {
+ setTasks([
+ { id: 'PT-301', itemName: products[0].name, assignedTo: 'Chef Skipper', status: 'Cooking', quantity: 2, priority: 'high' },
+ { id: 'PT-302', itemName: products[1].name, assignedTo: 'Chef Private', status: 'Cooking', quantity: 1, priority: 'medium' },
+ { id: 'PT-303', itemName: products[2].name, assignedTo: 'Kitchen Aide Rico', status: 'In Queue', quantity: 3, priority: 'low' },
+ { id: 'PT-304', itemName: products[3 % products.length].name, assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 4, priority: 'high' }
+ ]);
+ }
+ }, [selectedBranch]);
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
  const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
- const [selectedWeekRange, setSelectedWeekRange] = useState<string>(DEFAULT_WEEK_RANGE);
- const [weeklyLogsMap, setWeeklyLogsMap] = useState<BranchOperationalWeekMap>(seededBranchWeeklyLogsMap);
+ const [selectedWeekRange, setSelectedWeekRange] = useState<string>('2026-06-15 to 2026-06-21');
+ const [weeklyLogsMap, setWeeklyLogsMap] = useState<Record<string, DailyOperationalLog[]>>(alternativeWeeklyLogsMap);
  const [isCapacityExpanded, setIsCapacityExpanded] = useState<boolean>(false);
- const [capacitySortBy, setCapacitySortBy] = useState<CapacitySortBy>('date');
+ const [capacitySortBy, setCapacitySortBy] = useState<'date' | 'bottleneck'>('date');
  const [bottleneckThreshold, setBottleneckThreshold] = useState<number>(90);
- const [capacitySmoothing, setCapacitySmoothing] = useState<CapacitySmoothing>('raw');
+ const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
 
  // Quick Adjust simulated capacity overrides states
  const [quickAdjustEnabled, setQuickAdjustEnabled] = useState<boolean>(false);
- const [capacityOverrides, setCapacityOverrides] = useState<CapacityOverride>({});
+ const [capacityOverrides, setCapacityOverrides] = useState<Record<string, { mode: 'ai' | 'manual'; value: number }>>({});
  const [globalAdjustValue, setGlobalAdjustValue] = useState<number>(100);
 
  // Email report schedule states
@@ -188,15 +230,14 @@ export default function App() {
 
  const handleGlobalOverride = () => {
  if (!weeklyLogs) return;
- const newOverrides: CapacityOverride = {};
+ const newOverrides: Record<string, { mode: 'ai' | 'manual'; value: number }> = {};
  weeklyLogs.forEach(log => {
  newOverrides[log.day] = { mode: 'manual', value: globalAdjustValue };
  });
  setCapacityOverrides(newOverrides);
  };
 
- const weeklyLogsByBranch = weeklyLogsMap[selectedWeekRange] || seededBranchWeeklyLogsMap[DEFAULT_WEEK_RANGE];
- const weeklyLogs = weeklyLogsByBranch[selectedBranch] || seededBranchWeeklyLogsMap[DEFAULT_WEEK_RANGE][selectedBranch];
+ const weeklyLogs = weeklyLogsMap[selectedWeekRange] || alternativeWeeklyLogsMap['2026-06-15 to 2026-06-21'];
 
  // Keep metrics in perfect alignment with selected week range and logs
  useEffect(() => {
@@ -212,9 +253,58 @@ export default function App() {
  aiHealthScore: Math.round(Math.min(100, Math.max(50, 90 + (sundayLog.productionMade / sundayLog.productionTarget) * 10 - (sundayLog.waste / sundayLog.sales) * 50)))
  }));
  }
- }, [weeklyLogs]);
+ }, [selectedWeekRange, weeklyLogsMap]);
 
+ // Polling mechanism to simulate real-time operational database updates every 60 seconds
+ useEffect(() => {
+ const intervalId = setInterval(() => {
+ setMetrics(prev => {
+ // Slightly randomize metrics.salesToday by +/- 2%
+ const percentChange = (Math.random() * 0.04 - 0.02);
+ const newSalesToday = Number((prev.salesToday * (1 + percentChange)).toFixed(2));
+ 
+ // Slightly randomize metrics.productionItems by a small integer delta (+/- 1-2 items)
+ const productionDelta = Math.floor(Math.random() * 5) - 2;
+ const newProductionItems = Math.max(0, prev.productionItems + productionDelta);
 
+ // Recompute the real-time AI Health Score based on updated figures
+ const newHealth = Math.round(Math.min(100, Math.max(50, 90 + (newProductionItems / (prev.productionTarget || 1)) * 10 - (prev.wasteCost / (newSalesToday || 1)) * 50)));
+
+ return {
+ ...prev,
+ salesToday: newSalesToday,
+ productionItems: newProductionItems,
+ aiHealthScore: newHealth
+ };
+ });
+ }, 60000);
+
+ return () => clearInterval(intervalId);
+ }, []);
+
+ // Ireland real-time Clock state (Dublin)
+ const [irelandTime, setIrelandTime] = useState<string>('');
+
+ useEffect(() => {
+ const updateTime = () => {
+ const now = new Date();
+ const formatter = new Intl.DateTimeFormat('en-IE', {
+ timeZone: 'Europe/Dublin',
+ weekday: 'short',
+ year: 'numeric',
+ month: 'short',
+ day: '2-digit',
+ hour: '2-digit',
+ minute: '2-digit',
+ second: '2-digit',
+ hour12: false
+ });
+ setIrelandTime(formatter.format(now));
+ };
+ updateTime();
+ const intervalId = setInterval(updateTime, 1000);
+ return () => clearInterval(intervalId);
+ }, []);
 
  // Sync core metrics periodically if mock transactions run
  const totalWasteCost = wasteRecords.reduce((acc, row) => acc + row.cost, 0);
@@ -224,39 +314,358 @@ export default function App() {
  const capacityPct = Math.round(Math.min((metrics.productionItems / metrics.productionTarget) * 80, 100));
 
  // Daily breakdown of 7-day projected capacity for the expandable section
- const dailyCapacityBreakdown = useMemo(() => buildDailyCapacityBreakdown({
- weeklyLogs,
- capacitySmoothing,
- quickAdjustEnabled,
- capacityOverrides
- }), [weeklyLogs, capacitySmoothing, quickAdjustEnabled, capacityOverrides]);
+ const dailyCapacityBreakdown = useMemo(() => {
+ if (!weeklyLogs || weeklyLogs.length === 0) return [];
+ 
+ const midIdx = Math.floor(weeklyLogs.length / 2);
+ const firstHalf = weeklyLogs.slice(0, midIdx);
+ const secondHalf = weeklyLogs.slice(midIdx);
+
+ const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
+ const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
+
+ const trendFactor = secondHalfRate / (firstHalfRate || 1);
+
+ const rawList = weeklyLogs.map(log => {
+ const dailyCurrentPct = Math.round(Math.min((log.productionMade / (log.productionTarget || 1)) * 80, 100));
+ const rawDailyProjection = Math.round(dailyCurrentPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
+ let dailyProjectedPct = isNaN(rawDailyProjection) || rawDailyProjection <= 0
+ ? Math.min(100, Math.max(0, dailyCurrentPct + 4))
+ : Math.min(100, rawDailyProjection);
+
+ // Support live 'What-If' manual overrides when Quick Adjust mode is active
+ if (quickAdjustEnabled) {
+ const override = capacityOverrides[log.day];
+ if (override && override.mode === 'manual') {
+ dailyProjectedPct = override.value;
+ }
+ }
+
+ return {
+ day: log.day,
+ date: log.date.substring(5), // simplified 'MM-DD'
+ current: dailyCurrentPct,
+ projected: dailyProjectedPct
+ };
+ });
+
+ if (capacitySmoothing === 'smoothed') {
+ // Apply 3-day moving average centering around current index to reduce visual spikes
+ return rawList.map((item, idx) => {
+ const neighbors = [item];
+ if (idx > 0) neighbors.push(rawList[idx - 1]);
+ if (idx < rawList.length - 1) neighbors.push(rawList[idx + 1]);
+
+ const avgCurrent = Math.round(neighbors.reduce((sum, n) => sum + n.current, 0) / neighbors.length);
+ const avgProjected = Math.round(neighbors.reduce((sum, n) => sum + n.projected, 0) / neighbors.length);
+
+ return {
+ ...item,
+ current: avgCurrent,
+ projected: avgProjected
+ };
+ });
+ }
+
+ return rawList;
+ }, [weeklyLogs, capacitySmoothing, quickAdjustEnabled, capacityOverrides]);
 
  // Determine rolling 7-day predictive capacity projection based on operational rates of the selected week context
- const projectedCapacityPct = useMemo(() => calculateProjectedCapacityPct({
- weeklyLogs,
- capacityPct,
- quickAdjustEnabled,
- dailyCapacityBreakdown
- }), [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
+ const projectedCapacityPct = useMemo(() => {
+ // If Quick Adjust simulation mode is active, the global projection is computed as the simple average of daily projected capacities
+ if (quickAdjustEnabled && dailyCapacityBreakdown && dailyCapacityBreakdown.length > 0) {
+ return Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / dailyCapacityBreakdown.length);
+ }
+
+ if (!weeklyLogs || weeklyLogs.length === 0) return capacityPct;
+
+ const totalMade = weeklyLogs.reduce((sum, log) => sum + log.productionMade, 0);
+ const totalTarget = weeklyLogs.reduce((sum, log) => sum + log.productionTarget, 0);
+ const baseRate = totalTarget > 0 ? (totalMade / totalTarget) : 0.8;
+
+ // Estimate relative trend/momentum comparing the back-half of week with front-half
+ const midIdx = Math.floor(weeklyLogs.length / 2);
+ const firstHalf = weeklyLogs.slice(0, midIdx);
+ const secondHalf = weeklyLogs.slice(midIdx);
+
+ const firstHalfRate = firstHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (firstHalf.length || 1);
+ const secondHalfRate = secondHalf.reduce((sum, l) => sum + (l.productionMade / (l.productionTarget || 1)), 0) / (secondHalf.length || 1);
+
+ const trendFactor = secondHalfRate / (firstHalfRate || 1);
+ 
+ // Core predictive calculation: current baseline capacity adjusted by rolling trend momentum
+ const rawProjection = Math.round(capacityPct * Math.max(0.85, Math.min(1.25, trendFactor || 1)));
+
+ return isNaN(rawProjection) || rawProjection <= 0 
+ ? Math.min(100, Math.max(0, capacityPct + 4)) 
+ : Math.min(100, rawProjection);
+ }, [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
  
  // Sorted daily capacity breakdown based on selected sort order (Chronological vs Bottleneck Intensity)
- const sortedDailyCapacityBreakdown = useMemo(() => sortDailyCapacityBreakdown(dailyCapacityBreakdown, capacitySortBy), [dailyCapacityBreakdown, capacitySortBy]);
+ const sortedDailyCapacityBreakdown = useMemo(() => {
+ const list = [...dailyCapacityBreakdown];
+ if (capacitySortBy === 'bottleneck') {
+ return list.sort((a, b) => b.projected - a.projected);
+ }
+ return list; // 'date' is default chronological order of weeklyLogs
+ }, [dailyCapacityBreakdown, capacitySortBy]);
  
  // Export Daily projected capacity as a CSV string file download
  const handleExportCapacityCSV = () => {
- downloadCapacityCsv(dailyCapacityBreakdown, selectedWeekRange);
+ if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
+ 
+ const headers = ['Day', 'Date', 'Current Capacity (%)', 'Projected Capacity (%)'];
+ const rows = dailyCapacityBreakdown.map(item => [
+ item.day,
+ item.date,
+ item.current,
+ item.projected
+ ]);
+ 
+ const csvContent = [
+ headers.join(','),
+ ...rows.map(row => row.map(val => `"${val}"`).join(','))
+ ].join('\n');
+ 
+ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+ const url = URL.createObjectURL(blob);
+ const link = document.createElement('a');
+ link.href = url;
+ link.setAttribute('download', `weekly_capacity_breakdown_${selectedWeekRange.replace(/\s+/g, '_')}.csv`);
+ document.body.appendChild(link);
+ link.click();
+ document.body.removeChild(link);
+ URL.revokeObjectURL(url);
  };
 
- // Export Daily projected capacity as a styled PDF summary document for reporting purposes
+ // Export Daily projected capacity as a stunning, styled PDF summary document for reporting purposes
  const handleExportCapacityPDF = () => {
- downloadCapacityPdf({
- dailyCapacityBreakdown,
- sortedDailyCapacityBreakdown,
- selectedWeekRange,
- bottleneckThreshold,
- capacitySmoothing,
- capacitySortBy
+ if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
+
+ // Initialize portrait PDF (A4 size page dimensions: 210mm x 297mm)
+ const doc = new jsPDF({
+ orientation: 'portrait',
+ unit: 'mm',
+ format: 'a4'
  });
+
+ // Helper color palette following the elegant Slate & Amber UI dashboard theme
+ const primaryColor = [24, 24, 27]; // Dark Slate (Zinc 900)
+ const accentColor = [249, 115, 22]; // Orange 500
+ const lightBg = [244, 244, 245]; // Light Gray (Zinc 100)
+ const alertColor = [239, 68, 68]; // Red 500
+ const amberAlert = [217, 119, 6]; // Amber 600
+ const textGray = [113, 113, 122]; // Zinc 500
+
+ // --- Page Header Background Accent Banner ---
+ doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.rect(0, 0, 210, 42, 'F');
+
+ // Header Metadata & Typography branding
+ doc.setTextColor(255, 255, 255);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(15);
+ doc.text('BAKERY OPERATIONAL CORE SUITE', 15, 14);
+
+ doc.setFont('helvetica', 'normal');
+ doc.setFontSize(9.5);
+ doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+ doc.text('PREDICTIVE WEEKLY CAPACITY PROJECTION REPORT', 15, 20);
+
+ doc.setTextColor(161, 161, 170); // Zinc 400
+ doc.setFontSize(8);
+ doc.text(`Active Calendar Frame: ${selectedWeekRange}`, 15, 26);
+ doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US')}`, 15, 30);
+
+ // Dynamic watermarked badge
+ doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
+ doc.rect(168, 10, 27, 5, 'F');
+ doc.setTextColor(255, 255, 255);
+ doc.setFontSize(7);
+ doc.setFont('helvetica', 'bold');
+ doc.text('ANALYTICS ENGINE', 170, 13.5);
+
+ // --- KPIs / Summary Metric Cards Banner ---
+ let yPos = 52;
+ 
+ const totalDays = dailyCapacityBreakdown.length;
+ const avgProjected = Math.round(dailyCapacityBreakdown.reduce((sum, item) => sum + item.projected, 0) / totalDays);
+ const maxProjectedItem = [...dailyCapacityBreakdown].sort((a, b) => b.projected - a.projected)[0];
+ const bottlenecksCount = dailyCapacityBreakdown.filter(item => item.projected > bottleneckThreshold).length;
+
+ // Background container sheet for key summaries
+ doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]);
+ doc.roundedRect(15, yPos, 180, 25, 2.5, 2.5, 'F');
+
+ // KPI Box 1: Average Load
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(8.5);
+ doc.text('AVERAGE LOAD FACTOR', 22, yPos + 7);
+ doc.setFontSize(14);
+ doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+ doc.text(`${avgProjected}%`, 22, yPos + 17);
+
+ // KPI Box 2: Peak Loaded Day
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(8.5);
+ doc.text('PEAK CAPACITY LIMIT', 80, yPos + 7);
+ doc.setFontSize(12.5);
+ doc.setTextColor(39, 39, 42); // Zinc 800
+ doc.text(`${maxProjectedItem.projected}% Load`, 80, yPos + 14.5);
+ doc.setFontSize(7.5);
+ doc.setFont('helvetica', 'normal');
+ doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+ doc.text(`On ${maxProjectedItem.day}`, 80, yPos + 19);
+
+ // KPI Box 3: Bottleneck Threshold Alarms
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(8.5);
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.text('THRESHOLD BOTTLENECKS', 138, yPos + 7);
+ doc.setFontSize(13.5);
+ if (bottlenecksCount > 0) {
+ doc.setTextColor(alertColor[0], alertColor[1], alertColor[2]);
+ doc.text(`${bottlenecksCount} Hot Days`, 138, yPos + 17);
+ } else {
+ doc.setTextColor(16, 185, 129); // Green 500
+ doc.text('Stable Output (0)', 138, yPos + 17);
+ }
+
+ // --- Subtitle parameter summary line ---
+ yPos += 35;
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(10.5);
+ doc.text('7-DAY DAILY PREDICTED TIMELINE BREAKDOWN', 15, yPos);
+
+ // Thin grey spacer boundary line
+ doc.setDrawColor(228, 228, 231); // Zinc 200
+ doc.setLineWidth(0.35);
+ doc.line(15, yPos + 2, 195, yPos + 2);
+
+ // Print metadata variables 
+ yPos += 7;
+ doc.setFont('helvetica', 'normal');
+ doc.setFontSize(8);
+ doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+ doc.text(`Bottleneck Limit Trigger: ${bottleneckThreshold}%`, 15, yPos);
+ doc.text(`Smoothing Mode: ${capacitySmoothing === 'smoothed' ? '3-Day Rolling Moving Average' : 'Raw Metrics (None)'}`, 72, yPos);
+ doc.text(`Sequence Filter Order: ${capacitySortBy === 'bottleneck' ? 'Bottleneck Intensity' : 'Calendar Sequence'}`, 142, yPos);
+
+ // --- Main Capacity Breakdown Table ---
+ yPos += 6;
+ doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.rect(15, yPos, 180, 8, 'F');
+
+ doc.setTextColor(255, 255, 255);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(8);
+ doc.text('WEEKDAY', 20, yPos + 5.5);
+ doc.text('DATE', 50, yPos + 5.5);
+ doc.text('BASE CURRENT (%)', 85, yPos + 5.5);
+ doc.text('PROJECTED LOAD (%)', 125, yPos + 5.5);
+ doc.text('BOTTLENECK STATE', 165, yPos + 5.5);
+
+ const rowHeight = 9.5;
+ yPos += 8;
+
+ sortedDailyCapacityBreakdown.forEach((item, idx) => {
+ const isBottleneck = item.projected > bottleneckThreshold;
+
+ // Alternating row highlighting background
+ if (idx % 2 === 1) {
+ doc.setFillColor(250, 250, 250);
+ doc.rect(15, yPos, 180, rowHeight, 'F');
+ }
+
+ // Draw light wire separators
+ doc.setDrawColor(244, 244, 245);
+ doc.setLineWidth(0.2);
+ doc.line(15, yPos + rowHeight, 195, yPos + rowHeight);
+
+ // Value rendering block
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(8.5);
+ doc.text(item.day, 20, yPos + 6);
+
+ doc.setFont('helvetica', 'normal');
+ doc.setTextColor(82, 82, 91);
+ doc.text(item.date, 50, yPos + 6);
+
+ doc.text(`${item.current}%`, 85, yPos + 6);
+
+ // Project highlighting styling
+ doc.setFont('helvetica', 'bold');
+ if (isBottleneck) {
+ doc.setTextColor(amberAlert[0], amberAlert[1], amberAlert[2]);
+ doc.text(`${item.projected}%`, 125, yPos + 6);
+ } else {
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.text(`${item.projected}%`, 125, yPos + 6);
+ }
+
+ // Alert cell tag
+ if (isBottleneck) {
+ doc.setFillColor(254, 243, 199); // Amber 100
+ doc.roundedRect(162, yPos + 1.8, 28, 5.5, 0.8, 0.8, 'F');
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(7.5);
+ doc.setTextColor(180, 83, 9); // Amber 700
+ doc.text('BOTTLENECK', 165.5, yPos + 5.6);
+ } else {
+ doc.setTextColor(113, 113, 122);
+ doc.setFont('helvetica', 'normal');
+ doc.setFontSize(7.5);
+ doc.text('NORMAL LOAD', 165, yPos + 5.6);
+ }
+
+ yPos += rowHeight;
+ });
+
+ // --- Footer Explanatory Bullet Points & Notes ---
+ yPos += 10;
+ doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+ doc.setFont('helvetica', 'bold');
+ doc.setFontSize(9.5);
+ doc.text('EXECUTIVE INTERPRETATION GUIDELINE', 15, yPos);
+
+ doc.setDrawColor(228, 228, 231);
+ doc.setLineWidth(0.35);
+ doc.line(15, yPos + 2, 195, yPos + 2);
+
+ yPos += 7;
+ doc.setFont('helvetica', 'normal');
+ doc.setFontSize(7.5);
+ doc.setTextColor(82, 82, 91);
+
+ const bulletins = [
+ '• Capacity forecasts are computed dynamically based on the active rolling index of completed production batches versus target.',
+ '• Days highlighted with yellow "BOTTLENECK" alert badges exceed your configured threshold parameter limit.',
+ '• Moving average view reduces short-term variation spikes to reveal systemic weekly production limits for senior management reporting.',
+ '• Report intended for staff duty scheduling, shifts optimization, and oven heating resource conservation.'
+ ];
+
+ bulletins.forEach(bullet => {
+ doc.text(bullet, 15, yPos);
+ yPos += 4.5;
+ });
+
+ // Ground footer copyright boundary lines
+ yPos = 282;
+ doc.setDrawColor(228, 228, 231);
+ doc.setLineWidth(0.3);
+ doc.line(15, yPos - 3, 195, yPos - 3);
+
+ doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+ doc.setFontSize(7);
+ doc.text('Automated forecast projection report. Confidential & intended for Bakery Internal Operations.', 15, yPos);
+ doc.text('Page 1 of 1', 182, yPos);
+
+ // Trigger PDF browser-side download
+ doc.save(`Capacity_Projection_Report_${selectedWeekRange.replace(/\s+/g, '_')}.pdf`);
  };
 
  const handleUpdateMetrics = (newMetrics: Partial<CoreMetrics>) => {
@@ -379,15 +788,11 @@ export default function App() {
 
  const handleUpdateWeeklyLog = (updatedLog: DailyOperationalLog) => {
  setWeeklyLogsMap(prev => {
- const currentWeekByBranch = prev[selectedWeekRange] || {};
- const currentWeekLogs = currentWeekByBranch[selectedBranch] || [];
+ const currentWeekLogs = prev[selectedWeekRange] || [];
  const updatedWeekLogs = currentWeekLogs.map(log => log.day === updatedLog.day ? updatedLog : log);
  return {
  ...prev,
- [selectedWeekRange]: {
- ...currentWeekByBranch,
- [selectedBranch]: updatedWeekLogs
- }
+ [selectedWeekRange]: updatedWeekLogs
  };
  });
 
@@ -406,14 +811,13 @@ export default function App() {
 
  const allTabMeta = [
  { id: 'Overview', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
- { id: 'Company KPI', label: 'Company KPI', icon: <Activity className="w-4 h-4" /> },
  { id: 'Sell', label: 'Branch Product', icon: <Coins className="w-4 h-4" /> },
  { id: 'Target', label: 'Target', icon: <ShieldCheck className="w-4 h-4" /> },
  { id: 'Production', label: 'Production', icon: <ChefHat className="w-4 h-4" /> },
  { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
  { id: 'Hours', label: 'Hours', icon: <CalendarDays className="w-4 h-4" /> },
- { id: 'Supplier', label: 'Supplier COGS', icon: <Boxes className="w-4 h-4" /> },
- { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> }
+ { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> },
+    { id: 'Energy', label: 'Energy', icon: <Zap className="w-4 h-4" /> }
  ];
 
  const tabMeta = allTabMeta.filter(tab => rolePermissions[userRole].includes(tab.id));
@@ -435,12 +839,13 @@ export default function App() {
  targets={targets}
  userRole={userRole}
  onUpdateMetrics={handleUpdateMetrics}
+ irelandTime={irelandTime}
  weeklyLogs={weeklyLogs}
  onAddOrUpdateLog={handleUpdateWeeklyLog}
  selectedWeekRange={selectedWeekRange}
  onSelectedWeekRangeChange={setSelectedWeekRange}
+ orders={orders}
  selectedBranch={selectedBranch}
- branchWeeklyLogsByBranch={weeklyLogsByBranch}
  theme={theme}
  />
  );
@@ -450,19 +855,6 @@ export default function App() {
  }
  case 'Target':
  return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
- case 'Company KPI':
- return (
- <CompanyKpiTab
- branchWeeklyLogsMap={weeklyLogsMap}
- selectedWeekRange={selectedWeekRange}
- weekRangeOptions={WEEK_RANGE_OPTIONS}
- onSelectedWeekRangeChange={setSelectedWeekRange}
- targets={targets}
- theme={theme}
- onNavigateTab={setActiveTab}
- selectedBranch={selectedBranch}
- />
- );
     case 'Studio':
       return <StudioTab theme={theme} />;
  case 'Production':
@@ -494,8 +886,6 @@ export default function App() {
  totalHoursScheduled={totalHours}
  />
  );
- case 'Supplier':
- return <SupplierTab theme={theme} />;
  case 'Planning':
  return <PlanningTab inventory={inventory} onOrderRestock={handleOrderRestock} selectedBranch={selectedBranch} theme={theme} weeklyLogs={weeklyLogs} />;
  default:
@@ -506,12 +896,13 @@ export default function App() {
  targets={targets} 
  userRole={userRole}
  onUpdateMetrics={handleUpdateMetrics}
+ irelandTime={irelandTime}
  weeklyLogs={weeklyLogs}
  onAddOrUpdateLog={handleUpdateWeeklyLog}
  selectedWeekRange={selectedWeekRange}
  onSelectedWeekRangeChange={setSelectedWeekRange}
+ orders={orders}
  selectedBranch={selectedBranch}
- branchWeeklyLogsByBranch={weeklyLogsByBranch}
  theme={theme}
  />
  );
@@ -547,54 +938,70 @@ export default function App() {
  <div 
  id="app-workspace" 
  className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-200 ${
- isLight ? 'bg-gradient-to-br from-zinc-50 via-white to-orange-50/35 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900' : 'bg-gradient-to-br from-zinc-950 via-black to-zinc-900 text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100'
+ isLight ? 'bg-zinc-50 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900' : 'bg-black text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100'
  }`}
  >
  
  {/* SIDEBAR: NAVIGATION */}
- <aside className={`w-full md:w-64 flex flex-col shrink-0 border-r shadow-xl transition-colors duration-200 ${
- isLight ? 'bg-zinc-105 bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-900 text-zinc-100'
+ <aside className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? 'fixed inset-0 z-50 h-[100dvh] overflow-hidden' : 'sticky md:relative top-0 z-40'} ${
+ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-900 text-zinc-100'
  }`}>
  {/* Brand Header */}
- <div className={`p-6 border-b flex items-center gap-3 transition-colors ${isLight ? 'border-zinc-150' : 'border-zinc-900'}`}>
- <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group">
- <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
- <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${healthColorClass} rounded-full border border-black animate-pulse`} title={healthTooltip} />
- </div>
- <div className="flex-1 min-w-0">
- <div className="flex items-center justify-between gap-1">
- <h1 className={`text-sm font-bold font-sans tracking-tight leading-tight truncate ${isLight ? 'text-zinc-900' : 'text-white'}`}>Food Penguin</h1>
- <span 
- className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
- title={healthTooltip}
- >
- <span className={`w-1 h-1 rounded-full ${healthColorClass} animate-pulse`} />
- {healthLabel}
- </span>
- </div>
- <span className={`text-[10px] font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Limited</span>
- </div>
- </div>
+        <div className={`p-4 md:p-6 border-b flex items-center justify-between gap-3 transition-colors ${isLight ? 'border-zinc-150' : 'border-zinc-900'}`}>
+          <div className="flex items-center gap-3 w-full">
+            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group shrink-0">
+              <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">FP</span>
+              <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${healthColorClass} rounded-full border border-black animate-pulse`} title={healthTooltip} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-1">
+                <h1 className={`text-sm font-bold font-sans tracking-tight leading-tight truncate ${isLight ? 'text-zinc-900' : 'text-white'}`}>Food Penguin</h1>
+                <span 
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
+                  title={healthTooltip}
+                >
+                  <span className={`w-1 h-1 rounded-full ${healthColorClass} animate-pulse`} />
+                  {healthLabel}
+                </span>
+              </div>
+              <span className={`text-[10px] font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Limited</span>
+            </div>
+          </div>
+          {/* Mobile Menu Toggle Button */}
+          <button 
+            className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800'}`}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
 
+        {/* Mobile Menu Wrapper */}
+        <div className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? 'flex' : 'hidden md:flex'}`}>
 
- {/* Global Branches Overview */}
+        {/* Global Branches Overview */}
+
  <div className={`mx-4 mt-6 p-3 rounded-2xl border transition-colors ${isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800 shadow'}`}>
  <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? 'border-zinc-200' : 'border-zinc-800/80'}`}>
  <Store className={`w-3.5 h-3.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`} />
  <span className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Global Branches</span>
  </div>
  <div className="space-y-1.5 font-sans">
- {BRANCHES.map(branch => {
- const shortName = formatBranchLabel(branch);
+ {([
+ 'Marks & Spencer - Cork City',
+ 'Tesco - Cork City',
+ 'Tesco - Mahon Point'
+ ] as const).map(branch => {
+ const shortName = branch.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
  const isSelected = selectedBranch === branch;
  return (
  <div 
  key={branch} 
- onClick={() => handleSelectBranch(branch)}
+ onClick={() => setSelectedBranch(branch)}
  className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
  isSelected 
  ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30'
- : isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900'
+ : isLight ? 'bg-white border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900'
  }`}
  >
  <span className={`truncate mr-2 ${
@@ -620,14 +1027,14 @@ export default function App() {
  return (
  <button
  key={tab.id}
- onClick={() => setActiveTab(tab.id)}
+ onClick={() => { setActiveTab(tab.id); setIsMobileMenuOpen(false); }}
  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
  isActive
  ? isLight
  ? 'bg-zinc-100 text-zinc-950 font-extrabold shadow-sm'
  : 'bg-zinc-900 text-white font-bold shadow-inner'
  : isLight
- ? 'text-zinc-605 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+ ? 'text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900'
  : 'text-zinc-500 hover:bg-zinc-905 hover:text-white'
  }`}
  >
@@ -658,7 +1065,7 @@ export default function App() {
  <button 
  onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
  className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${
- isLight ? 'hover:text-zinc-900' : 'hover:text-white'
+ isLight ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'hover:text-white'
  }`}
  title="Click to view daily breakdown"
  >
@@ -666,9 +1073,9 @@ export default function App() {
  isLight ? 'text-zinc-500' : 'text-zinc-400'
  }`}>Weekly Capacity</p>
  {isCapacityExpanded ? (
- <ChevronUp className={`w-3.5 h-3.5 transition-all transform hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
+ <ChevronUp className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  ) : (
- <ChevronDown className={`w-3.5 h-3.5 transition-all transform hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
+ <ChevronDown className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  )}
  </button>
  <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
@@ -711,13 +1118,13 @@ export default function App() {
  isLight ? 'border-zinc-200' : 'border-zinc-800/60'
  }`}>
  <div className="flex justify-between items-center">
- <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>
+ <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Current Load:
  </span>
  <span className={`font-bold ${isLight ? 'text-zinc-800' : 'text-white'}`}>{capacityPct}%</span>
  </div>
  <div className="flex justify-between items-center">
- <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-550' : 'text-zinc-400'}`}>
+ <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 7-Day Forecast:
  </span>
  <span className={`font-bold ${projectedCapacityPct >= capacityPct ? 'text-amber-500' : 'text-emerald-500'}`}>
@@ -725,7 +1132,7 @@ export default function App() {
  </span>
  </div>
  <p className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${
- isLight ? 'border-zinc-200 text-zinc-400' : 'border-zinc-800/20 text-zinc-550'
+ isLight ? 'border-zinc-200 text-zinc-400' : 'border-zinc-800/20 text-zinc-500'
  }`}>
  Estimated from rolling week rates & trend momentum.
  </p>
@@ -739,39 +1146,39 @@ export default function App() {
  <div className="flex items-center gap-1.5">
  <button 
  onClick={handleExportCapacityCSV}
- className={`p-1 px-1.5 rounded hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
+ className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
  isLight 
- ? 'bg-zinc-100 border-zinc-250 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
+ ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
  : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
  }`}
  title="Download daily capacity report as CSV"
  >
  <Download className="w-2.5 h-2.5 text-orange-400" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
  </button>
  <button 
  onClick={handleExportCapacityPDF}
- className={`p-1 px-1.5 rounded hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
+ className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
  isLight 
- ? 'bg-zinc-100 border-zinc-250 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
+ ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
  : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
  }`}
  title="Download styled PDF projection summary report"
  >
  <Download className="w-2.5 h-2.5 text-amber-500" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
  </button>
  <button 
  onClick={() => setIsScheduleReportModalOpen(true)}
- className={`p-1 px-1.5 rounded hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
+ className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
  isLight 
- ? 'bg-zinc-100 border-zinc-250 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
+ ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
  : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
  }`}
  title="Schedule automated email report delivery"
  >
  <Mail className="w-2.5 h-2.5 text-rose-400" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:text-zinc-900' : 'text-zinc-300'}`}>Schedule</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>Schedule</span>
  </button>
  <span className="text-[8px] text-zinc-400 font-semibold ml-1">[Current vs Proj]</span>
  </div>
@@ -788,8 +1195,8 @@ export default function App() {
  onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck')}
  className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
  isLight 
- ? 'bg-white border-zinc-250 text-amber-600' 
- : 'bg-zinc-900 border-zinc-800/80 text-amber-450 hover:text-amber-300'
+ ? 'bg-white border-zinc-200 text-amber-600' 
+ : 'bg-zinc-900 border-zinc-800/80 text-amber-450  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300'
  }`}
  >
  <option value="date" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>📅 Date (Chronological)</option>
@@ -800,15 +1207,15 @@ export default function App() {
  {/* Smoothing Mode Toggle */}
  <div className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500 font-bold' : 'text-zinc-500'}`} title="3-Day moving average smoothing vs raw data">Data View:</span>
- <div className={`flex rounded p-0.5 border ${isLight ? 'bg-zinc-200 border-zinc-250' : 'bg-zinc-900 border-zinc-800/80'}`}>
+ <div className={`flex rounded p-0.5 border ${isLight ? 'bg-zinc-200 border-zinc-200' : 'bg-zinc-900 border-zinc-800/80'}`}>
  <button
  onClick={() => setCapacitySmoothing('raw')}
  className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
  capacitySmoothing === 'raw' 
  ? 'bg-orange-500 text-white shadow-sm' 
  : isLight 
- ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-300' 
- : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-850'
+ ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' 
+ : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
  }`}
  >
  Raw
@@ -819,8 +1226,8 @@ export default function App() {
  capacitySmoothing === 'smoothed' 
  ? 'bg-orange-500 text-white shadow-sm' 
  : isLight 
- ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-300' 
- : 'text-zinc-500 hover:text-zinc-350 hover:bg-zinc-850'
+ ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' 
+ : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
  }`}
  title="3-Day Moving Average Smoothed"
  >
@@ -837,7 +1244,7 @@ export default function App() {
  ? 'text-orange-500 font-extrabold' 
  : isLight 
  ? 'text-zinc-500' 
- : 'text-zinc-550'
+ : 'text-zinc-500'
  }`} title="Toggle manual vs AI capacity adjustments">
  <Wand2 className={`w-3 h-3 ${quickAdjustEnabled ? 'animate-pulse text-orange-500' : ''}`} />
  Quick Adjust:
@@ -854,8 +1261,8 @@ export default function App() {
  quickAdjustEnabled
  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm'
  : isLight
- ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200'
- : 'bg-zinc-900 border-zinc-800 text-zinc-350 hover:text-white hover:bg-zinc-850'
+ ? 'bg-zinc-100 border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200'
+ : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800'
  }`}
  >
  {quickAdjustEnabled ? 'What-If ON' : 'OFF'}
@@ -872,7 +1279,7 @@ export default function App() {
  <button
  onClick={handleResetOverrides}
  type="button"
- className={`text-[7px] font-mono uppercase tracking-wide font-extrabold transition-all underline decoration-dotted hover:text-amber-500 cursor-pointer ${
+ className={`text-[7px] font-mono uppercase tracking-wide font-extrabold transition-all underline decoration-dotted  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-500 cursor-pointer ${
  isLight ? 'text-zinc-500' : 'text-zinc-400'
  }`}
  >
@@ -908,11 +1315,11 @@ export default function App() {
  <div className={`flex flex-col gap-2 p-2.5 rounded-xl border ${
  isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
  }`}>
- <div className="flex justify-between items-center text-[7.5px] text-zinc-550 font-bold uppercase tracking-widest leading-none">
+ <div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
  <span>Bottleneck Threshold</span>
  <span className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border ${
  isLight 
- ? 'bg-white border-zinc-250 text-amber-600' 
+ ? 'bg-white border-zinc-200 text-amber-600' 
  : 'bg-zinc-900 border-zinc-800/55 text-amber-450'
  }`}>{bottleneckThreshold}%</span>
  </div>
@@ -971,9 +1378,9 @@ export default function App() {
  }`}
  >
  <div className="flex justify-between items-center text-[10px] gap-2">
- <span className={`font-sans font-bold flex items-center gap-1 flex-wrap min-w-[70px] ${isLight ? 'text-zinc-800' : 'text-zinc-350'}`}>
+ <span className={`font-sans font-bold flex items-center gap-1 flex-wrap min-w-[70px] ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>
  {item.day.substring(0, 3)} 
- <span className={`text-[8px] font-normal font-mono ${isLight ? 'text-zinc-550' : 'text-zinc-500'}`}>({item.date})</span>
+ <span className={`text-[8px] font-normal font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>({item.date})</span>
  {isBottleneck && (
  <span className={`text-[7.5px] font-mono leading-none py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5 ${isLight ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'}`}>
                         {isLight && <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />} Hot
@@ -1064,7 +1471,7 @@ export default function App() {
  }
  })()
  ) : (
- <span className="text-zinc-650 text-[8px] font-bold font-mono tracking-tighter" title="First day of active week sequence">
+ <span className="text-zinc-600 text-[8px] font-bold font-mono tracking-tighter" title="First day of active week sequence">
  •
  </span>
  )}
@@ -1112,7 +1519,7 @@ export default function App() {
  className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
  (!capacityOverrides[item.day] || capacityOverrides[item.day].mode === 'ai')
  ? 'bg-amber-500 text-zinc-950 shadow-sm font-extrabold'
- : 'text-zinc-500 hover:text-zinc-200'
+ : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200'
  }`}
  >
  <Sparkles className="w-2 h-2 shrink-0" />
@@ -1124,7 +1531,7 @@ export default function App() {
  className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
  (capacityOverrides[item.day]?.mode === 'manual')
  ? 'bg-orange-500 text-white shadow-sm font-extrabold'
- : 'text-zinc-500 hover:text-zinc-200'
+ : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200'
  }`}
  >
  <SlidersHorizontal className="w-2 h-2 shrink-0" />
@@ -1187,7 +1594,7 @@ export default function App() {
  value={userRole} 
  onChange={(e) => setUserRole(e.target.value as any)}
  className={`mt-0.5 bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
- isLight ? 'text-zinc-500 hover:text-zinc-800 font-bold' : 'text-zinc-550 hover:text-zinc-300'
+ isLight ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300'
  }`}
  >
  <option value="Admin">Admin</option>
@@ -1197,9 +1604,10 @@ export default function App() {
  </div>
  </div>
  </div>
- </aside>
+ </div>
+      </aside>
 
-<div className="flex-1 flex flex-col min-w-0 transition-colors duration-200 bg-transparent">
+ <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-zinc-50' : 'bg-black'}`}>
  
  {/* Global Toolbar */}
  <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
@@ -1210,7 +1618,7 @@ export default function App() {
  {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
  </h2>
  <span className={`hidden lg:inline-block text-[9px] font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
- isLight ? 'bg-zinc-100 text-zinc-650 border-zinc-200' : 'bg-zinc-900 text-zinc-400 border-zinc-850'
+ isLight ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : 'bg-zinc-900 text-zinc-400 border-zinc-800'
  }`}>
  Food chain ops portal
  </span>
@@ -1222,13 +1630,13 @@ export default function App() {
  <span className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Store:</span>
  <select
  value={selectedBranch}
- onChange={(e) => handleSelectBranch(e.target.value as BranchName)}
+ onChange={(e) => setSelectedBranch(e.target.value as any)}
  className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
  style={{ outline: 'none' }}
  >
- {BRANCHES.map(branch => (
- <option key={branch} value={branch} className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>{formatBranchOptionLabel(branch)}</option>
- ))}
+ <option value="Marks & Spencer - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Marks & Spencer Cork City</option>
+ <option value="Tesco - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Cork City</option>
+ <option value="Tesco - Mahon Point" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Mahon Point</option>
  </select>
  </div>
  </div>
@@ -1237,7 +1645,7 @@ export default function App() {
  <div className="text-right hidden sm:block">
  <span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">🇮🇪 Ireland Time (Dublin)</span>
  <span className={`text-xs font-mono font-bold block mt-1 ${isLight ? 'text-zinc-800' : 'text-zinc-100'}`}>
- <DublinClock />
+ {irelandTime || 'Updating live...'}
  </span>
  </div>
 
@@ -1245,17 +1653,13 @@ export default function App() {
  <button
  onClick={toggleTheme}
  title={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
- aria-label={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
- className={`h-9 px-3 rounded-full flex items-center justify-center gap-1.5 transition-all focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none active:scale-[0.98] hover:-translate-y-0.5 ${
+ className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
  isLight 
- ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 shadow-sm' 
+ ? 'bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm' 
  : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
  }`}
  >
- {isLight ? <Moon className="w-4 h-4 text-zinc-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
- <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
- {isLight ? 'Day' : 'Dark'}
- </span>
+ {isLight ? <Moon className="w-4.5 h-4.5 text-zinc-600" /> : <Sun className="w-4.5 h-4.5 text-amber-400" />}
  </button>
  </div>
  </header>
@@ -1293,7 +1697,7 @@ export default function App() {
  className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
  reportFrequency === 'daily' 
  ? 'bg-rose-500 text-white shadow' 
- : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
+ : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
  }`}
  >
  Daily
@@ -1303,7 +1707,7 @@ export default function App() {
  className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
  reportFrequency === 'weekly' 
  ? 'bg-rose-500 text-white shadow' 
- : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
+ : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
  }`}
  >
  Weekly
@@ -1331,7 +1735,7 @@ export default function App() {
  <button
  onClick={() => setIsScheduleReportModalOpen(false)}
  className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded transition-colors ${
- isLight ? 'text-zinc-600 hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800'
+ isLight ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800'
  }`}
  >
  Cancel
@@ -1347,7 +1751,7 @@ export default function App() {
  }
  }}
  disabled={!reportEmailAddress}
- className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
+ className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
  >
  <Clock className="w-3 h-3" />
  Activate Schedule
