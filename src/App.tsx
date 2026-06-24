@@ -37,6 +37,7 @@ import EnergyTab from './components/EnergyTab';
 import SuppliersTab from './components/SuppliersTab';
 import FinanceTab from './components/FinanceTab';
 import RealtimeTab from './components/RealtimeTab';
+import ResourceAllocationTab from './components/ResourceAllocationTab';
 import LoginScreen from './components/LoginScreen';
 import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
@@ -73,8 +74,8 @@ import {
 } from 'lucide-react';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
-  Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
-  Manager: ['Overview', 'Realtime', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Energy', 'Suppliers', 'Finance', 'Studio'],
+  Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio'],
+  Manager: ['Overview', 'Realtime', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio'],
   Staff: ['Overview', 'Realtime', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers'],
   User: ['Overview', 'Realtime'] // User can only view data
 };
@@ -826,6 +827,7 @@ export default function App() {
  { id: 'Waste', label: 'Waste', icon: <Trash2 className="w-4 h-4" /> },
  { id: 'Hours', label: 'Hours', icon: <CalendarDays className="w-4 h-4" /> },
  { id: 'Planning', label: 'Planning', icon: <Boxes className="w-4 h-4" /> },
+    { id: 'Allocation', label: 'Allocations', icon: <Boxes className="w-4 h-4" /> },
     { id: 'Energy', label: 'Energy', icon: <Zap className="w-4 h-4" /> },
     { id: 'Suppliers', label: 'Suppliers', icon: <Package className="w-4 h-4" /> },
     { id: 'Finance', label: 'Finance', icon: <DollarSign className="w-4 h-4" /> }
@@ -866,7 +868,9 @@ export default function App() {
  }
  case 'Target':
  return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
-    case 'Studio':
+          case 'Allocation':
+        return <ResourceAllocationTab theme={theme} branches={['M&S Cork', 'Tesco Cork', 'Tesco Mahon']} />;
+      case 'Studio':
       return <StudioTab theme={theme} />;
  case 'Production':
  return (
