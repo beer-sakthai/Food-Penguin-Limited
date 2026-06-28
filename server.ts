@@ -42,8 +42,7 @@ function getAiClient(): GoogleGenAI {
 
 // ==========================================
 // 1. STRATEGIC EXECUTIVE THINKER
-// Model: gemini-3.1-pro-preview
-// Mode: ThinkingLevel.HIGH
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/strategic-advisor", async (req, res) => {
   try {
@@ -71,7 +70,7 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
 
       res.json({
         text: response.text || "No response text generated.",
-        thinking: "Deep strategic thinking executed successfully using gemini-3.1-pro-preview."
+        thinking: "Deep strategic thinking executed successfully using gemini-1.5-flash."
       });
     } catch (apiErr: any) {
       console.log("Strategic Advisor falling back to simulation because Gemini key is inactive or failed.");
@@ -88,7 +87,7 @@ app.post("/api/gemini/strategic-advisor", async (req, res) => {
 
 // ==========================================
 // 2. LOW LATENCY COPILOT
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/low-latency-cmd", async (req, res) => {
   try {
@@ -130,7 +129,7 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
 
 // ==========================================
 // 3. MENU ILLUSTRATOR & BANNER GENERATOR
-// Model: gemini-3.1-flash-image-preview
+// Model: imagen-3.0-generate-001
 // ==========================================
 app.post("/api/gemini/generate-marketing-image", async (req, res) => {
   try {
@@ -148,7 +147,7 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
 
     try {
       const response = await ai.models.generateImages({
-        model: "gemini-3.1-flash-image-preview",
+        model: "imagen-3.0-generate-001",
         prompt: "A clean, commercial studio foods advertisement banner for Food Penguin Limited. " + prompt,
         config: {
           aspectRatio: aspectRatio || "1:1",
@@ -181,7 +180,7 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
 
 // ==========================================
 // 4. KITCHEN QUALITY DISH AUDITOR
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
   try {
@@ -212,7 +211,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
       };
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-1.5-flash",
         contents: { parts: [imagePart, promptPart] }
       });
 
@@ -233,7 +232,7 @@ app.post("/api/gemini/analyze-dish-photo", async (req, res) => {
 
 // ==========================================
 // 5. MARKET TREND SEARCH GROUNDING
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/search-trends", async (req, res) => {
   try {
@@ -276,7 +275,7 @@ app.post("/api/gemini/search-trends", async (req, res) => {
 
 // ==========================================
 // 6. SUGGEST RESTOCK ALGORITHMIC PLANNER
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/suggest-restock", async (req, res) => {
   try {
@@ -329,7 +328,7 @@ app.post("/api/gemini/suggest-restock", async (req, res) => {
 
 // ==========================================
 // 7. SHIFT SUMMARY GENERATOR
-// Model: gemini-3.1-pro-preview
+// Model: gemini-1.5-flash
 // ==========================================
 app.post("/api/gemini/shift-summary", async (req, res) => {
   try {
