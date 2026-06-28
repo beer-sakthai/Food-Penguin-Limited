@@ -1,5 +1,7 @@
 import React from 'react';
 import { SalesOrder } from '../types';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { TrendingUp, ShoppingBag, Euro } from 'lucide-react';
 
 export const MS_PRODUCTS = [
   { name: 'Avocado Maki', category: 'General', price: 3.50, margin: '75%', barcode: '5055372900774' },
@@ -240,6 +242,59 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
         <p className={`text-lg font-medium ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
           {branchProducts.length} unique products listed for this branch
         </p>
+      </div>
+
+      {/* SALES PERFORMANCE VISUALIZATION */}
+      <div className={`p-6 rounded-3xl transition-all duration-300 ${
+        isLight ? 'bg-white border border-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 shadow-xl'
+      }`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-zinc-200 dark:border-zinc-800 gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-amber-500" />
+              <h2 className={`text-xl font-bold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Monthly Revenue Trajectory</h2>
+            </div>
+            <p className="text-xs text-zinc-500 mt-1">Gourmet sushi sales performance over the past 6-month period</p>
+          </div>
+          <div className="flex gap-4">
+            <div className="text-right">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Average Monthly Sales</p>
+              <p className={`text-lg font-extrabold ${isLight ? 'text-zinc-900' : 'text-amber-400'}`}>€51.0K</p>
+            </div>
+            <div className="text-right border-l pl-4 border-zinc-200 dark:border-zinc-800">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Peak Performance</p>
+              <p className="text-lg font-extrabold text-emerald-500">€62.0K (Jun)</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-64 w-full mt-6">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={[
+              { month: 'Jan', Sales: 42000 },
+              { month: 'Feb', Sales: 48000 },
+              { month: 'Mar', Sales: 51000 },
+              { month: 'Apr', Sales: 49000 },
+              { month: 'May', Sales: 55000 },
+              { month: 'Jun', Sales: 62000 },
+            ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="sellRevenueGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.35}/>
+                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#27272a'} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 11 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 11 }} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '12px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}` }}
+                formatter={(value: any) => [`€${value.toLocaleString()}`, 'Sales Revenue']}
+              />
+              <Area type="monotone" dataKey="Sales" stroke="#f59e0b" strokeWidth={3} fill="url(#sellRevenueGrad)" dot={{ r: 4, strokeWidth: 2, fill: '#f59e0b' }} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* PRODUCTS LIST */}

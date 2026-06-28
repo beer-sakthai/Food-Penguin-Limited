@@ -1,18 +1,23 @@
+import { motion } from 'motion/react';
 import React, { useState, useRef } from 'react';
-import { Recipe, ProductionTask } from '../types';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
+
 import { 
- FolderHeart, 
- ChefHat, 
- Sparkles, 
- CheckCircle2, 
- Eye, 
- FileText,
- AlertCircle,
- Plus,
- Upload,
- Camera
+  FolderHeart, 
+  ChefHat, 
+  Sparkles, 
+  CheckCircle2, 
+  Eye, 
+  FileText,
+  AlertCircle,
+  Plus,
+  Upload,
+  Camera,
+  Activity
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, Legend, ComposedChart } from 'recharts';
+import { Recipe, ProductionTask } from '../types';
+
+
 
 interface ProductionTabProps {
  recipes: Recipe[];
@@ -54,7 +59,18 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  const [fileLabel, setFileLabel] = useState('No photo captured');
  const fileInputRef = useRef<HTMLInputElement>(null);
 
- const statusData = ['In Queue', 'Cooking', 'Prepared'].map(status => ({
+ 
+  const efficiencyData = [
+    { hour: '08:00', volume: 45, target: 50, efficiency: 90 },
+    { hour: '10:00', volume: 85, target: 80, efficiency: 106 },
+    { hour: '12:00', volume: 150, target: 120, efficiency: 125 },
+    { hour: '14:00', volume: 110, target: 110, efficiency: 100 },
+    { hour: '16:00', volume: 60, target: 70, efficiency: 82 },
+    { hour: '18:00', volume: 130, target: 140, efficiency: 92 },
+    { hour: '20:00', volume: 90, target: 80, efficiency: 112 },
+  ];
+
+  const statusData = ['In Queue', 'Cooking', 'Prepared'].map(status => ({
  status,
  count: tasks.filter(t => t.status === status).reduce((sum, t) => sum + t.quantity, 0)
  }));
@@ -122,10 +138,10 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  };
 
  return (
- <div className="grid grid-cols-1 gap-6">
- 
- {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
- <div className="space-y-6">
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
+      <div className="lg:col-span-2 space-y-6">
  
  {/* Active Cooking Grid */}
  <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
@@ -152,7 +168,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  />
  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
  {statusData.map((entry, index) => (
- <Cell key={`cell-${index}`} fill={STATUS_COLORS[index]} />
+ <Cell key={`prod-cell-${index}`} fill={STATUS_COLORS[index]} />
  ))}
  </Bar>
  </BarChart>
@@ -204,7 +220,140 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  </div>
  </div>
 
- {/* Master Recipes Catalogue */}
+ 
+        {/* Production Volume & Efficiency Rates */}
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
+            <div className="flex items-center gap-3">
+              <div className="p-2 border border-emerald-900/40 bg-emerald-950/40 text-emerald-400 rounded-lg">
+                <Activity className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-sans font-semibold text-white">Volume & Efficiency</h2>
+                <p className="text-xs text-zinc-500">Hourly units produced against target expectations</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-[10px] font-mono font-bold uppercase tracking-wider">
+               <div className="flex items-center gap-1.5 text-zinc-400">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Actual Volume
+               </div>
+               <div className="flex items-center gap-1.5 text-zinc-400">
+                 <div className="w-2 h-2 rounded-full bg-zinc-600"></div> Target
+               </div>
+               <div className="flex items-center gap-1.5 text-amber-500">
+                 <div className="w-2 h-0.5 bg-amber-500"></div> Efficiency %
+               </div>
+            </div>
+          </div>
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 pt-4">
+            {efficiencyData.map((data, idx) => {
+              const isLow = data.efficiency < 85;
+              const radius = 18;
+              const circumference = 2 * Math.PI * radius;
+              const strokeDashoffset = circumference - (Math.min(data.efficiency, 100) / 100) * circumference;
+              return (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg bg-zinc-950/50 border border-zinc-800/50"
+                >
+                  <div className="relative flex items-center justify-center w-12 h-12 mb-1">
+                    {isLow && (
+                      <motion.div 
+                        className="absolute inset-0 rounded-full bg-rose-500/50"
+                        initial={{ opacity: 0.5, scale: 0.8 }}
+                        animate={{ opacity: 0, scale: 1.4 }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      />
+                    )}
+                    <svg className="w-full h-full transform -rotate-90 relative z-10">
+                      <circle cx="24" cy="24" r={radius} stroke="#27272a" strokeWidth="4" fill="transparent" />
+                      <motion.circle 
+                        cx="24" cy="24" r={radius} 
+                        stroke={isLow ? "#f43f5e" : "#f59e0b"} 
+                        strokeWidth="4" 
+                        fill="transparent" 
+                        strokeDasharray={circumference}
+                        initial={{ strokeDashoffset: circumference }}
+                        animate={{ strokeDashoffset }}
+                        transition={{ duration: 1.5, delay: 0.5 + idx * 0.1, ease: "easeOut" }}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span className={`absolute text-[10px] font-bold font-mono z-20 ${isLow ? 'text-rose-400' : 'text-zinc-200'}`}>
+                      {data.efficiency}%
+                    </span>
+                  </div>
+                  <span className="text-[9px] text-zinc-500 font-mono tracking-wider">{data.hour}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+          <div className="h-64 mt-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={efficiencyData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
+                <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <YAxis yAxisId="left" orientation="left" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <Tooltip 
+                  cursor={{ fill: '#1f2937' }}
+                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+                  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                />
+                <Bar yAxisId="left" dataKey="volume" name="Actual Volume" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar yAxisId="left" dataKey="target" name="Target Volume" fill="#52525b" radius={[4, 4, 0, 0]} barSize={20} />
+                <Line yAxisId="right" type="monotone" dataKey="efficiency" name="Efficiency %" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#f59e0b' }} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Daily Production Output vs Target Grouped Bar Chart */}
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-800 gap-2">
+            <div>
+              <h2 className="text-base font-sans font-semibold text-white flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-400" />
+                Daily Culinary Output vs. Target
+              </h2>
+              <p className="text-xs text-zinc-500">Weekly comparison of actual items plated versus daily targets</p>
+            </div>
+            <span className="p-1 px-3 text-[10px] rounded-full bg-emerald-950/40 text-emerald-400 font-mono font-bold border border-emerald-900/40">
+              92% Weekly Efficiency
+            </span>
+          </div>
+
+          <div className="h-64 mt-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={[
+                { day: 'Mon', Output: 450, Target: 400 },
+                { day: 'Tue', Output: 380, Target: 400 },
+                { day: 'Wed', Output: 520, Target: 450 },
+                { day: 'Thu', Output: 480, Target: 480 },
+                { day: 'Fri', Output: 610, Target: 550 },
+                { day: 'Sat', Output: 680, Target: 600 },
+                { day: 'Sun', Output: 590, Target: 550 },
+              ]} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <Tooltip 
+                  cursor={{ fill: '#1f2937', opacity: 0.3 }}
+                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+                  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+                <Bar dataKey="Output" name="Actual Plated Items" fill="#10b981" radius={[3, 3, 0, 0]} barSize={20} />
+                <Bar dataKey="Target" name="Culinary Target" fill="#4b5563" radius={[3, 3, 0, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Master Recipes Catalogue */}
  <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
  <h2 className="text-base font-sans font-semibold text-white pb-1">Ocean-to-Plate Recipe Standard</h2>
  <p className="text-xs text-zinc-500 pb-4">Approved corporate dish compositions and prep profiles</p>
@@ -231,10 +380,145 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  ))}
  </div>
  </div>
- </div>
 
+      </div>
 
+      {/* RIGHT: TASK INPUT & AI AUDIT */}
+      <div className="space-y-6">
+        
+        {/* Add Task Form */}
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
+          <div className="flex items-center gap-2 mb-4">
+            <Plus className="w-5 h-5 text-amber-500" />
+            <h2 className="text-base font-sans font-semibold">Queue New Dish</h2>
+          </div>
+          
+          <form onSubmit={handleSubmitTask} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Dish Name</label>
+              <input 
+                type="text" 
+                value={taskItem}
+                onChange={e => setTaskItem(e.target.value)}
+                placeholder="e.g. Classic Cod Slabs"
+                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-white"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Chef Station</label>
+              <select 
+                value={assignedTo}
+                onChange={e => setAssignedTo(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-zinc-300"
+              >
+                <option value="Chef Skipper">Chef Skipper (Grill)</option>
+                <option value="Chef Rico">Chef Rico (Fryer)</option>
+                <option value="Chef Kowalski">Chef Kowalski (Prep)</option>
+                <option value="Chef Private">Chef Private (Plating)</option>
+              </select>
+            </div>
 
- </div>
- );
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Quantity</label>
+                <input 
+                  type="number" 
+                  min="1"
+                  value={qty}
+                  onChange={e => setQty(parseInt(e.target.value) || 1)}
+                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Priority</label>
+                <select 
+                  value={priority}
+                  onChange={e => setPriority(e.target.value as any)}
+                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-zinc-300"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
+              <ChefHat className="w-4 h-4" />
+              Dispatch Order
+            </button>
+          </form>
+        </div>
+
+        {/* AI Culinary Auditor */}
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+             <h2 className="text-base font-sans font-semibold flex items-center gap-2 text-white">
+              <Camera className="w-4 h-4 text-amber-500" />
+              AI Culinary Auditor
+            </h2>
+          </div>
+          <p className="text-xs text-zinc-500 mb-4">Upload a photo of a plated dish for instant AI quality compliance analysis against standard recipes.</p>
+          
+          <div className="space-y-3">
+             <input 
+               type="file"
+               ref={fileInputRef}
+               className="hidden"
+               accept="image/*"
+               onChange={handleFileChange}
+             />
+             
+             <div className="grid grid-cols-3 gap-2 mb-3">
+               {SAMPLE_MOCK_DISHES.map((d, i) => (
+                 <button 
+                   key={i}
+                   onClick={() => selectPresetDish(d)}
+                   title={d.desc}
+                   className="p-2 border border-zinc-800 rounded bg-zinc-950 flex flex-col items-center gap-1 hover:border-amber-500/50 transition-colors"
+                 >
+                   <img src={d.data} alt={d.name} className="w-8 h-8 rounded" />
+                   <span className="text-[8px] font-bold text-zinc-400 text-center truncate w-full">{d.name}</span>
+                 </button>
+               ))}
+             </div>
+
+             <div className="flex items-center gap-2">
+               <button
+                 type="button"
+                 onClick={handleUploadClick}
+                 className="flex items-center gap-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-mono font-bold text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
+               >
+                 <Upload className="w-3 h-3" />
+                 Select
+               </button>
+               <span className="text-[10px] text-zinc-500 font-mono truncate flex-1">{fileLabel}</span>
+             </div>
+
+             <button 
+                onClick={handleRunAudit}
+                disabled={auditorLoading || !selectedPhoto}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 mt-2 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${
+                  (auditorLoading || !selectedPhoto)
+                    ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                    : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                }`}
+              >
+                {auditorLoading ? 'INSPECTING...' : 'RUN AUDIT'}
+              </button>
+
+              {auditResult && (
+                 <div className="p-4 rounded-xl mt-4 text-xs leading-relaxed border bg-amber-950/20 border-amber-900/40 text-amber-50">
+                  {auditResult}
+                 </div>
+              )}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }

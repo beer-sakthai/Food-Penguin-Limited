@@ -12,7 +12,7 @@ import {
   YAxis,
   CartesianGrid
 } from 'recharts';
-import { Sparkles, DollarSign, RefreshCw, Target, Activity } from 'lucide-react';
+import { DollarSign, Target, Activity } from 'lucide-react';
 
 interface FinanceTabProps {
   theme?: 'light' | 'dark';
@@ -22,8 +22,6 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
   const isLight = theme === 'light';
   
   const [mode, setMode] = useState<'plan' | 'use'>('plan');
-  const [report, setReport] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
 
   // Plan data as requested by user
   const planData = [
@@ -48,27 +46,6 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
     Plan: p.value,
     Use: useData.find(u => u.name === p.name)?.value || 0
   }));
-
-  const generateReport = async () => {
-    setIsGenerating(true);
-    try {
-      const response = await fetch("/api/gemini/finance-analysis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plan: planData,
-          actual: useData
-        })
-      });
-      if (!response.ok) throw new Error("Failed");
-      const { text } = await response.json();
-      setReport(text);
-    } catch (e) {
-      setReport("Jules was unable to generate financial insights.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -132,26 +109,6 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
                </div>
             </div>
           ))}
-
-          <div className={`p-5 rounded-2xl border transition-all flex flex-col justify-center items-start group relative overflow-hidden ${isLight ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-800 border-zinc-700'}`}>
-            <div className="absolute -right-4 -top-4 opacity-10 text-emerald-400">
-              <Sparkles size={80} />
-            </div>
-            <h3 className="text-sm font-semibold text-zinc-300 mb-1 z-10 flex items-center gap-2">
-              <Sparkles size={16} className="text-emerald-400" />
-              Jules P&L Auditor
-            </h3>
-            <p className="text-xs text-zinc-400 mb-3 z-10 leading-relaxed">
-              Analyze structural variance (Target vs Actual Use) to recover margins.
-            </p>
-            <button 
-              onClick={generateReport}
-              disabled={isGenerating}
-              className="w-full py-2 bg-emerald-500 text-zinc-900 text-xs font-bold uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 z-10 flex items-center justify-center gap-2"
-            >
-              {isGenerating ? <RefreshCw size={14} className="animate-spin" /> : "Run Analysis"}
-            </button>
-          </div>
         </div>
 
         {/* Charts Container */}
@@ -175,7 +132,7 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
                   labelLine={false}
                 >
                   {currentData.map((entry, index) => (
-                    <Cell key={`cell-\${index}`} fill={entry.color} />
+                    <Cell key={`finance-cell-${index}-${entry.name}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip 
@@ -220,18 +177,6 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
           </div>
         </div>
       </div>
-
-      {report && (
-        <div className={`p-6 rounded-2xl border transition-all animate-in fade-in slide-in-from-bottom-4 duration-500 ${isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-zinc-950 border-emerald-900/40'}`}>
-          <h3 className={`text-sm font-bold font-sans tracking-wide uppercase flex items-center gap-2 mb-4 ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>
-            <Sparkles size={16} />
-            Jules Structural Insights
-          </h3>
-          <div className={`prose prose-sm max-w-none ${isLight ? 'prose-emerald text-zinc-700' : 'prose-invert text-zinc-300'} font-sans leading-relaxed whitespace-pre-wrap`}>
-            {report}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

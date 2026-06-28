@@ -171,10 +171,10 @@ export default function WasteTab({
  };
 
  return (
- <div className="grid grid-cols-1 gap-6">
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
- {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
- <div className="space-y-6">
+      {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
+      <div className="lg:col-span-2 space-y-6">
 
  {/* Dynamic Allowance Index and Chart Split */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -250,7 +250,7 @@ export default function WasteTab({
  stroke="none"
  >
  {pieData.map((entry, index) => (
- <Cell key={`cell-${index}`} fill={PIE_COLORS[entry.name] || '#94a3b8'} />
+ <Cell key={`waste-cell-${index}-${entry.name}`} fill={PIE_COLORS[entry.name] || '#94a3b8'} />
  ))}
  </Pie>
  <Legend 
@@ -399,8 +399,123 @@ export default function WasteTab({
  </table>
  </div>
  </div>
- </div>
 
- </div>
- );
+      </div>
+
+      {/* RIGHT ASPECT: LOGGING & AI STRATEGY */}
+      <div className="space-y-6">
+        
+        {/* Input Form */}
+        <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div className="flex items-center gap-2 mb-4">
+            <Trash2 className={`w-5 h-5 ${isLight ? 'text-zinc-700' : 'text-zinc-400'}`} />
+            <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Log Waste Event</h2>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Item</label>
+              <select 
+                value={newItem}
+                onChange={e => handleProductChange(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+              >
+                {products.map(p => (
+                  <option key={p.name} value={p.name}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Weight (kg)</label>
+                <input 
+                  type="number" 
+                  step="0.1"
+                  min="0.1"
+                  value={weight}
+                  onChange={e => handleWeightChange(parseFloat(e.target.value))}
+                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
+                  required
+                />
+              </div>
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Value (€)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  value={cost}
+                  readOnly
+                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none opacity-80 cursor-not-allowed ${isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-500'}`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Reason</label>
+              <select 
+                value={reason}
+                onChange={e => setReason(e.target.value as any)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+              >
+                <option value="Expired">Expired</option>
+                <option value="Overproduced">Overproduced</option>
+                <option value="Quality Issue">Quality Issue</option>
+                <option value="Spill/Accident">Spill/Accident</option>
+              </select>
+            </div>
+
+            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
+              <Plus className="w-4 h-4" />
+              Log Waste Record
+            </button>
+          </form>
+        </div>
+
+        {/* AI Action Strategy */}
+        <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div className="flex items-center justify-between mb-4">
+             <h2 className={`text-base font-sans font-semibold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              AI Prevention Strategy
+            </h2>
+          </div>
+          <p className="text-xs text-zinc-500 mb-4">Select a high-loss category to generate predictive preservation tactics and repurposing hacks.</p>
+          
+          <div className="space-y-3">
+             <select 
+                value={helpCat}
+                onChange={e => setHelpCat(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+              >
+                <option value="Seafood">Seafood</option>
+                <option value="Produce">Produce</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Baked Goods">Baked Goods</option>
+                <option value="Prepared Foods">Prepared Foods</option>
+              </select>
+
+              <button 
+                onClick={handleFetchRepurposeStrategy}
+                disabled={strategyLoading}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${
+                  strategyLoading 
+                    ? (isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed')
+                    : 'bg-zinc-800 hover:bg-zinc-700 text-white dark:bg-zinc-800 dark:hover:bg-zinc-700'
+                }`}
+              >
+                {strategyLoading ? 'ANALYZING...' : 'GENERATE ADVICE'}
+              </button>
+
+              {repurposeStrategy && (
+                 <div className={`p-4 rounded-xl mt-4 text-xs leading-relaxed border ${isLight ? 'bg-amber-50/50 border-amber-200 text-zinc-800' : 'bg-amber-950/20 border-amber-900/40 text-amber-50'}`}>
+                  {repurposeStrategy}
+                 </div>
+              )}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }

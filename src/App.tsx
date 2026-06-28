@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { jsPDF } from 'jspdf';
+import { Reorder, motion } from 'motion/react';
 import {
  initialMetrics,
  initialOrders,
@@ -10,7 +11,8 @@ import {
  initialHours,
  initialInventory,
  initialWeeklyLogs,
- alternativeWeeklyLogsMap
+ alternativeWeeklyLogsMap,
+ initialAlerts
 } from './data';
 import {
  CoreMetrics,
@@ -21,7 +23,8 @@ import {
  WasteRecord,
  EmployeeHour,
  InventoryItem,
- DailyOperationalLog
+ DailyOperationalLog,
+ RealtimeAlert
 } from './types';
 
 // Tab Views
@@ -38,6 +41,7 @@ import SuppliersTab from './components/SuppliersTab';
 import FinanceTab from './components/FinanceTab';
 import RealtimeTab from './components/RealtimeTab';
 import ResourceAllocationTab from './components/ResourceAllocationTab';
+import ReportsTab from './components/ReportsTab';
 import LoginScreen from './components/LoginScreen';
 import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
 import CapacityVarianceChart from './components/CapacityVarianceChart';
@@ -45,7 +49,7 @@ import CapacityVarianceChart from './components/CapacityVarianceChart';
 
 // Main Icons
 import {
-  LayoutDashboard, Camera, Menu, X,
+  AlertTriangle, LayoutDashboard, Camera, Menu, X,
   Coins,
   Zap,
   Package,
@@ -70,14 +74,71 @@ import {
  SlidersHorizontal,
  Mail,
  Clock,
- Store
+ Store,
+  FileSpreadsheet,
+  GripVertical
 } from 'lucide-react';
 
+import { RotateCcw, Info } from 'lucide-react';
+
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
-  Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio'],
-  Manager: ['Overview', 'Realtime', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio'],
-  Staff: ['Overview', 'Realtime', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers'],
+  Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
+  Manager: ['Overview', 'Realtime', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
+  Staff: ['Overview', 'Realtime', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers', 'Reports'],
   User: ['Overview', 'Realtime'] // User can only view data
+};
+
+const getDayContributingItems = (day: string, projectedLoad: number) => {
+  const totalUnits = Math.round(projectedLoad * 12);
+  switch (day) {
+    case 'Mon':
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.45), category: 'Sushi Rolls', loadShare: 45, impact: 'High' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'Premium Sushi Rice Prep', quantity: Math.round(totalUnits * 0.20), category: 'Grains', loadShare: 20, impact: 'Low' }
+      ];
+    case 'Tue':
+      return [
+        { name: 'Spicy Bluefin Tuna Roll', quantity: Math.round(totalUnits * 0.50), category: 'Sushi Rolls', loadShare: 50, impact: 'High' },
+        { name: 'Kyoto Salmon Sashimi Platter', quantity: Math.round(totalUnits * 0.30), category: 'Sashimi & Platters', loadShare: 30, impact: 'Medium' },
+        { name: 'Nori Seaweed Processing', quantity: Math.round(totalUnits * 0.20), category: 'Dry Goods', loadShare: 20, impact: 'Low' }
+      ];
+    case 'Wed':
+      return [
+        { name: 'Volcano Baked Scallop Roll', quantity: Math.round(totalUnits * 0.40), category: 'Specialty Rolls', loadShare: 40, impact: 'High' },
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'Fresh Avocados Slicing', quantity: Math.round(totalUnits * 0.25), category: 'Produce', loadShare: 25, impact: 'Low' }
+      ];
+    case 'Thu':
+      return [
+        { name: 'Kyoto Salmon Sashimi Platter', quantity: Math.round(totalUnits * 0.45), category: 'Sashimi & Platters', loadShare: 45, impact: 'High' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'Sushi Seasoning Vinegar Mix', quantity: Math.round(totalUnits * 0.20), category: 'Condiments', loadShare: 20, impact: 'Low' }
+      ];
+    case 'Fri':
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.55), category: 'Sushi Rolls', loadShare: 55, impact: 'Critical' },
+        { name: 'Spicy Bluefin Tuna Roll', quantity: Math.round(totalUnits * 0.30), category: 'Sushi Rolls', loadShare: 30, impact: 'Medium' },
+        { name: 'Bluefin Tuna Loin Portioning', quantity: Math.round(totalUnits * 0.15), category: 'Seafood', loadShare: 15, impact: 'Low' }
+      ];
+    case 'Sat':
+      return [
+        { name: 'Volcano Baked Scallop Roll', quantity: Math.round(totalUnits * 0.45), category: 'Specialty Rolls', loadShare: 45, impact: 'High' },
+        { name: 'Kyoto Salmon Sashimi Platter', quantity: Math.round(totalUnits * 0.40), category: 'Sashimi & Platters', loadShare: 40, impact: 'High' },
+        { name: 'Atlantic Sushi Salmon Slicing', quantity: Math.round(totalUnits * 0.15), category: 'Seafood', loadShare: 15, impact: 'Low' }
+      ];
+    case 'Sun':
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.40), category: 'Sushi Rolls', loadShare: 40, impact: 'High' },
+        { name: 'Spicy Bluefin Tuna Roll', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.25), category: 'Sushi Rolls', loadShare: 25, impact: 'Low' }
+      ];
+    default:
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.50), category: 'Sushi Rolls', loadShare: 50, impact: 'High' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.50), category: 'Sushi Rolls', loadShare: 50, impact: 'Medium' }
+      ];
+  }
 };
 
 export default function App() {
@@ -180,19 +241,27 @@ export default function App() {
  }, [selectedBranch]);
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
+  const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
  const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
  const [selectedWeekRange, setSelectedWeekRange] = useState<string>('2026-06-15 to 2026-06-21');
  const [weeklyLogsMap, setWeeklyLogsMap] = useState<Record<string, DailyOperationalLog[]>>(alternativeWeeklyLogsMap);
  const [isCapacityExpanded, setIsCapacityExpanded] = useState<boolean>(false);
- const [capacitySortBy, setCapacitySortBy] = useState<'date' | 'bottleneck'>('date');
+ const [overlayBranches, setOverlayBranches] = useState<string[]>([]);
+ const [capacitySortBy, setCapacitySortBy] = useState<'date' | 'bottleneck' | 'custom'>('date');
+  const [customSortOrder, setCustomSortOrder] = useState<string[]>([]);
  const [bottleneckThreshold, setBottleneckThreshold] = useState<number>(90);
+ const [showThresholdTooltip, setShowThresholdTooltip] = useState<boolean>(false);
+ const [focusedDay, setFocusedDay] = useState<string | null>(null);
+ const [expandedDays, setExpandedDays] = useState<string[]>([]);
  const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
 
  // Quick Adjust simulated capacity overrides states
  const [quickAdjustEnabled, setQuickAdjustEnabled] = useState<boolean>(false);
  const [capacityOverrides, setCapacityOverrides] = useState<Record<string, { mode: 'ai' | 'manual'; value: number }>>({});
  const [globalAdjustValue, setGlobalAdjustValue] = useState<number>(100);
+  const [bulkSelectedDays, setBulkSelectedDays] = useState<string[]>([]);
+  const [bulkOverrideValue, setBulkOverrideValue] = useState<number>(0);
 
  // Email report schedule states
  const [isScheduleReportModalOpen, setIsScheduleReportModalOpen] = useState<boolean>(false);
@@ -234,8 +303,9 @@ export default function App() {
  };
 
  const handleResetOverrides = () => {
- setCapacityOverrides({});
- };
+    setCapacityOverrides({});
+    setBulkSelectedDays([]);
+  };
 
  const handleGlobalOverride = () => {
  if (!weeklyLogs) return;
@@ -409,15 +479,83 @@ export default function App() {
  ? Math.min(100, Math.max(0, capacityPct + 4)) 
  : Math.min(100, rawProjection);
  }, [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
+
+ // Multi-branch capacity projection data for overlay comparisons
+ const branchProjectionData = useMemo(() => {
+   const branches = [
+     'Marks & Spencer - Cork City',
+     'Tesco - Cork City',
+     'Tesco - Mahon Point'
+   ] as const;
+
+   const colors: Record<string, string> = {
+     'Marks & Spencer - Cork City': '#eab308', // Gold/Amber
+     'Tesco - Cork City': '#3b82f6',             // Blue
+     'Tesco - Mahon Point': '#10b981'            // Emerald
+   };
+
+   const data: Record<string, { current: number; projected: number; color: string }> = {};
+
+   branches.forEach(br => {
+     if (br === selectedBranch) {
+       data[br] = {
+         current: capacityPct,
+         projected: projectedCapacityPct,
+         color: colors[br]
+       };
+     } else {
+       let currentScale = 1.0;
+       let projectedScale = 1.0;
+
+       if (br === 'Marks & Spencer - Cork City') {
+         currentScale = 0.88;
+         projectedScale = 0.92;
+       } else if (br === 'Tesco - Cork City') {
+         currentScale = 1.12;
+         projectedScale = 1.06;
+       } else if (br === 'Tesco - Mahon Point') {
+         currentScale = 0.94;
+         projectedScale = 1.14;
+       }
+
+       let weekModifier = 0;
+       if (selectedWeekRange.includes('06-22')) {
+         weekModifier = 3;
+       } else if (selectedWeekRange.includes('06-15')) {
+         weekModifier = -2;
+       }
+
+       const calculatedCurrent = Math.min(100, Math.max(30, Math.round(capacityPct * currentScale + weekModifier)));
+       const calculatedProjected = Math.min(100, Math.max(30, Math.round(projectedCapacityPct * projectedScale + weekModifier * 1.5)));
+
+       data[br] = {
+         current: calculatedCurrent,
+         projected: calculatedProjected,
+         color: colors[br]
+       };
+     }
+   });
+
+   return data;
+ }, [selectedBranch, capacityPct, projectedCapacityPct, selectedWeekRange]);
  
  // Sorted daily capacity breakdown based on selected sort order (Chronological vs Bottleneck Intensity)
  const sortedDailyCapacityBreakdown = useMemo(() => {
- const list = [...dailyCapacityBreakdown];
- if (capacitySortBy === 'bottleneck') {
- return list.sort((a, b) => b.projected - a.projected);
- }
- return list; // 'date' is default chronological order of weeklyLogs
- }, [dailyCapacityBreakdown, capacitySortBy]);
+  const list = [...dailyCapacityBreakdown];
+  if (capacitySortBy === 'bottleneck') {
+    return list.sort((a, b) => b.projected - a.projected);
+  } else if (capacitySortBy === 'custom' && customSortOrder.length > 0) {
+    return list.sort((a, b) => {
+      const idxA = customSortOrder.indexOf(a.day);
+      const idxB = customSortOrder.indexOf(b.day);
+      if (idxA === -1 && idxB === -1) return 0;
+      if (idxA === -1) return 1;
+      if (idxB === -1) return -1;
+      return idxA - idxB;
+    });
+  }
+  return list;
+}, [dailyCapacityBreakdown, capacitySortBy, customSortOrder]);
  
  // Export Daily projected capacity as a CSV string file download
  const handleExportCapacityCSV = () => {
@@ -561,7 +699,7 @@ export default function App() {
  doc.setTextColor(textGray[0], textGray[1], textGray[2]);
  doc.text(`Bottleneck Limit Trigger: ${bottleneckThreshold}%`, 15, yPos);
  doc.text(`Smoothing Mode: ${capacitySmoothing === 'smoothed' ? '3-Day Rolling Moving Average' : 'Raw Metrics (None)'}`, 72, yPos);
- doc.text(`Sequence Filter Order: ${capacitySortBy === 'bottleneck' ? 'Bottleneck Intensity' : 'Calendar Sequence'}`, 142, yPos);
+ doc.text(`Sequence Filter Order: ${capacitySortBy === 'bottleneck' ? 'Bottleneck Intensity' : capacitySortBy === 'custom' ? 'Custom Priority' : 'Calendar Sequence'}`, 142, yPos);
 
  // --- Main Capacity Breakdown Table ---
  yPos += 6;
@@ -830,7 +968,8 @@ export default function App() {
     { id: 'Allocation', label: 'Allocations', icon: <Boxes className="w-4 h-4" /> },
     { id: 'Energy', label: 'Energy', icon: <Zap className="w-4 h-4" /> },
     { id: 'Suppliers', label: 'Suppliers', icon: <Package className="w-4 h-4" /> },
-    { id: 'Finance', label: 'Finance', icon: <DollarSign className="w-4 h-4" /> }
+    { id: 'Finance', label: 'Finance', icon: <DollarSign className="w-4 h-4" /> },
+     { id: 'Reports', label: 'Reports Hub', icon: <FileSpreadsheet className="w-4 h-4" /> }
  ];
 
  const tabMeta = allTabMeta.filter(tab => rolePermissions[userRole].includes(tab.id));
@@ -862,12 +1001,28 @@ export default function App() {
  theme={theme}
  />
  );
- case 'Sell': {
+ case 'Realtime':
+		return <RealtimeTab theme={theme} />;
+	case 'Sell': {
  const filteredOrders = orders.filter(o => !o.branch || o.branch === selectedBranch);
  return <SellTab selectedBranch={selectedBranch} theme={theme} />;
  }
  case 'Target':
  return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
+	case 'Reports':
+		return (
+			<ReportsTab
+				theme={theme}
+				orders={orders}
+				targets={targets}
+				tasks={tasks}
+				wasteRecords={wasteRecords}
+				hoursData={hoursData}
+				inventory={inventory}
+				weeklyLogs={weeklyLogs}
+				alerts={alerts}
+			/>
+		);
           case 'Allocation':
         return <ResourceAllocationTab theme={theme} branches={['M&S Cork', 'Tesco Cork', 'Tesco Mahon']} />;
       case 'Studio':
@@ -1104,58 +1259,187 @@ export default function App() {
  </span>
  </div>
 
- {/* Premium, interactive, layered capacity progress bar */}
+ {/* Branch Overlay Selector (Gold Liner style) */}
+ <div className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-[8.5px] select-none border transition-all ${
+   isLight ? 'bg-zinc-100/65 border-zinc-200 shadow-sm' : 'bg-zinc-950/30 border-zinc-800/45'
+ }`}>
+   <div className="flex items-center justify-between">
+     <span className={`flex items-center gap-1.5 font-bold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+       <span className={`w-1.5 h-1.5 rounded-full ${overlayBranches.length > 0 ? 'bg-yellow-500 animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'bg-zinc-400'}`} />
+       Overlay Branch Trends
+     </span>
+     {overlayBranches.length > 0 && (
+       <button 
+         onClick={() => setOverlayBranches([])}
+         className={`px-1.5 py-0.5 rounded text-[7px] font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${
+           isLight 
+             ? 'bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700' 
+             : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300'
+         }`}
+       >
+         Clear Overlay
+       </button>
+     )}
+   </div>
+
+   <div className="flex flex-wrap gap-1.5">
+     {(['Marks & Spencer - Cork City', 'Tesco - Cork City', 'Tesco - Mahon Point'] as const).map((branch) => {
+       const isCurrent = branch === selectedBranch;
+       const isSelected = overlayBranches.includes(branch);
+       const shortName = branch.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
+       
+       // Theme colors config
+       const colors: Record<string, { bg: string, text: string, activeBg: string }> = {
+         'Marks & Spencer - Cork City': {
+           bg: isLight ? 'bg-amber-50 border-amber-200/50 text-amber-700' : 'bg-amber-950/20 border-amber-900/30 text-amber-500',
+           text: 'text-amber-500',
+           activeBg: 'bg-amber-500 text-zinc-950 border-amber-400 shadow-[0_0_8px_rgba(234,179,8,0.45)]'
+         },
+         'Tesco - Cork City': {
+           bg: isLight ? 'bg-blue-50 border-blue-200/50 text-blue-700' : 'bg-blue-950/20 border-blue-900/30 text-blue-400',
+           text: 'text-blue-400',
+           activeBg: 'bg-blue-600 text-white border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.45)]'
+         },
+         'Tesco - Mahon Point': {
+           bg: isLight ? 'bg-emerald-50 border-emerald-200/50 text-emerald-700' : 'bg-emerald-950/20 border-emerald-900/30 text-emerald-400',
+           text: 'text-emerald-400',
+           activeBg: 'bg-emerald-600 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.45)]'
+         }
+       };
+
+       const style = colors[branch];
+
+       if (isCurrent) {
+         return (
+           <div
+             key={branch}
+             className={`px-2 py-1 rounded-md border text-[7.5px] font-bold flex items-center gap-1 cursor-default opacity-95 ${style.activeBg}`}
+           >
+             <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+             {shortName} (Active)
+           </div>
+         );
+       }
+
+       return (
+         <button
+           key={branch}
+           onClick={() => {
+             setOverlayBranches(prev => 
+               prev.includes(branch) 
+                 ? prev.filter(b => b !== branch) 
+                 : [...prev, branch]
+             );
+           }}
+           className={`px-2 py-1 rounded-md border text-[7.5px] font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
+             isSelected 
+               ? style.activeBg
+               : `${isLight ? 'bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100' : 'bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800'} opacity-75`
+           }`}
+         >
+           {shortName}
+         </button>
+       );
+     })}
+    </div>
+  </div>
+
+  {/* Premium, interactive, layered capacity progress bar */}
         <div className={`relative h-3 rounded-full overflow-hidden mt-3 shadow-inner ${
           isLight ? 'bg-zinc-200' : 'bg-zinc-800/80'
         }`}>
+          {/* Visual 'Safe Zone' range marker (40% to bottleneckThreshold) */}
+          {bottleneckThreshold > 40 && (
+            <motion.div 
+              className={`absolute top-0 h-full border-l border-r border-dashed z-0 ${
+                isLight 
+                  ? 'bg-emerald-500/[0.08] border-emerald-500/25' 
+                  : 'bg-emerald-500/[0.06] border-emerald-400/20'
+              }`}
+              animate={{ 
+                left: '40%', 
+                width: `${bottleneckThreshold - 40}%` 
+              }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              title={`Optimal Safe Zone: 40% to ${bottleneckThreshold}%`}
+            />
+          )}
+
           {/* Visual range indicator: Distance from Projected to Bottleneck Threshold */}
           {projectedCapacityPct <= bottleneckThreshold ? (
-            <div 
-              className={`absolute top-0 h-full transition-all duration-500 ease-out ${isLight ? 'bg-emerald-500/20' : 'bg-emerald-500/30'}`}
-              style={{ left: `${projectedCapacityPct}%`, width: `${bottleneckThreshold - projectedCapacityPct}%` }}
+            <motion.div 
+              className={`absolute top-0 h-full ${isLight ? 'bg-emerald-500/20' : 'bg-emerald-500/30'}`}
+              animate={{ left: `${projectedCapacityPct}%`, width: `${bottleneckThreshold - projectedCapacityPct}%` }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
               title={`Safe Buffer: ${bottleneckThreshold - projectedCapacityPct}%`}
             />
           ) : (
-            <div 
-              className={`absolute top-0 h-full animate-pulse transition-all duration-500 ease-out ${isLight ? 'bg-rose-500/40' : 'bg-rose-500/50'}`}
-              style={{ left: `${bottleneckThreshold}%`, width: `${projectedCapacityPct - bottleneckThreshold}%` }}
+            <motion.div 
+              className={`absolute top-0 h-full animate-pulse ${isLight ? 'bg-rose-500/40' : 'bg-rose-500/50'}`}
+              animate={{ left: `${bottleneckThreshold}%`, width: `${projectedCapacityPct - bottleneckThreshold}%` }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
               title={`Threshold Overflow: ${projectedCapacityPct - bottleneckThreshold}%`}
             />
           )}
 
           {/* Solid Current Capacity Bar */}
-          <div 
-            className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(249,115,22,0.2)]"
-            style={{ width: `${capacityPct}%` }}
+          <motion.div 
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full shadow-[0_0_8px_rgba(249,115,22,0.2)]"
+            animate={{ width: `${capacityPct}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
             title={`Current load: ${capacityPct}%`}
           />
 
           {/* Optional dynamic striped extension for projected excess over current */}
           {projectedCapacityPct > capacityPct && (
-            <div 
-              className="absolute left-0 top-0 h-full bg-amber-500/40 transition-all duration-500 ease-out"
+            <motion.div 
+              className="absolute left-0 top-0 h-full bg-amber-500/40"
               style={{ 
-                left: `${capacityPct}%`,
-                width: `${projectedCapacityPct - capacityPct}%`,
                 backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(245, 158, 11, 0.2) 4px, rgba(245, 158, 11, 0.2) 8px)'
               }}
+              animate={{ 
+                left: `${capacityPct}%`,
+                width: `${projectedCapacityPct - capacityPct}%`
+              }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
               title={`Projected increase: ${projectedCapacityPct - capacityPct}%`}
             />
           )}
           
           {/* Vertical dashed line indicator to point to the projected load */}
-          <div 
-            className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10 transition-all duration-500 ease-out"
-            style={{ left: `${projectedCapacityPct}%` }}
+          <motion.div 
+            className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10"
+            animate={{ left: `${projectedCapacityPct}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
             title={`7-Day Projection Target: ${projectedCapacityPct}%`}
           />
 
           {/* Vertical marker for User-set Bottleneck Threshold */}
-          <div 
-            className="absolute top-0 h-full w-0.5 bg-rose-500 z-20 transition-all duration-500"
-            style={{ left: `${bottleneckThreshold}%` }}
+          <motion.div 
+            className="absolute top-0 h-full w-0.5 bg-rose-500 z-20"
+            animate={{ left: `${bottleneckThreshold}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
             title={`Bottleneck Threshold: ${bottleneckThreshold}%`}
           />
+
+          {/* Overlay branch markers */}
+          {overlayBranches.map((name) => {
+            if (name === selectedBranch) return null;
+            const val = branchProjectionData[name as keyof typeof branchProjectionData];
+            if (!val) return null;
+            const bData = val as { current: number; projected: number; color: string };
+            const shortName = name.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
+            return (
+              <motion.div 
+                key={name}
+                className="absolute top-0 h-full w-1 rounded-full border border-white/20 z-30 shadow-[0_0_4px_rgba(0,0,0,0.5)]"
+                style={{ backgroundColor: bData.color }}
+                animate={{ left: `${bData.projected}%` }}
+                transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                title={`${shortName} Projected Capacity: ${bData.projected}%`}
+              />
+            );
+          })}
         </div>
 
         {/* Text details and comparison metrics */}
@@ -1176,6 +1460,47 @@ export default function App() {
  {projectedCapacityPct}% {projectedCapacityPct >= capacityPct ? '↑' : '↓'}
  </span>
  </div>
+
+ <div className="flex justify-between items-center">
+  <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+  <span className="w-1.5 h-1.5 rounded-sm bg-emerald-500/15 border border-dashed border-emerald-500/40" /> Safe Zone (40% - {bottleneckThreshold}%):
+  </span>
+  <span className="font-bold text-emerald-500">
+  Active
+  </span>
+  </div>
+
+  {/* Branch Projections Overlay Comparison */}
+ {overlayBranches.length > 0 && (
+ <div className={`mt-2 pt-2 border-t border-dashed space-y-1.5 ${
+ isLight ? 'border-zinc-200' : 'border-zinc-800/40'
+ }`}>
+ <p className={`text-[8px] uppercase tracking-wider font-bold mb-1 select-none ${
+ isLight ? 'text-zinc-400' : 'text-zinc-500'
+ }`}>Projected Branch Comparison</p>
+ {Object.entries(branchProjectionData).map(([name, val]) => {
+ const isCurrentBranch = name === selectedBranch;
+ const isSelected = overlayBranches.includes(name);
+ if (!isCurrentBranch && !isSelected) return null;
+ const bData = val as { current: number; projected: number; color: string };
+ const shortName = name.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
+ return (
+ <div key={name} className="flex justify-between items-center">
+ <span className={`flex items-center gap-1.5 ${
+ isLight ? 'text-zinc-600' : 'text-zinc-300'
+ } ${isCurrentBranch ? 'font-bold' : ''}`}>
+ <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: bData.color }} />
+ {shortName}:
+ </span>
+ <span className="font-bold font-mono text-[9.5px]" style={{ color: bData.color }}>
+ {bData.projected}% {isCurrentBranch && <span className="text-[7.5px] uppercase tracking-wide font-black pl-1">(Active)</span>}
+ </span>
+ </div>
+ );
+ })}
+ </div>
+ )}
+
  <p className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${
  isLight ? 'border-zinc-200 text-zinc-400' : 'border-zinc-800/20 text-zinc-500'
  }`}>
@@ -1189,6 +1514,26 @@ export default function App() {
  <div className="flex items-center justify-between">
  <p className={`font-bold uppercase tracking-wider text-[8px] ${isLight ? 'text-zinc-500' : 'text-zinc-555'}`}>Daily Capacity Breakdown</p>
  <div className="flex items-center gap-1.5">
+    {/* Global 'Clear All Filters' Button (Gold Liner Style) */}
+    <button
+      onClick={() => {
+        setCapacitySortBy('date');
+        setCapacitySmoothing('raw');
+        setBulkSelectedDays([]);
+      }}
+      disabled={capacitySortBy === 'date' && capacitySmoothing === 'raw' && bulkSelectedDays.length === 0}
+      className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
+        (capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0)
+          ? isLight
+            ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer'
+            : 'bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer'
+          : 'opacity-40 cursor-not-allowed ' + (isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-400' : 'bg-zinc-800/50 border-zinc-700/35 text-zinc-600')
+      }`}
+      title="Clear all daily capacity filters, sorting, smoothing, and bulk selections"
+    >
+      <RotateCcw className={`w-2.5 h-2.5 ${(capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0) ? 'text-yellow-500' : ''}`} />
+      <span>Clear Filters</span>
+    </button>
  <button 
  onClick={handleExportCapacityCSV}
  className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
@@ -1237,7 +1582,7 @@ export default function App() {
  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Order by:</span>
  <select
  value={capacitySortBy}
- onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck')}
+ onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck' | 'custom')}
  className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
  isLight 
  ? 'bg-white border-zinc-200 text-amber-600' 
@@ -1246,6 +1591,7 @@ export default function App() {
  >
  <option value="date" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>📅 Date (Chronological)</option>
  <option value="bottleneck" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>🔥 Bottleneck Intensity</option>
+ <option value="custom" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>🖐️ Custom Priority</option>
  </select>
  </div>
  
@@ -1314,76 +1660,178 @@ export default function App() {
  </button>
  </div>
 
- {quickAdjustEnabled && (
- <div className="flex flex-col gap-1.5 pt-1.5 border-t border-dashed border-zinc-200 dark:border-zinc-800/80 mt-1">
- <div className="flex items-center justify-between">
- <span className={`text-[7px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>
- Global Preset: {globalAdjustValue}%
- </span>
- {Object.keys(capacityOverrides).length > 0 && (
- <button
- onClick={handleResetOverrides}
- type="button"
- className={`text-[7px] font-mono uppercase tracking-wide font-extrabold transition-all underline decoration-dotted  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-500 cursor-pointer ${
- isLight ? 'text-zinc-500' : 'text-zinc-400'
- }`}
- >
- Clear All
- </button>
- )}
- </div>
- <div className="flex items-center gap-2">
- <input
- type="range"
- min="10"
- max="110"
- step="5"
- value={globalAdjustValue}
- onChange={(e) => setGlobalAdjustValue(Number(e.target.value))}
- className="flex-1 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-500 hover:accent-amber-400 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
- style={{ accentColor: '#f59e0b' }}
- />
- <button
- onClick={handleGlobalOverride}
- type="button"
- className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-800 transition-colors rounded px-2 py-0.5 text-[8px] font-bold uppercase font-mono tracking-wider active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
- >
- Apply
- </button>
- </div>
- </div>
+  {quickAdjustEnabled && (
+  <div className={`p-2 mt-1.5 rounded-xl border flex flex-col gap-1.5 ${isLight ? 'bg-amber-50/50 border-amber-200' : 'bg-amber-950/20 border-amber-900/50'}`}>
+    <div className="flex justify-between items-center text-[9px] uppercase font-bold text-amber-600 dark:text-amber-500">
+      <span>{bulkSelectedDays.length > 0 ? `Bulk Adjust (${bulkSelectedDays.length} days)` : 'Global Preset'}</span>
+      <div className="flex items-center gap-2">
+        {bulkSelectedDays.length > 0 && (
+          <button onClick={() => setBulkSelectedDays([])} className="hover:underline text-[8px] tracking-wider">Clear Selection</button>
+        )}
+        {Object.keys(capacityOverrides).length > 0 && (
+          <button onClick={handleResetOverrides} className="hover:underline text-[8px] tracking-wider">Reset All</button>
+        )}
+      </div>
+    </div>
+    
+    <div className="flex items-center gap-2">
+      <input
+        type="range"
+        min={bulkSelectedDays.length > 0 ? "-50" : "10"}
+        max={bulkSelectedDays.length > 0 ? "50" : "110"}
+        step="5"
+        value={bulkSelectedDays.length > 0 ? bulkOverrideValue : globalAdjustValue}
+        onChange={(e) => {
+          if (bulkSelectedDays.length > 0) {
+            setBulkOverrideValue(Number(e.target.value));
+          } else {
+            setGlobalAdjustValue(Number(e.target.value));
+          }
+        }}
+        className="flex-1 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-500 hover:accent-amber-400 active:scale-[0.98] transition-all duration-200"
+        style={{ accentColor: '#f59e0b' }}
+      />
+      {(() => {
+        const isBulk = bulkSelectedDays.length > 0;
+        const hasWarning = isBulk && bulkSelectedDays.some(day => {
+          const item = dailyCapacityBreakdown.find(d => d.day === day);
+          if (!item) return false;
+          const newCap = item.projected + bulkOverrideValue;
+          return newCap > 110 || newCap < 0;
+        });
+
+        return (
+          <div className="flex items-center gap-1.5 shrink-0">
+            {hasWarning && (
+              <div title="Warning: Adjustment pushes capacity beyond 110% or below 0%" className="text-rose-500">
+                <AlertTriangle className="w-3.5 h-3.5" />
+              </div>
+            )}
+            <button
+              onClick={() => {
+                if (isBulk) {
+                  const newOverrides = { ...capacityOverrides };
+                  bulkSelectedDays.forEach(day => {
+                    const item = dailyCapacityBreakdown.find(d => d.day === day);
+                    if (item) {
+                      newOverrides[day] = { mode: 'manual', value: item.projected + bulkOverrideValue };
+                    }
+                  });
+                  setCapacityOverrides(newOverrides);
+                  setBulkSelectedDays([]);
+                } else {
+                  handleGlobalOverride();
+                }
+              }}
+              className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-[9px] font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+            >
+              Apply {isBulk ? `${bulkOverrideValue > 0 ? '+' : ''}${bulkOverrideValue}%` : `${globalAdjustValue}%`}
+            </button>
+          </div>
+        );
+      })()}
+    </div>
+  </div>
  )}
  </div>
  </div>
 
- {/* Bottleneck Threshold Slider */}
- <div className={`flex flex-col gap-2 p-2.5 rounded-xl border ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
- }`}>
- <div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
- <span>Bottleneck Threshold</span>
- <span className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border ${
- isLight 
- ? 'bg-white border-zinc-200 text-amber-600' 
- : 'bg-zinc-900 border-zinc-800/55 text-amber-450'
- }`}>{bottleneckThreshold}%</span>
- </div>
- <input
- type="range"
- min="50"
- max="100"
- step="1"
- value={bottleneckThreshold}
- onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
- className="w-full h-1 bg-zinc-300 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 focus:outline-none transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
- style={{ accentColor: '#f97316' }}
- />
- <div className="flex justify-between text-[7px] text-zinc-500 font-mono leading-none">
- <span>50%</span>
- <span>75%</span>
- <span>100%</span>
- </div>
- </div>
+	{/* Bottleneck Threshold Slider */}
+	<div className={`flex flex-col gap-2 p-2.5 rounded-xl border relative ${
+	isLight ? 'bg-zinc-100 border-zinc-200 shadow-sm' : 'bg-zinc-950/80 border-zinc-900/60'
+	}`}>
+	<div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+	<div className="flex items-center gap-1">
+	  <span>Bottleneck Threshold</span>
+	  <button
+	    type="button"
+	    onClick={() => setShowThresholdTooltip(!showThresholdTooltip)}
+	    onMouseEnter={() => setShowThresholdTooltip(true)}
+	    onMouseLeave={() => setShowThresholdTooltip(false)}
+	    className={`p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-95 ${
+	      showThresholdTooltip 
+	        ? 'text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10' 
+	        : isLight 
+	          ? 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50' 
+	          : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
+	    }`}
+	    title="Information Tooltip"
+	  >
+	    <Info className="w-3 h-3" />
+	  </button>
+	</div>
+	<motion.span 
+	  key={bottleneckThreshold}
+	  initial={{ scale: 0.92, opacity: 0.8 }}
+	  animate={{ scale: 1, opacity: 1 }}
+	  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+	    isLight 
+	      ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' 
+	      : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+	  }`}
+	>
+	  {bottleneckThreshold}%
+	</motion.span>
+	</div>
+
+	{/* Tooltip Popup box aligned directly on top of the container */}
+	{showThresholdTooltip && (
+	  <div className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-[9px] font-normal normal-case tracking-normal leading-relaxed ${
+	    isLight 
+	      ? 'bg-white border-zinc-200/90 text-zinc-700 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)]' 
+	      : 'bg-zinc-900/95 border-zinc-800 text-zinc-300 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5),0_8px_10px_-6px_rgba(0,0,0,0.5)]'
+	  }`}>
+	    {/* Gold line border indicator on the left side to highlight calibration info */}
+	    <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-yellow-500" />
+	    
+	    <h4 className="font-bold text-[9.5px] text-yellow-500 mb-1.5 flex items-center gap-1 uppercase tracking-wider">
+	      <Info className="w-3 h-3 text-yellow-500" />
+	      Calibration Parameters
+	    </h4>
+	    <p className="mb-2.5 text-[8.5px] leading-normal">
+	      The <strong>Bottleneck Threshold</strong> defines your operational peak capacity tolerance. Adjusting it triggers real-time visual alerts and modifies report metrics.
+	    </p>
+	    
+	    <div className="space-y-2 border-t pt-2 border-zinc-200/50 dark:border-zinc-800/50">
+	      <div className="flex flex-col gap-0.5">
+	        <span className="font-bold text-yellow-500 uppercase tracking-wide text-[7.5px] flex items-center gap-1">
+	          ⚠️ Live Alert System
+	        </span>
+	        <p className="text-[8px] text-zinc-500 dark:text-zinc-400">
+	          Any day with projected capacity above <span className="font-bold">{bottleneckThreshold}%</span> automatically lights up with a yellow <span className="bg-amber-500/10 text-amber-500 border border-amber-500/25 px-1 py-0.2 rounded font-mono font-bold text-[7px] shadow-sm shadow-amber-500/20">HOT</span> bottleneck alert badge inside the Daily Capacity Breakdown list.
+	        </p>
+	      </div>
+	      <div className="flex flex-col gap-0.5">
+	        <span className="font-bold text-yellow-500 uppercase tracking-wide text-[7.5px] flex items-center gap-1">
+	          📊 Report Generation
+	        </span>
+	        <p className="text-[8px] text-zinc-500 dark:text-zinc-400">
+	          This threshold is baked directly into generated PDF summaries and CSV sheets. The system uses it to compile bottleneck statistics, mark overflow dates, and formulate staff allocation recommendations.
+	        </p>
+	      </div>
+	    </div>
+	  </div>
+	)}
+	<input
+	type="range"
+	min="50"
+	max="100"
+	step="1"
+	value={bottleneckThreshold}
+	onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
+	className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+	style={{ 
+	  accentColor: '#eab308',
+	  background: `linear-gradient(to right, #eab308 0%, #eab308 ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} 100%)`
+	}}
+	/>
+	<div className="flex justify-between text-[7px] text-zinc-500 font-mono leading-none">
+	<span>50%</span>
+	<span>75%</span>
+	<span>100%</span>
+	</div>
+	</div>
 
  {/* Visual D3 Target vs Actual Variance performance drift Chart */}
  <div className={`p-2.5 rounded-xl border ${
@@ -1401,16 +1849,11 @@ export default function App() {
                 <button
                   onClick={() => {
                     const el = document.getElementById(`bottleneck-day-${maxProjectedItem.day}`);
-                    // Using modern scrollIntoView with smooth behavior
                     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // Add a brief highlight flash when scrolled
-                    if (el) {
-                      el.classList.add('ring-2', 'ring-amber-500', 'ring-offset-2', 'ring-offset-zinc-900', 'rounded-xl');
-                      setTimeout(() => {
-                        el.classList.remove('ring-2', 'ring-amber-500', 'ring-offset-2', 'ring-offset-zinc-900', 'rounded-xl');
-                      }, 2000);
-                    }
+                    setFocusedDay(maxProjectedItem.day);
+                    setTimeout(() => {
+                      setFocusedDay(null);
+                    }, 2500);
                   }}
                   className={`w-full flex items-center justify-between mt-1 mb-2 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-sm group ${
                     isLight 
@@ -1430,7 +1873,15 @@ export default function App() {
             }
             return null;
           })()}
-          <div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
+                    <Reorder.Group 
+  axis="y" 
+  values={sortedDailyCapacityBreakdown} 
+  onReorder={(newOrder) => { 
+    setCustomSortOrder(newOrder.map(item => item.day)); 
+    setCapacitySortBy('custom'); 
+  }} 
+  className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar"
+>
             {(() => {
               const avgWeeklyProjected = Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / (dailyCapacityBreakdown.length || 1));
               return sortedDailyCapacityBreakdown.map((item, index) => {
@@ -1450,10 +1901,11 @@ export default function App() {
  const fillPathD = `M 2,12 L ${points.join(' L ')} L 46,12 Z`;
 
  return (
- <div 
-                            key={index} 
-                            id={`bottleneck-day-${item.day}`}
-                            className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${
+  <Reorder.Item 
+    key={item.day}
+    value={item}
+    id={`bottleneck-day-${item.day}`}
+    className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${
                               isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40'
                             } ${
                               isBottleneck 
@@ -1461,18 +1913,55 @@ export default function App() {
                                   ? 'bg-amber-50 border-2 border-amber-400 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_12px_rgba(245,158,11,0.4)] animate-[pulse_2s_ease-in-out_infinite]' 
                                   : 'bg-amber-900/10 border-2 border-amber-500/60 p-2.5 rounded-xl my-1 shadow-[0_0_15px_rgba(245,158,11,0.3)] text-zinc-300 animate-[pulse_2s_ease-in-out_infinite]' 
                                 : 'px-1 pt-1'
+                            } ${
+                              focusedDay === item.day
+                                ? 'ring-2 ring-yellow-500 border-yellow-500 rounded-xl p-2.5 shadow-[0_0_20px_rgba(234,179,8,0.75)] scale-[1.02] bg-yellow-500/5 dark:bg-yellow-500/10 z-10'
+                                : ''
                             }`}
                           >
  <div className="flex justify-between items-center text-[10px] gap-2">
- <span className={`font-sans font-bold flex items-center gap-1 flex-wrap min-w-[70px] ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>
+                            <div className="flex items-center gap-1.5 min-w-[70px]">
+  <div className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-amber-500 transition-colors" title="Drag to reorder priority">
+    <GripVertical size={12} />
+  </div>
+  <button
+    type="button"
+    onClick={() => {
+      setExpandedDays(prev => 
+        prev.includes(item.day) ? prev.filter(d => d !== item.day) : [...prev, item.day]
+      );
+    }}
+    className={`p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:scale-105 active:scale-95 shadow-sm shrink-0 ${
+      isLight ? 'hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950' : 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100'
+    }`}
+    title="Toggle contributing items"
+  >
+    {expandedDays.includes(item.day) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+  </button>
+                              {quickAdjustEnabled && (
+                                <input 
+                                  type="checkbox"
+                                  checked={bulkSelectedDays.includes(item.day)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setBulkSelectedDays([...bulkSelectedDays, item.day]);
+                                    } else {
+                                      setBulkSelectedDays(bulkSelectedDays.filter(d => d !== item.day));
+                                    }
+                                  }}
+                                  className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-amber-500 focus:ring-2 cursor-pointer transition-colors accent-amber-500"
+                                />
+                              )}
+                              <span className={`font-sans font-bold flex items-center gap-1 flex-wrap ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>
  {item.day.substring(0, 3)} 
  <span className={`text-[8px] font-normal font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>({item.date})</span>
  {isBottleneck && (
- <span className={`text-[7.5px] font-mono leading-none py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5 ${isLight ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'}`}>
+ <span className={`text-[7.5px] font-mono leading-none py-0.5 px-1 rounded-sm font-bold uppercase tracking-wider animate-pulse inline-flex items-center gap-0.5 shadow-lg ${isLight ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-amber-500/35' : 'bg-3d-copper-dark metallic-base drop-shadow-xl shadow-yellow-500/45'}`}>
                         {isLight && <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />} Hot
-                      </span>
- )}
- </span>
+                        </span>
+  )}
+  </span>
+</div>
 
  {/* Center: Sparkline trend & differential */}
  <div className="flex-1 flex items-center justify-center gap-1.5 px-1">
@@ -1654,9 +2143,24 @@ export default function App() {
  className="w-16 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
  style={{ accentColor: '#f97316' }}
  />
- <span className="font-mono text-[8px] font-bold text-orange-500 w-6 text-right shrink-0">
+ <div className="flex flex-col items-end shrink-0 w-8">
+ <span className="font-mono text-[8px] font-bold text-orange-500 text-right">
  {capacityOverrides[item.day]?.value}%
  </span>
+ {(() => {
+ const val = capacityOverrides[item.day]?.value;
+ if (val !== undefined && val !== item.projected) {
+ const delta = val - item.projected;
+ const isPos = delta > 0;
+ return (
+ <span className={`font-mono text-[6.5px] font-extrabold ${isPos ? 'text-rose-500' : 'text-emerald-500'}`}>
+ {isPos ? '+' : ''}{delta}%
+ </span>
+ );
+ }
+ return null;
+ })()}
+ </div>
  </div>
  ) : (
  <span className="text-[7px] text-zinc-400 italic font-mono uppercase tracking-wide">
@@ -1665,11 +2169,75 @@ export default function App() {
  )}
  </div>
  )}
- </div>
+  {/* Expandable Details view showing top contributing items */}
+  {expandedDays.includes(item.day) && (
+    <motion.div 
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      transition={{ duration: 0.25, ease: 'easeInOut' }}
+      className={`mt-2 overflow-hidden text-[9.5px] border-t pt-2 space-y-1.5 ${
+        isLight ? 'border-zinc-200 shadow-inner' : 'border-zinc-800/60 shadow-inner'
+      }`}
+    >
+      <div className={`font-semibold flex items-center justify-between px-1 mb-1 ${
+        isLight ? 'text-zinc-600 font-bold' : 'text-zinc-400'
+      }`}>
+        <span>Top Contributing Production Items</span>
+        <span className="font-mono text-[8px] uppercase tracking-wider">Qty / Impact</span>
+      </div>
+      <div className="space-y-1">
+        {getDayContributingItems(item.day, item.projected).map((prodItem, idx) => {
+          let badgeColor = '';
+          if (prodItem.impact === 'Critical' || prodItem.impact === 'High') {
+            badgeColor = isLight ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-rose-950/20 text-rose-400 border-rose-900/40';
+          } else if (prodItem.impact === 'Medium') {
+            badgeColor = isLight ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-amber-950/20 text-amber-400 border-amber-900/40';
+          } else {
+            badgeColor = isLight ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-emerald-950/20 text-emerald-400 border-emerald-900/40';
+          }
+
+          return (
+            <div 
+              key={idx} 
+              className={`flex items-center justify-between p-1.5 rounded-lg border transition-all duration-200 hover:scale-[1.01] ${
+                isLight ? 'bg-white border-zinc-100 hover:border-zinc-200 shadow-sm' : 'bg-zinc-900/40 border-zinc-800/40 hover:border-zinc-800'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                <div className="flex flex-col min-w-0">
+                  <span className={`font-semibold truncate ${isLight ? 'text-zinc-800 font-bold' : 'text-zinc-200'}`}>
+                    {prodItem.name}
+                  </span>
+                  <span className={`text-[8px] font-normal truncate ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    {prodItem.category}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="text-right flex flex-col">
+                  <span className={`font-bold font-mono text-[9px] ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>
+                    {prodItem.quantity} units
+                  </span>
+                  <span className={`text-[8px] font-mono font-medium ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    {prodItem.loadShare}% Share
+                  </span>
+                </div>
+                <span className={`text-[7.5px] font-mono uppercase px-1.5 py-0.5 rounded-md border font-extrabold ${badgeColor}`}>
+                  {prodItem.impact}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  )}
+ </Reorder.Item>
  );
                   });
                 })()}
-              </div>
+              </Reorder.Group>
             </div>
           )}
  </div>

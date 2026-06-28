@@ -30,7 +30,9 @@ import {
  BarChart,
  Bar,
  Legend,
- Cell
+ Cell,
+ PieChart,
+ Pie
 } from 'recharts';
 
 interface OverviewTabProps {
@@ -529,8 +531,10 @@ export default function OverviewTab({
  {/* KPI Bento Cards */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
  {/* Card 1: Sell Today */}
- <div 
- onClick={() => onNavigateTab('Sell')}
+  <motion.div 
+  key={activeLog.date + '-sell-' + activeLog.sales}
+  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
+  onClick={() => onNavigateTab('Sell')}
  className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
                 ? 'bg-amber-100/50 border-amber-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
@@ -574,11 +578,13 @@ export default function OverviewTab({
  </ResponsiveContainer>
  </div>
  <div className="absolute bottom-0 left-0 right-0 h-1 bg-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
- </div>
+  </motion.div>
 
  {/* Card 2: Production */}
- <div 
- onClick={() => onNavigateTab('Production')}
+  <motion.div 
+  key={activeLog.date + '-prod-' + activeLog.productionMade}
+  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+  onClick={() => onNavigateTab('Production')}
  className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
                 ? 'bg-zinc-100/50 border-zinc-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
@@ -621,11 +627,13 @@ export default function OverviewTab({
  </ResponsiveContainer>
  </div>
  <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
- </div>
+  </motion.div>
 
  {/* Card 3: Waste Cost */}
- <div 
- onClick={() => onNavigateTab('Waste')}
+  <motion.div 
+  key={activeLog.date + '-waste-' + activeLog.waste}
+  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
+  onClick={() => onNavigateTab('Waste')}
  className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
                 ? 'bg-orange-100/50 border-orange-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-orange-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
@@ -669,11 +677,13 @@ export default function OverviewTab({
  </ResponsiveContainer>
  </div>
  <div className="absolute bottom-0 left-0 right-0 h-1 bg-rose-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
- </div>
+  </motion.div>
 
  {/* Card 4: Hours */}
- <div 
- onClick={() => onNavigateTab('Hours')}
+  <motion.div 
+  key={activeLog.date + '-hours-' + activeLog.hours}
+  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
+  onClick={() => onNavigateTab('Hours')}
  className={`p-5 rounded-3xl border transition-all shadow-md cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
  isLight
                 ? 'bg-zinc-100/50 border-zinc-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
@@ -716,10 +726,10 @@ export default function OverviewTab({
  </ResponsiveContainer>
  </div>
  <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
- </div>
+  </motion.div>
 
  {/* Card 5: COGS & Supplier breakdowns */}
- <div 
+ <motion.div key={activeLog.date + '-cogs-' + totalCogsActiveDay} initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.4, delay: 0.25 }} 
  className={`p-5 rounded-3xl border transition-all shadow-md group relative overflow-hidden flex flex-col justify-between ${
  isLight
                 ? 'bg-amber-100/50 border-amber-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
@@ -790,8 +800,7 @@ export default function OverviewTab({
  </div>
  </div>
  <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
- </div>
- </div>
+  </motion.div>
 
  {/* Real-time AI Operations Shift Summary */}
  <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
@@ -1126,7 +1135,7 @@ export default function OverviewTab({
  maxBarSize={60}
  >
  {branchPerformanceData.map((entry, index) => (
- <Cell key={`cell-${index}`} fill={entry.fill || entry.color} />
+ <Cell key={`overview-cell-${index}-${entry.id || entry.name}`} fill={entry.fill || entry.color} />
  ))}
  </Bar>
  </BarChart>
@@ -1207,6 +1216,141 @@ export default function OverviewTab({
  </div>
 
  </div>
+ </div>
+
+ {/* Department Visual Analytics Dashboard */}
+ <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 font-sans">
+   {/* Sell Tab Chart: Monthly Revenue Trajectory */}
+   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
+     isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl'
+   }`}>
+     <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+       <div className="flex items-center gap-2.5">
+         <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+           <TrendingUp className="w-4 h-4" />
+         </div>
+         <div>
+           <h3 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Monthly Sales Trend</h3>
+           <p className="text-[10px] text-zinc-500 font-mono">REVENUE TRAJECTORY (6-MONTH)</p>
+         </div>
+       </div>
+       <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded font-bold text-amber-500">€286K YTD</span>
+     </div>
+     <div className="h-56 w-full mt-6">
+       <ResponsiveContainer width="100%" height="100%">
+         <AreaChart data={[
+           { month: 'Jan', Sales: 42000 },
+           { month: 'Feb', Sales: 48000 },
+           { month: 'Mar', Sales: 51000 },
+           { month: 'Apr', Sales: 49000 },
+           { month: 'May', Sales: 55000 },
+           { month: 'Jun', Sales: 62000 },
+         ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+           <defs>
+             <linearGradient id="sellTrendGrad" x1="0" y1="0" x2="0" y2="1">
+               <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
+               <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+             </linearGradient>
+           </defs>
+           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#27272a'} />
+           <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 10 }} />
+           <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 10 }} />
+           <Tooltip contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '12px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}` }} />
+           <Area type="monotone" dataKey="Sales" stroke="#f59e0b" strokeWidth={2.5} fill="url(#sellTrendGrad)" dot={{ r: 3, strokeWidth: 1.5, fill: '#f59e0b' }} />
+         </AreaChart>
+       </ResponsiveContainer>
+     </div>
+   </div>
+
+   {/* Production Tab Chart: Daily Output vs Target */}
+   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
+     isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl'
+   }`}>
+     <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+       <div className="flex items-center gap-2.5">
+         <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+           <Activity className="w-4 h-4" />
+         </div>
+         <div>
+           <h3 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Daily Output vs. Target</h3>
+           <p className="text-[10px] text-zinc-500 font-mono">PRODUCTION VOLUMES (WEEKLY)</p>
+         </div>
+       </div>
+       <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded font-bold text-emerald-500">92% Target Pace</span>
+     </div>
+     <div className="h-56 w-full mt-6">
+       <ResponsiveContainer width="100%" height="100%">
+         <BarChart data={[
+           { day: 'Mon', Output: 450, Target: 400 },
+           { day: 'Tue', Output: 380, Target: 400 },
+           { day: 'Wed', Output: 520, Target: 450 },
+           { day: 'Thu', Output: 480, Target: 480 },
+           { day: 'Fri', Output: 610, Target: 550 },
+           { day: 'Sat', Output: 680, Target: 600 },
+           { day: 'Sun', Output: 590, Target: 550 },
+         ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#27272a'} />
+           <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 10 }} />
+           <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#a1a1aa', fontSize: 10 }} />
+           <Tooltip contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '12px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}` }} />
+           <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '10px', paddingTop: '5px' }} />
+           <Bar dataKey="Output" name="Actual Output" fill="#10b981" radius={[3, 3, 0, 0]} maxBarSize={15} />
+           <Bar dataKey="Target" name="Culinary Target" fill="#64748b" radius={[3, 3, 0, 0]} maxBarSize={15} />
+         </BarChart>
+       </ResponsiveContainer>
+     </div>
+   </div>
+
+   {/* Waste Tab Chart: Waste Categories Pie Chart */}
+   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
+     isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl'
+   }`}>
+     <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+       <div className="flex items-center gap-2.5">
+         <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500">
+           <Trash2 className="w-4 h-4" />
+         </div>
+         <div>
+           <h3 className={`text-sm font-extrabold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Waste by Category</h3>
+           <p className="text-[10px] text-zinc-500 font-mono">LEAKAGE METRIC PROPORTIONS</p>
+         </div>
+       </div>
+       <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded font-bold text-rose-500">€2,890 Total</span>
+     </div>
+     <div className="h-56 w-full mt-6 relative flex flex-col justify-center">
+       <div className="h-44 w-full">
+         <ResponsiveContainer width="100%" height="100%">
+           <PieChart>
+             <Tooltip contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '12px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}` }} />
+             <Pie
+               data={[
+                 { name: 'Expired', value: 1240 },
+                 { name: 'Overproduced', value: 890 },
+                 { name: 'Quality Issue', value: 450 },
+                 { name: 'Accidents', value: 310 },
+               ]}
+               cx="50%"
+               cy="50%"
+               innerRadius={45}
+               outerRadius={65}
+               paddingAngle={4}
+               dataKey="value"
+             >
+               {[
+                 { name: 'Expired', color: '#f43f5e' },
+                 { name: 'Overproduced', color: '#f59e0b' },
+                 { name: 'Quality Issue', color: '#6366f1' },
+                 { name: 'Accidents', color: '#64748b' },
+               ].map((entry, index) => (
+                 <Cell key={`cell-${index}`} fill={entry.color} />
+               ))}
+             </Pie>
+             <Legend iconType="circle" iconSize={6} layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: '9px', color: isLight ? '#52525b' : '#a1a1aa' }} />
+           </PieChart>
+         </ResponsiveContainer>
+       </div>
+     </div>
+   </div>
  </div>
 
  {/* Daily Sushi Ops & COGS Ledger Entry Form */}
@@ -1557,9 +1701,10 @@ export default function OverviewTab({
  </div>
  </div>
  )}
- </div>
- </div>
- </motion.div>
- </div>
- );
+   </div>
+    </div>
+    </div>
+    </motion.div>
+    </div>
+  );
 }

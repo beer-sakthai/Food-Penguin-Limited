@@ -13,6 +13,7 @@ export interface CoreMetrics {
 export interface SalesOrder {
   id: string;
   timestamp: string;
+  date?: string;
   item: string;
   category: string;
   quantity: number;
@@ -31,6 +32,7 @@ export interface CompanyTarget {
   unit: string;
   category: 'Sell' | 'Production' | 'Waste' | 'Hours';
   deadline: string;
+  date?: string;
 }
 
 export interface Recipe {
@@ -50,6 +52,7 @@ export interface ProductionTask {
   status: 'In Queue' | 'Cooking' | 'Prepared' | 'Out for Delivery';
   quantity: number;
   priority: 'low' | 'medium' | 'high';
+  date?: string;
 }
 
 export interface WasteRecord {
@@ -71,6 +74,7 @@ export interface EmployeeHour {
   actualHours: number;
   shiftStart: string;
   shiftEnd: string;
+  date?: string;
 }
 
 export interface InventoryItem {
@@ -91,6 +95,7 @@ export interface RealtimeAlert {
   value: string;
   status: 'normal' | 'warning' | 'critical';
   message: string;
+  date?: string;
 }
 
 export interface DailyOperationalLog {

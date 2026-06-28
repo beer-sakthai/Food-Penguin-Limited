@@ -119,7 +119,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  />
  <Bar dataKey="completion" radius={[4, 4, 0, 0]} maxBarSize={40}>
  {completionData.map((entry, index) => (
- <Cell key={`cell-${index}`} fill={entry.completion >= 100 ? '#10b981' : '#f59e0b'} />
+ <Cell key={`target-cell-${index}-${entry.name}`} fill={entry.completion >= 100 ? '#10b981' : '#f59e0b'} />
  ))}
  </Bar>
  </BarChart>
