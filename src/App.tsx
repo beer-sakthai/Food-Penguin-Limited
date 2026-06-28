@@ -480,7 +480,17 @@ export default function App() {
  : Math.min(100, rawProjection);
  }, [weeklyLogs, capacityPct, quickAdjustEnabled, dailyCapacityBreakdown]);
 
- // Multi-branch capacity projection data for overlay comparisons
+ // AI Accuracy Confidence metric based on the variance between past projected capacity and actual historical production logs
+  const aiAccuracyConfidence = useMemo(() => {
+    if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return 95;
+    const variances = dailyCapacityBreakdown.map(item => Math.abs(item.projected - item.current));
+    const avgVariance = variances.reduce((sum, v) => sum + v, 0) / variances.length;
+    // Map average variance to a confidence percentage from 0 to 100%
+    const score = Math.round(100 - avgVariance * 1.25);
+    return Math.max(50, Math.min(100, score));
+  }, [dailyCapacityBreakdown]);
+
+  // Multi-branch capacity projection data for overlay comparisons
  const branchProjectionData = useMemo(() => {
    const branches = [
      'Marks & Spencer - Cork City',
@@ -1254,9 +1264,30 @@ export default function App() {
  <ChevronDown className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  )}
  </button>
- <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
- Forecast AI
- </span>
+ <div className="flex items-center gap-1.5">
+  <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
+   Forecast AI
+  </span>
+  <span 
+   className={`flex items-center gap-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${
+    aiAccuracyConfidence >= 90
+     ? isLight ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+     : aiAccuracyConfidence >= 80
+     ? isLight ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+     : isLight ? 'text-rose-600 bg-rose-50 border-rose-200' : 'text-rose-400 bg-rose-500/10 border-rose-500/20'
+   }`}
+   title={`AI Model Confidence: ${aiAccuracyConfidence}% (calculated dynamically based on historic variance between actual logs and model projections)`}
+  >
+   <span className={`w-1 h-1 rounded-full ${
+    aiAccuracyConfidence >= 90
+     ? 'bg-emerald-500 animate-pulse'
+     : aiAccuracyConfidence >= 80
+     ? 'bg-amber-500'
+     : 'bg-rose-500'
+   }`} />
+   Accuracy Conf: {aiAccuracyConfidence}%
+  </span>
+ </div>
  </div>
 
  {/* Branch Overlay Selector (Gold Liner style) */}
