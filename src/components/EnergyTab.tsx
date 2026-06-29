@@ -130,30 +130,14 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
           <div className={`text-xs mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Baked Items</div>
         </div>
 
-        <div className={`p-5 rounded-2xl border transition-all ${
-          Number(avgWhPerUnit) > maxEfficiencyAllowed 
-            ? isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/20 border-rose-900/50'
-            : isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-900/50'
-        }`}>
+        <div className={`p-5 rounded-2xl border transition-all ${ Number(avgWhPerUnit) > maxEfficiencyAllowed ? isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/20 border-rose-900/50' : isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-900/50' }`}>
           <div className="flex items-center gap-3 mb-2">
-            <div className={`p-2 rounded-lg ${
-              Number(avgWhPerUnit) > maxEfficiencyAllowed 
-                ? isLight ? 'bg-rose-100 text-rose-600' : 'bg-rose-500/10 text-rose-400'
-                : isLight ? 'bg-emerald-100 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'
-            }`}>
+            <div className={`p-2 rounded-lg ${ Number(avgWhPerUnit) > maxEfficiencyAllowed ? isLight ? 'bg-rose-100 text-rose-600' : 'bg-rose-500/10 text-rose-400' : isLight ? 'bg-emerald-100 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400' }`}>
               <BatteryCharging size={20} />
             </div>
-            <h3 className={`text-sm font-semibold ${
-              Number(avgWhPerUnit) > maxEfficiencyAllowed 
-                ? isLight ? 'text-rose-700' : 'text-rose-300'
-                : isLight ? 'text-emerald-700' : 'text-emerald-300'
-            }`}>Energy per Unit</h3>
+            <h3 className={`text-sm font-semibold ${ Number(avgWhPerUnit) > maxEfficiencyAllowed ? isLight ? 'text-rose-700' : 'text-rose-300' : isLight ? 'text-emerald-700' : 'text-emerald-300' }`}>Energy per Unit</h3>
           </div>
-          <div className={`text-3xl font-bold font-mono flex items-center gap-2 ${
-            Number(avgWhPerUnit) > maxEfficiencyAllowed 
-              ? isLight ? 'text-rose-600' : 'text-rose-500'
-              : isLight ? 'text-emerald-600' : 'text-emerald-500'
-          }`}>
+          <div className={`text-3xl font-bold font-mono flex items-center gap-2 ${ Number(avgWhPerUnit) > maxEfficiencyAllowed ? isLight ? 'text-rose-600' : 'text-rose-500' : isLight ? 'text-emerald-600' : 'text-emerald-500' }`}>
             {avgWhPerUnit} Wh
             {Number(avgWhPerUnit) > maxEfficiencyAllowed && <AlertCircle size={20} className="animate-pulse" />}
           </div>

@@ -361,13 +361,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
         <button
           onClick={handleExportCSV}
           disabled={activeReportDetails.count === 0}
-          className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${
-            activeReportDetails.count === 0 
-              ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 border border-zinc-700'
-              : isLight 
-                ? 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-300' 
-                : 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-600'
-          }`}
+          className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${ activeReportDetails.count === 0 ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 border border-zinc-700' : isLight ? 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-300' : 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-600' }`}
           id="reports-hub-csv-download-button"
         >
           <Download className="w-4 h-4" />
@@ -376,9 +370,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       </div>
 
       {/* SEARCH AND CONTROLS CARD */}
-      <div className={`rounded-2xl border p-5 transition-all shadow-sm ${
-        isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'
-      }`}>
+      <div className={`rounded-2xl border p-5 transition-all shadow-sm ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 items-end">
           
           {/* SECTION RANGE CONTROLLER */}
@@ -390,11 +382,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={activeSection}
                 onChange={(e) => setActiveSection(e.target.value as ReportSection)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all duration-200 bg-transparent ${
-                  isLight 
-                    ? 'border-zinc-300 text-zinc-800 hover:border-zinc-400' 
-                    : 'border-zinc-700 text-zinc-100 hover:border-zinc-600'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all duration-200 bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800 hover:border-zinc-400' : 'border-zinc-700 text-zinc-100 hover:border-zinc-600' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-hub-department-selector"
               >
                 {sectionsList.map(s => (
@@ -415,9 +403,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-              } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+              className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
               id="reports-hub-start-date"
             />
           </div>
@@ -431,9 +417,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-              } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+              className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
               id="reports-hub-end-date"
             />
           </div>
@@ -448,9 +432,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-sell-branch-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Branches</option>
@@ -464,9 +446,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={targetCategoryFilter}
                 onChange={(e) => setTargetCategoryFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-target-category-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Categories</option>
@@ -481,9 +461,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={taskPriorityFilter}
                 onChange={(e) => setTaskPriorityFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-production-priority-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Priorities</option>
@@ -497,9 +475,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={wasteReasonFilter}
                 onChange={(e) => setWasteReasonFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-waste-reason-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Reasons</option>
@@ -514,9 +490,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={hoursRoleFilter}
                 onChange={(e) => setHoursRoleFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-hours-role-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Roles</option>
@@ -531,9 +505,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={planningSupplierFilter}
                 onChange={(e) => setPlanningSupplierFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-planning-supplier-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Suppliers</option>
@@ -549,9 +521,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               <select
                 value={alertStatusFilter}
                 onChange={(e) => setAlertStatusFilter(e.target.value)}
-                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
-                  isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100'
-                } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]`}
+                className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${ isLight ? 'border-zinc-300 text-zinc-800' : 'border-zinc-700 text-zinc-100' } focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none`}
                 id="reports-realtime-status-filter"
               >
                 <option value="All" className={isLight ? 'text-zinc-900' : 'text-black'}>All Severities</option>
@@ -575,9 +545,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.25, delay: idx * 0.05 }}
-              className={`p-5 rounded-2xl border flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 ${
-                isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800'
-              }`}
+              className={`p-5 rounded-2xl border flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 ${ isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800' }`}
             >
               <span className={`text-[11px] font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 {metric.label}
@@ -594,9 +562,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* DATA PREVIEW TABLE CARD */}
-        <div className={`lg:col-span-2 rounded-2xl border p-5 overflow-hidden flex flex-col ${
-          isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'
-        }`}>
+        <div className={`lg:col-span-2 rounded-2xl border p-5 overflow-hidden flex flex-col ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800' }`}>
           <div className="pb-4 flex items-center justify-between border-b border-zinc-800/20 mb-4">
             <div>
               <h2 className={`text-base font-semibold ${isLight ? 'text-zinc-800' : 'text-white'}`}>
@@ -606,20 +572,14 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
                 Displaying first {Math.min(50, activeReportDetails.count)} rows within custom range
               </p>
             </div>
-            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-              activeReportDetails.count > 0 
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
-            }`}>
+            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${ activeReportDetails.count > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20' }`}>
               {activeReportDetails.count} records
             </span>
           </div>
 
           <div className="overflow-x-auto rounded-xl border border-zinc-800/10 flex-1 max-h-96">
             <table className="w-full text-xs text-left">
-              <thead className={`text-[10px] font-bold uppercase tracking-wider sticky top-0 z-10 border-b border-zinc-800/25 ${
-                isLight ? 'bg-zinc-100 text-zinc-600' : 'bg-zinc-950 text-zinc-400'
-              }`}>
+              <thead className={`text-[10px] font-bold uppercase tracking-wider sticky top-0 z-10 border-b border-zinc-800/25 ${ isLight ? 'bg-zinc-100 text-zinc-600' : 'bg-zinc-950 text-zinc-400' }`}>
                 <tr>
                   {activeReportDetails.headers.map((h, i) => (
                     <th key={i} className="p-3 whitespace-nowrap">{h}</th>
@@ -651,9 +611,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
         </div>
 
         {/* JULES (GOOGLE AI) CONSULTING AUDITOR */}
-        <div className={`rounded-2xl border p-5 flex flex-col justify-between relative overflow-hidden ${
-          isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'
-        }`}>
+        <div className={`rounded-2xl border p-5 flex flex-col justify-between relative overflow-hidden ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
           {/* Decorative glowing gradient */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full filter blur-xl pointer-events-none" />
           
@@ -670,9 +628,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               </div>
             </div>
 
-            <div className={`p-4 rounded-xl border text-xs leading-relaxed max-h-72 overflow-y-auto ${
-              isLight ? 'bg-yellow-50/50 border-yellow-200/50 text-zinc-700' : 'bg-yellow-950/10 border-yellow-900/20 text-zinc-300'
-            }`}>
+            <div className={`p-4 rounded-xl border text-xs leading-relaxed max-h-72 overflow-y-auto ${ isLight ? 'bg-yellow-50/50 border-yellow-200/50 text-zinc-700' : 'bg-yellow-950/10 border-yellow-900/20 text-zinc-300' }`}>
               {isAiLoading ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-3">
                   <div className="w-5 h-5 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
@@ -696,13 +652,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
           <button
             onClick={handleConsultJules}
             disabled={isAiLoading || activeReportDetails.count === 0}
-            className={`w-full mt-4 py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] ${
-              activeReportDetails.count === 0
-                ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 border border-zinc-700'
-                : isLight
-                  ? 'bg-zinc-900 text-white hover:bg-zinc-800 focus:ring-2 focus:ring-yellow-500'
-                  : 'bg-yellow-500 hover:bg-yellow-400 text-zinc-950 focus:ring-2 focus:ring-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-            }`}
+            className={`w-full mt-4 py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] ${ activeReportDetails.count === 0 ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 border border-zinc-700' : isLight ? 'bg-zinc-900 text-white hover:bg-zinc-800 focus:ring-2 focus:ring-yellow-500' : 'bg-yellow-500 hover:bg-yellow-400 text-zinc-950 focus:ring-2 focus:ring-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)]' }`}
             id="reports-hub-ai-audit-button"
           >
             <Sparkles className="w-3.5 h-3.5" />

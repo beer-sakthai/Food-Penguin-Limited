@@ -119,7 +119,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
                 {hoursData.map((emp) => {
                   const variance = emp.scheduledHours - emp.actualHours;
                   return (
-                    <tr key={emp.id} className="bg-zinc-900  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800/50 transition-colors">
+                    <tr key={emp.id} className="bg-zinc-900 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800/50 transition-colors">
                       <td className="px-4 py-3 font-medium text-zinc-200">{emp.name}</td>
                       <td className="px-4 py-3 text-[10px] font-mono text-zinc-400">
                         <span className="uppercase font-bold">{emp.role}</span>

@@ -412,47 +412,33 @@ export default function OverviewTab({
  return (
  <div id="overview-viewport" className="space-y-6">
  {/* Header Banner with Premium ambient bento design */}
- <div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
- isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}>
+ <div className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${ isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
  <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
  
  <div className="relative z-10 max-w-2xl">
  <div className="flex flex-wrap items-center gap-2.5 mb-4">
- <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-800 border-zinc-700/60 text-orange-400'
- }`}>
+ <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono transition-colors ${ isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-800 border-zinc-700/60 text-orange-400' }`}>
  <Sparkles className="w-3 h-3 animate-pulse" />
  Sushi Intelligence Portal Active
  </div>
  {irelandTime && (
- <span className={`text-xs px-3.5 py-1 font-mono tracking-tight font-semibold border rounded-full inline-flex items-center gap-1.5 transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-400'
- }`}>
+ <span className={`text-xs px-3.5 py-1 font-mono tracking-tight font-semibold border rounded-full inline-flex items-center gap-1.5 transition-colors ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-400' }`}>
  Dublin Clock (IE): {irelandTime}
  </span>
  )}
  </div>
- <h1 className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
- isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'
- }`}>
+ <h1 className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${ isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md' }`}>
  Sushi Ops Strategy Center
  </h1>
- <p className={`text-sm leading-relaxed ${
- isLight ? 'text-zinc-600 text-zinc-600 text-zinc-600' : 'text-zinc-300'
- }`}>
+ <p className={`text-sm leading-relaxed ${ isLight ? 'text-zinc-600 text-zinc-600 text-zinc-600' : 'text-zinc-300' }`}>
  Premium Sushi Production Company is currently executing at <span className="text-orange-600 dark:text-orange-400 font-semibold">{metrics.aiHealthScore}% efficiency</span>. Cooking objectives are on target, and waste reports show an improvement of <span className="text-emerald-600 dark:text-emerald-400 font-semibold">18.2% vs last Friday</span>.
  </p>
  </div>
 
  {/* Date-Range Selector Box */}
- <div className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
- isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-950/60 border-zinc-800'
- }`}>
- <div className={`flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider ${
- isLight ? 'text-zinc-700' : 'text-zinc-400'
- }`}>
+ <div className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${ isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-950/60 border-zinc-800' }`}>
+ <div className={`flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider ${ isLight ? 'text-zinc-700' : 'text-zinc-400' }`}>
  <Calendar className={`w-3.5 h-3.5 ${isLight ? 'text-orange-600' : 'text-orange-400'}`} />
  <span>Audit Calendar Week</span>
  </div>
@@ -460,9 +446,7 @@ export default function OverviewTab({
  <select
  value={selectedWeekRange}
  onChange={(e) => onSelectedWeekRangeChange(e.target.value)}
- className={`w-full focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 rounded-xl px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
- isLight ? 'bg-white border-zinc-200 text-orange-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-700' : 'bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-355'
- }`}
+ className={`w-full focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all rounded-xl px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 cursor-pointer shadow-inner focus:outline-none ${ isLight ? 'bg-white border-zinc-200 text-orange-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-700' : 'bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-355' }`}
  >
  <option value="2026-06-15 to 2026-06-21" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950'} font-mono text-xs`}>
  Week 25 (Jun 15 - Jun 21, 2026) [Active]
@@ -474,9 +458,7 @@ export default function OverviewTab({
  Week 24 (Jun 08 - Jun 14, 2026) [Historical]
  </option>
  </select>
- <div className={`flex items-center justify-between text-[9px] font-mono mt-1 pt-2 border-t ${
- isLight ? 'border-zinc-200' : 'border-zinc-900'
- }`}>
+ <div className={`flex items-center justify-between text-[9px] font-mono mt-1 pt-2 border-t ${ isLight ? 'border-zinc-200' : 'border-zinc-900' }`}>
  <span className="text-zinc-500">Selected Date Range:</span>
  <span className="text-orange-500 font-bold">{selectedWeekRange}</span>
  </div>
@@ -492,20 +474,14 @@ export default function OverviewTab({
  className="space-y-6"
  >
  {/* Weekday Quick Select Tabs */}
- <div className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${
- isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
- }`}>
+ <div className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900' }`}>
  <div className="flex items-center gap-2">
  <Calendar className={`w-4 h-4 font-bold ${isLight ? 'text-orange-600' : 'text-orange-400'}`} />
- <span className={`text-xs font-mono uppercase tracking-wider font-bold ${
- isLight ? 'text-zinc-700' : 'text-zinc-300'
- }`}>
+ <span className={`text-xs font-mono uppercase tracking-wider font-bold ${ isLight ? 'text-zinc-700' : 'text-zinc-300' }`}>
  Display Mode: {activeLog.date} ({activeLog.day}) Audit
  </span>
  </div>
- <div className={`flex items-center p-1 rounded-2xl border shadow-inner transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800'
- }`}>
+ <div className={`flex items-center p-1 rounded-2xl border shadow-inner transition-colors ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800' }`}>
  {(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const).map((day) => {
  const isActive = selectedDayTab === day;
  return (
@@ -513,13 +489,7 @@ export default function OverviewTab({
  key={day}
  onClick={() => setSelectedDayTab(day)}
  type="button"
- className={`px-3.5 py-1.5 text-xs rounded-xl font-mono font-bold transition-all ${
- isActive
- ? 'bg-orange-500 text-white shadow-md'
- : isLight
- ? 'text-zinc-500 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-600 hover:bg-white'
- : 'text-zinc-400 hover:text-white'
- }`}
+ className={`px-3.5 py-1.5 text-xs rounded-xl font-mono font-bold transition-all ${ isActive ? 'bg-orange-500 text-white shadow-md' : isLight ? 'text-zinc-500 text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-600 hover:bg-white' : 'text-zinc-400 hover:text-white' }`}
  >
  {day}
  </button>
@@ -535,11 +505,7 @@ export default function OverviewTab({
   key={activeLog.date + '-sell-' + activeLog.sales}
   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
   onClick={() => onNavigateTab('Sell')}
- className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
- isLight
-                ? 'bg-amber-100/50 border-amber-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
-                : 'bg-3d-gold-dark metallic-base hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] text-white'
- }`}
+ className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${ isLight ? 'bg-amber-100/50 border-amber-300 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-3d-gold-dark metallic-base hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] text-white' }`}
  >
  <div>
  <div className="flex justify-between items-start">
@@ -553,11 +519,7 @@ export default function OverviewTab({
  +8.5% daily avg
  </span>
  </div>
- <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-orange-600 group-hover:bg-orange-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-800 text-orange-500 group-hover:bg-orange-500 group-hover:text-white'
- }`}>
+ <div className={`p-2.5 border transition-all duration-300 rounded-xl ${ isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600 group-hover:bg-orange-500 group-hover:text-white' : 'bg-zinc-950 border-zinc-800 text-orange-500 group-hover:bg-orange-500 group-hover:text-white' }`}>
  <TrendingUp className="w-4 h-4" />
  </div>
  </div>
@@ -585,11 +547,7 @@ export default function OverviewTab({
   key={activeLog.date + '-prod-' + activeLog.productionMade}
   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
   onClick={() => onNavigateTab('Production')}
- className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
- isLight
-                ? 'bg-zinc-100/50 border-zinc-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
-                : 'bg-3d-silver-dark metallic-base hover:shadow-[0_0_20px_rgba(200,200,200,0.3)] text-white'
- }`}
+ className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${ isLight ? 'bg-zinc-100/50 border-zinc-300 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-3d-silver-dark metallic-base hover:shadow-[0_0_20px_rgba(200,200,200,0.3)] text-white' }`}
  >
  <div>
  <div className="flex justify-between items-start">
@@ -602,11 +560,7 @@ export default function OverviewTab({
  Target: {activeLog.productionTarget.toLocaleString()}
  </span>
  </div>
- <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-800 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white'
- }`}>
+ <div className={`p-2.5 border transition-all duration-300 rounded-xl ${ isLight ? 'bg-zinc-100 border-zinc-200 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white' : 'bg-zinc-950 border-zinc-800 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white' }`}>
  <Package className="w-4 h-4" />
  </div>
  </div>
@@ -634,11 +588,7 @@ export default function OverviewTab({
   key={activeLog.date + '-waste-' + activeLog.waste}
   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
   onClick={() => onNavigateTab('Waste')}
- className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
- isLight
-                ? 'bg-orange-100/50 border-orange-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-orange-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
-                : 'bg-3d-copper-dark metallic-base hover:shadow-[0_0_20px_rgba(255,150,100,0.3)] text-white'
- }`}
+ className={`p-5 rounded-3xl border transition-all shadow-sm cursor-pointer group relative overflow-hidden flex flex-col justify-between ${ isLight ? 'bg-orange-100/50 border-orange-300 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-orange-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-3d-copper-dark metallic-base hover:shadow-[0_0_20px_rgba(255,150,100,0.3)] text-white' }`}
  >
  <div>
  <div className="flex justify-between items-start">
@@ -652,11 +602,7 @@ export default function OverviewTab({
  Within limit
  </span>
  </div>
- <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-rose-600 group-hover:bg-rose-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-800 text-rose-455 group-hover:bg-rose-500 group-hover:text-white'
- }`}>
+ <div className={`p-2.5 border transition-all duration-300 rounded-xl ${ isLight ? 'bg-zinc-100 border-zinc-200 text-rose-600 group-hover:bg-rose-500 group-hover:text-white' : 'bg-zinc-950 border-zinc-800 text-rose-455 group-hover:bg-rose-500 group-hover:text-white' }`}>
  <Trash2 className="w-4 h-4" />
  </div>
  </div>
@@ -684,11 +630,7 @@ export default function OverviewTab({
   key={activeLog.date + '-hours-' + activeLog.hours}
   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
   onClick={() => onNavigateTab('Hours')}
- className={`p-5 rounded-3xl border transition-all shadow-md cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
- isLight
-                ? 'bg-zinc-100/50 border-zinc-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
-                : 'bg-3d-silver-dark metallic-base hover:shadow-[0_0_20px_rgba(200,200,200,0.3)] text-white'
- }`}
+ className={`p-5 rounded-3xl border transition-all shadow-md cursor-pointer group relative overflow-hidden flex flex-col justify-between ${ isLight ? 'bg-zinc-100/50 border-zinc-300 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-zinc-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-3d-silver-dark metallic-base hover:shadow-[0_0_20px_rgba(200,200,200,0.3)] text-white' }`}
  >
  <div>
  <div className="flex justify-between items-start">
@@ -701,11 +643,7 @@ export default function OverviewTab({
  Staffing Optimal
  </span>
  </div>
- <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-amber-600 group-hover:bg-amber-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-800 text-amber-400 group-hover:bg-amber-500 group-hover:text-white'
- }`}>
+ <div className={`p-2.5 border transition-all duration-300 rounded-xl ${ isLight ? 'bg-zinc-100 border-zinc-200 text-amber-600 group-hover:bg-amber-500 group-hover:text-white' : 'bg-zinc-950 border-zinc-800 text-amber-400 group-hover:bg-amber-500 group-hover:text-white' }`}>
  <Clock className="w-4 h-4" />
  </div>
  </div>
@@ -730,11 +668,7 @@ export default function OverviewTab({
 
  {/* Card 5: COGS & Supplier breakdowns */}
  <motion.div key={activeLog.date + '-cogs-' + totalCogsActiveDay} initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.4, delay: 0.25 }} 
- className={`p-5 rounded-3xl border transition-all shadow-md group relative overflow-hidden flex flex-col justify-between ${
- isLight
-                ? 'bg-amber-100/50 border-amber-300  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]'
-                : 'bg-3d-gold-dark metallic-base hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] text-white'
- }`}
+ className={`p-5 rounded-3xl border transition-all shadow-md group relative overflow-hidden flex flex-col justify-between ${ isLight ? 'bg-amber-100/50 border-amber-300 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 text-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-3d-gold-dark metallic-base hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] text-white' }`}
  >
  <div>
  <div className="flex justify-between items-start">
@@ -747,11 +681,7 @@ export default function OverviewTab({
  Weekly: €{totalCogsWeek.toLocaleString()}
  </span>
  </div>
- <div className={`p-2.5 border transition-all duration-300 rounded-xl ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-purple-600 group-hover:bg-purple-500 group-hover:text-white' 
- : 'bg-zinc-950 border-zinc-800 text-purple-400 group-hover:bg-purple-500 group-hover:text-white'
- }`}>
+ <div className={`p-2.5 border transition-all duration-300 rounded-xl ${ isLight ? 'bg-zinc-100 border-zinc-200 text-purple-600 group-hover:bg-purple-500 group-hover:text-white' : 'bg-zinc-950 border-zinc-800 text-purple-400 group-hover:bg-purple-500 group-hover:text-white' }`}>
  <Settings className="w-4 h-4" />
  </div>
  </div>
@@ -803,28 +733,18 @@ export default function OverviewTab({
   </motion.div>
 
  {/* Real-time AI Operations Shift Summary */}
- <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${
- isLight ? 'bg-orange-50/50 border border-orange-200' : 'bg-3d-copper-dark metallic-base drop-shadow-xl'
- }`}>
+ <div id="ai-shift-summary" className={`rounded-3xl border p-6 shadow-sm overflow-hidden relative font-sans transition-all duration-300 ${ isLight ? 'bg-orange-50/50 border border-orange-200' : 'bg-3d-copper-dark metallic-base drop-shadow-xl' }`}>
  <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  
- <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
- isLight ? 'border-zinc-200' : 'border-zinc-800'
- }`}>
+ <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${ isLight ? 'border-zinc-200' : 'border-zinc-800' }`}>
  <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-orange-50 border-orange-100 text-orange-600' : 'bg-orange-950/30 border-orange-900/40 text-orange-400'
- }`}>
+ <div className={`p-3 border rounded-2xl transition-all duration-300 ${ isLight ? 'bg-orange-50 border-orange-100 text-orange-600' : 'bg-orange-950/30 border-orange-900/40 text-orange-400' }`}>
  <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
  </div>
  <div>
  <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
  AI Live Shift Summary Report
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-orange-50 border-orange-200 text-orange-700' 
- : 'bg-orange-500/10 border-orange-500/30 text-orange-400'
- }`}>
+ <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${ isLight ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-orange-500/10 border-orange-500/30 text-orange-400' }`}>
  Live Analysis
  </span>
  </h3>
@@ -838,11 +758,7 @@ export default function OverviewTab({
  onClick={fetchShiftSummary}
  disabled={summaryLoading}
  type="button"
- className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' 
- : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white'
- }`}
+ className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white' }`}
  >
  {summaryLoading ? (
  <>
@@ -866,17 +782,11 @@ export default function OverviewTab({
  <div className={`h-4 rounded-full w-2/3 ${isLight ? 'bg-zinc-100' : 'bg-zinc-800'}`} />
  </div>
  ) : summaryError ? (
- <div className={`p-4 rounded-2xl border text-xs font-mono/80 ${
- isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-950/20 border-rose-900/40 text-rose-400'
- }`}>
+ <div className={`p-4 rounded-2xl border text-xs font-mono/80 ${ isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-950/20 border-rose-900/40 text-rose-400' }`}>
  ⚠️ Failed to fetch live summary feedback: {summaryError}. Please verify your API key is correctly configured.
  </div>
  ) : (
- <div className={`p-5 rounded-2xl border relative overflow-hidden transition-colors ${
- isLight 
- ? 'bg-orange-50/20 border-orange-100/70 text-zinc-800' 
- : 'bg-orange-950/5 border-orange-900/10 text-zinc-300'
- }`}>
+ <div className={`p-5 rounded-2xl border relative overflow-hidden transition-colors ${ isLight ? 'bg-orange-50/20 border-orange-100/70 text-zinc-800' : 'bg-orange-950/5 border-orange-900/10 text-zinc-300' }`}>
  <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full filter blur-xl pointer-events-none" />
  <p className="text-sm leading-relaxed whitespace-pre-wrap font-sans relative z-10 italic">
  "{shiftSummary || 'Selecting metrics and compiling the shift trajectory summary...'}"
@@ -884,11 +794,7 @@ export default function OverviewTab({
  
  <div className="flex flex-wrap items-center gap-6 mt-4 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-[10px] text-zinc-500">
  <div className="flex items-center gap-1.5">
- <span className={`w-2 h-2 rounded-full ${
- Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110))) >= 80 
- ? 'bg-emerald-500' 
- : 'bg-amber-500'
- }`} />
+ <span className={`w-2 h-2 rounded-full ${ Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110))) >= 80 ? 'bg-emerald-500' : 'bg-amber-500' }`} />
  <span>Efficiency Score: {Math.min(100, Math.max(50, Math.round(95 - (activeLog.waste / (activeLog.sales || 1)) * 110)))}%</span>
  </div>
  <div>Sales: €{activeLog.sales.toLocaleString()}</div>
@@ -909,11 +815,7 @@ export default function OverviewTab({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className={`text-lg font-sans font-bold ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Performance Index</h3>
-                <span className={`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
-                  isLight 
-                    ? 'bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200' 
-                    : 'bg-emerald-950/40 text-emerald-400 border-emerald-900/40'
-                }`}>
+                <span className={`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${ isLight ? 'bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200' : 'bg-emerald-950/40 text-emerald-400 border-emerald-900/40' }`}>
                   {chartView === 'weekly' ? 'Week Overview' : 'Today Overview'}
                 </span>
               </div>
@@ -925,22 +827,14 @@ export default function OverviewTab({
                <button
                   type="button"
                   onClick={() => setChartView('hourly')}
-                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
-                    chartView === 'hourly'
-                      ? 'bg-amber-500 text-zinc-950 shadow-md'
-                      : isLight ? 'text-zinc-500 hover:text-amber-700 hover:bg-white' : 'text-zinc-400 hover:bg-zinc-800'
-                  }`}
+                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${ chartView === 'hourly' ? 'bg-amber-500 text-zinc-950 shadow-md' : isLight ? 'text-zinc-500 hover:text-amber-700 hover:bg-white' : 'text-zinc-400 hover:bg-zinc-800' }`}
                 >
                   Hourly
                 </button>
                 <button
                   type="button"
                   onClick={() => setChartView('weekly')}
-                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
-                    chartView === 'weekly'
-                      ? 'bg-amber-500 text-zinc-950 shadow-md'
-                      : isLight ? 'text-zinc-500 hover:text-amber-700 hover:bg-white' : 'text-zinc-400 hover:bg-zinc-800'
-                  }`}
+                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${ chartView === 'weekly' ? 'bg-amber-500 text-zinc-950 shadow-md' : isLight ? 'text-zinc-500 hover:text-amber-700 hover:bg-white' : 'text-zinc-400 hover:bg-zinc-800' }`}
                 >
                   Weekly
                 </button>
@@ -990,9 +884,7 @@ export default function OverviewTab({
                     setCompareBranchA(e.target.value);
                     setCompareMode('twoBranches');
                   }}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                    isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
-                  }`}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white' }`}
                 >
                   <option value="m_s_cork">M&S Cork</option>
                   <option value="tesco_cork">Tesco Cork</option>
@@ -1010,9 +902,7 @@ export default function OverviewTab({
                     setCompareBranchB(e.target.value);
                     setCompareMode('twoBranches');
                   }}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                    isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
-                  }`}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white' }`}
                 >
                   <option value="m_s_cork">M&S Cork</option>
                   <option value="tesco_cork">Tesco Cork</option>
@@ -1023,11 +913,7 @@ export default function OverviewTab({
           </div>
           <button
             onClick={() => setCompareMode(compareMode === 'all' ? 'twoBranches' : 'all')}
-            className={`w-full mt-6 px-4 py-3 rounded-xl border font-bold text-sm transition-all ${
-              compareMode === 'all'
-                ? 'bg-amber-500 text-zinc-950 border-amber-600'
-                : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900 bg-opacity-60 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white'
-            }`}
+            className={`w-full mt-6 px-4 py-3 rounded-xl border font-bold text-sm transition-all ${ compareMode === 'all' ? 'bg-amber-500 text-zinc-950 border-amber-600' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900 bg-opacity-60 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white' }`}
           >
             {compareMode === 'all' ? 'Viewing All Active Branches' : 'View All Global Branches'}
           </button>
@@ -1039,17 +925,13 @@ export default function OverviewTab({
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 z-10 relative">
  
  {/* Left Column: Recharts Comparison Visualizer BarChart */}
- <div className={`p-5 rounded-2xl border flex flex-col justify-between transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-200 shadow-inner' : 'bg-zinc-950/40 border-zinc-900'
- }`}>
+ <div className={`p-5 rounded-2xl border flex flex-col justify-between transition-colors ${ isLight ? 'bg-zinc-50 border-zinc-200 shadow-inner' : 'bg-zinc-950/40 border-zinc-900' }`}>
  <div>
  <div className="flex items-center justify-between mb-4">
  <span className={`text-[10px] font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
  Dynamic Comparison Bar
  </span>
- <span className={`text-[10px] border rounded px-2.5 py-0.5 font-mono ${
- isLight ? 'bg-white border-zinc-200 text-zinc-700 shadow-sm' : 'bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300'
- }`}>
+ <span className={`text-[10px] border rounded px-2.5 py-0.5 font-mono ${ isLight ? 'bg-white border-zinc-200 text-zinc-700 shadow-sm' : 'bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300' }`}>
  Scale: {branchCompareMetric === 'sales' ? 'Euro (€)' : branchCompareMetric === 'production' ? 'Units (Pcs)' : branchCompareMetric === 'waste' ? 'Percentage (%)' : 'Index Points (0-100)'}
  </span>
  </div>
@@ -1095,9 +977,7 @@ export default function OverviewTab({
  if (active && payload && payload.length) {
  const data = payload[0].payload;
  return (
- <div className={`border p-4 rounded-xl shadow-xl transition-all ${
- isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}>
+ <div className={`border p-4 rounded-xl shadow-xl transition-all ${ isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}>
  <p className={`text-[10px] font-mono uppercase font-bold select-none ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>{data.type}</p>
  <p className={`text-sm font-extrabold mt-1 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>{data.fullName}</p>
  <div className="mt-2 space-y-1.5 font-mono text-[11px]">
@@ -1144,9 +1024,7 @@ export default function OverviewTab({
  </div>
 
  {/* Micro comparison labels */}
- <div className={`grid ${branchPerformanceData.length === 2 ? 'grid-cols-2' : 'grid-cols-3'} gap-2 border-t pt-3 mt-2 text-center text-[10px] font-sans ${
- isLight ? 'border-zinc-200' : 'border-zinc-900/80'
- }`}>
+ <div className={`grid ${branchPerformanceData.length === 2 ? 'grid-cols-2' : 'grid-cols-3'} gap-2 border-t pt-3 mt-2 text-center text-[10px] font-sans ${ isLight ? 'border-zinc-200' : 'border-zinc-900/80' }`}>
  {branchPerformanceData.map(branch => (
  <div key={branch.id} className="flex flex-col items-center">
  <span className={`font-semibold ${isLight ? 'text-zinc-600' : 'text-zinc-500'}`}>{branch.name}</span>
@@ -1165,19 +1043,13 @@ export default function OverviewTab({
  <div className="flex flex-col justify-between space-y-4">
  
  {/* Champion Branch Banner Card */}
- <div className={`p-5 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
- isLight ? 'bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5' : 'bg-zinc-950 border-emerald-950/80'
- }`}>
+ <div className={`p-5 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${ isLight ? 'bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5' : 'bg-zinc-950 border-emerald-950/80' }`}>
  {/* Subtle visual gradient glow for the champion */}
  <div className="absolute right-0 bottom-0 w-36 h-36 bg-gradient-to-tr from-emerald-500/20 to-transparent rounded-full filter blur-xl pointer-events-none" />
  
  <div>
  <div className={`flex items-center justify-between pb-3 border-b ${isLight ? 'border-zinc-200' : 'border-zinc-900/80'}`}>
- <span className={`text-[9px] font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
- isLight 
- ? 'bg-emerald-50 border-emerald-200 text-emerald-700 font-bold' 
- : 'bg-emerald-950/45 text-emerald-400 border-emerald-900/60'
- }`}>
+ <span className={`text-[9px] font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${ isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-700 font-bold' : 'bg-emerald-950/45 text-emerald-400 border-emerald-900/60' }`}>
  <span>🏆</span> Peak Efficiency Store
  </span>
  <span className={`font-mono font-extrabold text-[13px] ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{championBranch.efficiencyScore}%</span>
@@ -1206,9 +1078,7 @@ export default function OverviewTab({
  </div>
 
  {/* Summary Performance Note */}
- <div className={`p-4 rounded-xl border text-[11px] leading-relaxed font-sans transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-900 text-zinc-400'
- }`}>
+ <div className={`p-4 rounded-xl border text-[11px] leading-relaxed font-sans transition-colors ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-900 text-zinc-400' }`}>
  <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-[9px]">💡 Strategic Multi-Branch Note</span>
  Sell products in Marks & Spencer are gourmet luxury lines featuring <strong>75% average margins</strong>. Tesco stores support high-volume meal deals and family-packed Trays with <strong>78% labor optimization metrics</strong>. Staffing schedules must remain aligned with peak regional purchase hours.
  </div>
@@ -1221,9 +1091,7 @@ export default function OverviewTab({
  {/* Department Visual Analytics Dashboard */}
  <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 font-sans">
    {/* Sell Tab Chart: Monthly Revenue Trajectory */}
-   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
-     isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl'
-   }`}>
+   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${ isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl' }`}>
      <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
        <div className="flex items-center gap-2.5">
          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
@@ -1263,9 +1131,7 @@ export default function OverviewTab({
    </div>
 
    {/* Production Tab Chart: Daily Output vs Target */}
-   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
-     isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl'
-   }`}>
+   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${ isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl' }`}>
      <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
        <div className="flex items-center gap-2.5">
          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
@@ -1302,9 +1168,7 @@ export default function OverviewTab({
    </div>
 
    {/* Waste Tab Chart: Waste Categories Pie Chart */}
-   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
-     isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl'
-   }`}>
+   <div className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${ isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-950 border border-zinc-900 shadow-xl' }`}>
      <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
        <div className="flex items-center gap-2.5">
          <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500">
@@ -1357,23 +1221,15 @@ export default function OverviewTab({
  <div className={`rounded-3xl p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? 'bg-amber-50/50 border border-amber-200' : 'bg-3d-gold-dark metallic-base drop-shadow-xl'}`}>
  <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
  
- <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
- isLight ? 'border-zinc-200' : 'border-zinc-800'
- }`}>
+ <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${ isLight ? 'border-zinc-200' : 'border-zinc-800' }`}>
  <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-950 border-zinc-800 text-orange-400'
- }`}>
+ <div className={`p-3 border rounded-2xl transition-all duration-300 ${ isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-950 border-zinc-800 text-orange-400' }`}>
  <Calendar className="w-5 h-5 flex-shrink-0" />
  </div>
  <div className="z-10">
  <h3 className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
  Operational Ledger & COGS Input
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-orange-50 border-orange-200 text-orange-700 font-bold' 
- : 'bg-orange-500/10 border-orange-500/30 text-orange-400'
- }`}>
+ <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${ isLight ? 'bg-orange-50 border-orange-200 text-orange-700 font-bold' : 'bg-orange-500/10 border-orange-500/30 text-orange-400' }`}>
  Ledger Direct Writer
  </span>
  </h3>
@@ -1383,17 +1239,13 @@ export default function OverviewTab({
  </div>
 
  <form onSubmit={handleSaveOperationalLog} className="mt-5 space-y-6 z-10 relative">
- <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl border transition-all duration-300 ${
- isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-905'
- }`}>
+ <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl border transition-all duration-300 ${ isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-905' }`}>
  <div>
  <label className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Target Day of Week</label>
  <select
  value={entryDay}
  onChange={(e) => setEntryDay(e.target.value as any)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all ${ isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white' }`}
  >
  <option value="Mon">Monday</option>
  <option value="Tue">Tuesday</option>
@@ -1411,9 +1263,7 @@ export default function OverviewTab({
  required
  value={entryDate}
  onChange={(e) => setEntryDate(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all ${ isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1421,9 +1271,7 @@ export default function OverviewTab({
  <select
  value={entrySupplierName}
  onChange={(e) => setEntrySupplierName(e.target.value as any)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all ${ isLight ? 'bg-white border-zinc-300 text-zinc-900 font-semibold' : 'bg-zinc-900 border-zinc-800 text-white' }`}
  >
  <option value="Tazaki">Tazaki</option>
  <option value="Sysco">Sysco</option>
@@ -1437,9 +1285,7 @@ export default function OverviewTab({
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4 font-sans">
  {/* Column A: Productivity Metrics */}
  <div className="space-y-4">
- <h4 className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
- isLight ? 'border-zinc-200 text-zinc-600 text-zinc-600' : 'border-zinc-800 text-zinc-400'
- }`}>
+ <h4 className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${ isLight ? 'border-zinc-200 text-zinc-600 text-zinc-600' : 'border-zinc-800 text-zinc-400' }`}>
  <Layers className="w-3.5 h-3.5 text-orange-400" />
  Operational & Yield Inputs
  </h4>
@@ -1452,9 +1298,7 @@ export default function OverviewTab({
  required
  value={entrySales}
  onChange={(e) => setEntrySales(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1465,9 +1309,7 @@ export default function OverviewTab({
  required
  value={entryWaste}
  onChange={(e) => setEntryWaste(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1477,9 +1319,7 @@ export default function OverviewTab({
  required
  value={entryHours}
  onChange={(e) => setEntryHours(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1489,9 +1329,7 @@ export default function OverviewTab({
  required
  value={entryProdTarget}
  onChange={(e) => setEntryProdTarget(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1501,9 +1339,7 @@ export default function OverviewTab({
  required
  value={entryProdMade}
  onChange={(e) => setEntryProdMade(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  </div>
@@ -1511,9 +1347,7 @@ export default function OverviewTab({
 
  {/* Column B: Supplier COGS breakdown */}
  <div className="space-y-4">
- <h4 className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
- isLight ? 'border-zinc-200 text-zinc-600 text-zinc-600' : 'border-zinc-800 text-zinc-400'
- }`}>
+ <h4 className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${ isLight ? 'border-zinc-200 text-zinc-600 text-zinc-600' : 'border-zinc-800 text-zinc-400' }`}>
  <Settings className="w-3.5 h-3.5 text-emerald-400" />
  Supplier COGS Breakdown (GOC)
  </h4>
@@ -1526,9 +1360,7 @@ export default function OverviewTab({
  required
  value={entryTazaki}
  onChange={(e) => setEntryTazaki(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1539,9 +1371,7 @@ export default function OverviewTab({
  required
  value={entrySysco}
  onChange={(e) => setEntrySysco(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1552,9 +1382,7 @@ export default function OverviewTab({
  required
  value={entryBulza}
  onChange={(e) => setEntryBulza(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1565,9 +1393,7 @@ export default function OverviewTab({
  required
  value={entrySticker}
  onChange={(e) => setEntrySticker(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  <div>
@@ -1578,9 +1404,7 @@ export default function OverviewTab({
  required
  value={entryOthers}
  onChange={(e) => setEntryOthers(e.target.value)}
- className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'
- }`}
+ className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white' }`}
  />
  </div>
  </div>
@@ -1590,7 +1414,7 @@ export default function OverviewTab({
  <div className={`flex justify-end pt-4 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}>
  <button
  type="submit"
- className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+ className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg duration-200"
  >
  <Save className="w-4 h-4" />
  Commit Active Operational Records
@@ -1599,26 +1423,18 @@ export default function OverviewTab({
  </form>
  </div>
 
- {/* Deep Advisor: "Enable high thinking" with gemini-1.5-flash */}
- <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${
- isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
- }`}>
- <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b ${
- isLight ? 'border-zinc-200 border-zinc-200' : 'border-zinc-900'
- }`}>
+ {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
+ <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900' }`}>
+ <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b ${ isLight ? 'border-zinc-200 border-zinc-200' : 'border-zinc-900' }`}>
  <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl text-orange-400 shadow-md ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-900 border-zinc-800'
- }`}>
+ <div className={`p-3 border rounded-2xl text-orange-400 shadow-md ${ isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-900 border-zinc-800' }`}>
  <BrainCircuit className="w-6 h-6 animate-pulse" />
  </div>
  <div>
  <h2 className={`text-lg font-sans font-extrabold flex items-center gap-2 flex-wrap ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
  Deep Strategic Advisor
- <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
- isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300'
- }`}>
- gemini-1.5-flash
+ <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${ isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300' }`}>
+ gemini-3.1-pro-preview
  </span>
  <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
  Thinking Level: HIGH
@@ -1634,9 +1450,7 @@ export default function OverviewTab({
  <textarea
  value={strategicPrompt}
  onChange={(e) => setStrategicPrompt(e.target.value)}
- className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans rounded-2xl ${
- isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100'
- }`}
+ className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] font-sans rounded-2xl ${ isLight ? 'border-zinc-300 bg-white text-zinc-900' : 'border-zinc-800 bg-zinc-900 text-zinc-100' }`}
  placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
  />
 
@@ -1644,17 +1458,11 @@ export default function OverviewTab({
  <button
  onClick={handleAskAdvisor}
  disabled={loading}
- className={`px-5 py-2.5 border rounded-xl transition-all inline-flex items-center gap-2 shadow-md  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-[1.01] ${
- isLight 
- ? 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 border-zinc-300 text-zinc-800 hover:text-zinc-900 font-bold text-xs' 
- : 'bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs'
- }`}
+ className={`px-5 py-2.5 border rounded-xl transition-all inline-flex items-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-[1.01] ${ isLight ? 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 border-zinc-300 text-zinc-800 hover:text-zinc-900 font-bold text-xs' : 'bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs' }`}
  >
  {loading ? (
  <>
- <span className={`w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin ${
- isLight ? 'border-zinc-400 border-t-zinc-800' : 'border-white/30 border-t-white'
- }`} />
+ <span className={`w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin ${ isLight ? 'border-zinc-400 border-t-zinc-800' : 'border-white/30 border-t-white' }`} />
  Generating High Thinking Report...
  </>
  ) : (
@@ -1668,35 +1476,23 @@ export default function OverviewTab({
 
  {/* Thinking process & Advice displays */}
  {thinkingProcess && (
- <div className={`p-4 rounded-2xl space-y-2 border ${
- isLight ? 'bg-orange-50/40 border-orange-200/80 text-zinc-800' : 'bg-orange-950/25 border border-orange-900/60'
- }`}>
- <span className={`text-[10px] uppercase font-mono tracking-wider font-extrabold block ${
- isLight ? 'text-orange-700' : 'text-orange-400'
- }`}>
+ <div className={`p-4 rounded-2xl space-y-2 border ${ isLight ? 'bg-orange-50/40 border-orange-200/80 text-zinc-800' : 'bg-orange-950/25 border border-orange-900/60' }`}>
+ <span className={`text-[10px] uppercase font-mono tracking-wider font-extrabold block ${ isLight ? 'text-orange-700' : 'text-orange-400' }`}>
  🧠 Thinking Process Summary (Reasoning Path):
  </span>
- <p className={`text-xs font-mono leading-relaxed whitespace-pre-wrap ${
- isLight ? 'text-zinc-600' : 'text-orange-200'
- }`}>
+ <p className={`text-xs font-mono leading-relaxed whitespace-pre-wrap ${ isLight ? 'text-zinc-600' : 'text-orange-200' }`}>
  {thinkingProcess}
  </p>
  </div>
  )}
 
  {advisorResponse && (
- <div className={`border rounded-2xl p-6 shadow-inner space-y-3 transition-colors ${
- isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800'
- }`}>
- <div className={`flex items-center gap-1.5 border-b pb-2 ${
- isLight ? 'border-zinc-200' : 'border-zinc-800'
- }`}>
+ <div className={`border rounded-2xl p-6 shadow-inner space-y-3 transition-colors ${ isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800' }`}>
+ <div className={`flex items-center gap-1.5 border-b pb-2 ${ isLight ? 'border-zinc-200' : 'border-zinc-800' }`}>
  <Lightbulb className="w-4 h-4 text-emerald-500" />
  <span className={`text-xs font-bold uppercase tracking-wide ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>Formulated Corporate Strategy:</span>
  </div>
- <div className={`text-xs font-sans leading-relaxed whitespace-pre-wrap ${
- isLight ? 'text-zinc-700' : 'text-zinc-300'
- }`}>
+ <div className={`text-xs font-sans leading-relaxed whitespace-pre-wrap ${ isLight ? 'text-zinc-700' : 'text-zinc-300' }`}>
  {advisorResponse}
  </div>
  </div>

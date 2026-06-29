@@ -117,9 +117,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
             </div>
           ) : (
             wasteAlerts.map(alert => (
-              <div key={alert.id} className={`p-3 rounded-xl border flex items-center justify-between animate-in slide-in-from-top-2 ${
-                isLight ? 'bg-rose-50 border-rose-100 text-rose-900' : 'bg-rose-950/20 border-rose-900/50 text-rose-300'
-              }`}>
+              <div key={alert.id} className={`p-3 rounded-xl border flex items-center justify-between animate-in slide-in-from-top-2 ${ isLight ? 'bg-rose-50 border-rose-100 text-rose-900' : 'bg-rose-950/20 border-rose-900/50 text-rose-300' }`}>
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-rose-500' : 'bg-rose-400'}`} />
                   <span className="text-sm font-medium">{alert.message}</span>

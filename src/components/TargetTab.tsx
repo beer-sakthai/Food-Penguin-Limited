@@ -146,9 +146,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <h3 className="text-sm font-sans font-bold text-white group-hover:text-orange-400 transition-colors mt-0.5">{tgt.name}</h3>
  </div>
  </div>
- <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] ${
- isCompleted ? 'bg-emerald-950/40 text-emerald-450 font-bold border border-emerald-900/40' : 'bg-orange-950/40 text-orange-400 border border-orange-900/40'
- }`}>
+ <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] ${ isCompleted ? 'bg-emerald-950/40 text-emerald-450 font-bold border border-emerald-900/40' : 'bg-orange-950/40 text-orange-400 border border-orange-900/40' }`}>
  {isCompleted ? 'Verified' : 'Ongoing'}
  </span>
  </div>
@@ -186,7 +184,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <h3 className="text-sm font-sans font-bold text-white flex items-center gap-1.5">
  AI Target Structuring Helper
  <span className="px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-300 text-[9px] font-mono border border-zinc-800">
- gemini-1.5-flash
+ gemini-3.1-flash-lite
  </span>
  </h3>
  <p className="text-xs text-zinc-505">Formulate and test mathematical target limits before deployment</p>
@@ -196,14 +194,14 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <textarea
  value={optimizeText}
  onChange={(e) => setOptimizeText(e.target.value)}
- className="w-full h-16 p-3 text-xs bg-zinc-900 border border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans shadow-inner text-white"
+ className="w-full h-16 p-3 text-xs bg-zinc-900 border border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all font-sans shadow-inner text-white"
  />
 
  <div className="text-right">
  <button
  onClick={handleOptimizeTarget}
  disabled={loadingSuggestion}
- className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-2 shadow-md active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+ className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-2 shadow-md active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg duration-200"
  >
  {loadingSuggestion ? (
  <>
@@ -245,7 +243,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  value={name}
  onChange={(e) => setName(e.target.value)}
  placeholder="e.g. Kyoto Salmon goal"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
+ className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all focus:outline-none"
  />
  </div>
 
@@ -257,7 +255,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  value={metric}
  onChange={(e) => setMetric(e.target.value)}
  placeholder="e.g. Sales (€)"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
+ className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all focus:outline-none"
  />
  </div>
 
@@ -269,7 +267,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  required
  value={targetValue || ''}
  onChange={(e) => setTargetValue(parseInt(e.target.value) || 0)}
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none font-mono"
+ className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all focus:outline-none font-mono"
  />
  </div>
  <div>
@@ -280,7 +278,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  value={unit}
  onChange={(e) => setUnit(e.target.value)}
  placeholder="units, €, kg"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
+ className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all focus:outline-none"
  />
  </div>
  </div>
@@ -291,7 +289,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <select
  value={category}
  onChange={(e) => setCategory(e.target.value as any)}
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
+ className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all focus:outline-none"
  >
  <option value="Sell">Sell</option>
  <option value="Production">Production</option>
@@ -307,7 +305,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  value={deadline}
  onChange={(e) => setDeadline(e.target.value)}
  placeholder="End of Friday"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
+ className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all focus:outline-none"
  />
  </div>
  </div>

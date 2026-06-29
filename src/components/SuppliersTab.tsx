@@ -168,11 +168,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
             placeholder="Search items or suppliers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-sm ${
-              isLight 
-                ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' 
-                : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800'
-            }`}
+            className={`pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] shadow-sm ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800' }`}
           />
         </div>
       </div>
@@ -190,15 +186,11 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
             return (
               <div 
                 key={supplier.id} 
-                className={`rounded-2xl border overflow-hidden transition-all duration-200 ${
-                  isLight ? 'bg-white border-zinc-200' : 'bg-black border-zinc-800'
-                }`}
+                className={`rounded-2xl border overflow-hidden transition-all duration-200 ${ isLight ? 'bg-white border-zinc-200' : 'bg-black border-zinc-800' }`}
               >
                 <button
                   onClick={() => toggleSupplier(supplier.id)}
-                  className={`w-full px-5 py-4 flex items-center justify-between transition-colors ${
-                    isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50'
-                  }`}
+                  className={`w-full px-5 py-4 flex items-center justify-between transition-colors ${ isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50' }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${isLight ? 'bg-indigo-50 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400'}`}>
@@ -219,20 +211,14 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
                 </button>
                 
                 <div 
-                  className={`transition-all duration-300 ease-in-out origin-top ${
-                    isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
+                  className={`transition-all duration-300 ease-in-out origin-top ${ isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0' }`}
                 >
                   <div className={`p-2 border-t ${isLight ? 'border-zinc-100 bg-zinc-50/50' : 'border-zinc-800/50 bg-zinc-900/20'}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                       {supplier.items.map(item => (
                         <div 
                           key={item.id}
-                          className={`px-4 py-3 rounded-xl border text-sm flex items-center gap-3 transition-all hover:-translate-y-0.5 hover:shadow-sm ${
-                            isLight 
-                              ? 'bg-white border-zinc-200 text-zinc-700 hover:border-indigo-300 hover:shadow-indigo-500/5' 
-                              : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-indigo-500/50 hover:bg-zinc-800/80 hover:shadow-[0_4px_12px_rgba(99,102,241,0.05)]'
-                          }`}
+                          className={`px-4 py-3 rounded-xl border text-sm flex items-center gap-3 transition-all hover:-translate-y-0.5 hover:shadow-sm ${ isLight ? 'bg-white border-zinc-200 text-zinc-700 hover:border-indigo-300 hover:shadow-indigo-500/5' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-indigo-500/50 hover:bg-zinc-800/80 hover:shadow-[0_4px_12px_rgba(99,102,241,0.05)]' }`}
                         >
                           <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLight ? 'bg-indigo-400' : 'bg-indigo-500'}`} />
                           <span className="leading-snug">{item.name}</span>

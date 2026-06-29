@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { jsPDF } from 'jspdf';
 import { Reorder, motion } from 'motion/react';
 import {
@@ -79,7 +79,10 @@ import {
   GripVertical
 } from 'lucide-react';
 
-import { RotateCcw, Info } from 'lucide-react';
+import { RotateCcw, Info, LogOut, GitCompare } from 'lucide-react';
+import { auth, db, handleFirestoreError, OperationType } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, onSnapshot, setDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
   Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
@@ -162,7 +165,95 @@ export default function App() {
  const [activeTab, setActiveTab] = useState<string>('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
  const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff' | 'User'>('Admin');
-  const [currentUser, setCurrentUser] = useState<{username: string, role: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{username: string, role: string, email?: string, photoURL?: string} | null>(null);
+  const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
+
+  // Auth Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser({
+          username: user.displayName || user.email || 'Google User',
+          role: 'Admin',
+          email: user.email || undefined,
+          photoURL: user.photoURL || undefined
+        });
+        setUserRole('Admin');
+      } else {
+        const storedUser = localStorage.getItem('localCurrentUser');
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            setCurrentUser(parsed);
+            setUserRole(parsed.role);
+          } catch (_) {
+            setCurrentUser(null);
+          }
+        } else {
+          setCurrentUser(null);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Firestore Sync Listener
+  useEffect(() => {
+    if (!currentUser || !currentUser.email || currentUser.email === 'demo@foodpenguin.com') {
+      setIsFirebaseSynced(false);
+      return;
+    }
+
+    const unsubscribeList: (() => void)[] = [];
+
+    const syncCollection = async <T extends { id: string }>(
+      colName: string,
+      initialData: T[],
+      setList: React.Dispatch<React.SetStateAction<T[]>>,
+      opType: OperationType
+    ) => {
+      try {
+        const ref = collection(db, colName);
+        const snap = await getDocs(ref).catch(err => handleFirestoreError(err, OperationType.LIST, colName));
+        
+        if (snap.empty) {
+          // Seed initial data
+          for (const item of initialData) {
+            await setDoc(doc(db, colName, item.id), item).catch(err => handleFirestoreError(err, OperationType.WRITE, `${colName}/${item.id}`));
+          }
+        }
+
+        const unsub = onSnapshot(ref, (snapshot) => {
+          const list: T[] = [];
+          snapshot.forEach(doc => {
+            list.push(doc.data() as T);
+          });
+          setList(list);
+        }, (err) => handleFirestoreError(err, OperationType.GET, colName));
+        
+        unsubscribeList.push(unsub);
+      } catch (e) {
+        console.error(`Error syncing ${colName} with Firestore:`, e);
+      }
+    };
+
+    const initSync = async () => {
+      await syncCollection('orders', initialOrders, setOrders, OperationType.WRITE);
+      await syncCollection('tasks', initialTasks, setTasks, OperationType.WRITE);
+      await syncCollection('waste', initialWaste, setWasteRecords, OperationType.WRITE);
+      await syncCollection('targets', initialTargets, setTargets, OperationType.WRITE);
+      await syncCollection('hours', initialHours, setHoursData, OperationType.WRITE);
+      await syncCollection('inventory', initialInventory, setInventory, OperationType.WRITE);
+      setIsFirebaseSynced(true);
+    };
+
+    initSync();
+
+    return () => {
+      unsubscribeList.forEach(unsub => unsub());
+    };
+  }, [currentUser]);
+
  const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
  const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
@@ -227,6 +318,7 @@ export default function App() {
 
  // Sync tasks list with active branch products on branch switch
  useEffect(() => {
+ if (isFirebaseSynced) return;
  const isMS = selectedBranch === 'Marks & Spencer - Cork City';
  const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
 
@@ -238,7 +330,7 @@ export default function App() {
  { id: 'PT-304', itemName: products[3 % products.length].name, assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 4, priority: 'high' }
  ]);
  }
- }, [selectedBranch]);
+ }, [selectedBranch, isFirebaseSynced]);
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
@@ -255,6 +347,7 @@ export default function App() {
  const [focusedDay, setFocusedDay] = useState<string | null>(null);
  const [expandedDays, setExpandedDays] = useState<string[]>([]);
  const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
+ const [compareModeEnabled, setCompareModeEnabled] = useState<boolean>(false);
 
  // Quick Adjust simulated capacity overrides states
  const [quickAdjustEnabled, setQuickAdjustEnabled] = useState<boolean>(false);
@@ -412,6 +505,8 @@ export default function App() {
  ? Math.min(100, Math.max(0, dailyCurrentPct + 4))
  : Math.min(100, rawDailyProjection);
 
+ const initialAiForecastVal = dailyProjectedPct;
+
  // Support live 'What-If' manual overrides when Quick Adjust mode is active
  if (quickAdjustEnabled) {
  const override = capacityOverrides[log.day];
@@ -424,7 +519,8 @@ export default function App() {
  day: log.day,
  date: log.date.substring(5), // simplified 'MM-DD'
  current: dailyCurrentPct,
- projected: dailyProjectedPct
+ projected: dailyProjectedPct,
+ initialAiForecast: initialAiForecastVal
  };
  });
 
@@ -437,11 +533,13 @@ export default function App() {
 
  const avgCurrent = Math.round(neighbors.reduce((sum, n) => sum + n.current, 0) / neighbors.length);
  const avgProjected = Math.round(neighbors.reduce((sum, n) => sum + n.projected, 0) / neighbors.length);
+ const avgInitialAiForecast = Math.round(neighbors.reduce((sum, n) => sum + n.initialAiForecast, 0) / neighbors.length);
 
  return {
  ...item,
  current: avgCurrent,
- projected: avgProjected
+ projected: avgProjected,
+ initialAiForecast: avgInitialAiForecast
  };
  });
  }
@@ -830,21 +928,25 @@ export default function App() {
  };
 
  // Reactive State Handlers
- const handleAddOrder = (newOrder: Omit<SalesOrder, 'id' | 'timestamp'>) => {
+ const handleAddOrder = async (newOrder) => {
  const timestampStr = new Date().toLocaleTimeString('en-US', {
  hour: '2-digit',
  minute: '2-digit',
  hour12: false
  });
  const orderId = `FP-${Math.floor(1000 + Math.random() * 9000)}`;
- const fullOrder: SalesOrder = {
+ const fullOrder = {
  ...newOrder,
  id: orderId,
  timestamp: timestampStr,
  branch: selectedBranch
  };
 
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'orders', orderId), fullOrder).catch(err => handleFirestoreError(err, OperationType.WRITE, `orders/${orderId}`));
+ } else {
  setOrders(prev => [fullOrder, ...prev]);
+ }
  
  // Reactive Sales Metrics update
  setMetrics(prev => ({
@@ -855,92 +957,137 @@ export default function App() {
  // Update the targets currentValue for Sales category
  setTargets(prev => prev.map(tgt => {
  if (tgt.category === 'Sell' && tgt.metric.includes('Sales')) {
- return { ...tgt, currentValue: tgt.currentValue + fullOrder.amount };
+ const newVal = tgt.currentValue + fullOrder.amount;
+ if (isFirebaseSynced) {
+ updateDoc(doc(db, 'targets', tgt.id), { currentValue: newVal }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `targets/${tgt.id}`));
+ }
+ return { ...tgt, currentValue: newVal };
  }
  return tgt;
  }));
  };
 
- const handleAddTarget = (newTarget: Omit<CompanyTarget, 'id'>) => {
+ const handleAddTarget = async (newTarget) => {
  const targetId = `T-${targets.length + 1}`;
- setTargets(prev => [...prev, { ...newTarget, id: targetId }]);
+ const fullTarget = { ...newTarget, id: targetId };
+
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'targets', targetId), fullTarget).catch(err => handleFirestoreError(err, OperationType.WRITE, `targets/${targetId}`));
+ } else {
+ setTargets(prev => [...prev, fullTarget]);
+ }
  };
 
- const handleAddTask = (newTask: Omit<ProductionTask, 'id'>) => {
+ const handleAddTask = async (newTask) => {
  const taskId = `PT-${Math.floor(400 + Math.random() * 100)}`;
+ const fullTask = { ...newTask, id: taskId };
+
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'tasks', taskId), fullTask).catch(err => handleFirestoreError(err, OperationType.WRITE, `tasks/${taskId}`));
+ } else {
  setTasks(prev => [{ ...newTask, id: taskId }, ...prev]);
+ }
  };
 
- const handleUpdateTaskStatus = (taskId: string, newStatus: ProductionTask['status']) => {
+ const handleUpdateTaskStatus = async (taskId, newStatus) => {
+ const targetTask = tasks.find(t => t.id === taskId);
+ if (!targetTask) return;
+
+ if (isFirebaseSynced) {
+ await updateDoc(doc(db, 'tasks', taskId), { status: newStatus }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `tasks/${taskId}`));
+ } else {
  setTasks(prev => prev.map(t => {
  if (t.id === taskId) {
+ return { ...t, status: newStatus };
+ }
+ return t;
+ }));
+ }
+
  // If transitioning from cooking to prepared, reactive add to cooked metrics
- if (newStatus === 'Prepared' && t.status !== 'Prepared') {
+ if (newStatus === 'Prepared' && targetTask.status !== 'Prepared') {
  setMetrics(m => ({
  ...m,
- productionItems: m.productionItems + t.quantity
+ productionItems: m.productionItems + targetTask.quantity
  }));
  
  // Reactive update target cooked units
  setTargets(tg => tg.map(tgt => {
  if (tgt.category === 'Production' && tgt.metric.toLowerCase().includes('cook')) {
- return { ...tgt, currentValue: tgt.currentValue + t.quantity };
+ const newVal = tgt.currentValue + targetTask.quantity;
+ if (isFirebaseSynced) {
+ updateDoc(doc(db, 'targets', tgt.id), { currentValue: newVal }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `targets/${tgt.id}`));
+ }
+ return { ...tgt, currentValue: newVal };
  }
  return tgt;
  }));
  }
- return { ...t, status: newStatus };
- }
- return t;
- }));
  };
 
- const handleAddWaste = (newWaste: Omit<WasteRecord, 'id' | 'date'>) => {
+ const handleAddWaste = async (newWaste) => {
  const wasteId = `W-${Math.floor(920 + Math.random() * 80)}`;
- const fullWaste: WasteRecord = {
+ const fullWaste = {
  ...newWaste,
  id: wasteId,
  date: new Date().toISOString().split('T')[0]
  };
 
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'waste', wasteId), fullWaste).catch(err => handleFirestoreError(err, OperationType.WRITE, `waste/${wasteId}`));
+ } else {
  setWasteRecords(prev => [fullWaste, ...prev]);
+ }
 
  // Reactive update target waste cost
  setTargets(tg => tg.map(tgt => {
  if (tgt.category === 'Waste' && tgt.metric.toLowerCase().includes('waste')) {
- return { ...tgt, currentValue: tgt.currentValue + fullWaste.cost };
+ const newVal = tgt.currentValue + fullWaste.cost;
+ if (isFirebaseSynced) {
+ updateDoc(doc(db, 'targets', tgt.id), { currentValue: newVal }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `targets/${tgt.id}`));
+ }
+ return { ...tgt, currentValue: newVal };
  }
  return tgt;
  }));
  };
 
- const handleToggleClockStatus = (employeeId: string) => {
- setHoursData(prev => prev.map(emp => {
- if (emp.id === employeeId) {
+ const handleToggleClockStatus = async (employeeId) => {
+ const emp = hoursData.find(e => e.id === employeeId);
+ if (!emp) return;
+
  const nextStatus = emp.status === 'Clocked In' ? 'Clocked Out' : 'Clocked In';
  const addHours = nextStatus === 'Clocked Out' ? 8.0 : 0;
- return {
- ...emp,
- status: nextStatus as any,
- actualHours: parseFloat((emp.actualHours + addHours).toFixed(1))
- };
+ const newActual = parseFloat((emp.actualHours + addHours).toFixed(1));
+
+ if (isFirebaseSynced) {
+ await updateDoc(doc(db, 'hours', employeeId), { status: nextStatus, actualHours: newActual }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `hours/${employeeId}`));
+ } else {
+ setHoursData(prev => prev.map(e => {
+ if (e.id === employeeId) {
+ return { ...e, status: nextStatus, actualHours: newActual };
  }
- return emp;
+ return e;
  }));
+ }
  };
 
- const handleOrderRestock = (itemId: string) => {
- setInventory(prev => prev.map(item => {
- if (item.id === itemId) {
- return {
+ const handleOrderRestock = async (itemId) => {
+ const item = inventory.find(i => i.id === itemId);
+ if (!item) return;
+
+ const updated = {
  ...item,
  stockLevel: 100,
  currentQty: item.reorderLevel + 120,
  status: 'Healthy'
  };
+
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'inventory', itemId), updated).catch(err => handleFirestoreError(err, OperationType.WRITE, `inventory/${itemId}`));
+ } else {
+ setInventory(prev => prev.map(i => i.id === itemId ? updated : i));
  }
- return item;
- }));
  };
 
  const handleUpdateWeeklyLog = (updatedLog: DailyOperationalLog) => {
@@ -1120,18 +1267,28 @@ export default function App() {
 
  const isLight = theme === 'light';
 
+ if (!currentUser) {
+   return (
+     <LoginScreen 
+       theme={theme} 
+       onLogin={(username, role) => {
+         const userObj = { username, role, email: 'demo@foodpenguin.com' };
+         localStorage.setItem('localCurrentUser', JSON.stringify(userObj));
+         setCurrentUser(userObj);
+         setUserRole(role as any);
+       }} 
+     />
+   );
+ }
+
  return (
  <div 
  id="app-workspace" 
- className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-200 ${
- isLight ? 'bg-zinc-50 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900' : 'bg-black text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100'
- }`}
+ className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-200 ${ isLight ? 'bg-zinc-50 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900' : 'bg-black text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100' }`}
  >
  
  {/* SIDEBAR: NAVIGATION */}
- <aside className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? 'fixed inset-0 z-50 h-[100dvh] overflow-hidden' : 'sticky md:relative top-0 z-40'} ${
- isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-900 text-zinc-100'
- }`}>
+ <aside className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? 'fixed inset-0 z-50 h-[100dvh] overflow-hidden' : 'sticky md:relative top-0 z-40'} ${ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-900 text-zinc-100' }`}>
  {/* Brand Header */}
         <div className={`p-4 md:p-6 border-b flex items-center justify-between gap-3 transition-colors ${isLight ? 'border-zinc-150' : 'border-zinc-900'}`}>
           <div className="flex items-center gap-3 w-full">
@@ -1184,17 +1341,9 @@ export default function App() {
  <div 
  key={branch} 
  onClick={() => setSelectedBranch(branch)}
- className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
- isSelected 
- ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30'
- : isLight ? 'bg-white border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900'
- }`}
+ className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${ isSelected ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30' : isLight ? 'bg-white border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900' }`}
  >
- <span className={`truncate mr-2 ${
- isSelected 
- ? isLight ? 'text-orange-700 font-bold' : 'text-orange-400 font-bold' 
- : isLight ? 'text-zinc-700 font-medium' : 'text-zinc-300 font-medium'
- }`}>
+ <span className={`truncate mr-2 ${ isSelected ? isLight ? 'text-orange-700 font-bold' : 'text-orange-400 font-bold' : isLight ? 'text-zinc-700 font-medium' : 'text-zinc-300 font-medium' }`}>
  {shortName}
  </span>
  <span className={`font-mono tracking-tight shrink-0 flex items-center gap-1.5 ${isLight ? 'text-emerald-500 font-bold' : 'text-[9px] px-2 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black'}`}>
@@ -1214,21 +1363,9 @@ export default function App() {
  <button
  key={tab.id}
  onClick={() => { setActiveTab(tab.id); setIsMobileMenuOpen(false); }}
- className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
- isActive
- ? isLight
- ? 'bg-zinc-100 text-zinc-950 font-extrabold shadow-sm'
- : 'bg-zinc-900 text-white font-bold shadow-inner'
- : isLight
- ? 'text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900'
- : 'text-zinc-500 hover:bg-zinc-905 hover:text-white'
- }`}
+ className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${ isActive ? isLight ? 'bg-zinc-100 text-zinc-950 font-extrabold shadow-sm' : 'bg-zinc-900 text-white font-bold shadow-inner' : isLight ? 'text-zinc-600 text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900' : 'text-zinc-500 hover:bg-zinc-905 hover:text-white' }`}
  >
- <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
- isActive 
- ? tab.id === 'Real-time' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125' 
- : isLight ? 'bg-transparent border border-zinc-300' : 'bg-transparent border border-zinc-800'
- }`} />
+ <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${ isActive ? tab.id === 'Real-time' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125' : isLight ? 'bg-transparent border border-zinc-300' : 'bg-transparent border border-zinc-800' }`} />
  <span className="flex-1 flex items-center gap-2">
  <span className={isActive ? 'text-orange-500' : isLight ? 'text-zinc-400' : 'text-zinc-500'}>{tab.icon}</span>
  {tab.label}
@@ -1240,28 +1377,20 @@ export default function App() {
 
  {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
  <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
- <div className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${
- isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}>
- <div className={`absolute right-0 top-0 w-24 h-24 bg-gradient-to-br rounded-full filter blur-2xl pointer-events-none ${
- isLight ? 'from-orange-550/5' : 'from-orange-500/5 to-transparent'
- }`} />
+ <div className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
+ <div className={`absolute right-0 top-0 w-24 h-24 bg-gradient-to-br rounded-full filter blur-2xl pointer-events-none ${ isLight ? 'from-orange-550/5' : 'from-orange-500/5 to-transparent' }`} />
  
  <div className="flex items-center justify-between mb-2">
  <button 
  onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
- className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${
- isLight ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'hover:text-white'
- }`}
+ className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${ isLight ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'hover:text-white' }`}
  title="Click to view daily breakdown"
  >
- <p className={`text-[10px] uppercase font-mono font-bold tracking-wider select-none ${
- isLight ? 'text-zinc-500' : 'text-zinc-400'
- }`}>Weekly Capacity</p>
+ <p className={`text-[10px] uppercase font-mono font-bold tracking-wider select-none ${ isLight ? 'text-zinc-500' : 'text-zinc-400' }`}>Weekly Capacity</p>
  {isCapacityExpanded ? (
- <ChevronUp className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
+ <ChevronUp className={`w-3.5 h-3.5 transition-all transform hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  ) : (
- <ChevronDown className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
+ <ChevronDown className={`w-3.5 h-3.5 transition-all transform hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  )}
  </button>
  <div className="flex items-center gap-1.5">
@@ -1269,31 +1398,17 @@ export default function App() {
    Forecast AI
   </span>
   <span 
-   className={`flex items-center gap-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${
-    aiAccuracyConfidence >= 90
-     ? isLight ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-     : aiAccuracyConfidence >= 80
-     ? isLight ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-     : isLight ? 'text-rose-600 bg-rose-50 border-rose-200' : 'text-rose-400 bg-rose-500/10 border-rose-500/20'
-   }`}
+   className={`flex items-center gap-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${ aiAccuracyConfidence >= 90 ? isLight ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : aiAccuracyConfidence >= 80 ? isLight ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-amber-400 bg-amber-500/10 border-amber-500/20' : isLight ? 'text-rose-600 bg-rose-50 border-rose-200' : 'text-rose-400 bg-rose-500/10 border-rose-500/20' }`}
    title={`AI Model Confidence: ${aiAccuracyConfidence}% (calculated dynamically based on historic variance between actual logs and model projections)`}
   >
-   <span className={`w-1 h-1 rounded-full ${
-    aiAccuracyConfidence >= 90
-     ? 'bg-emerald-500 animate-pulse'
-     : aiAccuracyConfidence >= 80
-     ? 'bg-amber-500'
-     : 'bg-rose-500'
-   }`} />
+   <span className={`w-1 h-1 rounded-full ${ aiAccuracyConfidence >= 90 ? 'bg-emerald-500 animate-pulse' : aiAccuracyConfidence >= 80 ? 'bg-amber-500' : 'bg-rose-500' }`} />
    Accuracy Conf: {aiAccuracyConfidence}%
   </span>
  </div>
  </div>
 
  {/* Branch Overlay Selector (Gold Liner style) */}
- <div className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-[8.5px] select-none border transition-all ${
-   isLight ? 'bg-zinc-100/65 border-zinc-200 shadow-sm' : 'bg-zinc-950/30 border-zinc-800/45'
- }`}>
+ <div className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-[8.5px] select-none border transition-all ${ isLight ? 'bg-zinc-100/65 border-zinc-200 shadow-sm' : 'bg-zinc-950/30 border-zinc-800/45' }`}>
    <div className="flex items-center justify-between">
      <span className={`flex items-center gap-1.5 font-bold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
        <span className={`w-1.5 h-1.5 rounded-full ${overlayBranches.length > 0 ? 'bg-yellow-500 animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'bg-zinc-400'}`} />
@@ -1302,11 +1417,7 @@ export default function App() {
      {overlayBranches.length > 0 && (
        <button 
          onClick={() => setOverlayBranches([])}
-         className={`px-1.5 py-0.5 rounded text-[7px] font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${
-           isLight 
-             ? 'bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700' 
-             : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300'
-         }`}
+         className={`px-1.5 py-0.5 rounded text-[7px] font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${ isLight ? 'bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300' }`}
        >
          Clear Overlay
        </button>
@@ -1362,7 +1473,7 @@ export default function App() {
                  : [...prev, branch]
              );
            }}
-           className={`px-2 py-1 rounded-md border text-[7.5px] font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
+           className={`px-2 py-1 rounded-md border text-[7.5px] font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] hover:-translate-y-0.5 active:scale-[0.98] ${
              isSelected 
                ? style.activeBg
                : `${isLight ? 'bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100' : 'bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800'} opacity-75`
@@ -1376,22 +1487,16 @@ export default function App() {
   </div>
 
   {/* Premium, interactive, layered capacity progress bar */}
-        <div className={`relative h-3 rounded-full overflow-hidden mt-3 shadow-inner ${
-          isLight ? 'bg-zinc-200' : 'bg-zinc-800/80'
-        }`}>
+        <div className={`relative h-3 rounded-full overflow-hidden mt-3 shadow-inner ${ isLight ? 'bg-zinc-200' : 'bg-zinc-800/80' }`}>
           {/* Visual 'Safe Zone' range marker (40% to bottleneckThreshold) */}
           {bottleneckThreshold > 40 && (
             <motion.div 
-              className={`absolute top-0 h-full border-l border-r border-dashed z-0 ${
-                isLight 
-                  ? 'bg-emerald-500/[0.08] border-emerald-500/25' 
-                  : 'bg-emerald-500/[0.06] border-emerald-400/20'
-              }`}
+              className={`absolute top-0 h-full border-l border-r border-dashed z-0 ${ isLight ? 'bg-emerald-500/[0.08] border-emerald-500/25' : 'bg-emerald-500/[0.06] border-emerald-400/20' }`}
               animate={{ 
                 left: '40%', 
                 width: `${bottleneckThreshold - 40}%` 
               }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Optimal Safe Zone: 40% to ${bottleneckThreshold}%`}
             />
           )}
@@ -1401,14 +1506,14 @@ export default function App() {
             <motion.div 
               className={`absolute top-0 h-full ${isLight ? 'bg-emerald-500/20' : 'bg-emerald-500/30'}`}
               animate={{ left: `${projectedCapacityPct}%`, width: `${bottleneckThreshold - projectedCapacityPct}%` }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Safe Buffer: ${bottleneckThreshold - projectedCapacityPct}%`}
             />
           ) : (
             <motion.div 
               className={`absolute top-0 h-full animate-pulse ${isLight ? 'bg-rose-500/40' : 'bg-rose-500/50'}`}
               animate={{ left: `${bottleneckThreshold}%`, width: `${projectedCapacityPct - bottleneckThreshold}%` }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Threshold Overflow: ${projectedCapacityPct - bottleneckThreshold}%`}
             />
           )}
@@ -1417,7 +1522,7 @@ export default function App() {
           <motion.div 
             className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full shadow-[0_0_8px_rgba(249,115,22,0.2)]"
             animate={{ width: `${capacityPct}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             title={`Current load: ${capacityPct}%`}
           />
 
@@ -1432,7 +1537,7 @@ export default function App() {
                 left: `${capacityPct}%`,
                 width: `${projectedCapacityPct - capacityPct}%`
               }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Projected increase: ${projectedCapacityPct - capacityPct}%`}
             />
           )}
@@ -1441,7 +1546,7 @@ export default function App() {
           <motion.div 
             className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10"
             animate={{ left: `${projectedCapacityPct}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             title={`7-Day Projection Target: ${projectedCapacityPct}%`}
           />
 
@@ -1449,7 +1554,7 @@ export default function App() {
           <motion.div 
             className="absolute top-0 h-full w-0.5 bg-rose-500 z-20"
             animate={{ left: `${bottleneckThreshold}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             title={`Bottleneck Threshold: ${bottleneckThreshold}%`}
           />
 
@@ -1474,9 +1579,7 @@ export default function App() {
         </div>
 
         {/* Text details and comparison metrics */}
- <div className={`space-y-1.5 mt-3 pt-2.5 border-t font-mono text-[10px] leading-relaxed ${
- isLight ? 'border-zinc-200' : 'border-zinc-800/60'
- }`}>
+ <div className={`space-y-1.5 mt-3 pt-2.5 border-t font-mono text-[10px] leading-relaxed ${ isLight ? 'border-zinc-200' : 'border-zinc-800/60' }`}>
  <div className="flex justify-between items-center">
  <span className={`flex items-center gap-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Current Load:
@@ -1503,12 +1606,8 @@ export default function App() {
 
   {/* Branch Projections Overlay Comparison */}
  {overlayBranches.length > 0 && (
- <div className={`mt-2 pt-2 border-t border-dashed space-y-1.5 ${
- isLight ? 'border-zinc-200' : 'border-zinc-800/40'
- }`}>
- <p className={`text-[8px] uppercase tracking-wider font-bold mb-1 select-none ${
- isLight ? 'text-zinc-400' : 'text-zinc-500'
- }`}>Projected Branch Comparison</p>
+ <div className={`mt-2 pt-2 border-t border-dashed space-y-1.5 ${ isLight ? 'border-zinc-200' : 'border-zinc-800/40' }`}>
+ <p className={`text-[8px] uppercase tracking-wider font-bold mb-1 select-none ${ isLight ? 'text-zinc-400' : 'text-zinc-500' }`}>Projected Branch Comparison</p>
  {Object.entries(branchProjectionData).map(([name, val]) => {
  const isCurrentBranch = name === selectedBranch;
  const isSelected = overlayBranches.includes(name);
@@ -1517,9 +1616,7 @@ export default function App() {
  const shortName = name.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
  return (
  <div key={name} className="flex justify-between items-center">
- <span className={`flex items-center gap-1.5 ${
- isLight ? 'text-zinc-600' : 'text-zinc-300'
- } ${isCurrentBranch ? 'font-bold' : ''}`}>
+ <span className={`flex items-center gap-1.5 ${ isLight ? 'text-zinc-600' : 'text-zinc-300' } ${isCurrentBranch ? 'font-bold' : ''}`}>
  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: bData.color }} />
  {shortName}:
  </span>
@@ -1532,9 +1629,7 @@ export default function App() {
  </div>
  )}
 
- <p className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${
- isLight ? 'border-zinc-200 text-zinc-400' : 'border-zinc-800/20 text-zinc-500'
- }`}>
+ <p className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${ isLight ? 'border-zinc-200 text-zinc-400' : 'border-zinc-800/20 text-zinc-500' }`}>
  Estimated from rolling week rates & trend momentum.
  </p>
  </div>
@@ -1553,13 +1648,7 @@ export default function App() {
         setBulkSelectedDays([]);
       }}
       disabled={capacitySortBy === 'date' && capacitySmoothing === 'raw' && bulkSelectedDays.length === 0}
-      className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
-        (capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0)
-          ? isLight
-            ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer'
-            : 'bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer'
-          : 'opacity-40 cursor-not-allowed ' + (isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-400' : 'bg-zinc-800/50 border-zinc-700/35 text-zinc-600')
-      }`}
+      className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ (capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0) ? isLight ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer' : 'bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer' : 'opacity-40 cursor-not-allowed ' + (isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-400' : 'bg-zinc-800/50 border-zinc-700/35 text-zinc-600') }`}
       title="Clear all daily capacity filters, sorting, smoothing, and bulk selections"
     >
       <RotateCcw className={`w-2.5 h-2.5 ${(capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0) ? 'text-yellow-500' : ''}`} />
@@ -1567,58 +1656,40 @@ export default function App() {
     </button>
  <button 
  onClick={handleExportCapacityCSV}
- className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
- : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
- }`}
+ className={`p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
  title="Download daily capacity report as CSV"
  >
  <Download className="w-2.5 h-2.5 text-orange-400" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
  </button>
  <button 
  onClick={handleExportCapacityPDF}
- className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
- : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
- }`}
+ className={`p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
  title="Download styled PDF projection summary report"
  >
  <Download className="w-2.5 h-2.5 text-amber-500" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
  </button>
  <button 
  onClick={() => setIsScheduleReportModalOpen(true)}
- className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
- isLight 
- ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' 
- : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700'
- }`}
+ className={`p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
  title="Schedule automated email report delivery"
  >
  <Mail className="w-2.5 h-2.5 text-rose-400" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>Schedule</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>Schedule</span>
  </button>
  <span className="text-[8px] text-zinc-400 font-semibold ml-1">[Current vs Proj]</span>
  </div>
  </div>
 
  {/* Sort Option Sorter Selector Dropdown & Smoothing Toggle */}
- <div className={`flex flex-col gap-2 p-2.5 rounded-xl border ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
- }`}>
+ <div className={`flex flex-col gap-2 p-2.5 rounded-xl border ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60' }`}>
  <div className="flex items-center justify-between gap-1.5">
  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Order by:</span>
  <select
  value={capacitySortBy}
  onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck' | 'custom')}
- className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
- isLight 
- ? 'bg-white border-zinc-200 text-amber-600' 
- : 'bg-zinc-900 border-zinc-800/80 text-amber-450  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300'
- }`}
+ className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${ isLight ? 'bg-white border-zinc-200 text-amber-600' : 'bg-zinc-900 border-zinc-800/80 text-amber-450 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300' }`}
  >
  <option value="date" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>📅 Date (Chronological)</option>
  <option value="bottleneck" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>🔥 Bottleneck Intensity</option>
@@ -1632,25 +1703,13 @@ export default function App() {
  <div className={`flex rounded p-0.5 border ${isLight ? 'bg-zinc-200 border-zinc-200' : 'bg-zinc-900 border-zinc-800/80'}`}>
  <button
  onClick={() => setCapacitySmoothing('raw')}
- className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
- capacitySmoothing === 'raw' 
- ? 'bg-orange-500 text-white shadow-sm' 
- : isLight 
- ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' 
- : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
- }`}
+ className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${ capacitySmoothing === 'raw' ? 'bg-orange-500 text-white shadow-sm' : isLight ? 'text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' }`}
  >
  Raw
  </button>
  <button
  onClick={() => setCapacitySmoothing('smoothed')}
- className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
- capacitySmoothing === 'smoothed' 
- ? 'bg-orange-500 text-white shadow-sm' 
- : isLight 
- ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' 
- : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
- }`}
+ className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${ capacitySmoothing === 'smoothed' ? 'bg-orange-500 text-white shadow-sm' : isLight ? 'text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' }`}
  title="3-Day Moving Average Smoothed"
  >
  Smooth 3D
@@ -1658,16 +1717,25 @@ export default function App() {
  </div>
  </div>
  
+ {/* Compare Mode Toggle */}
+ <div className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
+ <span className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${compareModeEnabled ? 'text-yellow-600 dark:text-yellow-500 font-extrabold' : isLight ? 'text-zinc-500' : 'text-zinc-500'}`} title="Compare initial AI forecast with manual simulation value">
+ <GitCompare className={`w-3 h-3 ${compareModeEnabled ? 'text-yellow-500' : ''}`} />
+ Compare Mode:
+ </span>
+ <button
+ onClick={() => setCompareModeEnabled(!compareModeEnabled)}
+ type="button"
+ className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${ compareModeEnabled ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
+ >
+ {compareModeEnabled ? 'COMPARE ON' : 'OFF'}
+ </button>
+ </div>
+
  {/* Quick Adjust Mode Toggle */}
  <div className={`flex flex-col gap-1.5 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
  <div className="flex items-center justify-between gap-1">
- <span className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${
- quickAdjustEnabled 
- ? 'text-orange-500 font-extrabold' 
- : isLight 
- ? 'text-zinc-500' 
- : 'text-zinc-500'
- }`} title="Toggle manual vs AI capacity adjustments">
+ <span className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${ quickAdjustEnabled ? 'text-orange-500 font-extrabold' : isLight ? 'text-zinc-500' : 'text-zinc-500' }`} title="Toggle manual vs AI capacity adjustments">
  <Wand2 className={`w-3 h-3 ${quickAdjustEnabled ? 'animate-pulse text-orange-500' : ''}`} />
  Quick Adjust:
  </span>
@@ -1679,13 +1747,7 @@ export default function App() {
  }
  }}
  type="button"
- className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
- quickAdjustEnabled
- ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm'
- : isLight
- ? 'bg-zinc-100 border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200'
- : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800'
- }`}
+ className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${ quickAdjustEnabled ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
  >
  {quickAdjustEnabled ? 'What-If ON' : 'OFF'}
  </button>
@@ -1700,7 +1762,7 @@ export default function App() {
           <button onClick={() => setBulkSelectedDays([])} className="hover:underline text-[8px] tracking-wider">Clear Selection</button>
         )}
         {Object.keys(capacityOverrides).length > 0 && (
-          <button onClick={handleResetOverrides} className="hover:underline text-[8px] tracking-wider">Reset All</button>
+          <button onClick={handleResetOverrides} className="hover:underline text-[8px] tracking-wider active:scale-[0.98] hover:-translate-y-0.5 transition-all duration-200 hover:shadow-md">Reset All</button>
         )}
       </div>
     </div>
@@ -1768,9 +1830,7 @@ export default function App() {
  </div>
 
 	{/* Bottleneck Threshold Slider */}
-	<div className={`flex flex-col gap-2 p-2.5 rounded-xl border relative ${
-	isLight ? 'bg-zinc-100 border-zinc-200 shadow-sm' : 'bg-zinc-950/80 border-zinc-900/60'
-	}`}>
+	<div className={`flex flex-col gap-2 p-2.5 rounded-xl border relative ${ isLight ? 'bg-zinc-100 border-zinc-200 shadow-sm' : 'bg-zinc-950/80 border-zinc-900/60' }`}>
 	<div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
 	<div className="flex items-center gap-1">
 	  <span>Bottleneck Threshold</span>
@@ -1779,28 +1839,19 @@ export default function App() {
 	    onClick={() => setShowThresholdTooltip(!showThresholdTooltip)}
 	    onMouseEnter={() => setShowThresholdTooltip(true)}
 	    onMouseLeave={() => setShowThresholdTooltip(false)}
-	    className={`p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-95 ${
-	      showThresholdTooltip 
-	        ? 'text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10' 
-	        : isLight 
-	          ? 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50' 
-	          : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
-	    }`}
+	    className={`p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] hover:-translate-y-0.5 active:scale-95 ${ showThresholdTooltip ? 'text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10' : isLight ? 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
 	    title="Information Tooltip"
 	  >
 	    <Info className="w-3 h-3" />
 	  </button>
 	</div>
 	<motion.span 
-	  key={bottleneckThreshold}
-	  initial={{ scale: 0.92, opacity: 0.8 }}
-	  animate={{ scale: 1, opacity: 1 }}
-	  transition={{ type: "spring", stiffness: 300, damping: 15 }}
-	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border ${
-	    isLight 
-	      ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' 
-	      : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-	  }`}
+	  key="bottleneck-badge"
+	  animate={{ scale: 1 }}
+	  whileHover={{ scale: 1.08 }}
+	  whileTap={{ scale: 0.95 }}
+	  transition={{ type: "spring", stiffness: 450, damping: 25 }}
+	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${ isLight ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]' }`}
 	>
 	  {bottleneckThreshold}%
 	</motion.span>
@@ -1808,11 +1859,7 @@ export default function App() {
 
 	{/* Tooltip Popup box aligned directly on top of the container */}
 	{showThresholdTooltip && (
-	  <div className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-[9px] font-normal normal-case tracking-normal leading-relaxed ${
-	    isLight 
-	      ? 'bg-white border-zinc-200/90 text-zinc-700 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)]' 
-	      : 'bg-zinc-900/95 border-zinc-800 text-zinc-300 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5),0_8px_10px_-6px_rgba(0,0,0,0.5)]'
-	  }`}>
+	  <div className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-[9px] font-normal normal-case tracking-normal leading-relaxed ${ isLight ? 'bg-white border-zinc-200/90 text-zinc-700 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)]' : 'bg-zinc-900/95 border-zinc-800 text-zinc-300 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5),0_8px_10px_-6px_rgba(0,0,0,0.5)]' }`}>
 	    {/* Gold line border indicator on the left side to highlight calibration info */}
 	    <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-yellow-500" />
 	    
@@ -1851,7 +1898,7 @@ export default function App() {
 	step="1"
 	value={bottleneckThreshold}
 	onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
-	className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+	className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow duration-200"
 	style={{ 
 	  accentColor: '#eab308',
 	  background: `linear-gradient(to right, #eab308 0%, #eab308 ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} 100%)`
@@ -1865,9 +1912,7 @@ export default function App() {
 	</div>
 
  {/* Visual D3 Target vs Actual Variance performance drift Chart */}
- <div className={`p-2.5 rounded-xl border ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60'
- }`}>
+ <div className={`p-2.5 rounded-xl border ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950/80 border-zinc-900/60' }`}>
  <CapacityVarianceChart weeklyLogs={weeklyLogs} isLight={isLight} />
  </div>
  
@@ -1886,11 +1931,7 @@ export default function App() {
                       setFocusedDay(null);
                     }, 2500);
                   }}
-                  className={`w-full flex items-center justify-between mt-1 mb-2 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-sm group ${
-                    isLight 
-                      ? 'bg-amber-100/80 text-amber-900 border border-amber-200 hover:bg-amber-100 hover:shadow-md' 
-                      : 'bg-amber-900/30 text-amber-500 border border-amber-900/50 hover:bg-amber-900/50 hover:border-amber-500/50 hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]'
-                  }`}
+                  className={`w-full flex items-center justify-between mt-1 mb-2 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-sm group ${ isLight ? 'bg-amber-100/80 text-amber-900 border border-amber-200 hover:bg-amber-100 hover:shadow-md' : 'bg-amber-900/30 text-amber-500 border border-amber-900/50 hover:bg-amber-900/50 hover:border-amber-500/50 hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]' }`}
                 >
                   <span className="flex items-center gap-1.5">
                     <span className={isLight ? 'text-amber-600' : 'text-amber-400'}>🔥</span>
@@ -1936,19 +1977,7 @@ export default function App() {
     key={item.day}
     value={item}
     id={`bottleneck-day-${item.day}`}
-    className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${
-                              isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40'
-                            } ${
-                              isBottleneck 
-                                ? isLight 
-                                  ? 'bg-amber-50 border-2 border-amber-400 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_12px_rgba(245,158,11,0.4)] animate-[pulse_2s_ease-in-out_infinite]' 
-                                  : 'bg-amber-900/10 border-2 border-amber-500/60 p-2.5 rounded-xl my-1 shadow-[0_0_15px_rgba(245,158,11,0.3)] text-zinc-300 animate-[pulse_2s_ease-in-out_infinite]' 
-                                : 'px-1 pt-1'
-                            } ${
-                              focusedDay === item.day
-                                ? 'ring-2 ring-yellow-500 border-yellow-500 rounded-xl p-2.5 shadow-[0_0_20px_rgba(234,179,8,0.75)] scale-[1.02] bg-yellow-500/5 dark:bg-yellow-500/10 z-10'
-                                : ''
-                            }`}
+    className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${ isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40' } ${ isBottleneck ? isLight ? 'bg-amber-50 border-2 border-amber-400 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_12px_rgba(245,158,11,0.4)] animate-[pulse_2s_ease-in-out_infinite]' : 'bg-amber-900/10 border-2 border-amber-500/60 p-2.5 rounded-xl my-1 shadow-[0_0_15px_rgba(245,158,11,0.3)] text-zinc-300 animate-[pulse_2s_ease-in-out_infinite]' : 'px-1 pt-1' } ${ focusedDay === item.day ? 'ring-2 ring-yellow-500 border-yellow-500 rounded-xl p-2.5 shadow-[0_0_20px_rgba(234,179,8,0.75)] scale-[1.02] bg-yellow-500/5 dark:bg-yellow-500/10 z-10' : '' }`}
                           >
  <div className="flex justify-between items-center text-[10px] gap-2">
                             <div className="flex items-center gap-1.5 min-w-[70px]">
@@ -1962,9 +1991,7 @@ export default function App() {
         prev.includes(item.day) ? prev.filter(d => d !== item.day) : [...prev, item.day]
       );
     }}
-    className={`p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:scale-105 active:scale-95 shadow-sm shrink-0 ${
-      isLight ? 'hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950' : 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100'
-    }`}
+    className={`p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] hover:scale-105 active:scale-95 shadow-sm shrink-0 ${ isLight ? 'hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950' : 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100' }`}
     title="Toggle contributing items"
   >
     {expandedDays.includes(item.day) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
@@ -1980,7 +2007,7 @@ export default function App() {
                                       setBulkSelectedDays(bulkSelectedDays.filter(d => d !== item.day));
                                     }
                                   }}
-                                  className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-amber-500 focus:ring-2 cursor-pointer transition-colors accent-amber-500"
+                                  className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] cursor-pointer transition-colors accent-amber-500"
                                 />
                               )}
                               <span className={`font-sans font-bold flex items-center gap-1 flex-wrap ${isLight ? 'text-zinc-800' : 'text-zinc-300'}`}>
@@ -2109,33 +2136,71 @@ export default function App() {
  style={{ width: `${item.current}%` }}
  />
  <div 
- className={`${
- !isBottleneck 
- ? 'bg-gradient-to-r from-orange-600 to-orange-400' 
- : item.projected - bottleneckThreshold >= 15 
- ? 'bg-gradient-to-r from-red-600 to-red-500 shadow-[0_0_8px_rgba(220,38,38,0.5)]' 
- : item.projected - bottleneckThreshold >= 8 
- ? 'bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.4)]'
- : 'bg-gradient-to-r from-amber-500 to-amber-400 shadow-[0_0_4px_rgba(245,158,11,0.3)]'
- } h-full rounded-r transition-all duration-300`}
+ className={`${ !isBottleneck ? 'bg-gradient-to-r from-orange-600 to-orange-400' : item.projected - bottleneckThreshold >= 15 ? 'bg-gradient-to-r from-red-600 to-red-500 shadow-[0_0_8px_rgba(220,38,38,0.5)]' : item.projected - bottleneckThreshold >= 8 ? 'bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.4)]' : 'bg-gradient-to-r from-amber-500 to-amber-400 shadow-[0_0_4px_rgba(245,158,11,0.3)]' } h-full rounded-r transition-all duration-300`}
  style={{ width: `${Math.max(0, item.projected - item.current)}%` }}
  />
  </div>
 
+ {/* Compare Mode Variance Secondary Bar & Info Panel */}
+ {compareModeEnabled && (
+ <motion.div 
+ initial={{ height: 0, opacity: 0 }}
+ animate={{ height: "auto", opacity: 1 }}
+ exit={{ height: 0, opacity: 0 }}
+ transition={{ type: "spring", stiffness: 350, damping: 28 }}
+ className={`mt-1.5 p-1.5 rounded-lg border flex flex-col gap-1 overflow-hidden transition-all duration-300 ${ isLight ? 'bg-yellow-50/40 border-yellow-200/50' : 'bg-yellow-950/5 border-yellow-900/10' }`}
+ >
+ <div className="flex justify-between items-center text-[7.5px] font-mono leading-none">
+ <div className="flex items-center gap-0.5 text-zinc-500">
+ <span>AI:</span>
+ <span className={`font-bold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>{item.initialAiForecast}%</span>
+ </div>
+ <div className="flex items-center gap-0.5 text-zinc-500">
+ <span>Sim:</span>
+ <span className={`font-bold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>{item.projected}%</span>
+ </div>
+ <div className="flex items-center gap-0.5 font-bold">
+ <span className="text-zinc-500">Var:</span>
+ <span className={`px-1 rounded-sm ${ item.projected > item.initialAiForecast ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : item.projected < item.initialAiForecast ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : 'bg-zinc-500/10 text-zinc-500' }`}>
+ {item.projected > item.initialAiForecast ? `+${item.projected - item.initialAiForecast}` : item.projected - item.initialAiForecast}%
+ </span>
+ </div>
+ </div>
+ 
+ {/* Secondary progress bar representing variance range */}
+ <div className="h-1.5 bg-zinc-950 dark:bg-zinc-950/90 rounded-full relative overflow-hidden flex items-center">
+ {/* Base AI forecast area in track */}
+ <div 
+ className="h-full bg-zinc-700/30 dark:bg-zinc-800/40 border-r border-dashed border-zinc-500/30 transition-all duration-300"
+ style={{ width: `${item.initialAiForecast}%` }}
+ />
+ {/* Animated Variance Bar Segment */}
+ <motion.div 
+ className={`absolute h-full rounded ${ item.projected >= item.initialAiForecast ? 'bg-gradient-to-r from-yellow-500 to-amber-500 shadow-[0_0_6px_rgba(234,179,8,0.3)]' : 'bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(239,68,68,0.3)]' }`}
+ animate={{ 
+ left: `${Math.min(item.initialAiForecast, item.projected)}%`, 
+ width: `${Math.abs(item.projected - item.initialAiForecast)}%` 
+ }}
+ transition={{ type: "spring", stiffness: 350, damping: 28 }}
+ />
+ {/* Spark mark at simulated point */}
+ <motion.div 
+ className={`absolute w-0.5 h-2 rounded-full z-10 ${ item.projected >= item.initialAiForecast ? 'bg-amber-400' : 'bg-rose-400' }`}
+ animate={{ left: `${item.projected}%` }}
+ transition={{ type: "spring", stiffness: 350, damping: 28 }}
+ />
+ </div>
+ </motion.div>
+ )}
+
  {/* Inline What-If adjustments for specific day */}
  {quickAdjustEnabled && (
- <div className={`mt-1.5 flex flex-wrap items-center justify-between gap-1.5 p-1.5 rounded-xl border transition-all duration-200 ${
- isLight ? 'bg-zinc-50 border-zinc-200/80 shadow-inner' : 'bg-zinc-950/40 border-zinc-800/60 shadow-inner'
- }`}>
+ <div className={`mt-1.5 flex flex-wrap items-center justify-between gap-1.5 p-1.5 rounded-xl border transition-all duration-200 ${ isLight ? 'bg-zinc-50 border-zinc-200/80 shadow-inner' : 'bg-zinc-950/40 border-zinc-800/60 shadow-inner' }`}>
  <div className="flex border rounded-lg p-0.5 bg-zinc-900 dark:bg-zinc-950 border-zinc-800 shrink-0">
  <button
  onClick={() => handleToggleOverrideMode(item.day, 'ai', item.projected)}
  type="button"
- className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
- (!capacityOverrides[item.day] || capacityOverrides[item.day].mode === 'ai')
- ? 'bg-amber-500 text-zinc-950 shadow-sm font-extrabold'
- : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200'
- }`}
+ className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ (!capacityOverrides[item.day] || capacityOverrides[item.day].mode === 'ai') ? 'bg-amber-500 text-zinc-950 shadow-sm font-extrabold' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200' }`}
  >
  <Sparkles className="w-2 h-2 shrink-0" />
  AI
@@ -2143,11 +2208,7 @@ export default function App() {
  <button
  onClick={() => handleToggleOverrideMode(item.day, 'manual', item.projected)}
  type="button"
- className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
- (capacityOverrides[item.day]?.mode === 'manual')
- ? 'bg-orange-500 text-white shadow-sm font-extrabold'
- : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200'
- }`}
+ className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ (capacityOverrides[item.day]?.mode === 'manual') ? 'bg-orange-500 text-white shadow-sm font-extrabold' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200' }`}
  >
  <SlidersHorizontal className="w-2 h-2 shrink-0" />
  SIM
@@ -2206,13 +2267,9 @@ export default function App() {
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: 'auto', opacity: 1 }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className={`mt-2 overflow-hidden text-[9.5px] border-t pt-2 space-y-1.5 ${
-        isLight ? 'border-zinc-200 shadow-inner' : 'border-zinc-800/60 shadow-inner'
-      }`}
+      className={`mt-2 overflow-hidden text-[9.5px] border-t pt-2 space-y-1.5 ${ isLight ? 'border-zinc-200 shadow-inner' : 'border-zinc-800/60 shadow-inner' }`}
     >
-      <div className={`font-semibold flex items-center justify-between px-1 mb-1 ${
-        isLight ? 'text-zinc-600 font-bold' : 'text-zinc-400'
-      }`}>
+      <div className={`font-semibold flex items-center justify-between px-1 mb-1 ${ isLight ? 'text-zinc-600 font-bold' : 'text-zinc-400' }`}>
         <span>Top Contributing Production Items</span>
         <span className="font-mono text-[8px] uppercase tracking-wider">Qty / Impact</span>
       </div>
@@ -2230,9 +2287,7 @@ export default function App() {
           return (
             <div 
               key={idx} 
-              className={`flex items-center justify-between p-1.5 rounded-lg border transition-all duration-200 hover:scale-[1.01] ${
-                isLight ? 'bg-white border-zinc-100 hover:border-zinc-200 shadow-sm' : 'bg-zinc-900/40 border-zinc-800/40 hover:border-zinc-800'
-              }`}
+              className={`flex items-center justify-between p-1.5 rounded-lg border transition-all duration-200 hover:scale-[1.01] ${ isLight ? 'bg-white border-zinc-100 hover:border-zinc-200 shadow-sm' : 'bg-zinc-900/40 border-zinc-800/40 hover:border-zinc-800' }`}
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
@@ -2269,6 +2324,25 @@ export default function App() {
                   });
                 })()}
               </Reorder.Group>
+
+              {/* Summary Legend explaining Impact levels */}
+              <div className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[8.5px] ${ isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800/60 text-zinc-400' }`}>
+                <span className="font-sans font-bold uppercase tracking-wider text-[7.5px] flex items-center gap-1">
+                  <span className="text-[10px]">💡</span> Item Impact Legend:
+                </span>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-sm border ${ isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/20 border-rose-900/40' }`} />
+                  <span className={`font-mono font-bold ${isLight ? 'text-rose-600' : 'text-rose-400'}`}>Critical / High</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-sm border ${ isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-950/20 border-amber-900/40' }`} />
+                  <span className={`font-mono font-bold ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>Medium</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-sm border ${ isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-900/40' }`} />
+                  <span className={`font-mono font-bold ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>Low Impact</span>
+                </div>
+              </div>
             </div>
           )}
  </div>
@@ -2277,25 +2351,43 @@ export default function App() {
  {/* Footer info links */}
  <div className={`p-4 border-t static transition-colors duration-200 ${isLight ? 'border-zinc-200 bg-zinc-50/50' : 'border-zinc-900 bg-black/40'}`}>
  <div className="flex items-center gap-2.5">
- <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border ${
- isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800'
- }`}>
- <User className="w-4 h-4" />
- <span className={`w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
+ <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${ isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800' }`}>
+ {currentUser?.photoURL ? (
+   <img src={currentUser.photoURL} alt={currentUser.username} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+ ) : (
+   <User className="w-4 h-4" />
+ )}
+ <span className={`w-2 h-2 rounded-full ${isFirebaseSynced ? 'bg-emerald-500 animate-pulse' : 'bg-orange-500'} absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
  </div>
- <div className="text-[11px] leading-tight flex-1">
- <p className={`font-semibold ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`}>Skipper Koala</p>
+ <div className="text-[11px] leading-tight flex-1 min-w-0">
+ <p className={`font-semibold truncate ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`} title={currentUser?.username || ''}>
+   {currentUser?.username || 'Skipper Koala'}
+ </p>
+ <div className="flex items-center gap-1.5 mt-0.5">
  <select 
  value={userRole} 
  onChange={(e) => setUserRole(e.target.value as any)}
- className={`mt-0.5 bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
- isLight ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300'
- }`}
+ className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300' }`}
  >
  <option value="Admin">Admin</option>
  <option value="Manager">Manager</option>
  <option value="Staff">Staff</option>
+ <option value="User">User</option>
  </select>
+ <span className="text-zinc-500 font-mono text-[8px]">•</span>
+ <button
+   onClick={async () => {
+     localStorage.removeItem('localCurrentUser');
+     setCurrentUser(null);
+     await signOut(auth).catch(() => {});
+   }}
+   className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${ isLight ? 'text-zinc-500 font-bold' : 'text-zinc-400' }`}
+   title="Sign Out"
+ >
+   <LogOut className="w-2.5 h-2.5" />
+   OUT
+ </button>
+ </div>
  </div>
  </div>
  </div>
@@ -2305,28 +2397,22 @@ export default function App() {
  <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-zinc-50' : 'bg-black'}`}>
  
  {/* Global Toolbar */}
- <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
- isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-950 border-zinc-900 text-white shadow-md'
- }`}>
+ <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-950 border-zinc-900 text-white shadow-md' }`}>
  <div className="flex items-center gap-2.5">
  <h2 className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
  </h2>
- <span className={`hidden lg:inline-block text-[9px] font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
- isLight ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : 'bg-zinc-900 text-zinc-400 border-zinc-800'
- }`}>
+ <span className={`hidden lg:inline-block text-[9px] font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${ isLight ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : 'bg-zinc-900 text-zinc-400 border-zinc-800' }`}>
  Food chain ops portal
  </span>
  
  {/* Global Branch Selector Dropdown */}
- <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800'
- }`}>
+ <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800' }`}>
  <span className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Store:</span>
  <select
  value={selectedBranch}
  onChange={(e) => setSelectedBranch(e.target.value as any)}
- className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+ className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
  style={{ outline: 'none' }}
  >
  <option value="Marks & Spencer - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Marks & Spencer Cork City</option>
@@ -2348,11 +2434,7 @@ export default function App() {
  <button
  onClick={toggleTheme}
  title={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
- className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
- isLight 
- ? 'bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm' 
- : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
- }`}
+ className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${ isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white' }`}
  >
  {isLight ? <Moon className="w-4.5 h-4.5 text-zinc-600" /> : <Sun className="w-4.5 h-4.5 text-amber-400" />}
  </button>
@@ -2370,9 +2452,7 @@ export default function App() {
  {/* Schedule Email Report Modal */}
  {isScheduleReportModalOpen && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-fadeIn">
- <div className={`w-full max-w-sm rounded-[1.25rem] shadow-2xl p-6 relative border animate-zoomIn ${
- isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-800'
- }`}>
+ <div className={`w-full max-w-sm rounded-[1.25rem] shadow-2xl p-6 relative border animate-zoomIn ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-800' }`}>
  <h3 className={`text-sm font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  <Mail className="w-4 h-4 text-rose-500" />
  Schedule Capacity Summary PDF
@@ -2389,21 +2469,13 @@ export default function App() {
  <div className="flex bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-1">
  <button
  onClick={() => setReportFrequency('daily')}
- className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
- reportFrequency === 'daily' 
- ? 'bg-rose-500 text-white shadow' 
- : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
- }`}
+ className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === 'daily' ? 'bg-rose-500 text-white shadow' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800' }`}
  >
  Daily
  </button>
  <button
  onClick={() => setReportFrequency('weekly')}
- className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
- reportFrequency === 'weekly' 
- ? 'bg-rose-500 text-white shadow' 
- : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
- }`}
+ className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === 'weekly' ? 'bg-rose-500 text-white shadow' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800' }`}
  >
  Weekly
  </button>
@@ -2419,9 +2491,7 @@ export default function App() {
  placeholder="ops.reports@company.com"
  value={reportEmailAddress}
  onChange={(e) => setReportEmailAddress(e.target.value)}
- className={`w-full px-3 py-2 text-xs font-mono rounded border outline-none focus:border-yellow-500 transition-colors ${
- isLight ? 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400' : 'bg-black border-zinc-800 text-white placeholder:text-zinc-600'
- }`}
+ className={`w-full px-3 py-2 text-xs font-mono rounded border outline-none focus:border-yellow-500 transition-colors ${ isLight ? 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400' : 'bg-black border-zinc-800 text-white placeholder:text-zinc-600' }`}
  />
  </div>
  </div>
@@ -2429,9 +2499,7 @@ export default function App() {
  <div className="flex items-center gap-2 mt-6 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800">
  <button
  onClick={() => setIsScheduleReportModalOpen(false)}
- className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded transition-colors ${
- isLight ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800'
- }`}
+ className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded transition-colors ${ isLight ? 'text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800' }`}
  >
  Cancel
  </button>
@@ -2446,7 +2514,7 @@ export default function App() {
  }
  }}
  disabled={!reportEmailAddress}
- className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
+ className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-1.5"
  >
  <Clock className="w-3 h-3" />
  Activate Schedule

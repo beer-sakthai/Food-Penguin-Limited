@@ -175,9 +175,7 @@ export function Barcode({ value, isLight }: { value: string; isLight: boolean })
   }, [value]);
 
   return (
-    <div className={`p-2 rounded-xl flex flex-col justify-center items-center transition-colors duration-200 mt-2 ${
-      isLight ? 'bg-zinc-100 text-zinc-800 border border-zinc-200' : 'bg-[#18181b] border border-zinc-800 text-white'
-    }`}>
+    <div className={`p-2 rounded-xl flex flex-col justify-center items-center transition-colors duration-200 mt-2 ${ isLight ? 'bg-zinc-100 text-zinc-800 border border-zinc-200' : 'bg-[#18181b] border border-zinc-800 text-white' }`}>
       <div className="flex h-10 w-full items-stretch justify-center max-w-[200px] overflow-hidden bg-white px-2 py-1 rounded" style={{ gap: '0.1px' }}>
         {bars.map((bit, idx) => (
           <div key={idx} className={`flex-1 ${bit === 1 ? 'bg-black' : 'bg-transparent'}`} style={{ minWidth: '1px' }} />
@@ -245,9 +243,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       </div>
 
       {/* SALES PERFORMANCE VISUALIZATION */}
-      <div className={`p-6 rounded-3xl transition-all duration-300 ${
-        isLight ? 'bg-white border border-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 shadow-xl'
-      }`}>
+      <div className={`p-6 rounded-3xl transition-all duration-300 ${ isLight ? 'bg-white border border-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 shadow-xl' }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-zinc-200 dark:border-zinc-800 gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -300,9 +296,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       {/* PRODUCTS LIST */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {branchProducts.map((p, i) => (
-          <div key={i} className={`p-6 rounded-2xl transition-transform hover:-translate-y-1 ${
-            isLight ? 'bg-white shadow-sm border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'
-          }`}>
+          <div key={i} className={`p-6 rounded-2xl transition-transform hover:-translate-y-1 ${ isLight ? 'bg-white shadow-sm border border-zinc-200' : 'bg-zinc-900 border border-zinc-800' }`}>
             <h3 className={`text-2xl font-bold leading-tight mb-2 ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{p.name}</h3>
             <p className={`text-xl font-bold mb-6 ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>€{p.price.toFixed(2)}</p>
             <Barcode value={p.barcode || '0000000000000'} isLight={isLight} />

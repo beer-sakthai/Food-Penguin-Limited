@@ -49,9 +49,7 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  const avgLabor = data.reduce((sum, d) => sum + d.laborEff, 0) / data.length;
 
  return (
- <div className={`rounded-xl border p-5 shadow-sm transition-all mt-6 relative overflow-hidden ${
- isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900 text-white'
- }`}>
+ <div className={`rounded-xl border p-5 shadow-sm transition-all mt-6 relative overflow-hidden ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900 text-white' }`}>
  <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${isLight ? 'from-yellow-400 to-yellow-300' : 'from-yellow-600 to-yellow-500'}`} />
  
  <div className="pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -101,24 +99,18 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end">
  {/* Tooltip */}
  <div className={`absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 flex flex-col items-center drop-shadow-xl ${isLight ? 'filter' : ''}`}>
- <div className={`text-[10px] font-mono p-2 rounded shadow-lg border ${
- isLight ? 'bg-zinc-900 text-zinc-50 border-zinc-800' : 'bg-white text-zinc-900 border-zinc-200'
- }`}>
+ <div className={`text-[10px] font-mono p-2 rounded shadow-lg border ${ isLight ? 'bg-zinc-900 text-zinc-50 border-zinc-800' : 'bg-white text-zinc-900 border-zinc-200' }`}>
  <span className="font-bold">{d.day}</span>
  <div className="mt-1 flex items-center gap-2">
  <span>Perf: <span className={isOver ? 'text-emerald-400' : 'text-amber-400'}>{d.perfPct.toFixed(1)}%</span></span>
  <span>Eff: <span className="text-yellow-400">{d.laborEff.toFixed(1)}</span></span>
  </div>
  </div>
- <div className={`w-2 h-2 rotate-45 -mt-1 border-b border-r ${
- isLight ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
- }`} />
+ <div className={`w-2 h-2 rotate-45 -mt-1 border-b border-r ${ isLight ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200' }`} />
  </div>
 
  <div 
- className={`w-full max-w-[48px] rounded-t transition-all duration-300 flex items-start justify-center pt-2 relative overflow-hidden group-hover:scale-[1.02] ${
- isLight ? 'shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]'
- }`}
+ className={`w-full max-w-[48px] rounded-t transition-all duration-300 flex items-start justify-center pt-2 relative overflow-hidden group-hover:scale-[1.02] ${ isLight ? 'shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]' : 'shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' }`}
  style={{ 
  height: `${heightPct}%`, 
  backgroundColor: `rgba(${baseRgb}, ${alpha})`,

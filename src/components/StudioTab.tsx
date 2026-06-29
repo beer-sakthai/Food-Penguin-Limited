@@ -122,13 +122,13 @@ export default function StudioTab({ theme }: StudioTabProps) {
         <div className="flex justify-center gap-4 mt-8">
           <button 
             onClick={() => setActiveMode('marketing')}
-            className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'marketing' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
+            className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'marketing' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
           >
             Ad Generator
           </button>
           <button 
             onClick={() => setActiveMode('audit')}
-            className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'audit' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
+            className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'audit' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
           >
             Quality Auditor
           </button>
@@ -149,7 +149,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                 value={adPrompt}
                 onChange={(e) => setAdPrompt(e.target.value)}
                 placeholder="Describe your delicious food advert..."
-                className={`w-full p-4 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all ${isLight ? 'bg-zinc-50 border border-zinc-200 text-zinc-900' : 'bg-zinc-950 border border-zinc-800 text-zinc-100'}`}
+                className={`w-full p-4 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all ${isLight ? 'bg-zinc-50 border border-zinc-200 text-zinc-900' : 'bg-zinc-950 border border-zinc-800 text-zinc-100'}`}
                 rows={4}
               />
             </div>
@@ -163,11 +163,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                   <button
                     key={ratio}
                     onClick={() => setAspectRatio(ratio)}
-                    className={`px-4 py-2 rounded-xl font-bold font-mono tracking-wider transition-all border ${
-                      aspectRatio === ratio 
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-md transform -translate-y-0.5' 
-                        : isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-700' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-                    }`}
+                    className={`px-4 py-2 rounded-xl font-bold font-mono tracking-wider transition-all border ${ aspectRatio === ratio ? 'bg-amber-500 text-white border-amber-600 shadow-md transform -translate-y-0.5' : isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-700' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200' }`}
                   >
                     {ratio}
                   </button>
@@ -205,7 +201,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                   href={generatedImage} 
                   download="marketing-asset.jpg"
                   target="_blank"
-                  className="flex items-center gap-1.5 px-4 py-2 bg-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-700 text-zinc-100 rounded-lg text-sm font-bold font-mono uppercase tracking-wider transition-all"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-zinc-800 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-700 text-zinc-100 rounded-lg text-sm font-bold font-mono uppercase tracking-wider transition-all"
                 >
                   <Download size={16} /> Download Asset
                 </a>
@@ -240,7 +236,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`w-full max-w-lg mb-8 aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 dark:hover:bg-zinc-800/50 ${isDragging ? (isLight ? 'border-rose-500 bg-rose-50' : 'border-rose-500 bg-rose-500/10') : (isLight ? 'border-zinc-300 text-zinc-400' : 'border-zinc-700 text-zinc-500')}`}
+                className={`w-full max-w-lg mb-8 aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 dark:hover:bg-zinc-800/50 ${isDragging ? (isLight ? 'border-rose-500 bg-rose-50' : 'border-rose-500 bg-rose-500/10') : (isLight ? 'border-zinc-300 text-zinc-400' : 'border-zinc-700 text-zinc-500')}`}
               >
                 <div className="p-4 bg-zinc-100 dark:bg-zinc-800 rounded-full mb-4">
                   <Camera size={48} className={isLight ? 'text-zinc-400' : 'text-zinc-500'} />
@@ -259,7 +255,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                   </div>
                   <button 
                     onClick={() => { setPreviewImage(null); setAuditResult(null); }}
-                    className={`mt-4 px-6 py-2 rounded-xl font-bold border transition-all ${isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800'}`}
+                    className={`mt-4 px-6 py-2 rounded-xl font-bold border transition-all ${isLight ? 'bg-white text-zinc-600 border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800'}`}
                   >
                     Upload Another Photo
                   </button>
@@ -281,7 +277,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                             setCopied(true);
                             setTimeout(() => setCopied(false), 2000);
                           }}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all ${isLight ? 'bg-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-300' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all ${isLight ? 'bg-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-300' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
                         >
                           {copied ? <><Check size={14} className="text-emerald-500" /> Copied</> : <><Copy size={14} /> Copy Log</>}
                         </button>

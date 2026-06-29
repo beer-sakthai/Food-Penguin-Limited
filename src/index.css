@@ -5,9 +5,7 @@
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
-html {
-  font-size: 20px;
-}
+/* Removed custom font-size override */
 
 @layer components {
   /* Common 3D properties */

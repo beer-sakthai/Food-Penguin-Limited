@@ -178,18 +178,14 @@ export default function WasteTab({
 
  {/* Dynamic Allowance Index and Chart Split */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- <div className={`rounded-xl border p-5 shadow-sm flex flex-col justify-between transition-all duration-300 ${
- isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}>
+ <div className={`rounded-xl border p-5 shadow-sm flex flex-col justify-between transition-all duration-300 ${ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
  <div>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Food Waste Cost Summary</h2>
  <p className="subtitle text-xs text-zinc-500">Corporate daily financial leakage benchmarks</p>
  </div>
  
- <div className={`p-3 rounded-lg flex items-center gap-3 self-start sm:self-auto ${
- isLight ? 'bg-rose-50 border border-rose-200' : 'bg-rose-950/40 border border-rose-900/40'
- }`}>
+ <div className={`p-3 rounded-lg flex items-center gap-3 self-start sm:self-auto ${ isLight ? 'bg-rose-50 border border-rose-200' : 'bg-rose-950/40 border border-rose-900/40' }`}>
  <div className="p-2 bg-rose-500 text-white rounded">
  <Euro className="w-5 h-5" />
  </div>
@@ -203,9 +199,7 @@ export default function WasteTab({
  </div>
 
  <div className="mt-8">
- <div className={`w-full h-2 rounded-full overflow-hidden border ${
- isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
- }`}>
+ <div className={`w-full h-2 rounded-full overflow-hidden border ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-950 border-zinc-800' }`}>
  <div 
  className="bg-rose-500 h-full rounded-full transition-all duration-500"
  style={{ width: `${Math.min((totalCostToday / 500) * 100, 100)}%` }}
@@ -220,9 +214,7 @@ export default function WasteTab({
  </div>
  </div>
 
- <div className={`rounded-xl border p-5 shadow-sm h-48 md:h-auto min-h-[220px] flex flex-col transition-all duration-300 ${
- isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}>
+ <div className={`rounded-xl border p-5 shadow-sm h-48 md:h-auto min-h-[220px] flex flex-col transition-all duration-300 ${ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Leakage Proportions</h2>
  <p className="text-xs text-zinc-500">Cost value breakdown by incident reason</p>
  <div className="flex-1 mt-2">
@@ -267,24 +259,16 @@ export default function WasteTab({
  </div>
 
  {/* Create a beautiful bar chart to compare daily waste costs against the target waste budget */}
- <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${
- isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
- }`}>
+ <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${ isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-dashed border-zinc-700/20">
  <div className="flex items-center gap-3">
- <div className={`p-3 border rounded-2xl transition-all duration-300 ${
- isLight ? 'bg-zinc-100 border-zinc-200 text-rose-600' : 'bg-zinc-950 border-zinc-800 text-rose-400'
- }`}>
+ <div className={`p-3 border rounded-2xl transition-all duration-300 ${ isLight ? 'bg-zinc-100 border-zinc-200 text-rose-600' : 'bg-zinc-950 border-zinc-800 text-rose-400' }`}>
  <TrendingDown className="w-5 h-5 flex-shrink-0" />
  </div>
  <div>
  <h3 className={`text-base font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  Daily Waste Benchmark vs Target
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
- isLight 
- ? 'bg-rose-50 border-rose-200 text-rose-700' 
- : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
- }`}>
+ <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${ isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-500/10 border-rose-500/30 text-rose-400' }`}>
  Weekly Target
  </span>
  </h3>
@@ -360,9 +344,7 @@ export default function WasteTab({
  </div>
 
  {/* Active Waste Ledger */}
- <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${
- isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-805 text-white'
- }`}>
+ <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-805 text-white' }`}>
  <div className="pb-4">
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Daily Spoilage & Scrap Ledger</h2>
  <p className="text-xs text-zinc-500">Documented items removed from active inventory</p>
@@ -370,9 +352,7 @@ export default function WasteTab({
 
  <div className="overflow-x-auto">
  <table className="w-full text-left text-xs">
- <thead className={`font-mono text-[10px] uppercase tracking-wider border-b ${
- isLight ? 'bg-zinc-50 text-zinc-600 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800'
- }`}>
+ <thead className={`font-mono text-[10px] uppercase tracking-wider border-b ${ isLight ? 'bg-zinc-50 text-zinc-600 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800' }`}>
  <tr>
  <th className="py-3 px-4">Waste Item</th>
  <th className="py-3 px-4">Category</th>
@@ -418,7 +398,7 @@ export default function WasteTab({
               <select 
                 value={newItem}
                 onChange={e => handleProductChange(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
               >
                 {products.map(p => (
                   <option key={p.name} value={p.name}>{p.name}</option>
@@ -435,7 +415,7 @@ export default function WasteTab({
                   min="0.1"
                   value={weight}
                   onChange={e => handleWeightChange(parseFloat(e.target.value))}
-                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
+                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
                   required
                 />
               </div>
@@ -456,7 +436,7 @@ export default function WasteTab({
               <select 
                 value={reason}
                 onChange={e => setReason(e.target.value as any)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Expired">Expired</option>
                 <option value="Overproduced">Overproduced</option>
@@ -465,7 +445,7 @@ export default function WasteTab({
               </select>
             </div>
 
-            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
+            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2 hover:-translate-y-0.5">
               <Plus className="w-4 h-4" />
               Log Waste Record
             </button>
@@ -486,7 +466,7 @@ export default function WasteTab({
              <select 
                 value={helpCat}
                 onChange={e => setHelpCat(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Seafood">Seafood</option>
                 <option value="Produce">Produce</option>
@@ -498,11 +478,7 @@ export default function WasteTab({
               <button 
                 onClick={handleFetchRepurposeStrategy}
                 disabled={strategyLoading}
-                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${
-                  strategyLoading 
-                    ? (isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed')
-                    : 'bg-zinc-800 hover:bg-zinc-700 text-white dark:bg-zinc-800 dark:hover:bg-zinc-700'
-                }`}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${ strategyLoading ? (isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed') : 'bg-zinc-800 hover:bg-zinc-700 text-white dark:bg-zinc-800 dark:hover:bg-zinc-700' }`}
               >
                 {strategyLoading ? 'ANALYZING...' : 'GENERATE ADVICE'}
               </button>
