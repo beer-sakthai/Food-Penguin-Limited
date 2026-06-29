@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { jsPDF } from 'jspdf';
 import { Reorder, motion } from 'motion/react';
 import {
@@ -79,7 +79,10 @@ import {
   GripVertical
 } from 'lucide-react';
 
-import { RotateCcw, Info } from 'lucide-react';
+import { RotateCcw, Info, LogOut, GitCompare } from 'lucide-react';
+import { auth, db, handleFirestoreError, OperationType } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, onSnapshot, setDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
   Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
@@ -162,7 +165,95 @@ export default function App() {
  const [activeTab, setActiveTab] = useState<string>('Overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
  const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff' | 'User'>('Admin');
-  const [currentUser, setCurrentUser] = useState<{username: string, role: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{username: string, role: string, email?: string, photoURL?: string} | null>(null);
+  const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
+
+  // Auth Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser({
+          username: user.displayName || user.email || 'Google User',
+          role: 'Admin',
+          email: user.email || undefined,
+          photoURL: user.photoURL || undefined
+        });
+        setUserRole('Admin');
+      } else {
+        const storedUser = localStorage.getItem('localCurrentUser');
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            setCurrentUser(parsed);
+            setUserRole(parsed.role);
+          } catch (_) {
+            setCurrentUser(null);
+          }
+        } else {
+          setCurrentUser(null);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Firestore Sync Listener
+  useEffect(() => {
+    if (!currentUser || !currentUser.email || currentUser.email === 'demo@foodpenguin.com') {
+      setIsFirebaseSynced(false);
+      return;
+    }
+
+    const unsubscribeList: (() => void)[] = [];
+
+    const syncCollection = async <T extends { id: string }>(
+      colName: string,
+      initialData: T[],
+      setList: React.Dispatch<React.SetStateAction<T[]>>,
+      opType: OperationType
+    ) => {
+      try {
+        const ref = collection(db, colName);
+        const snap = await getDocs(ref).catch(err => handleFirestoreError(err, OperationType.LIST, colName));
+        
+        if (snap.empty) {
+          // Seed initial data
+          for (const item of initialData) {
+            await setDoc(doc(db, colName, item.id), item).catch(err => handleFirestoreError(err, OperationType.WRITE, `${colName}/${item.id}`));
+          }
+        }
+
+        const unsub = onSnapshot(ref, (snapshot) => {
+          const list: T[] = [];
+          snapshot.forEach(doc => {
+            list.push(doc.data() as T);
+          });
+          setList(list);
+        }, (err) => handleFirestoreError(err, OperationType.GET, colName));
+        
+        unsubscribeList.push(unsub);
+      } catch (e) {
+        console.error(`Error syncing ${colName} with Firestore:`, e);
+      }
+    };
+
+    const initSync = async () => {
+      await syncCollection('orders', initialOrders, setOrders, OperationType.WRITE);
+      await syncCollection('tasks', initialTasks, setTasks, OperationType.WRITE);
+      await syncCollection('waste', initialWaste, setWasteRecords, OperationType.WRITE);
+      await syncCollection('targets', initialTargets, setTargets, OperationType.WRITE);
+      await syncCollection('hours', initialHours, setHoursData, OperationType.WRITE);
+      await syncCollection('inventory', initialInventory, setInventory, OperationType.WRITE);
+      setIsFirebaseSynced(true);
+    };
+
+    initSync();
+
+    return () => {
+      unsubscribeList.forEach(unsub => unsub());
+    };
+  }, [currentUser]);
+
  const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
  const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
@@ -227,6 +318,7 @@ export default function App() {
 
  // Sync tasks list with active branch products on branch switch
  useEffect(() => {
+ if (isFirebaseSynced) return;
  const isMS = selectedBranch === 'Marks & Spencer - Cork City';
  const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
 
@@ -238,7 +330,7 @@ export default function App() {
  { id: 'PT-304', itemName: products[3 % products.length].name, assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 4, priority: 'high' }
  ]);
  }
- }, [selectedBranch]);
+ }, [selectedBranch, isFirebaseSynced]);
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
@@ -255,6 +347,7 @@ export default function App() {
  const [focusedDay, setFocusedDay] = useState<string | null>(null);
  const [expandedDays, setExpandedDays] = useState<string[]>([]);
  const [capacitySmoothing, setCapacitySmoothing] = useState<'raw' | 'smoothed'>('raw');
+ const [compareModeEnabled, setCompareModeEnabled] = useState<boolean>(false);
 
  // Quick Adjust simulated capacity overrides states
  const [quickAdjustEnabled, setQuickAdjustEnabled] = useState<boolean>(false);
@@ -412,6 +505,8 @@ export default function App() {
  ? Math.min(100, Math.max(0, dailyCurrentPct + 4))
  : Math.min(100, rawDailyProjection);
 
+ const initialAiForecastVal = dailyProjectedPct;
+
  // Support live 'What-If' manual overrides when Quick Adjust mode is active
  if (quickAdjustEnabled) {
  const override = capacityOverrides[log.day];
@@ -424,7 +519,8 @@ export default function App() {
  day: log.day,
  date: log.date.substring(5), // simplified 'MM-DD'
  current: dailyCurrentPct,
- projected: dailyProjectedPct
+ projected: dailyProjectedPct,
+ initialAiForecast: initialAiForecastVal
  };
  });
 
@@ -437,11 +533,13 @@ export default function App() {
 
  const avgCurrent = Math.round(neighbors.reduce((sum, n) => sum + n.current, 0) / neighbors.length);
  const avgProjected = Math.round(neighbors.reduce((sum, n) => sum + n.projected, 0) / neighbors.length);
+ const avgInitialAiForecast = Math.round(neighbors.reduce((sum, n) => sum + n.initialAiForecast, 0) / neighbors.length);
 
  return {
  ...item,
  current: avgCurrent,
- projected: avgProjected
+ projected: avgProjected,
+ initialAiForecast: avgInitialAiForecast
  };
  });
  }
@@ -830,21 +928,25 @@ export default function App() {
  };
 
  // Reactive State Handlers
- const handleAddOrder = (newOrder: Omit<SalesOrder, 'id' | 'timestamp'>) => {
+ const handleAddOrder = async (newOrder) => {
  const timestampStr = new Date().toLocaleTimeString('en-US', {
  hour: '2-digit',
  minute: '2-digit',
  hour12: false
  });
  const orderId = `FP-${Math.floor(1000 + Math.random() * 9000)}`;
- const fullOrder: SalesOrder = {
+ const fullOrder = {
  ...newOrder,
  id: orderId,
  timestamp: timestampStr,
  branch: selectedBranch
  };
 
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'orders', orderId), fullOrder).catch(err => handleFirestoreError(err, OperationType.WRITE, `orders/${orderId}`));
+ } else {
  setOrders(prev => [fullOrder, ...prev]);
+ }
  
  // Reactive Sales Metrics update
  setMetrics(prev => ({
@@ -855,92 +957,137 @@ export default function App() {
  // Update the targets currentValue for Sales category
  setTargets(prev => prev.map(tgt => {
  if (tgt.category === 'Sell' && tgt.metric.includes('Sales')) {
- return { ...tgt, currentValue: tgt.currentValue + fullOrder.amount };
+ const newVal = tgt.currentValue + fullOrder.amount;
+ if (isFirebaseSynced) {
+ updateDoc(doc(db, 'targets', tgt.id), { currentValue: newVal }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `targets/${tgt.id}`));
+ }
+ return { ...tgt, currentValue: newVal };
  }
  return tgt;
  }));
  };
 
- const handleAddTarget = (newTarget: Omit<CompanyTarget, 'id'>) => {
+ const handleAddTarget = async (newTarget) => {
  const targetId = `T-${targets.length + 1}`;
- setTargets(prev => [...prev, { ...newTarget, id: targetId }]);
+ const fullTarget = { ...newTarget, id: targetId };
+
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'targets', targetId), fullTarget).catch(err => handleFirestoreError(err, OperationType.WRITE, `targets/${targetId}`));
+ } else {
+ setTargets(prev => [...prev, fullTarget]);
+ }
  };
 
- const handleAddTask = (newTask: Omit<ProductionTask, 'id'>) => {
+ const handleAddTask = async (newTask) => {
  const taskId = `PT-${Math.floor(400 + Math.random() * 100)}`;
+ const fullTask = { ...newTask, id: taskId };
+
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'tasks', taskId), fullTask).catch(err => handleFirestoreError(err, OperationType.WRITE, `tasks/${taskId}`));
+ } else {
  setTasks(prev => [{ ...newTask, id: taskId }, ...prev]);
+ }
  };
 
- const handleUpdateTaskStatus = (taskId: string, newStatus: ProductionTask['status']) => {
+ const handleUpdateTaskStatus = async (taskId, newStatus) => {
+ const targetTask = tasks.find(t => t.id === taskId);
+ if (!targetTask) return;
+
+ if (isFirebaseSynced) {
+ await updateDoc(doc(db, 'tasks', taskId), { status: newStatus }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `tasks/${taskId}`));
+ } else {
  setTasks(prev => prev.map(t => {
  if (t.id === taskId) {
+ return { ...t, status: newStatus };
+ }
+ return t;
+ }));
+ }
+
  // If transitioning from cooking to prepared, reactive add to cooked metrics
- if (newStatus === 'Prepared' && t.status !== 'Prepared') {
+ if (newStatus === 'Prepared' && targetTask.status !== 'Prepared') {
  setMetrics(m => ({
  ...m,
- productionItems: m.productionItems + t.quantity
+ productionItems: m.productionItems + targetTask.quantity
  }));
  
  // Reactive update target cooked units
  setTargets(tg => tg.map(tgt => {
  if (tgt.category === 'Production' && tgt.metric.toLowerCase().includes('cook')) {
- return { ...tgt, currentValue: tgt.currentValue + t.quantity };
+ const newVal = tgt.currentValue + targetTask.quantity;
+ if (isFirebaseSynced) {
+ updateDoc(doc(db, 'targets', tgt.id), { currentValue: newVal }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `targets/${tgt.id}`));
+ }
+ return { ...tgt, currentValue: newVal };
  }
  return tgt;
  }));
  }
- return { ...t, status: newStatus };
- }
- return t;
- }));
  };
 
- const handleAddWaste = (newWaste: Omit<WasteRecord, 'id' | 'date'>) => {
+ const handleAddWaste = async (newWaste) => {
  const wasteId = `W-${Math.floor(920 + Math.random() * 80)}`;
- const fullWaste: WasteRecord = {
+ const fullWaste = {
  ...newWaste,
  id: wasteId,
  date: new Date().toISOString().split('T')[0]
  };
 
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'waste', wasteId), fullWaste).catch(err => handleFirestoreError(err, OperationType.WRITE, `waste/${wasteId}`));
+ } else {
  setWasteRecords(prev => [fullWaste, ...prev]);
+ }
 
  // Reactive update target waste cost
  setTargets(tg => tg.map(tgt => {
  if (tgt.category === 'Waste' && tgt.metric.toLowerCase().includes('waste')) {
- return { ...tgt, currentValue: tgt.currentValue + fullWaste.cost };
+ const newVal = tgt.currentValue + fullWaste.cost;
+ if (isFirebaseSynced) {
+ updateDoc(doc(db, 'targets', tgt.id), { currentValue: newVal }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `targets/${tgt.id}`));
+ }
+ return { ...tgt, currentValue: newVal };
  }
  return tgt;
  }));
  };
 
- const handleToggleClockStatus = (employeeId: string) => {
- setHoursData(prev => prev.map(emp => {
- if (emp.id === employeeId) {
+ const handleToggleClockStatus = async (employeeId) => {
+ const emp = hoursData.find(e => e.id === employeeId);
+ if (!emp) return;
+
  const nextStatus = emp.status === 'Clocked In' ? 'Clocked Out' : 'Clocked In';
  const addHours = nextStatus === 'Clocked Out' ? 8.0 : 0;
- return {
- ...emp,
- status: nextStatus as any,
- actualHours: parseFloat((emp.actualHours + addHours).toFixed(1))
- };
+ const newActual = parseFloat((emp.actualHours + addHours).toFixed(1));
+
+ if (isFirebaseSynced) {
+ await updateDoc(doc(db, 'hours', employeeId), { status: nextStatus, actualHours: newActual }).catch(err => handleFirestoreError(err, OperationType.UPDATE, `hours/${employeeId}`));
+ } else {
+ setHoursData(prev => prev.map(e => {
+ if (e.id === employeeId) {
+ return { ...e, status: nextStatus, actualHours: newActual };
  }
- return emp;
+ return e;
  }));
+ }
  };
 
- const handleOrderRestock = (itemId: string) => {
- setInventory(prev => prev.map(item => {
- if (item.id === itemId) {
- return {
+ const handleOrderRestock = async (itemId) => {
+ const item = inventory.find(i => i.id === itemId);
+ if (!item) return;
+
+ const updated = {
  ...item,
  stockLevel: 100,
  currentQty: item.reorderLevel + 120,
  status: 'Healthy'
  };
+
+ if (isFirebaseSynced) {
+ await setDoc(doc(db, 'inventory', itemId), updated).catch(err => handleFirestoreError(err, OperationType.WRITE, `inventory/${itemId}`));
+ } else {
+ setInventory(prev => prev.map(i => i.id === itemId ? updated : i));
  }
- return item;
- }));
  };
 
  const handleUpdateWeeklyLog = (updatedLog: DailyOperationalLog) => {
@@ -1119,6 +1266,20 @@ export default function App() {
  const healthTooltip = `System Health Status: ${healthLabel}\n• Operations Score: ${metrics.aiHealthScore}%\n• Low Stock Ingredients: ${lowStockCount}\n• Lagging Goals: ${targetDeficitCount}`;
 
  const isLight = theme === 'light';
+
+ if (!currentUser) {
+   return (
+     <LoginScreen 
+       theme={theme} 
+       onLogin={(username, role) => {
+         const userObj = { username, role, email: 'demo@foodpenguin.com' };
+         localStorage.setItem('localCurrentUser', JSON.stringify(userObj));
+         setCurrentUser(userObj);
+         setUserRole(role as any);
+       }} 
+     />
+   );
+ }
 
  return (
  <div 
@@ -1391,7 +1552,7 @@ export default function App() {
                 left: '40%', 
                 width: `${bottleneckThreshold - 40}%` 
               }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Optimal Safe Zone: 40% to ${bottleneckThreshold}%`}
             />
           )}
@@ -1401,14 +1562,14 @@ export default function App() {
             <motion.div 
               className={`absolute top-0 h-full ${isLight ? 'bg-emerald-500/20' : 'bg-emerald-500/30'}`}
               animate={{ left: `${projectedCapacityPct}%`, width: `${bottleneckThreshold - projectedCapacityPct}%` }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Safe Buffer: ${bottleneckThreshold - projectedCapacityPct}%`}
             />
           ) : (
             <motion.div 
               className={`absolute top-0 h-full animate-pulse ${isLight ? 'bg-rose-500/40' : 'bg-rose-500/50'}`}
               animate={{ left: `${bottleneckThreshold}%`, width: `${projectedCapacityPct - bottleneckThreshold}%` }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Threshold Overflow: ${projectedCapacityPct - bottleneckThreshold}%`}
             />
           )}
@@ -1417,7 +1578,7 @@ export default function App() {
           <motion.div 
             className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full shadow-[0_0_8px_rgba(249,115,22,0.2)]"
             animate={{ width: `${capacityPct}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             title={`Current load: ${capacityPct}%`}
           />
 
@@ -1432,7 +1593,7 @@ export default function App() {
                 left: `${capacityPct}%`,
                 width: `${projectedCapacityPct - capacityPct}%`
               }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
               title={`Projected increase: ${projectedCapacityPct - capacityPct}%`}
             />
           )}
@@ -1441,7 +1602,7 @@ export default function App() {
           <motion.div 
             className="absolute top-0 h-full w-0.5 border-r border-dashed border-white/70 z-10"
             animate={{ left: `${projectedCapacityPct}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             title={`7-Day Projection Target: ${projectedCapacityPct}%`}
           />
 
@@ -1449,7 +1610,7 @@ export default function App() {
           <motion.div 
             className="absolute top-0 h-full w-0.5 bg-rose-500 z-20"
             animate={{ left: `${bottleneckThreshold}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             title={`Bottleneck Threshold: ${bottleneckThreshold}%`}
           />
 
@@ -1658,6 +1819,27 @@ export default function App() {
  </div>
  </div>
  
+ {/* Compare Mode Toggle */}
+ <div className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
+ <span className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${compareModeEnabled ? 'text-yellow-600 dark:text-yellow-500 font-extrabold' : isLight ? 'text-zinc-500' : 'text-zinc-500'}`} title="Compare initial AI forecast with manual simulation value">
+ <GitCompare className={`w-3 h-3 ${compareModeEnabled ? 'text-yellow-500' : ''}`} />
+ Compare Mode:
+ </span>
+ <button
+ onClick={() => setCompareModeEnabled(!compareModeEnabled)}
+ type="button"
+ className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
+ compareModeEnabled
+ ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]'
+ : isLight
+ ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200'
+ : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800'
+ }`}
+ >
+ {compareModeEnabled ? 'COMPARE ON' : 'OFF'}
+ </button>
+ </div>
+
  {/* Quick Adjust Mode Toggle */}
  <div className={`flex flex-col gap-1.5 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
  <div className="flex items-center justify-between gap-1">
@@ -1792,11 +1974,12 @@ export default function App() {
 	  </button>
 	</div>
 	<motion.span 
-	  key={bottleneckThreshold}
-	  initial={{ scale: 0.92, opacity: 0.8 }}
-	  animate={{ scale: 1, opacity: 1 }}
-	  transition={{ type: "spring", stiffness: 300, damping: 15 }}
-	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+	  key="bottleneck-badge"
+	  animate={{ scale: 1 }}
+	  whileHover={{ scale: 1.08 }}
+	  whileTap={{ scale: 0.95 }}
+	  transition={{ type: "spring", stiffness: 450, damping: 25 }}
+	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${
 	    isLight 
 	      ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' 
 	      : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]'
@@ -2122,6 +2305,72 @@ export default function App() {
  />
  </div>
 
+ {/* Compare Mode Variance Secondary Bar & Info Panel */}
+ {compareModeEnabled && (
+ <motion.div 
+ initial={{ height: 0, opacity: 0 }}
+ animate={{ height: "auto", opacity: 1 }}
+ exit={{ height: 0, opacity: 0 }}
+ transition={{ type: "spring", stiffness: 350, damping: 28 }}
+ className={`mt-1.5 p-1.5 rounded-lg border flex flex-col gap-1 overflow-hidden transition-all duration-300 ${
+ isLight ? 'bg-yellow-50/40 border-yellow-200/50' : 'bg-yellow-950/5 border-yellow-900/10'
+ }`}
+ >
+ <div className="flex justify-between items-center text-[7.5px] font-mono leading-none">
+ <div className="flex items-center gap-0.5 text-zinc-500">
+ <span>AI:</span>
+ <span className={`font-bold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>{item.initialAiForecast}%</span>
+ </div>
+ <div className="flex items-center gap-0.5 text-zinc-500">
+ <span>Sim:</span>
+ <span className={`font-bold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>{item.projected}%</span>
+ </div>
+ <div className="flex items-center gap-0.5 font-bold">
+ <span className="text-zinc-500">Var:</span>
+ <span className={`px-1 rounded-sm ${
+ item.projected > item.initialAiForecast 
+ ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+ : item.projected < item.initialAiForecast 
+ ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' 
+ : 'bg-zinc-500/10 text-zinc-500'
+ }`}>
+ {item.projected > item.initialAiForecast ? `+${item.projected - item.initialAiForecast}` : item.projected - item.initialAiForecast}%
+ </span>
+ </div>
+ </div>
+ 
+ {/* Secondary progress bar representing variance range */}
+ <div className="h-1.5 bg-zinc-950 dark:bg-zinc-950/90 rounded-full relative overflow-hidden flex items-center">
+ {/* Base AI forecast area in track */}
+ <div 
+ className="h-full bg-zinc-700/30 dark:bg-zinc-800/40 border-r border-dashed border-zinc-500/30 transition-all duration-300"
+ style={{ width: `${item.initialAiForecast}%` }}
+ />
+ {/* Animated Variance Bar Segment */}
+ <motion.div 
+ className={`absolute h-full rounded ${
+ item.projected >= item.initialAiForecast 
+ ? 'bg-gradient-to-r from-yellow-500 to-amber-500 shadow-[0_0_6px_rgba(234,179,8,0.3)]' 
+ : 'bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(239,68,68,0.3)]'
+ }`}
+ animate={{ 
+ left: `${Math.min(item.initialAiForecast, item.projected)}%`, 
+ width: `${Math.abs(item.projected - item.initialAiForecast)}%` 
+ }}
+ transition={{ type: "spring", stiffness: 350, damping: 28 }}
+ />
+ {/* Spark mark at simulated point */}
+ <motion.div 
+ className={`absolute w-0.5 h-2 rounded-full z-10 ${
+ item.projected >= item.initialAiForecast ? 'bg-amber-400' : 'bg-rose-400'
+ }`}
+ animate={{ left: `${item.projected}%` }}
+ transition={{ type: "spring", stiffness: 350, damping: 28 }}
+ />
+ </div>
+ </motion.div>
+ )}
+
  {/* Inline What-If adjustments for specific day */}
  {quickAdjustEnabled && (
  <div className={`mt-1.5 flex flex-wrap items-center justify-between gap-1.5 p-1.5 rounded-xl border transition-all duration-200 ${
@@ -2269,6 +2518,33 @@ export default function App() {
                   });
                 })()}
               </Reorder.Group>
+
+              {/* Summary Legend explaining Impact levels */}
+              <div className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[8.5px] ${
+                isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800/60 text-zinc-400'
+              }`}>
+                <span className="font-sans font-bold uppercase tracking-wider text-[7.5px] flex items-center gap-1">
+                  <span className="text-[10px]">💡</span> Item Impact Legend:
+                </span>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-sm border ${
+                    isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/20 border-rose-900/40'
+                  }`} />
+                  <span className={`font-mono font-bold ${isLight ? 'text-rose-600' : 'text-rose-400'}`}>Critical / High</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-sm border ${
+                    isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-950/20 border-amber-900/40'
+                  }`} />
+                  <span className={`font-mono font-bold ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>Medium</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-sm border ${
+                    isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-900/40'
+                  }`} />
+                  <span className={`font-mono font-bold ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>Low Impact</span>
+                </div>
+              </div>
             </div>
           )}
  </div>
@@ -2277,25 +2553,49 @@ export default function App() {
  {/* Footer info links */}
  <div className={`p-4 border-t static transition-colors duration-200 ${isLight ? 'border-zinc-200 bg-zinc-50/50' : 'border-zinc-900 bg-black/40'}`}>
  <div className="flex items-center gap-2.5">
- <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border ${
+ <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${
  isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800'
  }`}>
- <User className="w-4 h-4" />
- <span className={`w-2 h-2 rounded-full bg-orange-500 absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
+ {currentUser?.photoURL ? (
+   <img src={currentUser.photoURL} alt={currentUser.username} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+ ) : (
+   <User className="w-4 h-4" />
+ )}
+ <span className={`w-2 h-2 rounded-full ${isFirebaseSynced ? 'bg-emerald-500 animate-pulse' : 'bg-orange-500'} absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
  </div>
- <div className="text-[11px] leading-tight flex-1">
- <p className={`font-semibold ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`}>Skipper Koala</p>
+ <div className="text-[11px] leading-tight flex-1 min-w-0">
+ <p className={`font-semibold truncate ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`} title={currentUser?.username || ''}>
+   {currentUser?.username || 'Skipper Koala'}
+ </p>
+ <div className="flex items-center gap-1.5 mt-0.5">
  <select 
  value={userRole} 
  onChange={(e) => setUserRole(e.target.value as any)}
- className={`mt-0.5 bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
+ className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
  isLight ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300'
  }`}
  >
  <option value="Admin">Admin</option>
  <option value="Manager">Manager</option>
  <option value="Staff">Staff</option>
+ <option value="User">User</option>
  </select>
+ <span className="text-zinc-500 font-mono text-[8px]">•</span>
+ <button
+   onClick={async () => {
+     localStorage.removeItem('localCurrentUser');
+     setCurrentUser(null);
+     await signOut(auth).catch(() => {});
+   }}
+   className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
+     isLight ? 'text-zinc-500 font-bold' : 'text-zinc-400'
+   }`}
+   title="Sign Out"
+ >
+   <LogOut className="w-2.5 h-2.5" />
+   OUT
+ </button>
+ </div>
  </div>
  </div>
  </div>

@@ -186,7 +186,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <h3 className="text-sm font-sans font-bold text-white flex items-center gap-1.5">
  AI Target Structuring Helper
  <span className="px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-300 text-[9px] font-mono border border-zinc-800">
- gemini-1.5-flash
+ gemini-3.1-flash-lite
  </span>
  </h3>
  <p className="text-xs text-zinc-505">Formulate and test mathematical target limits before deployment</p>

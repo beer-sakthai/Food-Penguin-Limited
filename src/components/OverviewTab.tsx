@@ -1599,7 +1599,7 @@ export default function OverviewTab({
  </form>
  </div>
 
- {/* Deep Advisor: "Enable high thinking" with gemini-1.5-flash */}
+ {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
  <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
  }`}>
@@ -1618,7 +1618,7 @@ export default function OverviewTab({
  <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
  isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300'
  }`}>
- gemini-1.5-flash
+ gemini-3.1-pro-preview
  </span>
  <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
  Thinking Level: HIGH
