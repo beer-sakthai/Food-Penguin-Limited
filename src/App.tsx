@@ -83,16 +83,20 @@ import {
 } from "lucide-react";
 
 import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
-import { auth, db, handleFirestoreError, OperationType } from "./firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
 import {
+  auth,
+  db,
+  handleFirestoreError,
+  OperationType,
+  onAuthStateChanged,
+  signOut,
   collection,
   onSnapshot,
   setDoc,
   doc,
   updateDoc,
   getDocs,
-} from "firebase/firestore";
+} from "./firebase";
 
 const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",

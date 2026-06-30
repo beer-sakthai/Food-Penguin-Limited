@@ -14,6 +14,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
   // Marketing Image State
   const [adPrompt, setAdPrompt] = useState<string>('');
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
+  const [imageModel, setImageModel] = useState<'gemini-3.1-flash-image-preview' | 'gemini-3-pro-image-preview'>('gemini-3.1-flash-image-preview');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -30,6 +31,24 @@ export default function StudioTab({ theme }: StudioTabProps) {
 
   const ASPECT_RATIOS = ['1:1', '2:3', '3:2', '3:4', '4:3', '9:16', '16:9', '21:9'];
 
+  const PRESETS = [
+    {
+      title: "🐟 Alaskan Cod Promo",
+      desc: "Rustic tableware, fresh dill, lemon slices, hot steam.",
+      prompt: "A gorgeous, high-end, sizzling-hot Alaskan Cod platter garnished with wild rosemary, fresh dill, and lemon slices, served on rustic charcoal tableware, warm steam rising, dynamic smoke, food advertisement style, sharp focus."
+    },
+    {
+      title: "🍔 Arctic Burger Blast",
+      desc: "Melted cheddar, organic lettuce, brioche bun, studio lighting.",
+      prompt: "A premium tall gourmet Arctic beef burger with cheddar cheese melted over the sides, crisp organic lettuce, heirloom tomatoes, custom sesame brioche bun, vibrant commercial studio lighting, product photograph."
+    },
+    {
+      title: "🍮 Dessert Luxury",
+      desc: "Decadent chocolate lava, oozing cocoa, frosty berries.",
+      prompt: "A decadent, layered chocolate-lava pudding cup, liquid cocoa oozing from the center, side-garnished with frosty wild berries, modern luxury restaurant advertisement, pristine white setting, macro photo."
+    }
+  ];
+
   const handleGenerateAd = async () => {
     if (!adPrompt.trim()) return;
     setIsGenerating(true);
@@ -39,7 +58,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
       const response = await fetch('/api/gemini/generate-marketing-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: adPrompt, aspectRatio })
+        body: JSON.stringify({ prompt: adPrompt, aspectRatio, model: imageModel })
       });
       const data = await response.json();
       if (data.imageUrl) {
@@ -137,36 +156,100 @@ export default function StudioTab({ theme }: StudioTabProps) {
 
       {activeMode === 'marketing' && (
         <div className={`p-8 rounded-3xl shadow-sm ${isLight ? 'bg-white border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'}`}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-yellow-500/10 text-yellow-500 rounded-xl"><ImageIcon size={24} /></div>
-            <h2 className={`text-2xl font-bold ${isLight ? 'text-zinc-800' : 'text-zinc-100'}`}>Advertisement Banner Studio</h2>
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-yellow-500/10 text-yellow-500 rounded-xl"><ImageIcon size={24} /></div>
+              <div>
+                <h2 className={`text-2xl font-bold ${isLight ? 'text-zinc-800' : 'text-zinc-100'}`}>Advertisement Banner Studio</h2>
+                <p className="text-xs text-zinc-500 font-medium">Create gorgeous marketing assets for campaigns instantly.</p>
+              </div>
+            </div>
+            {/* Model Selector Tag */}
+            <div className={`p-1.5 rounded-xl flex gap-1.5 ${isLight ? 'bg-zinc-100' : 'bg-zinc-950 border border-zinc-800'}`}>
+              <button
+                type="button"
+                onClick={() => setImageModel('gemini-3.1-flash-image-preview')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  imageModel === 'gemini-3.1-flash-image-preview'
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+                title="Use fast, lightweight image generator model"
+              >
+                Fast / Flash
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageModel('gemini-3-pro-image-preview')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  imageModel === 'gemini-3-pro-image-preview'
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+                title="Use supreme, high-fidelity studio quality generator model"
+              >
+                Studio / Pro
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6">
+            {/* Quick Presets Bento */}
             <div>
-              <label className={`block text-sm font-bold uppercase tracking-wider mb-2 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Prompt</label>
+              <span className={`block text-xs font-bold uppercase tracking-wider mb-2.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                ✨ Recommended Prompt Presets
+              </span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setAdPrompt(preset.prompt)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all hover:-translate-y-0.5 active:scale-[0.98] group cursor-pointer ${
+                      adPrompt === preset.prompt
+                        ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
+                        : isLight
+                          ? 'bg-zinc-50 border-zinc-200 hover:bg-zinc-100/80 hover:border-zinc-300'
+                          : 'bg-zinc-950 border-zinc-850 hover:bg-zinc-900/50 hover:border-zinc-800'
+                    }`}
+                  >
+                    <span className="block font-bold text-xs text-zinc-800 dark:text-zinc-200 group-hover:text-amber-500 transition-colors">
+                      {preset.title}
+                    </span>
+                    <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                      {preset.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                Custom Prompt Description
+              </label>
               <textarea 
                 value={adPrompt}
                 onChange={(e) => setAdPrompt(e.target.value)}
-                placeholder="Describe your delicious food advert..."
-                className={`w-full p-4 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all ${isLight ? 'bg-zinc-50 border border-zinc-200 text-zinc-900' : 'bg-zinc-950 border border-zinc-800 text-zinc-100'}`}
+                placeholder="Describe your delicious food advert in high fidelity detail..."
+                className={`w-full p-4 rounded-2xl resize-none outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.25)] transition-all ${isLight ? 'bg-zinc-50 border border-zinc-200 text-zinc-900' : 'bg-zinc-950 border border-zinc-800 text-zinc-100'}`}
                 rows={4}
               />
             </div>
 
             <div>
-              <label className={`flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-3 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
-                 Aspect Ratio
+              <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                 Select Aspect Ratio
               </label>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2.5">
                 {ASPECT_RATIOS.map(ratio => (
                   <button
                     key={ratio}
                     onClick={() => setAspectRatio(ratio)}
-                    className={`px-4 py-2 rounded-xl font-bold font-mono tracking-wider transition-all border ${
+                    className={`px-3.5 py-2 rounded-xl font-bold font-mono text-xs tracking-wider transition-all border cursor-pointer ${
                       aspectRatio === ratio 
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-md transform -translate-y-0.5' 
-                        : isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-700' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                        ? 'bg-amber-500 text-white border-amber-600 shadow-[0_2px_8px_rgba(245,158,11,0.3)] transform -translate-y-0.5' 
+                        : isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-700' : 'bg-zinc-950 border-zinc-850 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
                     }`}
                   >
                     {ratio}
@@ -178,9 +261,13 @@ export default function StudioTab({ theme }: StudioTabProps) {
             <button 
               onClick={handleGenerateAd}
               disabled={isGenerating || !adPrompt.trim()}
-              className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98] hover:-translate-y-0.5"
+              className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98] hover:-translate-y-0.5 cursor-pointer"
             >
-              {isGenerating ? <><Loader2 size={24} className="animate-spin" /> Generating Image...</> : <><Send size={24} /> Generate Production Asset</>}
+              {isGenerating ? (
+                <><Loader2 size={24} className="animate-spin text-zinc-950" /> Crafting Premium Asset...</>
+              ) : (
+                <><Send size={24} /> Generate Marketing Asset</>
+              )}
             </button>
             {errorMsg && (
               <div className="flex items-center gap-2 p-4 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20">

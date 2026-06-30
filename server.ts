@@ -130,28 +130,43 @@ app.post("/api/gemini/low-latency-cmd", async (req, res) => {
 
 // ==========================================
 // 3. MENU ILLUSTRATOR & BANNER GENERATOR
-// Model: gemini-3.1-flash-image-preview
+// Model: gemini-3.1-flash-image-preview or gemini-3-pro-image-preview
 // ==========================================
 app.post("/api/gemini/generate-marketing-image", async (req, res) => {
   try {
-    const { prompt, aspectRatio } = req.body;
+    const { prompt, aspectRatio, model } = req.body;
     if (!prompt) {
       return res.status(400).json({ error: "Image prompt is required" });
     }
 
+    const selectedModel = model === "gemini-3-pro-image-preview" ? "gemini-3-pro-image-preview" : "gemini-3-1-flash-image-preview";
+    const ratio = aspectRatio || "1:1";
+
+    // Map ratio to width and height for SVG fallback
+    let svgW = 400;
+    let svgH = 300;
+    if (ratio === "1:1") { svgW = 400; svgH = 400; }
+    else if (ratio === "2:3") { svgW = 266; svgH = 400; }
+    else if (ratio === "3:2") { svgW = 400; svgH = 266; }
+    else if (ratio === "3:4") { svgW = 300; svgH = 400; }
+    else if (ratio === "4:3") { svgW = 400; svgH = 300; }
+    else if (ratio === "9:16") { svgW = 225; svgH = 400; }
+    else if (ratio === "16:9") { svgW = 400; svgH = 225; }
+    else if (ratio === "21:9") { svgW = 500; svgH = 214; }
+
     const ai = getAiClient();
     if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       // Return a high quality SVG of food matching the prompt as fallback
-      const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${aspectRatio || '1:1'} (Simulated)</text></svg>`;
+      const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="${svgW/2}" cy="${svgH/2 - 20}" r="${Math.min(svgW, svgH)*0.25}" fill="%2338bdf8"/><path d="M${svgW*0.3},${svgH*0.6} Q${svgW*0.5},${svgH*0.75} ${svgW*0.7},${svgH*0.6}" stroke="%23f59e0b" stroke-width="6" fill="none"/><text x="50%" y="${svgH - 45}" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="11">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="25" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="9">Model: ${selectedModel} | Ratio ${ratio} (Simulated)</text></svg>`;
       return res.json({ imageUrl: mockSvg, simulated: true });
     }
 
     try {
       const response = await ai.models.generateImages({
-        model: "gemini-3.1-flash-image-preview",
+        model: selectedModel,
         prompt: "A clean, commercial studio foods advertisement banner for Food Penguin Limited. " + prompt,
         config: {
-          aspectRatio: aspectRatio || "1:1",
+          aspectRatio: ratio,
           outputMimeType: "image/png"
         }
       });
@@ -161,16 +176,14 @@ app.post("/api/gemini/generate-marketing-image", async (req, res) => {
         base64Image = response.generatedImages[0].image.imageBytes;
       }
 
-      
-
       if (base64Image) {
         res.json({ imageUrl: `data:image/png;base64,${base64Image}`, simulated: false });
       } else {
-        throw new Error("No image data returned from Gemini flash image.");
+        throw new Error("No image data returned from Gemini image API.");
       }
     } catch (apiErr: any) {
       console.log("Marketing Image falling back to simulated SVG because Gemini key is inactive or failed.");
-      const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="200" cy="130" r="70" fill="%2338bdf8"/><path d="M120,180 Q200,220 280,180" stroke="%23f59e0b" stroke-width="8" fill="none"/><text x="50%" y="260" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="16">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="30" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="12">Ratio ${aspectRatio || '1:1'} (Simulated on Fallback)</text></svg>`;
+      const mockSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}"><rect width="100%" height="100%" fill="%230f172a"/><circle cx="${svgW/2}" cy="${svgH/2 - 20}" r="${Math.min(svgW, svgH)*0.25}" fill="%2338bdf8"/><path d="M${svgW*0.3},${svgH*0.6} Q${svgW*0.5},${svgH*0.75} ${svgW*0.7},${svgH*0.6}" stroke="%23f59e0b" stroke-width="6" fill="none"/><text x="50%" y="${svgH - 45}" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="11">Food Penguin Banner: ${prompt.replace(/"/g, '&quot;')}</text><text x="50%" y="25" dominant-baseline="middle" text-anchor="middle" fill="%2364748b" font-family="monospace" font-size="9">Model: ${selectedModel} | Ratio ${ratio} (Simulated on Fallback)</text></svg>`;
       res.json({ imageUrl: mockSvg, simulated: true });
     }
   } catch (err: any) {
