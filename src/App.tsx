@@ -2173,182 +2173,6 @@ export default function App() {
             })}
           </nav>
 
-          {/* Aesthetic & Theme Panel */}
-          <div className={`mx-2 mt-1.5 p-2.5 gold-liner-box transition-all ${
-            isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
-          }`}>
-            <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-yellow-500/20">
-              <Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse shrink-0" />
-              <span className="text-xs font-sans font-black uppercase tracking-wider text-yellow-500">
-                Aesthetic Studio
-              </span>
-            </div>
-            
-            {/* Dark & Day Mode Select */}
-            <div className="flex flex-col gap-1 mb-2.5">
-              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
-                Visual Mode
-              </span>
-              <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
-                <button
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
-                    isLight 
-                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" 
-                      : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
-                  <Sun className="w-3 h-3 text-amber-500" /> Day
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
-                    !isLight 
-                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" 
-                      : "text-zinc-500 hover:text-zinc-700"
-                  }`}
-                >
-                  <Moon className="w-3 h-3 text-zinc-400" /> Night
-                </button>
-              </div>
-            </div>
-
-            {/* Metallic Accent Presets */}
-            <div className="flex flex-col gap-1">
-              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
-                Metallic Edition
-              </span>
-              <div className="grid grid-cols-3 gap-1">
-                {/* Gold Button */}
-                <button
-                  type="button"
-                  onClick={() => changeMetallicTheme("gold")}
-                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "gold"
-                      ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
-                  🥇 Gold
-                </button>
-
-                {/* Silver Button */}
-                <button
-                  type="button"
-                  onClick={() => changeMetallicTheme("silver")}
-                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "silver"
-                      ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
-                  🥈 Silver
-                </button>
-
-                {/* Copper Button */}
-                <button
-                  type="button"
-                  onClick={() => changeMetallicTheme("copper")}
-                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "copper"
-                      ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
-                  🥉 Copper
-                </button>
-              </div>
-            </div>
-
-            {/* Note confirming Gold Liners */}
-            <div className="mt-2 text-xs leading-tight font-sans text-zinc-500 dark:text-zinc-400 flex items-start gap-1">
-              <span className="text-xs">👑</span>
-              <span>
-                <strong>24k Gold Liner</strong> is wrapped around all container boxes to elevate margin security.
-              </span>
-            </div>
-          </div>
-
-          {/* Global Branches Overview */}
-
-          <div
-            className={`mx-2 mt-1.5 p-2 gold-liner-box transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
-          >
-            <div
-              className={`flex items-center gap-2 mb-1.5 pb-1 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
-            >
-              <Store
-                className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-              />
-              <span
-                className={`text-xs font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
-              >
-                Global Branches
-              </span>
-            </div>
-            <div className="space-y-1 font-sans">
-              {(
-                [
-                  "Marks & Spencer - Cork City",
-                  "Tesco - Cork City",
-                  "Tesco - Mahon Point",
-                ] as const
-              ).map((branch) => {
-                const shortName = branch
-                  .replace("Marks & Spencer", "M&S")
-                  .replace(" - Cork City", " Cork")
-                  .replace(" - Mahon Point", " Mahon");
-                const isSelected = selectedBranch === branch;
-                return (
-                  <div
-                    key={branch}
-                    onClick={() => setSelectedBranch(branch)}
-                    className={`flex justify-between items-center text-xs p-1.5 rounded-lg border cursor-pointer transition-colors ${
-                      isSelected
-                        ? isLight
-                          ? "bg-orange-50 border-orange-200"
-                          : "bg-orange-500/10 border-orange-500/30"
-                        : isLight
-                          ? "bg-white border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
-                          : "bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900"
-                    }`}
-                  >
-                    <span
-                      className={`truncate mr-2 ${
-                        isSelected
-                          ? isLight
-                            ? "text-orange-700 font-bold"
-                            : "text-orange-400 font-bold"
-                          : isLight
-                            ? "text-zinc-700 font-medium"
-                            : "text-zinc-300 font-medium"
-                      }`}
-                    >
-                      {shortName}
-                    </span>
-                    <span
-                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1 ${isLight ? "text-emerald-500 font-bold" : "text-xs px-1.5 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black"}`}
-                    >
-                      {isLight && (
-                        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
-                      )}{" "}
-                      Live
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-
           {/* Footer info links */}
           <div
             className={`p-2.5 border-t shrink-0 transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
@@ -4452,7 +4276,183 @@ export default function App() {
               )}
             </div>
           </div>
-        </div>
+        {/* Aesthetic & Theme Panel */}
+          <div className={`mx-2 mt-1.5 p-2.5 gold-liner-box transition-all ${
+            isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
+          }`}>
+            <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-yellow-500/20">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse shrink-0" />
+              <span className="text-xs font-sans font-black uppercase tracking-wider text-yellow-500">
+                Aesthetic Studio
+              </span>
+            </div>
+            
+            {/* Dark & Day Mode Select */}
+            <div className="flex flex-col gap-1 mb-2.5">
+              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
+                Visual Mode
+              </span>
+              <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
+                <button
+                  type="button"
+                  onClick={() => setTheme("light")}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
+                    isLight 
+                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" 
+                      : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <Sun className="w-3 h-3 text-amber-500" /> Day
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTheme("dark")}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
+                    !isLight 
+                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" 
+                      : "text-zinc-500 hover:text-zinc-700"
+                  }`}
+                >
+                  <Moon className="w-3 h-3 text-zinc-400" /> Night
+                </button>
+              </div>
+            </div>
+
+            {/* Metallic Accent Presets */}
+            <div className="flex flex-col gap-1">
+              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
+                Metallic Edition
+              </span>
+              <div className="grid grid-cols-3 gap-1">
+                {/* Gold Button */}
+                <button
+                  type="button"
+                  onClick={() => changeMetallicTheme("gold")}
+                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                    metallicTheme === "gold"
+                      ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
+                      : isLight
+                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  🥇 Gold
+                </button>
+
+                {/* Silver Button */}
+                <button
+                  type="button"
+                  onClick={() => changeMetallicTheme("silver")}
+                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                    metallicTheme === "silver"
+                      ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
+                      : isLight
+                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  🥈 Silver
+                </button>
+
+                {/* Copper Button */}
+                <button
+                  type="button"
+                  onClick={() => changeMetallicTheme("copper")}
+                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                    metallicTheme === "copper"
+                      ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
+                      : isLight
+                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  🥉 Copper
+                </button>
+              </div>
+            </div>
+
+            {/* Note confirming Gold Liners */}
+            <div className="mt-2 text-xs leading-tight font-sans text-zinc-500 dark:text-zinc-400 flex items-start gap-1">
+              <span className="text-xs">👑</span>
+              <span>
+                <strong>24k Gold Liner</strong> is wrapped around all container boxes to elevate margin security.
+              </span>
+            </div>
+          </div>
+
+          {/* Global Branches Overview */}
+
+          <div
+            className={`mx-2 mt-1.5 p-2 gold-liner-box transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
+          >
+            <div
+              className={`flex items-center gap-2 mb-1.5 pb-1 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
+            >
+              <Store
+                className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+              />
+              <span
+                className={`text-xs font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+              >
+                Global Branches
+              </span>
+            </div>
+            <div className="space-y-1 font-sans">
+              {(
+                [
+                  "Marks & Spencer - Cork City",
+                  "Tesco - Cork City",
+                  "Tesco - Mahon Point",
+                ] as const
+              ).map((branch) => {
+                const shortName = branch
+                  .replace("Marks & Spencer", "M&S")
+                  .replace(" - Cork City", " Cork")
+                  .replace(" - Mahon Point", " Mahon");
+                const isSelected = selectedBranch === branch;
+                return (
+                  <div
+                    key={branch}
+                    onClick={() => setSelectedBranch(branch)}
+                    className={`flex justify-between items-center text-xs p-1.5 rounded-lg border cursor-pointer transition-colors ${
+                      isSelected
+                        ? isLight
+                          ? "bg-orange-50 border-orange-200"
+                          : "bg-orange-500/10 border-orange-500/30"
+                        : isLight
+                          ? "bg-white border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
+                          : "bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900"
+                    }`}
+                  >
+                    <span
+                      className={`truncate mr-2 ${
+                        isSelected
+                          ? isLight
+                            ? "text-orange-700 font-bold"
+                            : "text-orange-400 font-bold"
+                          : isLight
+                            ? "text-zinc-700 font-medium"
+                            : "text-zinc-300 font-medium"
+                      }`}
+                    >
+                      {shortName}
+                    </span>
+                    <span
+                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1 ${isLight ? "text-emerald-500 font-bold" : "text-xs px-1.5 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black"}`}
+                    >
+                      {isLight && (
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                      )}{" "}
+                      Live
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+
+          </div>
       </aside>
 
       {/* Schedule Email Report Modal */}
