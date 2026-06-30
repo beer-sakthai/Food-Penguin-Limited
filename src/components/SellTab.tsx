@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SalesOrder } from '../types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, ShoppingBag, Euro } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Euro, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const MS_PRODUCTS = [
   { name: 'Avocado Maki', category: 'General', price: 3.50, margin: '75%', barcode: '5055372900774' },
@@ -200,6 +200,21 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
   // Decide which branch products list to show!
   const branchProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(branchProducts.length / itemsPerPage);
+
+  // Reset to first page when branch changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [selectedBranch]);
+
+  const currentProducts = branchProducts.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
   // Analysis of the current branch's products
   const determineType = (name: string) => {
     const n = name.toLowerCase();
@@ -299,7 +314,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
 
       {/* PRODUCTS LIST */}
       <div className="flex flex-col gap-3">
-        {branchProducts.map((p, i) => (
+        {currentProducts.map((p, i) => (
           <div key={i} className={`p-4 md:px-6 rounded-2xl flex items-center justify-between transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] cursor-default ${
             isLight ? 'bg-white shadow-sm border border-zinc-200 hover:shadow-md' : 'bg-zinc-900 border border-zinc-800 hover:border-zinc-700'
           }`}>
@@ -313,6 +328,45 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
           </div>
         ))}
       </div>
+
+      {/* PAGINATION CONTROLS */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6 px-4">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+            disabled={currentPage === 0}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all ${
+              currentPage === 0 
+                ? 'opacity-50 cursor-not-allowed text-zinc-500'
+                : isLight
+                  ? 'bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 shadow-sm hover:shadow active:scale-[0.98]'
+                  : 'bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 text-white shadow-sm hover:shadow active:scale-[0.98]'
+            }`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Previous
+          </button>
+          
+          <div className={`font-mono text-sm font-bold px-4 py-2 rounded-lg ${isLight ? 'bg-zinc-100 text-zinc-600' : 'bg-zinc-900 border border-zinc-800 text-zinc-400'}`}>
+            Page <span className={isLight ? 'text-zinc-900' : 'text-zinc-100'}>{currentPage + 1}</span> of {totalPages}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={currentPage === totalPages - 1}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all ${
+              currentPage === totalPages - 1
+                ? 'opacity-50 cursor-not-allowed text-zinc-500'
+                : isLight
+                  ? 'bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 shadow-sm hover:shadow active:scale-[0.98]'
+                  : 'bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 text-white shadow-sm hover:shadow active:scale-[0.98]'
+            }`}
+          >
+            Next
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
       {/* ANALYTICS FOOTER */}
       <div className={`mt-12 p-8 rounded-3xl ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'}`}>
