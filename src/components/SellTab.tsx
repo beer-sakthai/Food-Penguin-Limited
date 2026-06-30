@@ -114,10 +114,10 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       <div className="space-y-16">
         {/* HEADER */}
         <div className="flex flex-col gap-2">
-          <h1 className={`text-5xl font-black tracking-tight ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>
+          <h1 className={`text-2xl font-black tracking-tight ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>
             {selectedBranch}
           </h1>
-          <p className={`text-xl font-medium ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          <p className={`text-base font-medium ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
             {branchProducts.length} unique products listed
           </p>
         </div>
@@ -135,11 +135,11 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
             <div className="flex gap-6">
               <div className="text-right">
                 <p className="text-xs font-mono uppercase tracking-wider text-zinc-500">Average</p>
-                <p className={`text-xl font-black ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>€51.0K</p>
+                <p className={`text-3xl font-black ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>€51.0K</p>
               </div>
               <div className="text-right">
                 <p className="text-xs font-mono uppercase tracking-wider text-zinc-500">Peak</p>
-                <p className="text-xl font-black text-amber-500">€62.0K <span className="text-sm text-zinc-500 font-medium">(Jun)</span></p>
+                <p className="text-3xl font-black text-amber-500">€62.0K <span className="text-sm text-zinc-500 font-medium">(Jun)</span></p>
               </div>
             </div>
           </div>
@@ -161,8 +161,8 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={isLight ? '#e4e4e7' : '#27272a'} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#71717a', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#71717a', fontSize: 12 }} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#71717a', fontSize: 15 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#71717a', fontSize: 15 }} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '8px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}`, boxShadow: 'none' }}
                   formatter={(value: number) => [`€${value.toLocaleString()}`, 'Sales']}
@@ -230,7 +230,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
           {currentProducts.map((p, i) => (
             <div key={i} className={`py-4 border-b ${isLight ? 'border-zinc-100' : 'border-zinc-800/50'} flex items-center justify-between transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] group cursor-default`}>
               <div className="flex-1 pr-4">
-                <h3 className={`text-lg font-bold leading-tight transition-colors ${isLight ? 'text-zinc-800 group-hover:text-zinc-900' : 'text-zinc-300 group-hover:text-zinc-100'}`}>{p.name}</h3>
+                <h3 className={`text-base font-bold leading-tight transition-colors ${isLight ? 'text-zinc-800 group-hover:text-zinc-900' : 'text-zinc-300 group-hover:text-zinc-100'}`}>{p.name}</h3>
                 <p className={`text-sm font-bold mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>€{p.price.toFixed(2)}</p>
               </div>
               <div className="shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">

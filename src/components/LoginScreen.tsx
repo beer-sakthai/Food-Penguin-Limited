@@ -144,7 +144,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
           <>
             <div className="relative my-5 flex py-1 items-center">
               <div className={`flex-grow border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}></div>
-              <span className={`flex-shrink mx-4 text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>Or Corporate Auth</span>
+              <span className={`flex-shrink mx-4 text-xs font-mono font-bold uppercase tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>Or Corporate Auth</span>
               <div className={`flex-grow border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}></div>
             </div>
 
@@ -195,7 +195,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
         
         {!isRegistering && (
           <div className="mt-4 text-center">
-            <span className={`text-[10px] uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            <span className={`text-xs uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
               Demo Credentials: user=admin pass=password
             </span>
           </div>

@@ -42,6 +42,11 @@ Everything funnels through `App.tsx`: it holds the seed state (imported from `sr
 - **Gold-liner UI.** Active inputs/selects use `focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500` plus a gold shadow glow; interactive elements use micro-animations like `hover:-translate-y-0.5` and `active:scale-[0.98]`. Match this when adding controls.
 - **Boundary validation on bulk edits.** Bulk forecast/capacity changes must pre-simulate the result and show a `lucide-react` `AlertTriangle` warning when values breach hard limits (e.g. `>110%` or `<0%`) before applying.
 
+### Project Rules (from .agents/AGENTS.md)
+
+- **Three font sizes only.** `src/index.css` defines exactly three sizes via Tailwind's `@theme` (Detail `1.05rem`, Headline `1.5rem`, Number `2.5rem`), each mapped across multiple Tailwind scale tokens (e.g. `--font-size-xs` through `--font-size-base` all resolve to `1.05rem`). Don't introduce ad-hoc text sizes outside this scale.
+- **Scratch files excluded from the build.** Root-level throwaway/scratch files (e.g. `scratch-selltab-original.tsx`) must stay out of TypeScript compilation — keep them listed in `tsconfig.json`'s `exclude`.
+
 ### Model-name caveat
 The README and GEMINI.md state the project "strictly" uses `gemini-1.5-flash`. The actual code in `server.ts` is the source of truth and is mixed: most text endpoints use `gemini-1.5-flash`, but `analyze-dish-photo` uses `gemini-3.1-pro-preview` and image generation uses `gemini-3-1-flash-image-preview` / `gemini-3-pro-image-preview`. Several endpoints also carry stale `// Model: gemini-3.1-pro-preview` comments above code that actually calls `gemini-1.5-flash` — trust the `model:` string in the `generateContent` call, not the comment. When editing models, check `server.ts` directly rather than trusting the docs, and prefer flash unless the user says otherwise.
 

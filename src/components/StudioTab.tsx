@@ -131,10 +131,10 @@ export default function StudioTab({ theme }: StudioTabProps) {
     <div className="max-w-4xl mx-auto space-y-6 pt-6 pb-12">
       {/* HEADER */}
       <div className={`p-8 rounded-3xl text-center shadow-sm ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'}`}>
-        <h1 className={`text-4xl font-extrabold mb-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
+        <h1 className={`text-2xl font-extrabold mb-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
           AI Operations Studio
         </h1>
-        <p className={`text-lg font-medium ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+        <p className={`text-base font-medium ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
           Advanced machine intelligence for your quality and marketing operations.
         </p>
 
@@ -216,7 +216,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                     <span className="block font-bold text-xs text-zinc-800 dark:text-zinc-200 group-hover:text-amber-500 transition-colors">
                       {preset.title}
                     </span>
-                    <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                    <span className="block text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
                       {preset.desc}
                     </span>
                   </button>
@@ -359,8 +359,8 @@ export default function StudioTab({ theme }: StudioTabProps) {
                       <p className={`font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Scanning multi-spectral dish parameters...</p>
                     </div>
                   ) : auditResult ? (
-                    <div className={`p-6 rounded-2xl shadow-inner whitespace-pre-wrap leading-relaxed ${isLight ? 'bg-zinc-50 text-zinc-800 border border-zinc-200' : 'bg-zinc-950 text-zinc-200 border border-zinc-800'}`}>
-                      <div className="text-base font-medium">{auditResult}</div>
+                    <div className={`p-6 rounded-2xl shadow-inner ${isLight ? 'bg-zinc-50 text-zinc-800 border border-zinc-200' : 'bg-zinc-950 text-zinc-200 border border-zinc-800'}`}>
+                      <div className="text-base font-medium whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto pr-1 custom-scrollbar">{auditResult}</div>
                       <div className="mt-4 flex justify-end">
                         <button 
                           onClick={() => {

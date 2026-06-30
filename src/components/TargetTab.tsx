@@ -110,11 +110,11 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={completionData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
- <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} />
- <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} tickFormatter={(val) => `${val}%`} />
+ <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 15 }} />
+ <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 15 }} tickFormatter={(val) => `${val}%`} />
  <Tooltip 
  cursor={{ fill: '#1f2937' }}
- contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+ contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '15px' }}
  itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
  />
  <Bar dataKey="completion" radius={[4, 4, 0, 0]} maxBarSize={40}>
@@ -142,11 +142,11 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  {getCategoryIcon(tgt.category)}
  </div>
  <div>
- <h4 className="text-[10px] font-mono uppercase text-zinc-500 tracking-widest font-bold">{tgt.category} goal</h4>
+ <h4 className="text-xs font-mono uppercase text-zinc-500 tracking-widest font-bold">{tgt.category} goal</h4>
  <h3 className="text-sm font-sans font-bold text-white group-hover:text-orange-400 transition-colors mt-0.5">{tgt.name}</h3>
  </div>
  </div>
- <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] ${
+ <span className={`px-2.5 py-0.5 rounded-full font-mono text-xs ${
  isCompleted ? 'bg-emerald-950/40 text-emerald-450 font-bold border border-emerald-900/40' : 'bg-orange-950/40 text-orange-400 border border-orange-900/40'
  }`}>
  {isCompleted ? 'Verified' : 'Ongoing'}
@@ -166,7 +166,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  style={{ width: `${isHours ? (isCompleted ? 100 : 50) : pct}%` }}
  />
  </div>
- <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono pt-1">
+ <div className="flex justify-between items-center text-xs text-zinc-500 font-mono pt-1">
  <span>Deadline: {tgt.deadline}</span>
  <span className="text-zinc-400 font-bold">{Math.round(isHours ? (isCompleted ? 100 : 50) : pct)}% Done</span>
  </div>
@@ -185,7 +185,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <div>
  <h3 className="text-sm font-sans font-bold text-white flex items-center gap-1.5">
  AI Target Structuring Helper
- <span className="px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-300 text-[9px] font-mono border border-zinc-800">
+ <span className="px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-300 text-xs font-mono border border-zinc-800">
  gemini-3.1-flash-lite
  </span>
  </h3>
@@ -221,7 +221,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
 
  {aiSuggestions && (
  <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-inner space-y-2">
- <span className="text-[10px] uppercase font-mono tracking-wider text-orange-400 font-bold block">Optimized Target Guidelines:</span>
+ <span className="text-xs uppercase font-mono tracking-wider text-orange-400 font-bold block">Optimized Target Guidelines:</span>
  <p className="text-xs text-zinc-300 leading-relaxed font-sans whitespace-pre-wrap">{aiSuggestions}</p>
  </div>
  )}
@@ -238,7 +238,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
 
  <form onSubmit={handleSubmit} className="space-y-4">
  <div>
- <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Target Header Name</label>
+ <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target Header Name</label>
  <input
  type="text"
  required
@@ -250,7 +250,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  </div>
 
  <div>
- <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Assessment Metric</label>
+ <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Assessment Metric</label>
  <input
  type="text"
  required
@@ -263,7 +263,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
 
  <div className="grid grid-cols-2 gap-3.5">
  <div>
- <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Target value</label>
+ <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target value</label>
  <input
  type="number"
  required
@@ -273,7 +273,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  />
  </div>
  <div>
- <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Unit label</label>
+ <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Unit label</label>
  <input
  type="text"
  required
@@ -287,7 +287,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
 
  <div className="grid grid-cols-2 gap-3.5">
  <div>
- <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Category</label>
+ <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Category</label>
  <select
  value={category}
  onChange={(e) => setCategory(e.target.value as any)}
@@ -300,7 +300,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  </select>
  </div>
  <div>
- <label className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Target Deadline</label>
+ <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target Deadline</label>
  <input
  type="text"
  required

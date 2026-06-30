@@ -2088,7 +2088,7 @@ export default function App() {
                   Food Penguin
                 </h1>
                 <span
-                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
                   title={healthTooltip}
                 >
                   <span
@@ -2098,7 +2098,7 @@ export default function App() {
                 </span>
               </div>
               <span
-                className={`text-[10px] font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                className={`text-xs font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
               >
                 Limited
               </span>
@@ -2118,7 +2118,7 @@ export default function App() {
           className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
           {/* Navigation Actions */}
-          <nav className="p-4 mt-2 space-y-1">
+          <nav className="p-2.5 mt-1 space-y-0.5">
             {tabMeta.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -2128,7 +2128,7 @@ export default function App() {
                     setActiveTab(tab.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
+                  className={`w-full text-left py-1.5 px-2.5 rounded-lg text-xs font-semibold flex items-center gap-2.5 transition-colors duration-200 ${
                     isActive
                       ? isLight
                         ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm"
@@ -2139,7 +2139,7 @@ export default function App() {
                   }`}
                 >
                   <span
-                    className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 shrink-0 ${
                       isActive
                         ? "bg-orange-500 scale-125"
                         : isLight
@@ -2163,7 +2163,7 @@ export default function App() {
                       {tab.label}
                     </span>
                     {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
-                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
+                      <span className="bg-red-500 text-white font-mono text-xs px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
                         {lowStockCount}
                       </span>
                     )}
@@ -2174,26 +2174,26 @@ export default function App() {
           </nav>
 
           {/* Aesthetic & Theme Panel */}
-          <div className={`mx-4 mt-4 p-3 gold-liner-box transition-all ${
+          <div className={`mx-2 mt-1.5 p-2.5 gold-liner-box transition-all ${
             isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
           }`}>
-            <div className="flex items-center gap-1.5 mb-2.5 pb-1.5 border-b border-yellow-500/20">
+            <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-yellow-500/20">
               <Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse shrink-0" />
-              <span className="text-[10px] font-sans font-black uppercase tracking-wider text-yellow-500">
+              <span className="text-xs font-sans font-black uppercase tracking-wider text-yellow-500">
                 Aesthetic Studio
               </span>
             </div>
             
             {/* Dark & Day Mode Select */}
             <div className="flex flex-col gap-1 mb-2.5">
-              <span className={`text-[7.5px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
+              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
                 Visual Mode
               </span>
               <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
                 <button
                   type="button"
                   onClick={() => setTheme("light")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
                     isLight 
                       ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" 
                       : "text-zinc-500 hover:text-zinc-300"
@@ -2204,7 +2204,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setTheme("dark")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
                     !isLight 
                       ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" 
                       : "text-zinc-500 hover:text-zinc-700"
@@ -2217,7 +2217,7 @@ export default function App() {
 
             {/* Metallic Accent Presets */}
             <div className="flex flex-col gap-1">
-              <span className={`text-[7.5px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
+              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
                 Metallic Edition
               </span>
               <div className="grid grid-cols-3 gap-1">
@@ -2225,7 +2225,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => changeMetallicTheme("gold")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
                     metallicTheme === "gold"
                       ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
                       : isLight
@@ -2240,7 +2240,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => changeMetallicTheme("silver")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
                     metallicTheme === "silver"
                       ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
                       : isLight
@@ -2255,7 +2255,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => changeMetallicTheme("copper")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
                     metallicTheme === "copper"
                       ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
                       : isLight
@@ -2269,8 +2269,8 @@ export default function App() {
             </div>
 
             {/* Note confirming Gold Liners */}
-            <div className="mt-2 text-[7.5px] leading-tight font-sans text-zinc-500 dark:text-zinc-400 flex items-start gap-1">
-              <span className="text-[9px]">👑</span>
+            <div className="mt-2 text-xs leading-tight font-sans text-zinc-500 dark:text-zinc-400 flex items-start gap-1">
+              <span className="text-xs">👑</span>
               <span>
                 <strong>24k Gold Liner</strong> is wrapped around all container boxes to elevate margin security.
               </span>
@@ -2280,21 +2280,21 @@ export default function App() {
           {/* Global Branches Overview */}
 
           <div
-            className={`mx-4 mt-4 p-3 gold-liner-box transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
+            className={`mx-2 mt-1.5 p-2 gold-liner-box transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
           >
             <div
-              className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
+              className={`flex items-center gap-2 mb-1.5 pb-1 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
             >
               <Store
                 className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
               />
               <span
-                className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                className={`text-xs font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
               >
                 Global Branches
               </span>
             </div>
-            <div className="space-y-1.5 font-sans">
+            <div className="space-y-1 font-sans">
               {(
                 [
                   "Marks & Spencer - Cork City",
@@ -2311,7 +2311,7 @@ export default function App() {
                   <div
                     key={branch}
                     onClick={() => setSelectedBranch(branch)}
-                    className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
+                    className={`flex justify-between items-center text-xs p-1.5 rounded-lg border cursor-pointer transition-colors ${
                       isSelected
                         ? isLight
                           ? "bg-orange-50 border-orange-200"
@@ -2335,10 +2335,10 @@ export default function App() {
                       {shortName}
                     </span>
                     <span
-                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1.5 ${isLight ? "text-emerald-500 font-bold" : "text-[9px] px-2 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black"}`}
+                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1 ${isLight ? "text-emerald-500 font-bold" : "text-xs px-1.5 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black"}`}
                     >
                       {isLight && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
                       )}{" "}
                       Live
                     </span>
@@ -2350,9 +2350,9 @@ export default function App() {
 
 
           {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
-          <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
+          <div className="px-2 py-1.5 mt-auto mb-1 hidden md:block">
             <div
-              className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${
+              className={`p-3 rounded-xl border relative overflow-hidden group transition-all duration-200 ${
                 isLight
                   ? "bg-zinc-50 border-zinc-200 text-zinc-900 shadow-sm"
                   : "bg-zinc-900 border-zinc-800 text-white"
@@ -2377,7 +2377,7 @@ export default function App() {
                   title="Click to view daily breakdown"
                 >
                   <p
-                    className={`text-[10px] uppercase font-mono font-bold tracking-wider select-none ${
+                    className={`text-xs uppercase font-mono font-bold tracking-wider select-none ${
                       isLight ? "text-zinc-500" : "text-zinc-400"
                     }`}
                   >
@@ -2394,11 +2394,11 @@ export default function App() {
                   )}
                 </button>
                 <div className="flex items-center gap-1.5">
-                  <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
+                  <span className="flex items-center gap-1 text-xs text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
                     Forecast AI
                   </span>
                   <span
-                    className={`flex items-center gap-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${
+                    className={`flex items-center gap-1 text-xs font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${
                       aiAccuracyConfidence >= 90
                         ? isLight
                           ? "text-emerald-600 bg-emerald-50 border-emerald-200"
@@ -2429,7 +2429,7 @@ export default function App() {
 
               {/* Branch Overlay Selector (Gold Liner style) */}
               <div
-                className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-[8.5px] select-none border transition-all ${
+                className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-xs select-none border transition-all ${
                   isLight
                     ? "bg-zinc-100/65 border-zinc-200 shadow-sm"
                     : "bg-zinc-950/30 border-zinc-800/45"
@@ -2447,7 +2447,7 @@ export default function App() {
                   {overlayBranches.length > 0 && (
                     <button
                       onClick={() => setOverlayBranches([])}
-                      className={`px-1.5 py-0.5 rounded text-[7px] font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${
+                      className={`px-1.5 py-0.5 rounded text-xs font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${
                         isLight
                           ? "bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700"
                           : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
@@ -2510,7 +2510,7 @@ export default function App() {
                       return (
                         <div
                           key={branch}
-                          className={`px-2 py-1 rounded-md border text-[7.5px] font-bold flex items-center gap-1 cursor-default opacity-95 ${style.activeBg}`}
+                          className={`px-2 py-1 rounded-md border text-xs font-bold flex items-center gap-1 cursor-default opacity-95 ${style.activeBg}`}
                         >
                           <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                           {shortName} (Active)
@@ -2528,7 +2528,7 @@ export default function App() {
                               : [...prev, branch],
                           );
                         }}
-                        className={`px-2 py-1 rounded-md border text-[7.5px] font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
+                        className={`px-2 py-1 rounded-md border text-xs font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
                           isSelected
                             ? style.activeBg
                             : `${isLight ? "bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100" : "bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800"} opacity-75`
@@ -2664,7 +2664,7 @@ export default function App() {
 
               {/* Text details and comparison metrics */}
               <div
-                className={`space-y-1.5 mt-3 pt-2.5 border-t font-mono text-[10px] leading-relaxed ${
+                className={`space-y-1.5 mt-3 pt-2.5 border-t font-mono text-xs leading-relaxed ${
                   isLight ? "border-zinc-200" : "border-zinc-800/60"
                 }`}
               >
@@ -2714,7 +2714,7 @@ export default function App() {
                     }`}
                   >
                     <p
-                      className={`text-[8px] uppercase tracking-wider font-bold mb-1 select-none ${
+                      className={`text-xs uppercase tracking-wider font-bold mb-1 select-none ${
                         isLight ? "text-zinc-400" : "text-zinc-500"
                       }`}
                     >
@@ -2750,12 +2750,12 @@ export default function App() {
                             {shortName}:
                           </span>
                           <span
-                            className="font-bold font-mono text-[9.5px]"
+                            className="font-bold font-mono text-xs"
                             style={{ color: bData.color }}
                           >
                             {bData.projected}%{" "}
                             {isCurrentBranch && (
-                              <span className="text-[7.5px] uppercase tracking-wide font-black pl-1">
+                              <span className="text-xs uppercase tracking-wide font-black pl-1">
                                 (Active)
                               </span>
                             )}
@@ -2767,7 +2767,7 @@ export default function App() {
                 )}
 
                 <p
-                  className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${
+                  className={`text-xs leading-normal mt-1 pt-1 italic font-sans border-t ${
                     isLight
                       ? "border-zinc-200 text-zinc-400"
                       : "border-zinc-800/20 text-zinc-500"
@@ -2780,11 +2780,11 @@ export default function App() {
               {/* Expandable daily capacity breakdown block */}
               {isCapacityExpanded && (
                 <div
-                  className={`mt-4 pt-3.5 border-t font-mono text-[9px] space-y-3 animate-fadeIn duration-300 ${isLight ? "border-zinc-205" : "border-zinc-800/80"}`}
+                  className={`mt-4 pt-3.5 border-t font-mono text-xs space-y-3 animate-fadeIn duration-300 ${isLight ? "border-zinc-205" : "border-zinc-800/80"}`}
                 >
                   <div className="flex items-center justify-between">
                     <p
-                      className={`font-bold uppercase tracking-wider text-[8px] ${isLight ? "text-zinc-500" : "text-zinc-555"}`}
+                      className={`font-bold uppercase tracking-wider text-xs ${isLight ? "text-zinc-500" : "text-zinc-555"}`}
                     >
                       Daily Capacity Breakdown
                     </p>
@@ -2803,7 +2803,7 @@ export default function App() {
                           capacityImpactFilter === "all" &&
                           bulkSelectedDays.length === 0
                         }
-                        className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
+                        className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-xs uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
                           capacitySortBy !== "date" ||
                           capacitySmoothing !== "raw" ||
                           capacityImpactFilter !== "all" ||
@@ -2834,7 +2834,7 @@ export default function App() {
                       >
                         <Download className="w-2.5 h-2.5 text-orange-400" />
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
                         >
                           CSV
                         </span>
@@ -2850,7 +2850,7 @@ export default function App() {
                       >
                         <Download className="w-2.5 h-2.5 text-amber-500" />
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
                         >
                           PDF
                         </span>
@@ -2866,12 +2866,12 @@ export default function App() {
                       >
                         <Mail className="w-2.5 h-2.5 text-rose-400" />
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
                         >
                           Schedule
                         </span>
                       </button>
-                      <span className="text-[8px] text-zinc-400 font-semibold ml-1">
+                      <span className="text-xs text-zinc-400 font-semibold ml-1">
                         [Current vs Proj]
                       </span>
                     </div>
@@ -2888,7 +2888,7 @@ export default function App() {
                     {/* Impact Filter Dropdown */}
                     <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/50">
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
                         title="Filter daily breakdown items by impact severity"
                       >
                         ⚡ Impact Filter:
@@ -2901,7 +2901,7 @@ export default function App() {
                             e.target.value as "all" | "critical" | "low"
                           )
                         }
-                        className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${
+                        className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${
                           isLight
                             ? "bg-white border-zinc-200 text-amber-600"
                             : "bg-zinc-900 border-zinc-800/80 text-amber-450 hover:text-amber-300"
@@ -2942,7 +2942,7 @@ export default function App() {
 
                     <div className="flex items-center justify-between gap-1.5">
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
                       >
                         Order by:
                       </span>
@@ -2953,7 +2953,7 @@ export default function App() {
                             e.target.value as "date" | "bottleneck" | "custom",
                           )
                         }
-                        className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
+                        className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
                           isLight
                             ? "bg-white border-zinc-200 text-amber-600"
                             : "bg-zinc-900 border-zinc-800/80 text-amber-450  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300"
@@ -2997,7 +2997,7 @@ export default function App() {
                       className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? "border-zinc-200" : "border-zinc-900/60"}`}
                     >
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
                         title="3-Day moving average smoothing vs raw data"
                       >
                         Data View:
@@ -3007,7 +3007,7 @@ export default function App() {
                       >
                         <button
                           onClick={() => setCapacitySmoothing("raw")}
-                          className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
+                          className={`text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
                             capacitySmoothing === "raw"
                               ? "bg-orange-500 text-white shadow-sm"
                               : isLight
@@ -3019,7 +3019,7 @@ export default function App() {
                         </button>
                         <button
                           onClick={() => setCapacitySmoothing("smoothed")}
-                          className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
+                          className={`text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
                             capacitySmoothing === "smoothed"
                               ? "bg-orange-500 text-white shadow-sm"
                               : isLight
@@ -3038,7 +3038,7 @@ export default function App() {
                       className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? "border-zinc-200" : "border-zinc-900/60"}`}
                     >
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${compareModeEnabled ? "text-yellow-600 dark:text-yellow-500 font-extrabold" : isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest flex items-center gap-1 ${compareModeEnabled ? "text-yellow-600 dark:text-yellow-500 font-extrabold" : isLight ? "text-zinc-500" : "text-zinc-500"}`}
                         title="Compare initial AI forecast with manual simulation value"
                       >
                         <GitCompare
@@ -3051,7 +3051,7 @@ export default function App() {
                           setCompareModeEnabled(!compareModeEnabled)
                         }
                         type="button"
-                        className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
+                        className={`text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
                           compareModeEnabled
                             ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]"
                             : isLight
@@ -3069,7 +3069,7 @@ export default function App() {
                     >
                       <div className="flex items-center justify-between gap-1">
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${
+                          className={`text-xs font-bold uppercase tracking-widest flex items-center gap-1 ${
                             quickAdjustEnabled
                               ? "text-orange-500 font-extrabold"
                               : isLight
@@ -3091,7 +3091,7 @@ export default function App() {
                             }
                           }}
                           type="button"
-                          className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
+                          className={`text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
                             quickAdjustEnabled
                               ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm"
                               : isLight
@@ -3107,7 +3107,7 @@ export default function App() {
                         <div
                           className={`p-2 mt-1.5 rounded-xl border flex flex-col gap-1.5 ${isLight ? "bg-amber-50/50 border-amber-200" : "bg-amber-950/20 border-amber-900/50"}`}
                         >
-                          <div className="flex justify-between items-center text-[9px] uppercase font-bold text-amber-600 dark:text-amber-500">
+                          <div className="flex justify-between items-center text-xs uppercase font-bold text-amber-600 dark:text-amber-500">
                             <span>
                               {bulkSelectedDays.length > 0
                                 ? `Bulk Adjust (${bulkSelectedDays.length} days)`
@@ -3117,7 +3117,7 @@ export default function App() {
                               {bulkSelectedDays.length > 0 && (
                                 <button
                                   onClick={() => setBulkSelectedDays([])}
-                                  className="hover:underline text-[8px] tracking-wider"
+                                  className="hover:underline text-xs tracking-wider"
                                 >
                                   Clear Selection
                                 </button>
@@ -3125,7 +3125,7 @@ export default function App() {
                               {Object.keys(capacityOverrides).length > 0 && (
                                 <button
                                   onClick={handleResetOverrides}
-                                  className="hover:underline text-[8px] tracking-wider hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all "
+                                  className="hover:underline text-xs tracking-wider hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all "
                                 >
                                   Reset All
                                 </button>
@@ -3204,7 +3204,7 @@ export default function App() {
                                         handleGlobalOverride();
                                       }
                                     }}
-                                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-[9px] font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+                                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-xs font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
                                   >
                                     Apply{" "}
                                     {isBulk
@@ -3228,7 +3228,7 @@ export default function App() {
                         : "bg-zinc-950/80 border-zinc-900/60"
                     }`}
                   >
-                    <div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+                    <div className="flex justify-between items-center text-xs text-zinc-500 font-bold uppercase tracking-widest leading-none">
                       <div className="flex items-center gap-1">
                         <span>Bottleneck Threshold</span>
                         <button
@@ -3260,7 +3260,7 @@ export default function App() {
                           stiffness: 450,
                           damping: 25,
                         }}
-                        className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${
+                        className={`font-mono text-xs font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${
                           isLight
                             ? "bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]"
                             : "bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]"
@@ -3273,7 +3273,7 @@ export default function App() {
                     {/* Tooltip Popup box aligned directly on top of the container */}
                     {showThresholdTooltip && (
                       <div
-                        className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-[9px] font-normal normal-case tracking-normal leading-relaxed ${
+                        className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-xs font-normal normal-case tracking-normal leading-relaxed ${
                           isLight
                             ? "bg-white border-zinc-200/90 text-zinc-700 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)]"
                             : "bg-zinc-900/95 border-zinc-800 text-zinc-300 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5),0_8px_10px_-6px_rgba(0,0,0,0.5)]"
@@ -3282,11 +3282,11 @@ export default function App() {
                         {/* Gold line border indicator on the left side to highlight calibration info */}
                         <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-yellow-500" />
 
-                        <h4 className="font-bold text-[9.5px] text-yellow-500 mb-1.5 flex items-center gap-1 uppercase tracking-wider">
+                        <h4 className="font-bold text-xs text-yellow-500 mb-1.5 flex items-center gap-1 uppercase tracking-wider">
                           <Info className="w-3 h-3 text-yellow-500" />
                           Calibration Parameters
                         </h4>
-                        <p className="mb-2.5 text-[8.5px] leading-normal">
+                        <p className="mb-2.5 text-xs leading-normal">
                           The <strong>Bottleneck Threshold</strong> defines your
                           operational peak capacity tolerance. Adjusting it
                           triggers real-time visual alerts and modifies report
@@ -3295,16 +3295,16 @@ export default function App() {
 
                         <div className="space-y-2 border-t pt-2 border-zinc-200/50 dark:border-zinc-800/50">
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-[7.5px] flex items-center gap-1">
+                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-xs flex items-center gap-1">
                               ⚠️ Live Alert System
                             </span>
-                            <p className="text-[8px] text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               Any day with projected capacity above{" "}
                               <span className="font-bold">
                                 {bottleneckThreshold}%
                               </span>{" "}
                               automatically lights up with a yellow{" "}
-                              <span className="bg-amber-500/10 text-amber-500 border border-amber-500/25 px-1 py-0.2 rounded font-mono font-bold text-[7px] shadow-sm shadow-amber-500/20">
+                              <span className="bg-amber-500/10 text-amber-500 border border-amber-500/25 px-1 py-0.2 rounded font-mono font-bold text-xs shadow-sm shadow-amber-500/20">
                                 HOT
                               </span>{" "}
                               bottleneck alert badge inside the Daily Capacity
@@ -3312,10 +3312,10 @@ export default function App() {
                             </p>
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-[7.5px] flex items-center gap-1">
+                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-xs flex items-center gap-1">
                               📊 Report Generation
                             </span>
-                            <p className="text-[8px] text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               This threshold is baked directly into generated
                               PDF summaries and CSV sheets. The system uses it
                               to compile bottleneck statistics, mark overflow
@@ -3341,7 +3341,7 @@ export default function App() {
                         background: `linear-gradient(to right, #eab308 0%, #eab308 ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? "#e4e4e7" : "#27272a"} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? "#e4e4e7" : "#27272a"} 100%)`,
                       }}
                     />
-                    <div className="flex justify-between text-[7px] text-zinc-500 font-mono leading-none">
+                    <div className="flex justify-between text-xs text-zinc-500 font-mono leading-none">
                       <span>50%</span>
                       <span>75%</span>
                       <span>100%</span>
@@ -3385,11 +3385,11 @@ export default function App() {
                           
                           <div className="flex items-start justify-between gap-1.5 pl-1.5">
                             <div className="flex flex-col">
-                              <span className="font-sans font-bold text-[10.5px] text-yellow-600 dark:text-yellow-500 flex items-center gap-1.5 uppercase tracking-wide">
+                              <span className="font-sans font-bold text-xs text-yellow-600 dark:text-yellow-500 flex items-center gap-1.5 uppercase tracking-wide">
                                 <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 animate-bounce" />
                                 Threshold Exceeded ({maxProjectedItem.projected}%)
                               </span>
-                              <span className="text-[9.5px] text-zinc-500 font-medium mt-0.5">
+                              <span className="text-xs text-zinc-500 font-medium mt-0.5">
                                 Capacity on <strong className="text-zinc-700 dark:text-zinc-300 font-bold">{maxProjectedItem.day}</strong> exceeds your safe {bottleneckThreshold}% limit.
                               </span>
                             </div>
@@ -3408,7 +3408,7 @@ export default function App() {
                                   setFocusedDay(null);
                                 }, 2500);
                               }}
-                              className={`p-1 rounded text-[9px] font-mono font-bold tracking-wider hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer ${
+                              className={`p-1 rounded text-xs font-mono font-bold tracking-wider hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer ${
                                 isLight
                                   ? "text-amber-800 bg-amber-100/70 hover:bg-amber-200/80 border border-amber-200"
                                   : "text-amber-400 bg-amber-950/50 hover:bg-amber-900/50 border border-amber-900/50 hover:border-amber-500/50"
@@ -3425,7 +3425,7 @@ export default function App() {
                             {(!quickFixRecommendation && !quickFixLoading) && (
                               <button
                                 onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}
-                                className={`w-full py-1.5 px-3 rounded-lg text-[9.5px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
+                                className={`w-full py-1.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
                                   isLight
                                     ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 font-extrabold shadow-[0_2px_8px_rgba(234,179,8,0.3)] hover:from-yellow-400 hover:to-amber-400"
                                     : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-zinc-950 font-extrabold shadow-[0_2px_12px_rgba(234,179,8,0.25)] hover:from-yellow-400 hover:to-amber-400"
@@ -3442,7 +3442,7 @@ export default function App() {
                                 isLight ? "bg-amber-100/30 border-amber-200" : "bg-amber-950/20 border-amber-900/30"
                               }`}>
                                 <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-                                <span className="text-[8.5px] font-mono text-amber-600 dark:text-amber-500 font-bold uppercase tracking-wider text-center animate-pulse">
+                                <span className="text-xs font-mono text-amber-600 dark:text-amber-500 font-bold uppercase tracking-wider text-center animate-pulse">
                                   Jules is formulating recalibrations...
                                 </span>
                               </div>
@@ -3450,11 +3450,11 @@ export default function App() {
 
                             {/* Error State */}
                             {quickFixError && (
-                              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-500 text-[8.5px] font-medium leading-relaxed">
+                              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-500 text-xs font-medium leading-relaxed">
                                 ⚠️ {quickFixError}
                                 <button
                                   onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}
-                                  className="block underline font-bold mt-1 text-rose-600 dark:text-rose-400 uppercase tracking-widest text-[7px]"
+                                  className="block underline font-bold mt-1 text-rose-600 dark:text-rose-400 uppercase tracking-widest text-xs"
                                 >
                                   Retry Fix
                                 </button>
@@ -3468,13 +3468,13 @@ export default function App() {
                                   ? "bg-white/80 border-amber-200/80 shadow-[0_1px_5px_rgba(0,0,0,0.02)]"
                                   : "bg-zinc-950/60 border-zinc-800/80 shadow-inner"
                               }`}>
-                                <div className="text-[9px] text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed text-justify pl-1 border-l-2 border-yellow-500/60">
+                                <div className="text-xs text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed text-justify pl-1 border-l-2 border-yellow-500/60">
                                   {quickFixRecommendation}
                                 </div>
                                 <div className="flex items-center justify-between gap-1 border-t pt-2 border-zinc-200/50 dark:border-zinc-850/50">
                                   <div className="flex flex-col">
-                                    <span className="text-[7.5px] text-zinc-400 uppercase tracking-wider font-bold">Suggested Overrides:</span>
-                                    <span className="text-[10px] font-mono font-extrabold text-orange-500">
+                                    <span className="text-xs text-zinc-400 uppercase tracking-wider font-bold">Suggested Overrides:</span>
+                                    <span className="text-xs font-mono font-extrabold text-orange-500">
                                       {maxProjectedItem.projected}% → {Math.max(10, Math.min(110, Math.round(maxProjectedItem.projected + (quickFixAdjustment || 0))))}% ({quickFixAdjustment}% Adjustment)
                                     </span>
                                   </div>
@@ -3485,13 +3485,13 @@ export default function App() {
                                         setQuickFixAdjustment(null);
                                         setQuickFixDay(null);
                                       }}
-                                      className="px-1.5 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-[8px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                                      className="px-1.5 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                                     >
                                       Dismiss
                                     </button>
                                     <button
                                       onClick={handleApplyQuickFix}
-                                      className={`px-2 py-1 rounded text-[8px] font-extrabold uppercase tracking-wider transition-all hover:-translate-y-0.5 active:scale-[0.98] shadow-sm flex items-center gap-1 border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
+                                      className={`px-2 py-1 rounded text-xs font-extrabold uppercase tracking-wider transition-all hover:-translate-y-0.5 active:scale-[0.98] shadow-sm flex items-center gap-1 border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
                                         isLight
                                           ? "bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)]"
                                           : "bg-amber-950/50 border-amber-900/60 text-amber-400 hover:bg-amber-900/40 hover:text-amber-300 hover:border-amber-500/50 shadow-[0_0_12px_rgba(234,179,8,0.2)]"
@@ -3535,10 +3535,10 @@ export default function App() {
                             <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500 mb-2">
                               🌱
                             </div>
-                            <p className={`font-bold text-[9px] uppercase tracking-wider ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
+                            <p className={`font-bold text-xs uppercase tracking-wider ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
                               No Days Found
                             </p>
-                            <p className="text-[8px] text-zinc-500 max-w-[180px] mt-1 leading-normal">
+                            <p className="text-xs text-zinc-500 max-w-[180px] mt-1 leading-normal">
                               All operational loads are clear of this impact level.
                             </p>
                           </div>
@@ -3585,7 +3585,7 @@ export default function App() {
                                 : ""
                             }`}
                           >
-                            <div className="flex justify-between items-center text-[10px] gap-2">
+                            <div className="flex justify-between items-center text-xs gap-2">
                               <div className="flex items-center gap-1.5 min-w-[70px]">
                                 <div
                                   className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-amber-500 transition-colors"
@@ -3643,7 +3643,7 @@ export default function App() {
                                 >
                                   {item.day.substring(0, 3)}
                                   <span
-                                    className={`text-[8px] font-normal font-mono ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                                    className={`text-xs font-normal font-mono ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
                                   >
                                     ({item.date})
                                   </span>
@@ -3674,7 +3674,7 @@ export default function App() {
 
                                     return (
                                       <span
-                                        className={`text-[7.5px] font-mono leading-none py-0.5 px-1.5 rounded-md border font-extrabold uppercase inline-flex items-center gap-1 shrink-0 ${badgeClass}`}
+                                        className={`text-xs font-mono leading-none py-0.5 px-1.5 rounded-md border font-extrabold uppercase inline-flex items-center gap-1 shrink-0 ${badgeClass}`}
                                       >
                                         <span className={`w-1 h-1 rounded-full ${dotClass} animate-pulse`} />
                                         {badgeText}
@@ -3782,7 +3782,7 @@ export default function App() {
                                     if (diff > 0) {
                                       return (
                                         <span
-                                          className="text-emerald-500 text-[8px] font-bold font-mono tracking-tighter flex items-center"
+                                          className="text-emerald-500 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title={`Up by +${diff}% from preceding day`}
                                         >
                                           ▲{diff}%
@@ -3791,7 +3791,7 @@ export default function App() {
                                     } else if (diff < 0) {
                                       return (
                                         <span
-                                          className="text-rose-500 text-[8px] font-bold font-mono tracking-tighter flex items-center"
+                                          className="text-rose-500 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title={`Down by ${diff}% from preceding day`}
                                         >
                                           ▼{Math.abs(diff)}%
@@ -3800,7 +3800,7 @@ export default function App() {
                                     } else {
                                       return (
                                         <span
-                                          className="text-zinc-600 text-[8px] font-bold font-mono tracking-tighter flex items-center"
+                                          className="text-zinc-600 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title="Stable relative to preceding day"
                                         >
                                           ■0%
@@ -3810,7 +3810,7 @@ export default function App() {
                                   })()
                                 ) : (
                                   <span
-                                    className="text-zinc-600 text-[8px] font-bold font-mono tracking-tighter"
+                                    className="text-zinc-600 text-xs font-bold font-mono tracking-tighter"
                                     title="First day of active week sequence"
                                   >
                                     •
@@ -3821,22 +3821,22 @@ export default function App() {
                               {/* Right side: capacity percentages */}
                               <div className="flex items-center gap-1 shrink-0 text-right min-w-[55px] justify-end">
                                 <span
-                                  className="text-zinc-500 text-[8px]"
+                                  className="text-zinc-500 text-xs"
                                   title="Current"
                                 >
                                   {item.current}%
                                 </span>
-                                <span className="text-zinc-600 text-[8px] select-none">
+                                <span className="text-zinc-600 text-xs select-none">
                                   →
                                 </span>
                                 <span
-                                  className={`font-bold text-[10px] ${isBottleneck ? "text-amber-400 font-bold" : item.projected >= item.current ? "text-orange-400" : "text-orange-500/80"}`}
+                                  className={`font-bold text-xs ${isBottleneck ? "text-amber-400 font-bold" : item.projected >= item.current ? "text-orange-400" : "text-orange-500/80"}`}
                                   title="Projected"
                                 >
                                   {item.projected}%
                                 </span>
                                 <span
-                                  className="ml-0.5 text-[10px] font-bold"
+                                  className="ml-0.5 text-xs font-bold"
                                   title={`Trend relative to weekly average (${avgWeeklyProjected}%)`}
                                 >
                                   {item.projected > avgWeeklyProjected ? (
@@ -3905,7 +3905,7 @@ export default function App() {
                                     : "bg-yellow-950/5 border-yellow-900/10"
                                 }`}
                               >
-                                <div className="flex justify-between items-center text-[7.5px] font-mono leading-none">
+                                <div className="flex justify-between items-center text-xs font-mono leading-none">
                                   <div className="flex items-center gap-0.5 text-zinc-500">
                                     <span>AI:</span>
                                     <span
@@ -4006,7 +4006,7 @@ export default function App() {
                                       )
                                     }
                                     type="button"
-                                    className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
+                                    className={`text-xs px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
                                       !capacityOverrides[item.day] ||
                                       capacityOverrides[item.day].mode === "ai"
                                         ? "bg-amber-500 text-zinc-950 shadow-sm font-extrabold"
@@ -4025,7 +4025,7 @@ export default function App() {
                                       )
                                     }
                                     type="button"
-                                    className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
+                                    className={`text-xs px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
                                       capacityOverrides[item.day]?.mode ===
                                       "manual"
                                         ? "bg-orange-500 text-white shadow-sm font-extrabold"
@@ -4045,7 +4045,7 @@ export default function App() {
                                       onClick={() =>
                                         handleClearSingleOverride(item.day)
                                       }
-                                      className="text-[7px] text-zinc-500 hover:text-amber-500 font-mono uppercase tracking-widest underline decoration-dotted transition-colors mr-1 cursor-pointer active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+                                      className="text-xs text-zinc-500 hover:text-amber-500 font-mono uppercase tracking-widest underline decoration-dotted transition-colors mr-1 cursor-pointer active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
                                       title="Reset to AI Forecast"
                                     >
                                       Reset AI
@@ -4069,7 +4069,7 @@ export default function App() {
                                       style={{ accentColor: "#f97316" }}
                                     />
                                     <div className="flex flex-col items-end shrink-0 w-8">
-                                      <span className="font-mono text-[8px] font-bold text-orange-500 text-right">
+                                      <span className="font-mono text-xs font-bold text-orange-500 text-right">
                                         {capacityOverrides[item.day]?.value}%
                                       </span>
                                       {(() => {
@@ -4083,7 +4083,7 @@ export default function App() {
                                           const isPos = delta > 0;
                                           return (
                                             <span
-                                              className={`font-mono text-[6.5px] font-extrabold ${isPos ? "text-rose-500" : "text-emerald-500"}`}
+                                              className={`font-mono text-xs font-extrabold ${isPos ? "text-rose-500" : "text-emerald-500"}`}
                                             >
                                               {isPos ? "+" : ""}
                                               {delta}%
@@ -4095,7 +4095,7 @@ export default function App() {
                                     </div>
                                   </div>
                                 ) : (
-                                  <span className="text-[7px] text-zinc-400 italic font-mono uppercase tracking-wide">
+                                  <span className="text-xs text-zinc-400 italic font-mono uppercase tracking-wide">
                                     forecast active
                                   </span>
                                 )}
@@ -4110,7 +4110,7 @@ export default function App() {
                                   duration: 0.25,
                                   ease: "easeInOut",
                                 }}
-                                className={`mt-2 overflow-hidden text-[9.5px] border-t pt-2 space-y-1.5 ${
+                                className={`mt-2 overflow-hidden text-xs border-t pt-2 space-y-1.5 ${
                                   isLight
                                     ? "border-zinc-200 shadow-inner"
                                     : "border-zinc-800/60 shadow-inner"
@@ -4124,7 +4124,7 @@ export default function App() {
                                   }`}
                                 >
                                   <span>Top Contributing Production Items</span>
-                                  <span className="font-mono text-[8px] uppercase tracking-wider">
+                                  <span className="font-mono text-xs uppercase tracking-wider">
                                     Qty / Impact
                                   </span>
                                 </div>
@@ -4173,7 +4173,7 @@ export default function App() {
                                               {prodItem.name}
                                             </span>
                                             <span
-                                              className={`text-[8px] font-normal truncate ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                                              className={`text-xs font-normal truncate ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                                             >
                                               {prodItem.category}
                                             </span>
@@ -4182,18 +4182,18 @@ export default function App() {
                                         <div className="flex items-center gap-2 shrink-0">
                                           <div className="text-right flex flex-col">
                                             <span
-                                              className={`font-bold font-mono text-[9px] ${isLight ? "text-zinc-800" : "text-zinc-300"}`}
+                                              className={`font-bold font-mono text-xs ${isLight ? "text-zinc-800" : "text-zinc-300"}`}
                                             >
                                               {prodItem.quantity} units
                                             </span>
                                             <span
-                                              className={`text-[8px] font-mono font-medium ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                                              className={`text-xs font-mono font-medium ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                                             >
                                               {prodItem.loadShare}% Share
                                             </span>
                                           </div>
                                           <span
-                                            className={`text-[7.5px] font-mono uppercase px-1.5 py-0.5 rounded-md border font-extrabold ${badgeColor}`}
+                                            className={`text-xs font-mono uppercase px-1.5 py-0.5 rounded-md border font-extrabold ${badgeColor}`}
                                           >
                                             {prodItem.impact}
                                           </span>
@@ -4212,14 +4212,14 @@ export default function App() {
 
                   {/* Summary Legend explaining Impact levels */}
                   <div
-                    className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[8.5px] ${
+                    className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs ${
                       isLight
                         ? "border-zinc-200 text-zinc-500"
                         : "border-zinc-800/60 text-zinc-400"
                     }`}
                   >
-                    <span className="font-sans font-bold uppercase tracking-wider text-[7.5px] flex items-center gap-1">
-                      <span className="text-[10px]">💡</span> Item Impact
+                    <span className="font-sans font-bold uppercase tracking-wider text-xs flex items-center gap-1">
+                      <span className="text-xs">💡</span> Item Impact
                       Legend:
                     </span>
                     <div className="flex items-center gap-1">
@@ -4272,7 +4272,7 @@ export default function App() {
 
           {/* Footer info links */}
           <div
-            className={`p-4 border-t static transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
+            className={`p-2.5 border-t shrink-0 transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
           >
             <div className="flex items-center gap-2.5">
               <div
@@ -4296,7 +4296,7 @@ export default function App() {
                   className={`w-2 h-2 rounded-full ${isFirebaseSynced ? "bg-emerald-500 animate-pulse" : "bg-orange-500"} absolute -bottom-0.5 -right-0.5 border ${isLight ? "border-zinc-100" : "border-zinc-950"}`}
                 />
               </div>
-              <div className="text-[11px] leading-tight flex-1 min-w-0">
+              <div className="text-xs leading-tight flex-1 min-w-0">
                 <p
                   className={`font-semibold truncate ${isLight ? "text-zinc-900 font-bold" : "text-white"}`}
                   title={currentUser?.username || ""}
@@ -4307,7 +4307,7 @@ export default function App() {
                   <select
                     value={userRole}
                     onChange={(e) => setUserRole(e.target.value as any)}
-                    className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
+                    className={`bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
                       isLight
                         ? "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold"
                         : "text-zinc-500 hover:text-zinc-300"
@@ -4318,14 +4318,14 @@ export default function App() {
                     <option value="Staff">Staff</option>
                     <option value="User">User</option>
                   </select>
-                  <span className="text-zinc-500 font-mono text-[8px]">•</span>
+                  <span className="text-zinc-500 font-mono text-xs">•</span>
                   <button
                     onClick={async () => {
                       localStorage.removeItem("localCurrentUser");
                       setCurrentUser(null);
                       await signOut(auth).catch(() => {});
                     }}
-                    className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
+                    className={`text-xs font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
                       isLight ? "text-zinc-500 font-bold" : "text-zinc-400"
                     }`}
                     title="Sign Out"
@@ -4358,7 +4358,7 @@ export default function App() {
               {tabMeta.find((t) => t.id === activeTab)?.label || activeTab} View
             </h2>
             <span
-              className={`hidden lg:inline-block text-[9px] font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
+              className={`hidden lg:inline-block text-xs font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
                 isLight
                   ? "bg-zinc-100 text-zinc-600 border-zinc-200"
                   : "bg-zinc-900 text-zinc-400 border-zinc-800"
@@ -4376,14 +4376,14 @@ export default function App() {
               }`}
             >
               <span
-                className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                className={`text-xs font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
               >
                 Store:
               </span>
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value as any)}
-                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-xs sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
                 style={{ outline: "none" }}
               >
                 <option
@@ -4410,7 +4410,7 @@ export default function App() {
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
+              <span className="text-xs font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
                 🇮🇪 Ireland Time (Dublin)
               </span>
               <span
@@ -4440,8 +4440,8 @@ export default function App() {
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto bg-transparent">
-          <div className="max-w-7xl mx-auto">{renderActiveView()}</div>
+        <main className="flex-1 p-6 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
+          <div className="max-w-7xl mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
         </main>
       </div>
 
@@ -4462,7 +4462,7 @@ export default function App() {
               Schedule Capacity Summary PDF
             </h3>
             <p
-              className={`text-[10px] uppercase font-mono font-bold tracking-widest mt-2 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+              className={`text-xs uppercase font-mono font-bold tracking-widest mt-2 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
             >
               Automated Report Delivery
             </p>
@@ -4470,14 +4470,14 @@ export default function App() {
             <div className="mt-5 space-y-4">
               <div className="flex flex-col gap-1.5">
                 <label
-                  className={`text-[9px] font-bold uppercase tracking-wider font-mono ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                  className={`text-xs font-bold uppercase tracking-wider font-mono ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
                 >
                   Delivery Frequency
                 </label>
                 <div className="flex bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-1">
                   <button
                     onClick={() => setReportFrequency("daily")}
-                    className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
+                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
                       reportFrequency === "daily"
                         ? "bg-rose-500 text-white shadow"
                         : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
@@ -4487,7 +4487,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setReportFrequency("weekly")}
-                    className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
+                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
                       reportFrequency === "weekly"
                         ? "bg-rose-500 text-white shadow"
                         : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
@@ -4499,7 +4499,7 @@ export default function App() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label
-                  className={`text-[9px] font-bold uppercase tracking-wider font-mono flex gap-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                  className={`text-xs font-bold uppercase tracking-wider font-mono flex gap-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
                 >
                   Target Email Address
                   <span className="text-rose-500">*</span>
@@ -4521,7 +4521,7 @@ export default function App() {
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800">
               <button
                 onClick={() => setIsScheduleReportModalOpen(false)}
-                className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded transition-colors ${
+                className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider font-mono rounded transition-colors ${
                   isLight
                     ? "text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
                     : "text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800"
@@ -4540,7 +4540,7 @@ export default function App() {
                   }
                 }}
                 disabled={!reportEmailAddress}
-                className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
+                className="flex-[2] py-2 text-xs font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
               >
                 <Clock className="w-3 h-3" />
                 Activate Schedule
