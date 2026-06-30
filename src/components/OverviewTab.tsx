@@ -1640,7 +1640,7 @@ export default function OverviewTab({
                         setCompareBranchA(e.target.value);
                         setCompareMode("twoBranches");
                       }}
-                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
                         isLight
                           ? "bg-zinc-50 border-zinc-200 text-zinc-900"
                           : "bg-zinc-900 border-zinc-800 text-white"
@@ -1666,7 +1666,7 @@ export default function OverviewTab({
                         setCompareBranchB(e.target.value);
                         setCompareMode("twoBranches");
                       }}
-                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
                         isLight
                           ? "bg-zinc-50 border-zinc-200 text-zinc-900"
                           : "bg-zinc-900 border-zinc-800 text-white"

@@ -401,7 +401,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 value={taskItem}
                 onChange={e => setTaskItem(e.target.value)}
                 placeholder="e.g. Classic Cod Slabs"
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-white"
+                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-white"
                 required
               />
             </div>
@@ -411,7 +411,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
               <select 
                 value={assignedTo}
                 onChange={e => setAssignedTo(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-zinc-300"
+                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-zinc-300"
               >
                 <option value="Chef Skipper">Chef Skipper (Grill)</option>
                 <option value="Chef Rico">Chef Rico (Fryer)</option>
@@ -428,7 +428,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                   min="1"
                   value={qty}
                   onChange={e => setQty(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-white"
+                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-white"
                   required
                 />
               </div>
@@ -437,7 +437,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 <select 
                   value={priority}
                   onChange={e => setPriority(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-zinc-300"
+                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-zinc-300"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -490,7 +490,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                <button
                  type="button"
                  onClick={handleUploadClick}
-                 className="flex items-center gap-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-mono font-bold text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
+                 className="flex items-center gap-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-mono font-bold text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all "
                >
                  <Upload className="w-3 h-3" />
                  Select
@@ -505,7 +505,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                   (auditorLoading || !selectedPhoto)
                     ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
                     : 'bg-zinc-800 hover:bg-zinc-700 text-white'
-                }`}
+                } hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all `}
               >
                 {auditorLoading ? 'INSPECTING...' : 'RUN AUDIT'}
               </button>

@@ -2111,7 +2111,7 @@ export default function App() {
           </div>
           {/* Mobile Menu Toggle Button */}
           <button
-            className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"}`}
+            className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"} hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all `}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -3131,7 +3131,7 @@ export default function App() {
                               {Object.keys(capacityOverrides).length > 0 && (
                                 <button
                                   onClick={handleResetOverrides}
-                                  className="hover:underline text-[8px] tracking-wider"
+                                  className="hover:underline text-[8px] tracking-wider hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all "
                                 >
                                   Reset All
                                 </button>
@@ -3641,7 +3641,7 @@ export default function App() {
                                         );
                                       }
                                     }}
-                                    className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-amber-500 focus:ring-2 cursor-pointer transition-colors accent-amber-500"
+                                    className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] focus:ring-2 cursor-pointer transition-colors accent-amber-500"
                                   />
                                 )}
                                 <span

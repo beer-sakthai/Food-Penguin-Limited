@@ -93,7 +93,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                 value={newItem}
                 onChange={e => setNewItem(e.target.value)}
                 placeholder="e.g. Flour, Packaging..."
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
                 required
               />
             </div>
@@ -106,7 +106,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                 onChange={e => setNewQty(e.target.value)}
                 min="1"
                 placeholder="0"
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
                 required
               />
             </div>
@@ -116,7 +116,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
               <select 
                 value={newFromBranch}
                 onChange={e => setNewFromBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Main Warehouse">Main Warehouse</option>
                 {branches.map(b => (
@@ -133,7 +133,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
               <select 
                 value={newToBranch}
                 onChange={e => setNewToBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
               >
                 {branches.map(b => (
                   <option key={b} value={b}>{b}</option>

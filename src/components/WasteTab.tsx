@@ -418,7 +418,7 @@ export default function WasteTab({
               <select 
                 value={newItem}
                 onChange={e => handleProductChange(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
               >
                 {products.map(p => (
                   <option key={p.name} value={p.name}>{p.name}</option>
@@ -435,7 +435,7 @@ export default function WasteTab({
                   min="0.1"
                   value={weight}
                   onChange={e => handleWeightChange(parseFloat(e.target.value))}
-                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
+                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
                   required
                 />
               </div>
@@ -456,7 +456,7 @@ export default function WasteTab({
               <select 
                 value={reason}
                 onChange={e => setReason(e.target.value as any)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Expired">Expired</option>
                 <option value="Overproduced">Overproduced</option>
@@ -486,7 +486,7 @@ export default function WasteTab({
              <select 
                 value={helpCat}
                 onChange={e => setHelpCat(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Seafood">Seafood</option>
                 <option value="Produce">Produce</option>
@@ -502,7 +502,7 @@ export default function WasteTab({
                   strategyLoading 
                     ? (isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed')
                     : 'bg-zinc-800 hover:bg-zinc-700 text-white dark:bg-zinc-800 dark:hover:bg-zinc-700'
-                }`}
+                } hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all `}
               >
                 {strategyLoading ? 'ANALYZING...' : 'GENERATE ADVICE'}
               </button>
