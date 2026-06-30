@@ -80,9 +80,9 @@ import {
 } from 'lucide-react';
 
 import { RotateCcw, Info, LogOut, GitCompare } from 'lucide-react';
-import { auth, db, handleFirestoreError, OperationType } from './firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, onSnapshot, setDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
+
+
+
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
   Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
@@ -166,7 +166,179 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
  const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff' | 'User'>('Admin');
   const [currentUser, setCurrentUser] = useState<{username: string, role: string, email?: string, photoURL?: string} | null>(null);
-  const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
+  
+
+  // Auth Listener
+  useEffect(() => {
+    useMemo } from 'react';
+import { jsPDF } from 'jspdf';
+import { Reorder, motion } from 'motion/react';
+import {
+ initialMetrics,
+ initialOrders,
+ initialTargets,
+ initialRecipes,
+ initialTasks,
+ initialWaste,
+ initialHours,
+ initialInventory,
+ initialWeeklyLogs,
+ alternativeWeeklyLogsMap,
+ initialAlerts
+} from './data';
+import {
+ CoreMetrics,
+ SalesOrder,
+ CompanyTarget,
+ Recipe,
+ ProductionTask,
+ WasteRecord,
+ EmployeeHour,
+ InventoryItem,
+ DailyOperationalLog,
+ RealtimeAlert
+} from './types';
+
+// Tab Views
+import OverviewTab from './components/OverviewTab';
+import SellTab from './components/SellTab';
+import TargetTab from './components/TargetTab';
+import StudioTab from './components/StudioTab';
+import ProductionTab from './components/ProductionTab';
+import WasteTab from './components/WasteTab';
+import HoursTab from './components/HoursTab';
+import PlanningTab from './components/PlanningTab';
+import EnergyTab from './components/EnergyTab';
+import SuppliersTab from './components/SuppliersTab';
+import FinanceTab from './components/FinanceTab';
+import RealtimeTab from './components/RealtimeTab';
+import ResourceAllocationTab from './components/ResourceAllocationTab';
+import ReportsTab from './components/ReportsTab';
+import LoginScreen from './components/LoginScreen';
+import { MS_PRODUCTS, TESCO_PRODUCTS } from './components/SellTab';
+import CapacityVarianceChart from './components/CapacityVarianceChart';
+
+
+// Main Icons
+import {
+  AlertTriangle, LayoutDashboard, Camera, Menu, X,
+  Coins,
+  Zap,
+  Package,
+  DollarSign,
+  ShieldCheck,
+  ChefHat,
+ Trash2,
+ CalendarDays,
+ Boxes,
+ Activity,
+ User,
+ Power,
+ Cpu,
+ GlassWater,
+ ChevronDown,
+ ChevronUp,
+ Download,
+ Sun,
+ Moon,
+ Wand2,
+ Sparkles,
+ SlidersHorizontal,
+ Mail,
+ Clock,
+ Store,
+  FileSpreadsheet,
+  GripVertical
+} from 'lucide-react';
+
+import { RotateCcw, Info, LogOut, GitCompare } from 'lucide-react';
+
+
+
+
+const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
+  Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
+  Manager: ['Overview', 'Realtime', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
+  Staff: ['Overview', 'Realtime', 'Sell', 'Production', 'Energy', 'Waste', 'Suppliers', 'Reports'],
+  User: ['Overview', 'Realtime'] // User can only view data
+};
+
+const getDayContributingItems = (day: string, projectedLoad: number) => {
+  const totalUnits = Math.round(projectedLoad * 12);
+  switch (day) {
+    case 'Mon':
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.45), category: 'Sushi Rolls', loadShare: 45, impact: 'High' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'Premium Sushi Rice Prep', quantity: Math.round(totalUnits * 0.20), category: 'Grains', loadShare: 20, impact: 'Low' }
+      ];
+    case 'Tue':
+      return [
+        { name: 'Spicy Bluefin Tuna Roll', quantity: Math.round(totalUnits * 0.50), category: 'Sushi Rolls', loadShare: 50, impact: 'High' },
+        { name: 'Kyoto Salmon Sashimi Platter', quantity: Math.round(totalUnits * 0.30), category: 'Sashimi & Platters', loadShare: 30, impact: 'Medium' },
+        { name: 'Nori Seaweed Processing', quantity: Math.round(totalUnits * 0.20), category: 'Dry Goods', loadShare: 20, impact: 'Low' }
+      ];
+    case 'Wed':
+      return [
+        { name: 'Volcano Baked Scallop Roll', quantity: Math.round(totalUnits * 0.40), category: 'Specialty Rolls', loadShare: 40, impact: 'High' },
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'Fresh Avocados Slicing', quantity: Math.round(totalUnits * 0.25), category: 'Produce', loadShare: 25, impact: 'Low' }
+      ];
+    case 'Thu':
+      return [
+        { name: 'Kyoto Salmon Sashimi Platter', quantity: Math.round(totalUnits * 0.45), category: 'Sashimi & Platters', loadShare: 45, impact: 'High' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'Sushi Seasoning Vinegar Mix', quantity: Math.round(totalUnits * 0.20), category: 'Condiments', loadShare: 20, impact: 'Low' }
+      ];
+    case 'Fri':
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.55), category: 'Sushi Rolls', loadShare: 55, impact: 'Critical' },
+        { name: 'Spicy Bluefin Tuna Roll', quantity: Math.round(totalUnits * 0.30), category: 'Sushi Rolls', loadShare: 30, impact: 'Medium' },
+        { name: 'Bluefin Tuna Loin Portioning', quantity: Math.round(totalUnits * 0.15), category: 'Seafood', loadShare: 15, impact: 'Low' }
+      ];
+    case 'Sat':
+      return [
+        { name: 'Volcano Baked Scallop Roll', quantity: Math.round(totalUnits * 0.45), category: 'Specialty Rolls', loadShare: 45, impact: 'High' },
+        { name: 'Kyoto Salmon Sashimi Platter', quantity: Math.round(totalUnits * 0.40), category: 'Sashimi & Platters', loadShare: 40, impact: 'High' },
+        { name: 'Atlantic Sushi Salmon Slicing', quantity: Math.round(totalUnits * 0.15), category: 'Seafood', loadShare: 15, impact: 'Low' }
+      ];
+    case 'Sun':
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.40), category: 'Sushi Rolls', loadShare: 40, impact: 'High' },
+        { name: 'Spicy Bluefin Tuna Roll', quantity: Math.round(totalUnits * 0.35), category: 'Sushi Rolls', loadShare: 35, impact: 'Medium' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.25), category: 'Sushi Rolls', loadShare: 25, impact: 'Low' }
+      ];
+    default:
+      return [
+        { name: 'Tokyo Dragon Roll', quantity: Math.round(totalUnits * 0.50), category: 'Sushi Rolls', loadShare: 50, impact: 'High' },
+        { name: 'California Roll Classic', quantity: Math.round(totalUnits * 0.50), category: 'Sushi Rolls', loadShare: 50, impact: 'Medium' }
+      ];
+  }
+};
+
+export default function App() {
+ // App States
+ const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+ try {
+ return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
+ } catch {
+ return 'dark';
+ }
+ });
+
+ const toggleTheme = () => {
+ const nextTheme = theme === 'dark' ? 'light' : 'dark';
+ setTheme(nextTheme);
+ try {
+ localStorage.setItem('theme', nextTheme);
+ } catch (_) {}
+ };
+
+ const [activeTab, setActiveTab] = useState<string>('Overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+ const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff' | 'User'>('Admin');
+  const [currentUser, setCurrentUser] = useState<{username: string, role: string, email?: string, photoURL?: string} | null>(null);
+  
 
   // Auth Listener
   useEffect(() => {
@@ -197,140 +369,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Firestore Sync Listener
-  useEffect(() => {
-    if (!currentUser || !currentUser.email || currentUser.email === 'demo@foodpenguin.com') {
-      setIsFirebaseSynced(false);
-      return;
-    }
-
-    const unsubscribeList: (() => void)[] = [];
-
-    const syncCollection = async <T extends { id: string }>(
-      colName: string,
-      initialData: T[],
-      setList: React.Dispatch<React.SetStateAction<T[]>>,
-      opType: OperationType
-    ) => {
-      try {
-        const ref = collection(db, colName);
-        const snap = await getDocs(ref).catch(err => handleFirestoreError(err, OperationType.LIST, colName));
-        
-        if (snap.empty) {
-          // Seed initial data
-          for (const item of initialData) {
-            await setDoc(doc(db, colName, item.id), item).catch(err => handleFirestoreError(err, OperationType.WRITE, `${colName}/${item.id}`));
-          }
-        }
-
-        const unsub = onSnapshot(ref, (snapshot) => {
-          const list: T[] = [];
-          snapshot.forEach(doc => {
-            list.push(doc.data() as T);
-          });
-          setList(list);
-        }, (err) => handleFirestoreError(err, OperationType.GET, colName));
-        
-        unsubscribeList.push(unsub);
-      } catch (e) {
-        console.error(`Error syncing ${colName} with Firestore:`, e);
-      }
-    };
-
-    const initSync = async () => {
-      await syncCollection('orders', initialOrders, setOrders, OperationType.WRITE);
-      await syncCollection('tasks', initialTasks, setTasks, OperationType.WRITE);
-      await syncCollection('waste', initialWaste, setWasteRecords, OperationType.WRITE);
-      await syncCollection('targets', initialTargets, setTargets, OperationType.WRITE);
-      await syncCollection('hours', initialHours, setHoursData, OperationType.WRITE);
-      await syncCollection('inventory', initialInventory, setInventory, OperationType.WRITE);
-      setIsFirebaseSynced(true);
-    };
-
-    initSync();
-
-    return () => {
-      unsubscribeList.forEach(unsub => unsub());
-    };
-  }, [currentUser]);
-
- const [selectedBranch, setSelectedBranch] = useState<'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point'>('Marks & Spencer - Cork City');
- const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
- const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
- const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
-
- const recipes = useMemo<Recipe[]>(() => {
- const isMS = selectedBranch === 'Marks & Spencer - Cork City';
- const activeProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
-
- const getIngredients = (category: string, name: string) => {
- const lowerName = name.toLowerCase();
- if (lowerName.includes('salmon')) {
- return ['Atlantic Salmon Fillet', 'Fresh Wasabi Paste', 'Premium Sushi Rice', 'Grated Daikon Radish', 'Soy Sauce'];
- }
- if (lowerName.includes('chicken')) {
- return ['Free-range Chicken Fillet', 'Katsu Curry Sauce', 'Panko Breadcrumbs', 'Seasoned Jasmine Rice', 'Spring Onions'];
- }
- if (lowerName.includes('tofu') || lowerName.includes('veggie') || lowerName.includes('plant')) {
- return ['Pressed Silken Tofu', 'Fresh Avocado', 'Cucumber ribbon', 'Mixed Sesame seeds', 'Sweet Glaze Drizzle'];
- }
- if (category === 'Sushi Rolls' || category === 'Maki Rolls' || category === 'Nigiri Duos') {
- return ['Seasoned Hinohikari Rice', 'Premium Toasted Nori Sheets', 'Crispy Cucumber', 'Kyoto Japanese Mayo', 'Soy Glaze'];
- }
- if (category === 'Noodles & Sides' || lowerName.includes('noodles')) {
- return ['Fresh Udon Grains', 'Julienned Sweet Peppers', 'Savory Soy Brew sauce', 'Crushed Peanuts', 'Chili Flakes'];
- }
- if (category === 'Desserts & Sweets' || lowerName.includes('mochi')) {
- return ['Sweetened Rice Flour Paste', 'Artisanal Ice Cream Core', 'Powdered Starch coating', 'Natural Strawberry syrup'];
- }
- return ['Hand-picked Nori', 'Select Sushi Rice', 'Signature Dipping Sauce', 'Crisp Cucumber slice'];
- };
-
- const getAllergens = (category: string, name: string) => {
- const lowerName = name.toLowerCase();
- const allergens: string[] = [];
- if (lowerName.includes('salmon') || lowerName.includes('fish')) allergens.push('Fish');
- if (lowerName.includes('chicken')) allergens.push('Gluten');
- if (lowerName.includes('tofu') || lowerName.includes('veggie')) allergens.push('Soya');
- if (lowerName.includes('noodles') || lowerName.includes('gyoza') || lowerName.includes('katsu')) {
- if (!allergens.includes('Gluten')) allergens.push('Gluten');
- }
- if (lowerName.includes('mochi')) allergens.push('Milk');
- if (category.toLowerCase().includes('roll')) {
- allergens.push('Sesame');
- }
- if (allergens.length === 0) allergens.push('Soya');
- return allergens;
- };
-
- return activeProducts.map((p, idx) => ({
- id: `${isMS ? 'R-MS' : 'R-T'}-${idx + 1}`,
- name: p.name,
- category: p.category,
- status: 'active' as const,
- prepTime: Math.min(15, Math.max(3, Math.round(p.price * 1.2))),
- ingredients: getIngredients(p.category, p.name),
- allergens: getAllergens(p.category, p.name)
- }));
- }, [selectedBranch]);
-
- const [tasks, setTasks] = useState<ProductionTask[]>(initialTasks);
-
- // Sync tasks list with active branch products on branch switch
- useEffect(() => {
- if (isFirebaseSynced) return;
- const isMS = selectedBranch === 'Marks & Spencer - Cork City';
- const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
-
- if (products.length >= 4) {
- setTasks([
- { id: 'PT-301', itemName: products[0].name, assignedTo: 'Chef Skipper', status: 'Cooking', quantity: 2, priority: 'high' },
- { id: 'PT-302', itemName: products[1].name, assignedTo: 'Chef Private', status: 'Cooking', quantity: 1, priority: 'medium' },
- { id: 'PT-303', itemName: products[2].name, assignedTo: 'Kitchen Aide Rico', status: 'In Queue', quantity: 3, priority: 'low' },
- { id: 'PT-304', itemName: products[3 % products.length].name, assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 4, priority: 'high' }
- ]);
- }
- }, [selectedBranch, isFirebaseSynced]);
+  
 
  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
@@ -2358,7 +2397,7 @@ export default function App() {
  ) : (
    <User className="w-4 h-4" />
  )}
- <span className={`w-2 h-2 rounded-full ${isFirebaseSynced ? 'bg-emerald-500 animate-pulse' : 'bg-orange-500'} absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
+ 
  </div>
  <div className="text-[11px] leading-tight flex-1 min-w-0">
  <p className={`font-semibold truncate ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`} title={currentUser?.username || ''}>
