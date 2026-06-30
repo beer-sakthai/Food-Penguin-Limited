@@ -128,11 +128,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
 
           <button
             type="submit"
-<<<<<<< HEAD
             className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] shadow-md shadow-amber-500/10"
-=======
-            className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-md shadow-amber-500/10"
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
           >
             {isRegistering ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
             {isRegistering ? 'Create Account' : 'Sign In'}
@@ -150,15 +146,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <button
               type="button"
               onClick={handleGoogleSignIn}
-<<<<<<< HEAD
               className={`w-full flex items-center justify-center gap-3 py-3 rounded-xl border font-bold transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] focus:outline-none ${ isLight ? 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-50 hover:shadow-lg hover:shadow-yellow-500/5' : 'bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-850 hover:shadow-lg hover:shadow-yellow-500/10' }`}
-=======
-              className={`w-full flex items-center justify-center gap-3 py-3 rounded-xl border font-bold transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:outline-none ${
-                isLight 
-                  ? 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-50 hover:shadow-lg hover:shadow-yellow-500/5' 
-                  : 'bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-850 hover:shadow-lg hover:shadow-yellow-500/10'
-              }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
             >
               <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                 <path

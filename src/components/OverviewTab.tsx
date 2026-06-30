@@ -1424,17 +1424,8 @@ export default function OverviewTab({
  </div>
 
  {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
-<<<<<<< HEAD
  <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900' }`}>
  <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b ${ isLight ? 'border-zinc-200 border-zinc-200' : 'border-zinc-900' }`}>
-=======
- <div id="deep-advisor-panel" className={`rounded-3xl border p-6 shadow-sm font-sans transition-all duration-300 ${
- isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900'
- }`}>
- <div className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b ${
- isLight ? 'border-zinc-200 border-zinc-200' : 'border-zinc-900'
- }`}>
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  <div className="flex items-center gap-3">
  <div className={`p-3 border rounded-2xl text-orange-400 shadow-md ${ isLight ? 'bg-zinc-100 border-zinc-200 text-orange-600' : 'bg-zinc-900 border-zinc-800' }`}>
  <BrainCircuit className="w-6 h-6 animate-pulse" />
@@ -1442,13 +1433,7 @@ export default function OverviewTab({
  <div>
  <h2 className={`text-lg font-sans font-extrabold flex items-center gap-2 flex-wrap ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
  Deep Strategic Advisor
-<<<<<<< HEAD
  <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${ isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300' }`}>
-=======
- <span className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
- isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold' : 'bg-zinc-900 text-zinc-300'
- }`}>
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  gemini-3.1-pro-preview
  </span>
  <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">

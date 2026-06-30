@@ -1726,17 +1726,7 @@ export default function App() {
  <button
  onClick={() => setCompareModeEnabled(!compareModeEnabled)}
  type="button"
-<<<<<<< HEAD
  className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${ compareModeEnabled ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
-=======
- className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
- compareModeEnabled
- ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]'
- : isLight
- ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200'
- : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800'
- }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  >
  {compareModeEnabled ? 'COMPARE ON' : 'OFF'}
  </button>
@@ -1861,15 +1851,7 @@ export default function App() {
 	  whileHover={{ scale: 1.08 }}
 	  whileTap={{ scale: 0.95 }}
 	  transition={{ type: "spring", stiffness: 450, damping: 25 }}
-<<<<<<< HEAD
 	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${ isLight ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]' }`}
-=======
-	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${
-	    isLight 
-	      ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' 
-	      : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-	  }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
 	>
 	  {bottleneckThreshold}%
 	</motion.span>
@@ -2166,13 +2148,7 @@ export default function App() {
  animate={{ height: "auto", opacity: 1 }}
  exit={{ height: 0, opacity: 0 }}
  transition={{ type: "spring", stiffness: 350, damping: 28 }}
-<<<<<<< HEAD
  className={`mt-1.5 p-1.5 rounded-lg border flex flex-col gap-1 overflow-hidden transition-all duration-300 ${ isLight ? 'bg-yellow-50/40 border-yellow-200/50' : 'bg-yellow-950/5 border-yellow-900/10' }`}
-=======
- className={`mt-1.5 p-1.5 rounded-lg border flex flex-col gap-1 overflow-hidden transition-all duration-300 ${
- isLight ? 'bg-yellow-50/40 border-yellow-200/50' : 'bg-yellow-950/5 border-yellow-900/10'
- }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  >
  <div className="flex justify-between items-center text-[7.5px] font-mono leading-none">
  <div className="flex items-center gap-0.5 text-zinc-500">
@@ -2185,17 +2161,7 @@ export default function App() {
  </div>
  <div className="flex items-center gap-0.5 font-bold">
  <span className="text-zinc-500">Var:</span>
-<<<<<<< HEAD
  <span className={`px-1 rounded-sm ${ item.projected > item.initialAiForecast ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : item.projected < item.initialAiForecast ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : 'bg-zinc-500/10 text-zinc-500' }`}>
-=======
- <span className={`px-1 rounded-sm ${
- item.projected > item.initialAiForecast 
- ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
- : item.projected < item.initialAiForecast 
- ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' 
- : 'bg-zinc-500/10 text-zinc-500'
- }`}>
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  {item.projected > item.initialAiForecast ? `+${item.projected - item.initialAiForecast}` : item.projected - item.initialAiForecast}%
  </span>
  </div>
@@ -2210,15 +2176,7 @@ export default function App() {
  />
  {/* Animated Variance Bar Segment */}
  <motion.div 
-<<<<<<< HEAD
  className={`absolute h-full rounded ${ item.projected >= item.initialAiForecast ? 'bg-gradient-to-r from-yellow-500 to-amber-500 shadow-[0_0_6px_rgba(234,179,8,0.3)]' : 'bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(239,68,68,0.3)]' }`}
-=======
- className={`absolute h-full rounded ${
- item.projected >= item.initialAiForecast 
- ? 'bg-gradient-to-r from-yellow-500 to-amber-500 shadow-[0_0_6px_rgba(234,179,8,0.3)]' 
- : 'bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_6px_rgba(239,68,68,0.3)]'
- }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  animate={{ 
  left: `${Math.min(item.initialAiForecast, item.projected)}%`, 
  width: `${Math.abs(item.projected - item.initialAiForecast)}%` 
@@ -2227,13 +2185,7 @@ export default function App() {
  />
  {/* Spark mark at simulated point */}
  <motion.div 
-<<<<<<< HEAD
  className={`absolute w-0.5 h-2 rounded-full z-10 ${ item.projected >= item.initialAiForecast ? 'bg-amber-400' : 'bg-rose-400' }`}
-=======
- className={`absolute w-0.5 h-2 rounded-full z-10 ${
- item.projected >= item.initialAiForecast ? 'bg-amber-400' : 'bg-rose-400'
- }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  animate={{ left: `${item.projected}%` }}
  transition={{ type: "spring", stiffness: 350, damping: 28 }}
  />
@@ -2374,18 +2326,11 @@ export default function App() {
               </Reorder.Group>
 
               {/* Summary Legend explaining Impact levels */}
-<<<<<<< HEAD
               <div className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[8.5px] ${ isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800/60 text-zinc-400' }`}>
-=======
-              <div className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[8.5px] ${
-                isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800/60 text-zinc-400'
-              }`}>
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
                 <span className="font-sans font-bold uppercase tracking-wider text-[7.5px] flex items-center gap-1">
                   <span className="text-[10px]">💡</span> Item Impact Legend:
                 </span>
                 <div className="flex items-center gap-1">
-<<<<<<< HEAD
                   <span className={`w-2 h-2 rounded-sm border ${ isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/20 border-rose-900/40' }`} />
                   <span className={`font-mono font-bold ${isLight ? 'text-rose-600' : 'text-rose-400'}`}>Critical / High</span>
                 </div>
@@ -2395,23 +2340,6 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-1">
                   <span className={`w-2 h-2 rounded-sm border ${ isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-900/40' }`} />
-=======
-                  <span className={`w-2 h-2 rounded-sm border ${
-                    isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/20 border-rose-900/40'
-                  }`} />
-                  <span className={`font-mono font-bold ${isLight ? 'text-rose-600' : 'text-rose-400'}`}>Critical / High</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`w-2 h-2 rounded-sm border ${
-                    isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-950/20 border-amber-900/40'
-                  }`} />
-                  <span className={`font-mono font-bold ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>Medium</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`w-2 h-2 rounded-sm border ${
-                    isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-900/40'
-                  }`} />
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
                   <span className={`font-mono font-bold ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`}>Low Impact</span>
                 </div>
               </div>
@@ -2423,13 +2351,7 @@ export default function App() {
  {/* Footer info links */}
  <div className={`p-4 border-t static transition-colors duration-200 ${isLight ? 'border-zinc-200 bg-zinc-50/50' : 'border-zinc-900 bg-black/40'}`}>
  <div className="flex items-center gap-2.5">
-<<<<<<< HEAD
  <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${ isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800' }`}>
-=======
- <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${
- isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800'
- }`}>
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  {currentUser?.photoURL ? (
    <img src={currentUser.photoURL} alt={currentUser.username} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
  ) : (
@@ -2445,13 +2367,7 @@ export default function App() {
  <select 
  value={userRole} 
  onChange={(e) => setUserRole(e.target.value as any)}
-<<<<<<< HEAD
  className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300' }`}
-=======
- className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
- isLight ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300'
- }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
  >
  <option value="Admin">Admin</option>
  <option value="Manager">Manager</option>
@@ -2465,13 +2381,7 @@ export default function App() {
      setCurrentUser(null);
      await signOut(auth).catch(() => {});
    }}
-<<<<<<< HEAD
    className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${ isLight ? 'text-zinc-500 font-bold' : 'text-zinc-400' }`}
-=======
-   className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
-     isLight ? 'text-zinc-500 font-bold' : 'text-zinc-400'
-   }`}
->>>>>>> 9a5bd7838fd616c22d221895a7adcd149e740dc4
    title="Sign Out"
  >
    <LogOut className="w-2.5 h-2.5" />
