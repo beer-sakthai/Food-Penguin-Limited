@@ -29,6 +29,7 @@ import {
 
 // Tab Views
 import OverviewTab from "./components/OverviewTab";
+import AdvisorTab from "./components/AdvisorTab";
 import SellTab from "./components/SellTab";
 import TargetTab from "./components/TargetTab";
 import StudioTab from "./components/StudioTab";
@@ -82,7 +83,7 @@ import {
   GripVertical,
 } from "lucide-react";
 
-import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
+import { RotateCcw, Info, LogOut, GitCompare, BrainCircuit } from "lucide-react";
 import {
   auth,
   db,
@@ -104,6 +105,7 @@ const rolePermissions: Record<
 > = {
   Admin: [
     "Overview",
+    "Advisor",
     "Realtime",
     "Sell",
     "Target",
@@ -120,6 +122,7 @@ const rolePermissions: Record<
   ],
   Manager: [
     "Overview",
+    "Advisor",
     "Realtime",
     "Target",
     "Production",
@@ -135,6 +138,7 @@ const rolePermissions: Record<
   ],
   Staff: [
     "Overview",
+    "Advisor",
     "Realtime",
     "Sell",
     "Production",
@@ -143,7 +147,7 @@ const rolePermissions: Record<
     "Suppliers",
     "Reports",
   ],
-  User: ["Overview", "Realtime"], // User can only view data
+  User: ["Overview", "Advisor", "Realtime"], // User can only view data
 };
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
@@ -709,6 +713,35 @@ export default function App() {
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
   const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
+
+  // Automatically flags inventory items based on stock level and reorder thresholds
+  const autoFlagInventory = (items: InventoryItem[]): InventoryItem[] => {
+    return items.map((item) => {
+      let status: "Healthy" | "Low" | "Critical" = "Healthy";
+      if (item.stockLevel <= 20) {
+        status = "Critical";
+      } else if (item.stockLevel <= 50 || item.currentQty <= item.reorderLevel) {
+        status = "Low";
+      }
+      return { ...item, status };
+    });
+  };
+
+  const processedInventory = useMemo(() => {
+    return autoFlagInventory(inventory);
+  }, [inventory]);
+
+  const lowStockCount = useMemo(() => {
+    return processedInventory.filter(
+      (item) => item.status === "Low" || item.status === "Critical"
+    ).length;
+  }, [processedInventory]);
+
+  const lowStockItems = useMemo(() => {
+    return processedInventory.filter(
+      (item) => item.status === "Low" || item.status === "Critical"
+    );
+  }, [processedInventory]);
   const [selectedWeekRange, setSelectedWeekRange] = useState<string>(
     "2026-06-15 to 2026-06-21",
   );
@@ -1785,6 +1818,11 @@ export default function App() {
       icon: <LayoutDashboard className="w-4 h-4" />,
     },
     {
+      id: "Advisor",
+      label: "Strategic Advisor",
+      icon: <BrainCircuit className="w-4 h-4" />,
+    },
+    {
       id: "Realtime",
       label: "Real-time",
       icon: <Activity className="w-4 h-4" />,
@@ -1860,8 +1898,11 @@ export default function App() {
             selectedBranch={selectedBranch}
             theme={theme}
             metallicTheme={metallicTheme}
+            lowStockItems={lowStockItems}
           />
         );
+      case "Advisor":
+        return <AdvisorTab theme={theme} />;
       case "Realtime":
         return <RealtimeTab theme={theme} />;
       case "Sell": {
@@ -1927,7 +1968,7 @@ export default function App() {
       case "Planning":
         return (
           <PlanningTab
-            inventory={inventory}
+            inventory={processedInventory}
             onOrderRestock={handleOrderRestock}
             selectedBranch={selectedBranch}
             theme={theme}
@@ -1963,9 +2004,6 @@ export default function App() {
   };
 
   // Dynamic production system health calculation
-  const lowStockCount = inventory.filter(
-    (item) => item.status === "Low",
-  ).length;
   const targetDeficitCount = targets.filter(
     (t) => t.currentValue < t.targetValue * 0.7,
   ).length;
@@ -2288,19 +2326,26 @@ export default function App() {
                           : "bg-transparent border border-zinc-800"
                     }`}
                   />
-                  <span className="flex-1 flex items-center gap-2">
-                    <span
-                      className={
-                        isActive
-                          ? "text-orange-500"
-                          : isLight
-                            ? "text-zinc-400"
-                            : "text-zinc-500"
-                      }
-                    >
-                      {tab.icon}
+                  <span className="flex-1 flex items-center gap-2 justify-between">
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={
+                          isActive
+                            ? "text-orange-500"
+                            : isLight
+                              ? "text-zinc-400"
+                              : "text-zinc-500"
+                        }
+                      >
+                        {tab.icon}
+                      </span>
+                      {tab.label}
                     </span>
-                    {tab.label}
+                    {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
+                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
+                        {lowStockCount}
+                      </span>
+                    )}
                   </span>
                 </button>
               );

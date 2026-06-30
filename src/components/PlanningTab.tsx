@@ -23,6 +23,7 @@ interface PlanningTabProps {
 
 export default function PlanningTab({ inventory, onOrderRestock, selectedBranch, theme, weeklyLogs }: PlanningTabProps) {
  const isLight = theme === 'light';
+ const lowStockItems = inventory.filter(item => item.status === 'Low' || item.status === 'Critical');
  
  // Search Grounding states
  const [procurementQuery, setProcurementQuery] = useState('Current wholesale bulk price of wild cold-water Alaskan Cod slabs, and general ocean shipment bottlenecks.');
@@ -105,8 +106,27 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  return (
  <div className="grid grid-cols-1 gap-6">
 
- {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
+  {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
  <div className="space-y-6">
+
+ {lowStockItems.length > 0 && (
+  <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all duration-300 ${
+   isLight ? 'bg-amber-50 border-amber-200 text-amber-950 shadow-sm' : 'bg-amber-950/15 border border-amber-900/40 text-amber-200'
+  }`}>
+   <div className="flex items-center gap-3">
+    <div className={`p-2 rounded-lg ${isLight ? 'bg-amber-100 text-amber-700' : 'bg-amber-950/60 text-amber-400'}`}>
+     <AlertTriangle className="w-4 h-4 animate-bounce text-amber-500" />
+    </div>
+    <div>
+     <p className="text-xs font-black">Restock Warning: {lowStockItems.length} Raw Materials Low</p>
+     <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Automated safety threshold triggers active. Please initialize the supply chain order restock procedure below.</p>
+    </div>
+   </div>
+   <span className="px-2.5 py-1 rounded bg-amber-500 text-zinc-950 text-[10px] font-mono font-black uppercase tracking-wider animate-pulse shrink-0">
+    Action Needed
+   </span>
+  </div>
+ )}
 
  {/* Stock Level Matrix */}
  <div className={`rounded-xl border p-5 shadow-sm transition-all ${

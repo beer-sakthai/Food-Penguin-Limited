@@ -5,6 +5,7 @@ import {
   CompanyTarget,
   DailyOperationalLog,
   SalesOrder,
+  InventoryItem,
 } from "../types";
 import {
   TrendingUp,
@@ -21,6 +22,7 @@ import {
   Calendar,
   Layers,
   Activity,
+  AlertTriangle,
 } from "lucide-react";
 import {
   AreaChart,
@@ -55,6 +57,7 @@ interface OverviewTabProps {
   selectedBranch: string;
   theme?: "dark" | "light";
   metallicTheme?: "gold" | "silver" | "copper";
+  lowStockItems?: InventoryItem[];
 }
 
 export default function OverviewTab({
@@ -72,14 +75,9 @@ export default function OverviewTab({
   selectedBranch,
   theme = "dark",
   metallicTheme = "gold",
+  lowStockItems = [],
 }: OverviewTabProps) {
   const isLight = theme === "light";
-  const [strategicPrompt, setStrategicPrompt] = useState(
-    "Synthesize an optimization plan for premium Sushi production to reduce Tazaki and Sysco transport delays by 12% while keeping active kitchen seafood waste indexes below 3% under Dublin humid weather.",
-  );
-  const [advisorResponse, setAdvisorResponse] = useState<string>("");
-  const [thinkingProcess, setThinkingProcess] = useState<string>("");
-  const [loading, setLoading] = useState(false);
 
   // Gemini Shift Summary states
   const [shiftSummary, setShiftSummary] = useState<string>("");
@@ -288,33 +286,6 @@ export default function OverviewTab({
       log.cogs.sticker +
       log.cogs.others,
   }));
-
-  const handleAskAdvisor = async () => {
-    if (!strategicPrompt.trim()) return;
-    setLoading(true);
-    setAdvisorResponse("");
-    setThinkingProcess("");
-    try {
-      const res = await fetch("/api/gemini/strategic-advisor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: strategicPrompt }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        setAdvisorResponse(`Error: ${data.error}`);
-      } else {
-        setAdvisorResponse(data.text);
-        if (data.thinking) {
-          setThinkingProcess(data.thinking);
-        }
-      }
-    } catch (err: any) {
-      setAdvisorResponse(`Connection error: ${err.message || err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const salesHistory = weeklyLogs.map((log) => ({
     day: log.day,
@@ -684,6 +655,53 @@ export default function OverviewTab({
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className="space-y-6"
       >
+        {/* Low Stock Alerts Notification Banner */}
+        {lowStockItems.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`p-5 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
+              isLight
+                ? "bg-amber-50 border-amber-200 text-amber-950 shadow-sm"
+                : "bg-amber-950/15 border border-amber-900/40 text-amber-200"
+            }`}
+          >
+            <div className="flex items-start gap-3.5">
+              <div
+                className={`p-2.5 rounded-2xl ${
+                  isLight
+                    ? "bg-amber-100 text-amber-800"
+                    : "bg-amber-950/60 text-amber-400 border border-amber-900/30"
+                } flex shrink-0`}
+              >
+                <AlertTriangle className="w-5 h-5 animate-bounce text-amber-500" />
+              </div>
+              <div>
+                <h4 className="text-sm font-black tracking-tight">
+                  Critical Inventory Warning: {lowStockItems.length}{" "}
+                  {lowStockItems.length === 1 ? "Item" : "Items"} with Low Stock
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                  The following raw materials are currently below minimum safety
+                  levels:{" "}
+                  <span className="font-extrabold text-amber-600 dark:text-amber-400">
+                    {lowStockItems
+                      .map((item) => `${item.name} (${item.currentQty} ${item.unit})`)
+                      .join(", ")}
+                  </span>
+                  .
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => onNavigateTab("Planning")}
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs rounded-xl shadow-md transition-all hover:-translate-y-0.5 active:scale-[0.98] shrink-0 cursor-pointer"
+            >
+              Review & Restock Planning
+            </button>
+          </motion.div>
+        )}
+
         {/* Weekday Quick Select Tabs */}
         <div
           className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${
@@ -2712,156 +2730,6 @@ export default function OverviewTab({
             </form>
           </div>
 
-          {/* Deep Advisor: "Enable high thinking" with gemini-3.1-pro-preview */}
-          <div
-            id="deep-advisor-panel"
-            className={`gold-liner-box p-6 font-sans transition-all duration-300 ${
-              isLight ? "bg-white" : "bg-zinc-950/90"
-            }`}
-          >
-            <div
-              className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b ${
-                isLight ? "border-zinc-200 border-zinc-200" : "border-zinc-900"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 border rounded-2xl text-orange-400 shadow-md ${
-                    isLight
-                      ? "bg-zinc-100 border-zinc-200 text-orange-600"
-                      : "bg-zinc-900 border-zinc-800"
-                  }`}
-                >
-                  <BrainCircuit className="w-6 h-6 animate-pulse" />
-                </div>
-                <div>
-                  <h2
-                    className={`text-lg font-sans font-extrabold flex items-center gap-2 flex-wrap ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                  >
-                    Deep Strategic Advisor
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono select-none ${
-                        isLight
-                          ? "bg-zinc-100 border border-zinc-200 text-zinc-700 font-bold"
-                          : "bg-zinc-900 text-zinc-300"
-                      }`}
-                    >
-                      gemini-3.1-pro-preview
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-mono select-none animate-pulse">
-                      Thinking Level: HIGH
-                    </span>
-                  </h2>
-                  <p className="text-xs text-zinc-500">
-                    Provide complex operational complications for multi-faceted
-                    reasoning solutions
-                  </p>
-                </div>
-              </div>
-              <span className="text-[11px] text-zinc-500 font-mono sm:text-right">
-                Uses deep thinking tree solver
-              </span>
-            </div>
-
-            <div className="space-y-4 mt-4">
-              <textarea
-                value={strategicPrompt}
-                onChange={(e) => setStrategicPrompt(e.target.value)}
-                className={`w-full h-24 p-3 border shadow-inner transition-all duration-350 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 font-sans rounded-2xl ${
-                  isLight
-                    ? "border-zinc-300 bg-white text-zinc-900"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-100"
-                }`}
-                placeholder="Introduce multi-layered logistic, resource, target, or supply complications..."
-              />
-
-              <div className="flex justify-end items-center">
-                <button
-                  onClick={handleAskAdvisor}
-                  disabled={loading}
-                  className={`px-5 py-2.5 border rounded-xl transition-all inline-flex items-center gap-2 shadow-md  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-[1.01] ${
-                    isLight
-                      ? "bg-zinc-100 hover:bg-zinc-200 border-zinc-300 border-zinc-300 text-zinc-800 hover:text-zinc-900 font-bold text-xs"
-                      : "bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs"
-                  }`}
-                >
-                  {loading ? (
-                    <>
-                      <span
-                        className={`w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin ${
-                          isLight
-                            ? "border-zinc-400 border-t-zinc-800"
-                            : "border-white/30 border-t-white"
-                        }`}
-                      />
-                      Generating High Thinking Report...
-                    </>
-                  ) : (
-                    <>
-                      <BrainCircuit className="w-3.5 h-3.5" />
-                      Compute Strategic Assessment
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Thinking process & Advice displays */}
-              {thinkingProcess && (
-                <div
-                  className={`p-4 rounded-2xl space-y-2 border ${
-                    isLight
-                      ? "bg-orange-50/40 border-orange-200/80 text-zinc-800"
-                      : "bg-orange-950/25 border border-orange-900/60"
-                  }`}
-                >
-                  <span
-                    className={`text-[10px] uppercase font-mono tracking-wider font-extrabold block ${
-                      isLight ? "text-orange-700" : "text-orange-400"
-                    }`}
-                  >
-                    🧠 Thinking Process Summary (Reasoning Path):
-                  </span>
-                  <p
-                    className={`text-xs font-mono leading-relaxed whitespace-pre-wrap ${
-                      isLight ? "text-zinc-600" : "text-orange-200"
-                    }`}
-                  >
-                    {thinkingProcess}
-                  </p>
-                </div>
-              )}
-
-              {advisorResponse && (
-                <div
-                  className={`border rounded-2xl p-6 shadow-inner space-y-3 transition-colors ${
-                    isLight
-                      ? "bg-zinc-50 border-zinc-200"
-                      : "bg-zinc-900 border-zinc-800"
-                  }`}
-                >
-                  <div
-                    className={`flex items-center gap-1.5 border-b pb-2 ${
-                      isLight ? "border-zinc-200" : "border-zinc-800"
-                    }`}
-                  >
-                    <Lightbulb className="w-4 h-4 text-emerald-500" />
-                    <span
-                      className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                    >
-                      Formulated Corporate Strategy:
-                    </span>
-                  </div>
-                  <div
-                    className={`text-xs font-sans leading-relaxed whitespace-pre-wrap ${
-                      isLight ? "text-zinc-700" : "text-zinc-300"
-                    }`}
-                  >
-                    {advisorResponse}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </motion.div>
     </div>
