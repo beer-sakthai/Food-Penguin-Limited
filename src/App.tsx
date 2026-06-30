@@ -352,12 +352,12 @@ export default function App() {
   });
 
   const [metallicTheme, setMetallicTheme] = useState<
-    "gold" | "silver" | "copper"
+    "gold" | "silver" | "copper" | "crystal"
   >(() => {
     try {
       return (
         (localStorage.getItem("metallicTheme") as
-          "gold" | "silver" | "copper") || "gold"
+          "gold" | "silver" | "copper" | "crystal") || "gold"
       );
     } catch {
       return "gold";
@@ -372,7 +372,9 @@ export default function App() {
     } catch (_) {}
   };
 
-  const changeMetallicTheme = (metal: "gold" | "silver" | "copper") => {
+  const changeMetallicTheme = (
+    metal: "gold" | "silver" | "copper" | "crystal",
+  ) => {
     setMetallicTheme(metal);
     try {
       localStorage.setItem("metallicTheme", metal);
@@ -399,6 +401,7 @@ export default function App() {
     if (forceGold) return "gold-liner-box";
     if (metallicTheme === "silver") return "silver-liner-box";
     if (metallicTheme === "copper") return "copper-liner-box";
+    if (metallicTheme === "crystal") return "crystal-liner-box";
     return "gold-liner-box";
   };
 
