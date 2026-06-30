@@ -80,9 +80,9 @@ import {
 } from 'lucide-react';
 
 import { RotateCcw, Info, LogOut, GitCompare } from 'lucide-react';
-import { auth, db, handleFirestoreError, OperationType } from './firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, onSnapshot, setDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
+
+
+
 
 const rolePermissions: Record<'Admin' | 'Manager' | 'Staff' | 'User', string[]> = {
   Admin: ['Overview', 'Realtime', 'Sell', 'Target', 'Production', 'Waste', 'Hours', 'Planning', 'Allocation', 'Energy', 'Suppliers', 'Finance', 'Studio', 'Reports'],
@@ -166,7 +166,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
  const [userRole, setUserRole] = useState<'Admin' | 'Manager' | 'Staff' | 'User'>('Admin');
   const [currentUser, setCurrentUser] = useState<{username: string, role: string, email?: string, photoURL?: string} | null>(null);
-  const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
+  
 
   // Auth Listener
   useEffect(() => {
@@ -2358,7 +2358,7 @@ export default function App() {
  ) : (
    <User className="w-4 h-4" />
  )}
- <span className={`w-2 h-2 rounded-full ${isFirebaseSynced ? 'bg-emerald-500 animate-pulse' : 'bg-orange-500'} absolute -bottom-0.5 -right-0.5 border ${isLight ? 'border-zinc-100' : 'border-zinc-950'}`} />
+ 
  </div>
  <div className="text-[11px] leading-tight flex-1 min-w-0">
  <p className={`font-semibold truncate ${isLight ? 'text-zinc-900 font-bold' : 'text-white'}`} title={currentUser?.username || ''}>
