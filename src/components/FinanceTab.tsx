@@ -12,7 +12,7 @@ import {
   YAxis,
   CartesianGrid
 } from 'recharts';
-import { DollarSign, Target, Activity, Calendar, Layers, Save } from 'lucide-react';
+import { DollarSign, Target, Activity, Calendar, Layers, Save, Settings } from 'lucide-react';
 import { DailyOperationalLog } from '../types';
 
 interface FinanceTabProps {
