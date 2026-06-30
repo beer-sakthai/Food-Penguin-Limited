@@ -104,7 +104,7 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  };
 
  return (
- <div className="grid w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+ <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
   {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
  <div className="space-y-6">
@@ -224,11 +224,12 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  )})}
  </div>
  </div>
+  </div>
 
- {/* Capacity Analytics visual component */}
- <CapacityAnalytics weeklyLogs={weeklyLogs} isLight={isLight} />
-
- </div>
+  {/* RIGHT ASPECT: Capacity Analytics */}
+  <div className="space-y-6">
+   <CapacityAnalytics weeklyLogs={weeklyLogs} isLight={isLight} />
+  </div>
 
  </div>
  );
