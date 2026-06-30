@@ -2122,6 +2122,64 @@ export default function App() {
         <div
           className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
+          {/* Navigation Actions */}
+          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
+            {tabMeta.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
+                    isActive
+                      ? isLight
+                        ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm"
+                        : "bg-zinc-900 text-white font-bold shadow-inner"
+                      : isLight
+                        ? "text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900"
+                        : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
+                      isActive
+                        ? tab.id === "Real-time"
+                          ? "bg-rose-500 animate-pulse"
+                          : "bg-orange-500 scale-125"
+                        : isLight
+                          ? "bg-transparent border border-zinc-300"
+                          : "bg-transparent border border-zinc-800"
+                    }`}
+                  />
+                  <span className="flex-1 flex items-center gap-2 justify-between">
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={
+                          isActive
+                            ? "text-orange-500"
+                            : isLight
+                              ? "text-zinc-400"
+                              : "text-zinc-500"
+                        }
+                      >
+                        {tab.icon}
+                      </span>
+                      {tab.label}
+                    </span>
+                    {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
+                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
+                        {lowStockCount}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+
           {/* Aesthetic & Theme Panel */}
           <div className={`mx-4 mt-4 p-3 gold-liner-box transition-all ${
             isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
@@ -2297,63 +2355,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Navigation Actions */}
-          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
-            {tabMeta.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
-                    isActive
-                      ? isLight
-                        ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm"
-                        : "bg-zinc-900 text-white font-bold shadow-inner"
-                      : isLight
-                        ? "text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900"
-                        : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
-                  }`}
-                >
-                  <span
-                    className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
-                      isActive
-                        ? tab.id === "Real-time"
-                          ? "bg-rose-500 animate-pulse"
-                          : "bg-orange-500 scale-125"
-                        : isLight
-                          ? "bg-transparent border border-zinc-300"
-                          : "bg-transparent border border-zinc-800"
-                    }`}
-                  />
-                  <span className="flex-1 flex items-center gap-2 justify-between">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={
-                          isActive
-                            ? "text-orange-500"
-                            : isLight
-                              ? "text-zinc-400"
-                              : "text-zinc-500"
-                        }
-                      >
-                        {tab.icon}
-                      </span>
-                      {tab.label}
-                    </span>
-                    {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
-                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
-                        {lowStockCount}
-                      </span>
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
 
           {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
           <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
