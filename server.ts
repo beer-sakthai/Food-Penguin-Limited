@@ -10,7 +10,9 @@ import {
   suggestRestock,
   getShiftSummary,
   getSustainabilityReport,
-  getFinanceAnalysis
+  getFinanceAnalysis,
+  getAiClient,
+  isRealGeminiKey
 } from "./src/ai/client";
 import dotenv from "dotenv";
 
