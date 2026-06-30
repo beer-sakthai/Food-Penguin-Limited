@@ -67,7 +67,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
       {/* Header section */}
       <div className="flex items-center gap-3">
         <Share2 className={`w-8 h-8 ${isLight ? 'text-amber-500' : 'text-amber-400'}`} />
@@ -79,7 +79,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Col: Form */}
-        <div className={`col-span-1 rounded-2xl border p-6 ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-800'}`}>
+        <div className={`col-span-1 rounded-2xl border p-6 ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-800'}`}>
           <div className="flex items-center gap-2 mb-6">
             <Truck className={`w-5 h-5 ${isLight ? 'text-amber-500' : 'text-amber-400'}`} />
             <h2 className={`font-bold ${isLight ? 'text-zinc-900' : 'text-white'}`}>New Transfer</h2>
@@ -93,7 +93,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                 value={newItem}
                 onChange={e => setNewItem(e.target.value)}
                 placeholder="e.g. Flour, Packaging..."
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-white'}`}
                 required
               />
             </div>
@@ -106,7 +106,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                 onChange={e => setNewQty(e.target.value)}
                 min="1"
                 placeholder="0"
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-white'}`}
                 required
               />
             </div>
@@ -116,7 +116,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
               <select 
                 value={newFromBranch}
                 onChange={e => setNewFromBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Main Warehouse">Main Warehouse</option>
                 {branches.map(b => (
@@ -133,7 +133,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
               <select 
                 value={newToBranch}
                 onChange={e => setNewToBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-zinc-300'}`}
               >
                 {branches.map(b => (
                   <option key={b} value={b}>{b}</option>
@@ -149,7 +149,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
         </div>
 
         {/* Right Col: List & Summary */}
-        <div className={`col-span-1 lg:col-span-2 rounded-2xl border p-6 flex flex-col ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-800'}`}>
+        <div className={`col-span-1 lg:col-span-2 rounded-2xl border p-6 flex flex-col ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-zinc-950 border-zinc-800'}`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <History className={`w-5 h-5 ${isLight ? 'text-amber-500' : 'text-amber-400'}`} />
@@ -175,7 +175,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${isLight ? 'bg-zinc-200/50 text-zinc-600' : 'bg-zinc-800 text-zinc-400'}`}>
+                        <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${isLight ? 'bg-zinc-200/50 text-zinc-600' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-zinc-400'}`}>
                           {req.id}
                         </span>
                         <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{req.item}</h4>
@@ -205,6 +205,6 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

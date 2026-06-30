@@ -94,7 +94,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
@@ -109,7 +109,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+        <div className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800'}`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`p-2 rounded-lg ${isLight ? 'bg-yellow-100 text-yellow-600' : 'bg-yellow-500/10 text-yellow-400'}`}>
               <Zap size={20} />
@@ -119,9 +119,9 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
           <div className="text-3xl font-bold font-mono text-yellow-500">{totalEnergy.toFixed(1)} kWh</div>
         </div>
 
-        <div className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+        <div className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800'}`}>
           <div className="flex items-center gap-3 mb-2">
-            <div className={`p-2 rounded-lg ${isLight ? 'bg-zinc-100 text-zinc-600' : 'bg-zinc-800 text-zinc-400'}`}>
+            <div className={`p-2 rounded-lg ${isLight ? 'bg-zinc-100 text-zinc-600' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-zinc-400'}`}>
               <Flame size={20} />
             </div>
             <h3 className={`text-sm font-semibold ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>Production Volume</h3>
@@ -144,7 +144,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
           <div className={`text-xs mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Target: <span className="font-bold">{maxEfficiencyAllowed} Wh</span></div>
         </div>
 
-        <div className={`p-5 rounded-2xl border transition-all flex flex-col justify-center items-start group relative overflow-hidden ${isLight ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-800 border-zinc-700'}`}>
+        <div className={`p-5 rounded-2xl border transition-all flex flex-col justify-center items-start group relative overflow-hidden ${isLight ? 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl border-zinc-700'}`}>
           <div className="absolute -right-4 -top-4 opacity-10">
             <Sparkles size={80} />
           </div>
@@ -166,7 +166,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
       </div>
 
       {/* Main Chart */}
-      <div className={`p-6 rounded-2xl border transition-all ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800'}`}>
+      <div className={`p-6 rounded-2xl border transition-all ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800'}`}>
         <h2 className={`text-lg font-bold font-sans tracking-tight mb-6 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
           Energy Draw vs Throughput
         </h2>
@@ -207,6 +207,6 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

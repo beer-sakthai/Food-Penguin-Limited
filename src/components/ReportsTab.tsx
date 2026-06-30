@@ -361,7 +361,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
         <button
           onClick={handleExportCSV}
           disabled={activeReportDetails.count === 0}
-          className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${ activeReportDetails.count === 0 ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 border border-zinc-700' : isLight ? 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-300' : 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-600' }`}
+          className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${ activeReportDetails.count === 0 ? 'opacity-50 cursor-not-allowed bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-zinc-500 border border-zinc-700' : isLight ? 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-300' : 'bg-yellow-500 text-zinc-950 hover:bg-yellow-400 border border-yellow-600' }`}
           id="reports-hub-csv-download-button"
         >
           <Download className="w-4 h-4" />
@@ -370,7 +370,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       </div>
 
       {/* SEARCH AND CONTROLS CARD */}
-      <div className={`rounded-2xl border p-5 transition-all shadow-sm ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
+      <div className={`rounded-2xl border p-5 transition-all shadow-sm ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-white' }`}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 items-end">
           
           {/* SECTION RANGE CONTROLLER */}
@@ -545,7 +545,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.25, delay: idx * 0.05 }}
-              className={`p-5 rounded-2xl border flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 ${ isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800' }`}
+              className={`p-5 rounded-2xl border flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800' }`}
             >
               <span className={`text-[11px] font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 {metric.label}
@@ -562,7 +562,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* DATA PREVIEW TABLE CARD */}
-        <div className={`lg:col-span-2 rounded-2xl border p-5 overflow-hidden flex flex-col ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800' }`}>
+        <div className={`lg:col-span-2 rounded-2xl border p-5 overflow-hidden flex flex-col ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800' }`}>
           <div className="pb-4 flex items-center justify-between border-b border-zinc-800/20 mb-4">
             <div>
               <h2 className={`text-base font-semibold ${isLight ? 'text-zinc-800' : 'text-white'}`}>
@@ -611,7 +611,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
         </div>
 
         {/* JULES (GOOGLE AI) CONSULTING AUDITOR */}
-        <div className={`rounded-2xl border p-5 flex flex-col justify-between relative overflow-hidden ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
+        <div className={`rounded-2xl border p-5 flex flex-col justify-between relative overflow-hidden ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-white' }`}>
           {/* Decorative glowing gradient */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full filter blur-xl pointer-events-none" />
           
@@ -652,7 +652,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
           <button
             onClick={handleConsultJules}
             disabled={isAiLoading || activeReportDetails.count === 0}
-            className={`w-full mt-4 py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] ${ activeReportDetails.count === 0 ? 'opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 border border-zinc-700' : isLight ? 'bg-zinc-900 text-white hover:bg-zinc-800 focus:ring-2 focus:ring-yellow-500' : 'bg-yellow-500 hover:bg-yellow-400 text-zinc-950 focus:ring-2 focus:ring-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)]' }`}
+            className={`w-full mt-4 py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] ${ activeReportDetails.count === 0 ? 'opacity-50 cursor-not-allowed bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-zinc-500 border border-zinc-700' : isLight ? 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl text-white hover:bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl focus:ring-2 focus:ring-yellow-500' : 'bg-yellow-500 hover:bg-yellow-400 text-zinc-950 focus:ring-2 focus:ring-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)]' }`}
             id="reports-hub-ai-audit-button"
           >
             <Sparkles className="w-3.5 h-3.5" />

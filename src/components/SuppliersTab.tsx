@@ -149,7 +149,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
   }).filter(supplier => supplier.items.length > 0 || supplier.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
@@ -168,14 +168,14 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
             placeholder="Search items or suppliers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] shadow-sm ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800' }`}
+            className={`pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] shadow-sm ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl' }`}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {filteredSuppliers.length === 0 ? (
-          <div className={`p-8 text-center rounded-2xl border ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
+          <div className={`p-8 text-center rounded-2xl border ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-zinc-400'}`}>
             No items found matching "{searchQuery}".
           </div>
         ) : (
@@ -186,7 +186,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
             return (
               <div 
                 key={supplier.id} 
-                className={`rounded-2xl border overflow-hidden transition-all duration-200 ${ isLight ? 'bg-white border-zinc-200' : 'bg-black border-zinc-800' }`}
+                className={`rounded-2xl border overflow-hidden transition-all duration-200 ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-black border-zinc-800' }`}
               >
                 <button
                   onClick={() => toggleSupplier(supplier.id)}
@@ -218,7 +218,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
                       {supplier.items.map(item => (
                         <div 
                           key={item.id}
-                          className={`px-4 py-3 rounded-xl border text-sm flex items-center gap-3 transition-all hover:-translate-y-0.5 hover:shadow-sm ${ isLight ? 'bg-white border-zinc-200 text-zinc-700 hover:border-indigo-300 hover:shadow-indigo-500/5' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-indigo-500/50 hover:bg-zinc-800/80 hover:shadow-[0_4px_12px_rgba(99,102,241,0.05)]' }`}
+                          className={`px-4 py-3 rounded-xl border text-sm flex items-center gap-3 transition-all hover:-translate-y-0.5 hover:shadow-sm ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 text-zinc-700 hover:border-indigo-300 hover:shadow-indigo-500/5' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-zinc-300 hover:border-indigo-500/50 hover:bg-zinc-800/80 hover:shadow-[0_4px_12px_rgba(99,102,241,0.05)]' }`}
                         >
                           <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLight ? 'bg-indigo-400' : 'bg-indigo-500'}`} />
                           <span className="leading-snug">{item.name}</span>
@@ -232,6 +232,6 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
           })
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

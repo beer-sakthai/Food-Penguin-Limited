@@ -50,13 +50,13 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
  };
 
  return (
- <div className="grid grid-cols-1 gap-6">
+ <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 gap-6">
 
  {/* LEFT ASPECT: EMPLOYEES DIRECTORY & SIMULATORS */}
  <div className="space-y-6">
 
  {/* Shift Roster Summary metrics */}
- <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
+ <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
  <div>
  <h2 className="text-sans font-bold text-white">Weekly Labor Allocation</h2>
@@ -98,7 +98,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
 
  
         {/* Hour Plan and Hour Used */}
-        <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
+        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
           <div className="pb-4">
             <h2 className="text-base font-sans font-semibold text-white">Hour Plan & Hours Used in Branch</h2>
             <p className="text-xs text-zinc-500">Detailed review of scheduled hours vs. actual hours logged by staff</p>
@@ -119,7 +119,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
                 {hoursData.map((emp) => {
                   const variance = emp.scheduledHours - emp.actualHours;
                   return (
-                    <tr key={emp.id} className="bg-zinc-900 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800/50 transition-colors">
+                    <tr key={emp.id} className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800/50 transition-colors">
                       <td className="px-4 py-3 font-medium text-zinc-200">{emp.name}</td>
                       <td className="px-4 py-3 text-[10px] font-mono text-zinc-400">
                         <span className="uppercase font-bold">{emp.role}</span>
@@ -144,6 +144,6 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

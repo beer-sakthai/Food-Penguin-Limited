@@ -48,7 +48,7 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
   }));
 
   return (
-    <div className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
@@ -64,14 +64,14 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
         <div className={`flex p-1 rounded-xl shadow-sm ${isLight ? 'bg-zinc-200/50' : 'bg-black/50'} w-full md:w-auto`}>
           <button
             onClick={() => setMode('plan')}
-            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'plan' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
+            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'plan' ? isLight ? 'bg-white/95 backdrop-blur-md shadow-lg text-zinc-900 shadow-sm' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
           >
             <Target size={16} className={mode === 'plan' ? 'text-emerald-500' : ''} />
             Plan Structure
           </button>
           <button
             onClick={() => setMode('use')}
-            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'use' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
+            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'use' ? isLight ? 'bg-white/95 backdrop-blur-md shadow-lg text-zinc-900 shadow-sm' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
           >
             <Activity size={16} className={mode === 'use' ? 'text-orange-500' : ''} />
             Actual Use
@@ -83,7 +83,7 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
         {/* Key Metrics */}
         <div className="space-y-4">
           {currentData.map(item => (
-            <div key={item.name} className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+            <div key={item.name} className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800'}`}>
                <div className="flex justify-between items-center mb-2">
                  <h3 className={`text-sm font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>{item.name}</h3>
                  <span className="text-2xl font-mono font-black" style={{ color: item.color }}>{item.value}%</span>
@@ -98,7 +98,7 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
         {/* Charts Container */}
         <div className="md:col-span-2 space-y-6 flex flex-col">
           {/* Pie Chart */}
-          <div className={`flex-1 p-6 rounded-2xl border transition-all min-h-[300px] ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div className={`flex-1 p-6 rounded-2xl border transition-all min-h-[300px] ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800'}`}>
             <h3 className={`text-sm font-bold font-sans tracking-tight mb-4 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
               Composition ({mode === 'plan' ? 'Target Plan' : 'Actual Use'})
             </h3>
@@ -135,7 +135,7 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
           </div>
 
           {/* Variance Bar Chart */}
-          <div className={`p-6 rounded-2xl border transition-all h-[250px] ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div className={`p-6 rounded-2xl border transition-all h-[250px] ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800'}`}>
             <h3 className={`text-sm font-bold font-sans tracking-tight mb-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
               Plan vs Use Variance
             </h3>
@@ -161,6 +161,6 @@ export default function FinanceTab({ theme = 'dark' }: FinanceTabProps) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -41,7 +41,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div className="flex items-center gap-3">
         <Activity className={`w-8 h-8 ${isLight ? 'text-rose-600' : 'text-rose-500'} animate-pulse`} />
         <div>
@@ -52,7 +52,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Active Orders */}
-        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
+        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
           <div className="flex justify-between items-start mb-4">
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Active Orders</h3>
             <span className="flex h-3 w-3 relative">
@@ -65,7 +65,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
         </div>
 
         {/* Production Rate */}
-        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
+        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
           <div className="flex justify-between items-start mb-4">
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Production Rate</h3>
             <TrendingUp className={`w-4 h-4 ${isLight ? 'text-blue-500' : 'text-blue-400'}`} />
@@ -79,7 +79,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
         </div>
 
         {/* System Uptime */}
-        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
+        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
           <div className="flex justify-between items-start mb-4">
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>System Uptime</h3>
             <Server className={`w-4 h-4 ${isLight ? 'text-indigo-500' : 'text-indigo-400'}`} />
@@ -91,7 +91,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
         </div>
 
         {/* Equipment Status */}
-        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
+        <div className={`p-6 rounded-2xl border ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
           <div className="flex justify-between items-start mb-4">
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Equipment</h3>
             <Cpu className={`w-4 h-4 ${isLight ? 'text-amber-500' : 'text-amber-400'}`} />
@@ -103,7 +103,7 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
         </div>
       </div>
 
-      <div className={`rounded-2xl border ${isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
+      <div className={`rounded-2xl border ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200 shadow-sm' : 'bg-black border-zinc-800'}`}>
         <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}>
           <h3 className={`text-sm font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
             <AlertTriangle className={`w-4 h-4 ${isLight ? 'text-rose-500' : 'text-rose-400'}`} /> Live Alerts Log
@@ -128,6 +128,6 @@ export default function RealtimeTab({ theme = 'dark' }: RealtimeTabProps) {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

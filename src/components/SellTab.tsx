@@ -176,7 +176,7 @@ export function Barcode({ value, isLight }: { value: string; isLight: boolean })
 
   return (
     <div className={`p-2 rounded-xl flex flex-col justify-center items-center transition-colors duration-200 mt-2 ${ isLight ? 'bg-zinc-100 text-zinc-800 border border-zinc-200' : 'bg-[#18181b] border border-zinc-800 text-white' }`}>
-      <div className="flex h-10 w-full items-stretch justify-center max-w-[200px] overflow-hidden bg-white px-2 py-1 rounded" style={{ gap: '0.1px' }}>
+      <div className="flex h-10 w-full items-stretch justify-center max-w-[200px] overflow-hidden bg-white/95 backdrop-blur-md shadow-lg px-2 py-1 rounded" style={{ gap: '0.1px' }}>
         {bars.map((bit, idx) => (
           <div key={idx} className={`flex-1 ${bit === 1 ? 'bg-black' : 'bg-transparent'}`} style={{ minWidth: '1px' }} />
         ))}
@@ -231,9 +231,9 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
   const getPct = (val: number) => Math.round((val / counts.total) * 100);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12 pt-4">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="max-w-4xl mx-auto space-y-8 pb-12 pt-4">
       {/* HEADER */}
-      <div className={`p-8 rounded-3xl text-center ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'}`}>
+      <div className={`p-8 rounded-3xl text-center ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border border-zinc-800'}`}>
         <h1 className={`text-4xl font-extrabold mb-2 ${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}`}>
           {selectedBranch}
         </h1>
@@ -243,7 +243,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       </div>
 
       {/* SALES PERFORMANCE VISUALIZATION */}
-      <div className={`p-6 rounded-3xl transition-all duration-300 ${ isLight ? 'bg-white border border-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 shadow-xl' }`}>
+      <div className={`p-6 rounded-3xl transition-all duration-300 ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border border-zinc-200 shadow-sm' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border border-zinc-800 shadow-xl' }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-zinc-200 dark:border-zinc-800 gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -296,7 +296,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       {/* PRODUCTS LIST */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {branchProducts.map((p, i) => (
-          <div key={i} className={`p-6 rounded-2xl transition-transform hover:-translate-y-1 ${ isLight ? 'bg-white shadow-sm border border-zinc-200' : 'bg-zinc-900 border border-zinc-800' }`}>
+          <div key={i} className={`p-6 rounded-2xl transition-transform hover:-translate-y-1 ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-sm border border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border border-zinc-800' }`}>
             <h3 className={`text-2xl font-bold leading-tight mb-2 ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{p.name}</h3>
             <p className={`text-xl font-bold mb-6 ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>€{p.price.toFixed(2)}</p>
             <Barcode value={p.barcode || '0000000000000'} isLight={isLight} />
@@ -305,18 +305,18 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       </div>
 
       {/* ANALYTICS FOOTER */}
-      <div className={`mt-12 p-8 rounded-3xl ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'}`}>
+      <div className={`mt-12 p-8 rounded-3xl ${isLight ? 'bg-zinc-50 border border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border border-zinc-800'}`}>
         <h2 className={`text-2xl font-bold mb-6 ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>Product Distribution Analysis</h2>
         <div className="grid grid-cols-3 gap-6 text-center">
-          <div className={`p-6 rounded-2xl ${isLight ? 'bg-white shadow-sm' : 'bg-zinc-950'}`}>
+          <div className={`p-6 rounded-2xl ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-sm' : 'bg-zinc-950'}`}>
             <div className={`text-5xl font-extrabold mb-2 ${isLight ? 'text-rose-500' : 'text-rose-400'}`}>{getPct(counts.seafood)}%</div>
             <p className={`text-lg font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Salmon & Seafood</p>
           </div>
-          <div className={`p-6 rounded-2xl ${isLight ? 'bg-white shadow-sm' : 'bg-zinc-950'}`}>
+          <div className={`p-6 rounded-2xl ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-sm' : 'bg-zinc-950'}`}>
             <div className={`text-5xl font-extrabold mb-2 ${isLight ? 'text-amber-500' : 'text-amber-400'}`}>{getPct(counts.chicken)}%</div>
             <p className={`text-lg font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Chicken</p>
           </div>
-          <div className={`p-6 rounded-2xl ${isLight ? 'bg-white shadow-sm' : 'bg-zinc-950'}`}>
+          <div className={`p-6 rounded-2xl ${isLight ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-sm' : 'bg-zinc-950'}`}>
             <div className={`text-5xl font-extrabold mb-2 ${isLight ? 'text-emerald-500' : 'text-emerald-400'}`}>{getPct(counts.veggie)}%</div>
             <p className={`text-lg font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Vegan / Veggie</p>
           </div>
@@ -328,7 +328,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
           <div className="space-y-5">
             <div className="flex items-center gap-4">
               <div className={`w-36 text-right text-base font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Seafood</div>
-              <div className={`flex-1 h-8 rounded-full overflow-hidden ${isLight ? 'bg-zinc-200' : 'bg-zinc-800'}`}>
+              <div className={`flex-1 h-8 rounded-full overflow-hidden ${isLight ? 'bg-zinc-200' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl'}`}>
                 <div style={{ width: `${getPct(counts.seafood)}%` }} className="h-full bg-rose-500 rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.2)]"></div>
               </div>
               <div className={`w-12 text-lg font-black ${isLight ? 'text-zinc-800' : 'text-zinc-200'}`}>{getPct(counts.seafood)}%</div>
@@ -336,7 +336,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
             
             <div className="flex items-center gap-4">
               <div className={`w-36 text-right text-base font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Chicken</div>
-              <div className={`flex-1 h-8 rounded-full overflow-hidden ${isLight ? 'bg-zinc-200' : 'bg-zinc-800'}`}>
+              <div className={`flex-1 h-8 rounded-full overflow-hidden ${isLight ? 'bg-zinc-200' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl'}`}>
                 <div style={{ width: `${getPct(counts.chicken)}%` }} className="h-full bg-amber-500 rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.2)]"></div>
               </div>
               <div className={`w-12 text-lg font-black ${isLight ? 'text-zinc-800' : 'text-zinc-200'}`}>{getPct(counts.chicken)}%</div>
@@ -344,7 +344,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
 
             <div className="flex items-center gap-4">
               <div className={`w-36 text-right text-base font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Veg/Vegan</div>
-              <div className={`flex-1 h-8 rounded-full overflow-hidden ${isLight ? 'bg-zinc-200' : 'bg-zinc-800'}`}>
+              <div className={`flex-1 h-8 rounded-full overflow-hidden ${isLight ? 'bg-zinc-200' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl'}`}>
                 <div style={{ width: `${getPct(counts.veggie)}%` }} className="h-full bg-emerald-500 rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.2)]"></div>
               </div>
               <div className={`w-12 text-lg font-black ${isLight ? 'text-zinc-800' : 'text-zinc-200'}`}>{getPct(counts.veggie)}%</div>
@@ -352,6 +352,6 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

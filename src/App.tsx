@@ -1288,7 +1288,7 @@ export default function App() {
  >
  
  {/* SIDEBAR: NAVIGATION */}
- <aside className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? 'fixed inset-0 z-50 h-[100dvh] overflow-hidden' : 'sticky md:relative top-0 z-40'} ${ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-950 border-zinc-900 text-zinc-100' }`}>
+ <aside className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? 'fixed inset-0 z-50 h-[100dvh] overflow-hidden' : 'sticky md:relative top-0 z-40'} ${ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 border-zinc-900 text-zinc-100' }`}>
  {/* Brand Header */}
         <div className={`p-4 md:p-6 border-b flex items-center justify-between gap-3 transition-colors ${isLight ? 'border-zinc-150' : 'border-zinc-900'}`}>
           <div className="flex items-center gap-3 w-full">
@@ -1312,7 +1312,7 @@ export default function App() {
           </div>
           {/* Mobile Menu Toggle Button */}
           <button 
-            className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800'}`}
+            className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? 'bg-zinc-100 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800'}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -1324,7 +1324,7 @@ export default function App() {
 
         {/* Global Branches Overview */}
 
- <div className={`mx-4 mt-6 p-3 rounded-2xl border transition-colors ${isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800 shadow'}`}>
+ <div className={`mx-4 mt-6 p-3 rounded-2xl border transition-colors ${isLight ? 'bg-zinc-50 border-zinc-200 shadow-sm' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl shadow'}`}>
  <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? 'border-zinc-200' : 'border-zinc-800/80'}`}>
  <Store className={`w-3.5 h-3.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`} />
  <span className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>Global Branches</span>
@@ -1341,7 +1341,7 @@ export default function App() {
  <div 
  key={branch} 
  onClick={() => setSelectedBranch(branch)}
- className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${ isSelected ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30' : isLight ? 'bg-white border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900' }`}
+ className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${ isSelected ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30' : isLight ? 'bg-white border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900' }`}
  >
  <span className={`truncate mr-2 ${ isSelected ? isLight ? 'text-orange-700 font-bold' : 'text-orange-400 font-bold' : isLight ? 'text-zinc-700 font-medium' : 'text-zinc-300 font-medium' }`}>
  {shortName}
@@ -1363,7 +1363,7 @@ export default function App() {
  <button
  key={tab.id}
  onClick={() => { setActiveTab(tab.id); setIsMobileMenuOpen(false); }}
- className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${ isActive ? isLight ? 'bg-zinc-100 text-zinc-950 font-extrabold shadow-sm' : 'bg-zinc-900 text-white font-bold shadow-inner' : isLight ? 'text-zinc-600 text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900' : 'text-zinc-500 hover:bg-zinc-905 hover:text-white' }`}
+ className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${ isActive ? isLight ? 'bg-zinc-100 text-zinc-950 font-extrabold shadow-sm' : 'bg-zinc-900 text-white font-bold shadow-inner' : isLight ? 'text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900' : 'text-zinc-500 hover:bg-zinc-905 hover:text-white' }`}
  >
  <span className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${ isActive ? tab.id === 'Real-time' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 scale-125' : isLight ? 'bg-transparent border border-zinc-300' : 'bg-transparent border border-zinc-800' }`} />
  <span className="flex-1 flex items-center gap-2">
@@ -1377,20 +1377,20 @@ export default function App() {
 
  {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
  <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
- <div className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900 border-zinc-800 text-white' }`}>
+ <div className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl text-white' }`}>
  <div className={`absolute right-0 top-0 w-24 h-24 bg-gradient-to-br rounded-full filter blur-2xl pointer-events-none ${ isLight ? 'from-orange-550/5' : 'from-orange-500/5 to-transparent' }`} />
  
  <div className="flex items-center justify-between mb-2">
  <button 
  onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
- className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${ isLight ? ' hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'hover:text-white' }`}
+ className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${ isLight ? '  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'hover:text-white' }`}
  title="Click to view daily breakdown"
  >
  <p className={`text-[10px] uppercase font-mono font-bold tracking-wider select-none ${ isLight ? 'text-zinc-500' : 'text-zinc-400' }`}>Weekly Capacity</p>
  {isCapacityExpanded ? (
- <ChevronUp className={`w-3.5 h-3.5 transition-all transform hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
+ <ChevronUp className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  ) : (
- <ChevronDown className={`w-3.5 h-3.5 transition-all transform hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
+ <ChevronDown className={`w-3.5 h-3.5 transition-all transform  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-110 ${isLight ? 'text-zinc-500 hover:text-zinc-800' : 'text-zinc-400 hover:text-white'}`} />
  )}
  </button>
  <div className="flex items-center gap-1.5">
@@ -1417,7 +1417,7 @@ export default function App() {
      {overlayBranches.length > 0 && (
        <button 
          onClick={() => setOverlayBranches([])}
-         className={`px-1.5 py-0.5 rounded text-[7px] font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${ isLight ? 'bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300' }`}
+         className={`px-1.5 py-0.5 rounded text-[7px] font-bold border cursor-pointer  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 active:scale-95 transition-all ${ isLight ? 'bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300' }`}
        >
          Clear Overlay
        </button>
@@ -1476,7 +1476,7 @@ export default function App() {
            className={`px-2 py-1 rounded-md border text-[7.5px] font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] hover:-translate-y-0.5 active:scale-[0.98] ${
              isSelected 
                ? style.activeBg
-               : `${isLight ? 'bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100' : 'bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800'} opacity-75`
+               : `${isLight ? 'bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl/60 text-zinc-400 hover:bg-zinc-800'} opacity-75`
            }`}
          >
            {shortName}
@@ -1648,7 +1648,7 @@ export default function App() {
         setBulkSelectedDays([]);
       }}
       disabled={capacitySortBy === 'date' && capacitySmoothing === 'raw' && bulkSelectedDays.length === 0}
-      className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ (capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0) ? isLight ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer' : 'bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer' : 'opacity-40 cursor-not-allowed ' + (isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-400' : 'bg-zinc-800/50 border-zinc-700/35 text-zinc-600') }`}
+      className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ (capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0) ? isLight ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer' : 'bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer' : 'opacity-40 cursor-not-allowed ' + (isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-400' : 'bg-zinc-800/50 border-zinc-700/35 text-zinc-600') }`}
       title="Clear all daily capacity filters, sorting, smoothing, and bulk selections"
     >
       <RotateCcw className={`w-2.5 h-2.5 ${(capacitySortBy !== 'date' || capacitySmoothing !== 'raw' || bulkSelectedDays.length > 0) ? 'text-yellow-500' : ''}`} />
@@ -1656,27 +1656,27 @@ export default function App() {
     </button>
  <button 
  onClick={handleExportCapacityCSV}
- className={`p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
+ className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
  title="Download daily capacity report as CSV"
  >
  <Download className="w-2.5 h-2.5 text-orange-400" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>CSV</span>
  </button>
  <button 
  onClick={handleExportCapacityPDF}
- className={`p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
+ className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
  title="Download styled PDF projection summary report"
  >
  <Download className="w-2.5 h-2.5 text-amber-500" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>PDF</span>
  </button>
  <button 
  onClick={() => setIsScheduleReportModalOpen(true)}
- className={`p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
+ className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900' : 'bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700' }`}
  title="Schedule automated email report delivery"
  >
  <Mail className="w-2.5 h-2.5 text-rose-400" />
- <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>Schedule</span>
+ <span className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? 'text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900' : 'text-zinc-300'}`}>Schedule</span>
  </button>
  <span className="text-[8px] text-zinc-400 font-semibold ml-1">[Current vs Proj]</span>
  </div>
@@ -1689,27 +1689,27 @@ export default function App() {
  <select
  value={capacitySortBy}
  onChange={(e) => setCapacitySortBy(e.target.value as 'date' | 'bottleneck' | 'custom')}
- className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${ isLight ? 'bg-white border-zinc-200 text-amber-600' : 'bg-zinc-900 border-zinc-800/80 text-amber-450 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300' }`}
+ className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${ isLight ? 'bg-white border-zinc-200 text-amber-600' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl/80 text-amber-450  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300' }`}
  >
- <option value="date" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>📅 Date (Chronological)</option>
- <option value="bottleneck" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>🔥 Bottleneck Intensity</option>
- <option value="custom" className={isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'}>🖐️ Custom Priority</option>
+ <option value="date" className={isLight ? 'bg-white text-zinc-900' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white'}>📅 Date (Chronological)</option>
+ <option value="bottleneck" className={isLight ? 'bg-white text-zinc-900' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white'}>🔥 Bottleneck Intensity</option>
+ <option value="custom" className={isLight ? 'bg-white text-zinc-900' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white'}>🖐️ Custom Priority</option>
  </select>
  </div>
  
  {/* Smoothing Mode Toggle */}
  <div className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? 'border-zinc-200' : 'border-zinc-900/60'}`}>
  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? 'text-zinc-500 font-bold' : 'text-zinc-500'}`} title="3-Day moving average smoothing vs raw data">Data View:</span>
- <div className={`flex rounded p-0.5 border ${isLight ? 'bg-zinc-200 border-zinc-200' : 'bg-zinc-900 border-zinc-800/80'}`}>
+ <div className={`flex rounded p-0.5 border ${isLight ? 'bg-zinc-200 border-zinc-200' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl/80'}`}>
  <button
  onClick={() => setCapacitySmoothing('raw')}
- className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${ capacitySmoothing === 'raw' ? 'bg-orange-500 text-white shadow-sm' : isLight ? 'text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' }`}
+ className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${ capacitySmoothing === 'raw' ? 'bg-orange-500 text-white shadow-sm' : isLight ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' }`}
  >
  Raw
  </button>
  <button
  onClick={() => setCapacitySmoothing('smoothed')}
- className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${ capacitySmoothing === 'smoothed' ? 'bg-orange-500 text-white shadow-sm' : isLight ? 'text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' }`}
+ className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${ capacitySmoothing === 'smoothed' ? 'bg-orange-500 text-white shadow-sm' : isLight ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' }`}
  title="3-Day Moving Average Smoothed"
  >
  Smooth 3D
@@ -1726,7 +1726,7 @@ export default function App() {
  <button
  onClick={() => setCompareModeEnabled(!compareModeEnabled)}
  type="button"
- className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${ compareModeEnabled ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
+ className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 active:scale-[0.98] ${ compareModeEnabled ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
  >
  {compareModeEnabled ? 'COMPARE ON' : 'OFF'}
  </button>
@@ -1747,7 +1747,7 @@ export default function App() {
  }
  }}
  type="button"
- className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${ quickAdjustEnabled ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
+ className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${ quickAdjustEnabled ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm' : isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl text-zinc-300 hover:text-white hover:bg-zinc-800' }`}
  >
  {quickAdjustEnabled ? 'What-If ON' : 'OFF'}
  </button>
@@ -1759,7 +1759,7 @@ export default function App() {
       <span>{bulkSelectedDays.length > 0 ? `Bulk Adjust (${bulkSelectedDays.length} days)` : 'Global Preset'}</span>
       <div className="flex items-center gap-2">
         {bulkSelectedDays.length > 0 && (
-          <button onClick={() => setBulkSelectedDays([])} className="hover:underline text-[8px] tracking-wider">Clear Selection</button>
+          <button onClick={() => setBulkSelectedDays([])} className=" hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:underline text-[8px] tracking-wider">Clear Selection</button>
         )}
         {Object.keys(capacityOverrides).length > 0 && (
           <button onClick={handleResetOverrides} className="hover:underline text-[8px] tracking-wider active:scale-[0.98] hover:-translate-y-0.5 transition-all duration-200 hover:shadow-md">Reset All</button>
@@ -1781,7 +1781,7 @@ export default function App() {
             setGlobalAdjustValue(Number(e.target.value));
           }
         }}
-        className="flex-1 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-500 hover:accent-amber-400 active:scale-[0.98] transition-all duration-200"
+        className="flex-1 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:accent-amber-400 active:scale-[0.98] transition-all duration-200"
         style={{ accentColor: '#f59e0b' }}
       />
       {(() => {
@@ -1839,7 +1839,7 @@ export default function App() {
 	    onClick={() => setShowThresholdTooltip(!showThresholdTooltip)}
 	    onMouseEnter={() => setShowThresholdTooltip(true)}
 	    onMouseLeave={() => setShowThresholdTooltip(false)}
-	    className={`p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] hover:-translate-y-0.5 active:scale-95 ${ showThresholdTooltip ? 'text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10' : isLight ? 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
+	    className={`p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)]  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 active:scale-95 ${ showThresholdTooltip ? 'text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10' : isLight ? 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`}
 	    title="Information Tooltip"
 	  >
 	    <Info className="w-3 h-3" />
@@ -1851,7 +1851,7 @@ export default function App() {
 	  whileHover={{ scale: 1.08 }}
 	  whileTap={{ scale: 0.95 }}
 	  transition={{ type: "spring", stiffness: 450, damping: 25 }}
-	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${ isLight ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' : 'bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]' }`}
+	  className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${ isLight ? 'bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]' }`}
 	>
 	  {bottleneckThreshold}%
 	</motion.span>
@@ -1898,7 +1898,7 @@ export default function App() {
 	step="1"
 	value={bottleneckThreshold}
 	onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
-	className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow duration-200"
+	className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98]  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow duration-200"
 	style={{ 
 	  accentColor: '#eab308',
 	  background: `linear-gradient(to right, #eab308 0%, #eab308 ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} 100%)`
@@ -1931,13 +1931,13 @@ export default function App() {
                       setFocusedDay(null);
                     }, 2500);
                   }}
-                  className={`w-full flex items-center justify-between mt-1 mb-2 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-sm group ${ isLight ? 'bg-amber-100/80 text-amber-900 border border-amber-200 hover:bg-amber-100 hover:shadow-md' : 'bg-amber-900/30 text-amber-500 border border-amber-900/50 hover:bg-amber-900/50 hover:border-amber-500/50 hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]' }`}
+                  className={`w-full flex items-center justify-between mt-1 mb-2 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-sm group ${ isLight ? 'bg-amber-100/80 text-amber-900 border border-amber-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-amber-100 hover:shadow-md' : 'bg-amber-900/30 text-amber-500 border border-amber-900/50 hover:bg-amber-900/50 hover:border-amber-500/50 hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]' }`}
                 >
                   <span className="flex items-center gap-1.5">
                     <span className={isLight ? 'text-amber-600' : 'text-amber-400'}>🔥</span>
                     Threshold Exceeded ({maxProjectedItem.projected}%)
                   </span>
-                  <span className={`flex items-center gap-1 transition-transform group-hover:translate-x-1 ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>
+                  <span className={`flex items-center gap-1 transition-transform group- hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:translate-x-1 ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>
                     Jump to {maxProjectedItem.day} →
                   </span>
                 </button>
@@ -1981,7 +1981,7 @@ export default function App() {
                           >
  <div className="flex justify-between items-center text-[10px] gap-2">
                             <div className="flex items-center gap-1.5 min-w-[70px]">
-  <div className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-amber-500 transition-colors" title="Drag to reorder priority">
+  <div className="cursor-grab active:cursor-grabbing text-zinc-400 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-500 transition-colors" title="Drag to reorder priority">
     <GripVertical size={12} />
   </div>
   <button
@@ -1991,7 +1991,7 @@ export default function App() {
         prev.includes(item.day) ? prev.filter(d => d !== item.day) : [...prev, item.day]
       );
     }}
-    className={`p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] hover:scale-105 active:scale-95 shadow-sm shrink-0 ${ isLight ? 'hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950' : 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100' }`}
+    className={`p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)]  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-105 active:scale-95 shadow-sm shrink-0 ${ isLight ? 'hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950' : 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100' }`}
     title="Toggle contributing items"
   >
     {expandedDays.includes(item.day) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
@@ -2130,7 +2130,7 @@ export default function App() {
  </div>
  
  {/* Interactive miniature double graph bar indicator */}
- <div className="h-1 bg-zinc-950 rounded-full overflow-hidden flex">
+ <div className="h-1 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 rounded-full overflow-hidden flex">
  <div 
  className="bg-zinc-700 h-full rounded-l transition-all duration-300"
  style={{ width: `${item.current}%` }}
@@ -2168,7 +2168,7 @@ export default function App() {
  </div>
  
  {/* Secondary progress bar representing variance range */}
- <div className="h-1.5 bg-zinc-950 dark:bg-zinc-950/90 rounded-full relative overflow-hidden flex items-center">
+ <div className="h-1.5 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 dark:bg-zinc-950/90 rounded-full relative overflow-hidden flex items-center">
  {/* Base AI forecast area in track */}
  <div 
  className="h-full bg-zinc-700/30 dark:bg-zinc-800/40 border-r border-dashed border-zinc-500/30 transition-all duration-300"
@@ -2196,11 +2196,11 @@ export default function App() {
  {/* Inline What-If adjustments for specific day */}
  {quickAdjustEnabled && (
  <div className={`mt-1.5 flex flex-wrap items-center justify-between gap-1.5 p-1.5 rounded-xl border transition-all duration-200 ${ isLight ? 'bg-zinc-50 border-zinc-200/80 shadow-inner' : 'bg-zinc-950/40 border-zinc-800/60 shadow-inner' }`}>
- <div className="flex border rounded-lg p-0.5 bg-zinc-900 dark:bg-zinc-950 border-zinc-800 shrink-0">
+ <div className="flex border rounded-lg p-0.5 bg-zinc-900 dark:bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 border-zinc-800 shrink-0">
  <button
  onClick={() => handleToggleOverrideMode(item.day, 'ai', item.projected)}
  type="button"
- className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ (!capacityOverrides[item.day] || capacityOverrides[item.day].mode === 'ai') ? 'bg-amber-500 text-zinc-950 shadow-sm font-extrabold' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200' }`}
+ className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ (!capacityOverrides[item.day] || capacityOverrides[item.day].mode === 'ai') ? 'bg-amber-500 text-zinc-950 shadow-sm font-extrabold' : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200' }`}
  >
  <Sparkles className="w-2 h-2 shrink-0" />
  AI
@@ -2208,7 +2208,7 @@ export default function App() {
  <button
  onClick={() => handleToggleOverrideMode(item.day, 'manual', item.projected)}
  type="button"
- className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ (capacityOverrides[item.day]?.mode === 'manual') ? 'bg-orange-500 text-white shadow-sm font-extrabold' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200' }`}
+ className={`text-[7px] px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ (capacityOverrides[item.day]?.mode === 'manual') ? 'bg-orange-500 text-white shadow-sm font-extrabold' : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200' }`}
  >
  <SlidersHorizontal className="w-2 h-2 shrink-0" />
  SIM
@@ -2287,7 +2287,7 @@ export default function App() {
           return (
             <div 
               key={idx} 
-              className={`flex items-center justify-between p-1.5 rounded-lg border transition-all duration-200 hover:scale-[1.01] ${ isLight ? 'bg-white border-zinc-100 hover:border-zinc-200 shadow-sm' : 'bg-zinc-900/40 border-zinc-800/40 hover:border-zinc-800' }`}
+              className={`flex items-center justify-between p-1.5 rounded-lg border transition-all duration-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:scale-[1.01] ${ isLight ? 'bg-white border-zinc-100 hover:border-zinc-200 shadow-sm' : 'bg-zinc-900/40 border-zinc-800/40 hover:border-zinc-800' }`}
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
@@ -2351,7 +2351,7 @@ export default function App() {
  {/* Footer info links */}
  <div className={`p-4 border-t static transition-colors duration-200 ${isLight ? 'border-zinc-200 bg-zinc-50/50' : 'border-zinc-900 bg-black/40'}`}>
  <div className="flex items-center gap-2.5">
- <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${ isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900 border-zinc-800' }`}>
+ <div className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${ isLight ? 'bg-zinc-200 border-zinc-300 text-zinc-700' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl' }`}>
  {currentUser?.photoURL ? (
    <img src={currentUser.photoURL} alt={currentUser.username} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
  ) : (
@@ -2367,7 +2367,7 @@ export default function App() {
  <select 
  value={userRole} 
  onChange={(e) => setUserRole(e.target.value as any)}
- className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300' }`}
+ className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold' : 'text-zinc-500 hover:text-zinc-300' }`}
  >
  <option value="Admin">Admin</option>
  <option value="Manager">Manager</option>
@@ -2381,7 +2381,7 @@ export default function App() {
      setCurrentUser(null);
      await signOut(auth).catch(() => {});
    }}
-   className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${ isLight ? 'text-zinc-500 font-bold' : 'text-zinc-400' }`}
+   className={`text-[9px] font-mono  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${ isLight ? 'text-zinc-500 font-bold' : 'text-zinc-400' }`}
    title="Sign Out"
  >
    <LogOut className="w-2.5 h-2.5" />
@@ -2397,7 +2397,7 @@ export default function App() {
  <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-zinc-50' : 'bg-black'}`}>
  
  {/* Global Toolbar */}
- <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-950 border-zinc-900 text-white shadow-md' }`}>
+ <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 border-zinc-900 text-white shadow-md' }`}>
  <div className="flex items-center gap-2.5">
  <h2 className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
@@ -2407,7 +2407,7 @@ export default function App() {
  </span>
  
  {/* Global Branch Selector Dropdown */}
- <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900 border-zinc-800' }`}>
+ <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${ isLight ? 'bg-zinc-100 border-zinc-200' : 'bg-zinc-900/80 backdrop-blur-2xl border-zinc-700/50 shadow-2xl' }`}>
  <span className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Store:</span>
  <select
  value={selectedBranch}
@@ -2415,9 +2415,9 @@ export default function App() {
  className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
  style={{ outline: 'none' }}
  >
- <option value="Marks & Spencer - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Marks & Spencer Cork City</option>
- <option value="Tesco - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Cork City</option>
- <option value="Tesco - Mahon Point" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-zinc-950 text-white'} font-bold`}>Tesco Mahon Point</option>
+ <option value="Marks & Spencer - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white'} font-bold`}>Marks & Spencer Cork City</option>
+ <option value="Tesco - Cork City" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white'} font-bold`}>Tesco Cork City</option>
+ <option value="Tesco - Mahon Point" className={`${isLight ? 'bg-white text-zinc-900' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white'} font-bold`}>Tesco Mahon Point</option>
  </select>
  </div>
  </div>
@@ -2434,7 +2434,7 @@ export default function App() {
  <button
  onClick={toggleTheme}
  title={`Switch to ${isLight ? 'Dark' : 'Day'} Mode`}
- className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${ isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white' }`}
+ className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${ isLight ? 'bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm' : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white' }`}
  >
  {isLight ? <Moon className="w-4.5 h-4.5 text-zinc-600" /> : <Sun className="w-4.5 h-4.5 text-amber-400" />}
  </button>
@@ -2452,7 +2452,7 @@ export default function App() {
  {/* Schedule Email Report Modal */}
  {isScheduleReportModalOpen && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-fadeIn">
- <div className={`w-full max-w-sm rounded-[1.25rem] shadow-2xl p-6 relative border animate-zoomIn ${ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-800' }`}>
+ <div className={`w-full max-w-sm rounded-[1.25rem] shadow-2xl p-6 relative border animate-zoomIn ${ isLight ? 'bg-white border-zinc-200' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 border-zinc-800' }`}>
  <h3 className={`text-sm font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  <Mail className="w-4 h-4 text-rose-500" />
  Schedule Capacity Summary PDF
@@ -2469,13 +2469,13 @@ export default function App() {
  <div className="flex bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-1">
  <button
  onClick={() => setReportFrequency('daily')}
- className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === 'daily' ? 'bg-rose-500 text-white shadow' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800' }`}
+ className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === 'daily' ? 'bg-rose-500 text-white shadow' : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800' }`}
  >
  Daily
  </button>
  <button
  onClick={() => setReportFrequency('weekly')}
- className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === 'weekly' ? 'bg-rose-500 text-white shadow' : 'text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800' }`}
+ className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === 'weekly' ? 'bg-rose-500 text-white shadow' : 'text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800' }`}
  >
  Weekly
  </button>
@@ -2499,7 +2499,7 @@ export default function App() {
  <div className="flex items-center gap-2 mt-6 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800">
  <button
  onClick={() => setIsScheduleReportModalOpen(false)}
- className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded transition-colors ${ isLight ? 'text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800' }`}
+ className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded transition-colors ${ isLight ? 'text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800' }`}
  >
  Cancel
  </button>
@@ -2514,7 +2514,7 @@ export default function App() {
  }
  }}
  disabled={!reportEmailAddress}
- className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-1.5"
+ className="flex-[2] py-2 text-[10px] font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-1.5"
  >
  <Clock className="w-3 h-3" />
  Activate Schedule
