@@ -49,11 +49,11 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
  }
  };
 
- return (
- <div className="grid grid-cols-1 gap-6">
+  return (
+  <div className="w-full">
 
- {/* LEFT ASPECT: EMPLOYEES DIRECTORY & SIMULATORS */}
- <div className="space-y-6">
+  {/* MAIN TWO COLUMN LAYOUT */}
+  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
  {/* Shift Roster Summary metrics */}
  <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
