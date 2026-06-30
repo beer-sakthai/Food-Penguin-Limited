@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, TrendingUp, Cpu, Server, CheckCircle2 } from 'lucide-react';
+import { Activity, Clock, AlertTriangle, TrendingUp, Cpu, Server, CheckCircle2 } from 'lucide-react';
 
 interface RealtimeTabProps {
   theme?: 'light' | 'dark';

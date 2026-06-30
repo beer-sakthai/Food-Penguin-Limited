@@ -352,12 +352,12 @@ export default function App() {
   });
 
   const [metallicTheme, setMetallicTheme] = useState<
-    "gold" | "silver" | "copper" | "crystal"
+    "gold" | "silver" | "copper"
   >(() => {
     try {
       return (
         (localStorage.getItem("metallicTheme") as
-          "gold" | "silver" | "copper" | "crystal") || "gold"
+          "gold" | "silver" | "copper") || "gold"
       );
     } catch {
       return "gold";
@@ -372,9 +372,7 @@ export default function App() {
     } catch (_) {}
   };
 
-  const changeMetallicTheme = (
-    metal: "gold" | "silver" | "copper" | "crystal",
-  ) => {
+  const changeMetallicTheme = (metal: "gold" | "silver" | "copper") => {
     setMetallicTheme(metal);
     try {
       localStorage.setItem("metallicTheme", metal);
@@ -401,7 +399,6 @@ export default function App() {
     if (forceGold) return "gold-liner-box";
     if (metallicTheme === "silver") return "silver-liner-box";
     if (metallicTheme === "copper") return "copper-liner-box";
-    if (metallicTheme === "crystal") return "crystal-liner-box";
     return "gold-liner-box";
   };
 
@@ -2057,18 +2054,18 @@ export default function App() {
   return (
     <div
       id="app-workspace"
-      className={`h-screen w-screen overflow-hidden flex flex-col md:flex-row font-sans antialiased transition-colors duration-500 ${
+      className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-200 ${
         isLight
-          ? "bg-transparent text-zinc-900"
-          : "bg-transparent text-zinc-100"
+          ? "bg-zinc-50 text-zinc-900 selection:bg-yellow-500/30 selection:text-yellow-900"
+          : "bg-black text-zinc-100 selection:bg-yellow-500/30 selection:text-yellow-100"
       }`}
     >
       {/* SIDEBAR: NAVIGATION */}
       <aside
-        className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
+        className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
           isLight
-            ? "bg-white/70 border-zinc-200 text-zinc-800 backdrop-blur-xl"
-            : "bg-zinc-950/70 border-zinc-800 text-zinc-100 backdrop-blur-xl"
+            ? "bg-white border-zinc-200 text-zinc-800"
+            : "bg-zinc-950 border-zinc-900 text-zinc-100"
         }`}
       >
         {/* Brand Header */}
@@ -4347,7 +4344,7 @@ export default function App() {
       </aside>
 
       <div
-        className={`flex-1 flex flex-col min-w-0 transition-colors duration-500 ${isLight ? "bg-transparent" : "bg-transparent"}`}
+        className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? "bg-zinc-50" : "bg-black"}`}
       >
         {/* Global Toolbar */}
         <header

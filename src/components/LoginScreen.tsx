@@ -40,7 +40,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
     }
 
     const usersStr = localStorage.getItem('mockUsers');
-    const users = usersStr ? JSON.parse(usersStr) : [];
+    const users = usersStr ? JSON.parse(usersStr) : [{ username: 'admin', password: 'password', role: 'Admin' }];
 
     if (isRegistering) {
       if (users.find((u: any) => u.username === username)) {
@@ -192,6 +192,14 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             {isRegistering ? 'Sign in' : 'Register now'}
           </button>
         </div>
+        
+        {!isRegistering && (
+          <div className="mt-4 text-center">
+            <span className={`text-[10px] uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+              Demo Credentials: user=admin pass=password
+            </span>
+          </div>
+        )}
 
       </div>
     </div>

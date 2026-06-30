@@ -760,7 +760,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.05 }}
             onClick={() => onNavigateTab("Sell")}
-            className={`p-5 ${metallicTheme}-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-amber-50/70 hover:bg-amber-100/60 text-zinc-900 shadow-md"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -852,7 +852,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
             onClick={() => onNavigateTab("Production")}
-            className={`p-5 ${metallicTheme}-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 shadow-sm"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -950,7 +950,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
             onClick={() => onNavigateTab("Waste")}
-            className={`p-5 ${metallicTheme}-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-orange-50/50 hover:bg-orange-100/40 text-zinc-900 shadow-sm"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -1046,7 +1046,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
             onClick={() => onNavigateTab("Hours")}
-            className={`p-5 ${metallicTheme}-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 shadow-sm"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -1140,7 +1140,7 @@ export default function OverviewTab({
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.25 }}
-            className={`p-5 ${metallicTheme}-liner-box group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 gold-liner-box group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-amber-50/70 hover:bg-amber-100/60 text-zinc-900 shadow-md"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -1273,15 +1273,14 @@ export default function OverviewTab({
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
           </motion.div>
-        </div>
 
           {/* Real-time AI Operations Shift Summary */}
           <div
             id="ai-shift-summary"
-            className={`crystal-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${
+            className={`gold-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${
               isLight
-                ? ""
-                : "drop-shadow-xl"
+                ? "bg-orange-50/50 border border-orange-200"
+                : "bg-3d-copper-dark metallic-base drop-shadow-xl"
             }`}
           >
             <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
@@ -1438,7 +1437,7 @@ export default function OverviewTab({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
             {/* Interactive Production & Revenue Chart */}
             <div
-              className={`lg:col-span-2 ${metallicTheme}-liner-box p-6 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+              className={`lg:col-span-2 gold-liner-box p-6 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
                 <div>
@@ -2375,7 +2374,7 @@ export default function OverviewTab({
 
           {/* Daily Sushi Ops & COGS Ledger Entry Form */}
           <div
-            className={`${metallicTheme}-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+            className={`gold-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
           >
             <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
@@ -2730,6 +2729,8 @@ export default function OverviewTab({
               </div>
             </form>
           </div>
+
+        </div>
       </motion.div>
     </div>
   );
