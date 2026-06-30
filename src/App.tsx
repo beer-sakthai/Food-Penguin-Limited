@@ -2057,7 +2057,7 @@ export default function App() {
   return (
     <div
       id="app-workspace"
-      className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-colors duration-500 ${
+      className={`h-screen w-screen overflow-hidden flex flex-col md:flex-row font-sans antialiased transition-colors duration-500 ${
         isLight
           ? "bg-transparent text-zinc-900"
           : "bg-transparent text-zinc-100"
