@@ -460,10 +460,13 @@ export default function OverviewTab({
   }, [rawBranchList]);
 
   return (
-    <div id="overview-viewport" className="w-full max-w-7xl mx-auto space-y-6">
+    <div
+      id="overview-viewport"
+      className="w-full max-w-7xl mx-auto h-full flex flex-col overflow-hidden gap-y-3"
+    >
       {/* Header Banner with Premium ambient bento design */}
       <div
-        className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
+        className={`shrink-0 rounded-3xl p-4 md:p-5 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
           isLight
             ? "bg-white border-zinc-200 text-zinc-900"
             : "bg-zinc-900 border-zinc-800 text-white"
@@ -497,7 +500,7 @@ export default function OverviewTab({
             )}
           </div>
           <h1
-            className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
+            className={`text-2xl font-sans font-extrabold tracking-tight mb-2 ${
               isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"
             }`}
           >
@@ -542,7 +545,7 @@ export default function OverviewTab({
             <span>Audit Calendar Week</span>
           </div>
           <p
-            className={`text-[10px] ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+            className={`text-xs ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
           >
             Filter general dashboard throughput, COGS, waste stats, and bar
             charts
@@ -576,7 +579,7 @@ export default function OverviewTab({
             </option>
           </select>
           <div
-            className={`flex items-center justify-between text-[9px] font-mono mt-1 pt-2 border-t ${
+            className={`flex items-center justify-between text-xs font-mono mt-1 pt-2 border-t ${
               isLight ? "border-zinc-200" : "border-zinc-900"
             }`}
           >
@@ -594,14 +597,14 @@ export default function OverviewTab({
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="space-y-6"
+        className="flex flex-col flex-1 min-h-0 overflow-hidden gap-y-3"
       >
         {/* Low Stock Alerts Notification Banner */}
         {lowStockItems.length > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`p-5 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
+            className={`shrink-0 p-3 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
               isLight
                 ? "bg-amber-50 border-amber-200 text-amber-950 shadow-sm"
                 : "bg-amber-950/15 border border-amber-900/40 text-amber-200"
@@ -645,7 +648,7 @@ export default function OverviewTab({
 
         {/* Weekday Quick Select Tabs */}
         <div
-          className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${
+          className={`shrink-0 flex flex-wrap items-center justify-between gap-4 p-2.5 rounded-3xl border transition-colors ${
             isLight ? "bg-white border-zinc-200" : "bg-zinc-950 border-zinc-900"
           }`}
         >
@@ -693,7 +696,7 @@ export default function OverviewTab({
         </div>
 
         {/* KPI Bento Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
+        <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-3">
           {/* Card 1: Sell Today */}
           <motion.div
             key={activeLog.date + "-sell-" + activeLog.sales}
@@ -711,17 +714,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Gross Revenue
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     €{activeLog.sales.toLocaleString()}
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}
                   >
                     <TrendingUp className="w-3 h-3" />
                     +8.5% daily avg
@@ -803,20 +806,20 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Throughput
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     {activeLog.productionMade.toLocaleString()}{" "}
-                    <span className="text-[10px] text-zinc-500 font-normal">
+                    <span className="text-xs text-zinc-500 font-normal">
                       units
                     </span>
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-zinc-500" : "text-zinc-400 text-zinc-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-zinc-500" : "text-zinc-400 text-zinc-400"}`}
                   >
                     Target: {activeLog.productionTarget.toLocaleString()}
                   </span>
@@ -901,17 +904,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Seafood Waste
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     €{activeLog.waste.toFixed(2)}
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
                   >
                     <CheckCircle2 className="w-3 h-3" />
                     Within limit
@@ -997,17 +1000,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Worked Hours
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     {activeLog.hours} hrs
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
                   >
                     Staffing Optimal
                   </span>
@@ -1091,17 +1094,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Total COGS (GOC)
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     €{totalCogsActiveDay.toLocaleString()}
                   </h3>
                   <span
-                    className={`inline-flex mt-1 text-[9px] font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                    className={`inline-flex mt-1 text-xs font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
                     Weekly: €{totalCogsWeek.toLocaleString()}
                   </span>
@@ -1118,7 +1121,7 @@ export default function OverviewTab({
               </div>
 
               {/* Supplier Breakdowns */}
-              <div className="mt-4 space-y-2 text-[9px] font-sans">
+              <div className="mt-4 space-y-2 text-xs font-sans">
                 <div>
                   <div
                     className={`flex justify-between font-mono ${isLight ? "text-zinc-600 text-zinc-600 font-semibold" : "text-zinc-400"}`}
@@ -1216,10 +1219,14 @@ export default function OverviewTab({
           </motion.div>
         </div>
 
+        {/* Flexible region: AI Summary + Charts + Branch Compare share the remaining viewport space */}
+        <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-1 xl:grid-cols-2 gap-3">
+          {/* Left column: AI Shift Summary + Performance Index chart */}
+          <div className="flex flex-col min-h-0 gap-3 overflow-hidden">
           {/* Real-time AI Operations Shift Summary */}
           <div
             id="ai-shift-summary"
-            className={`crystal-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${
+            className={`shrink-0 crystal-liner-box p-4 overflow-hidden relative font-sans transition-all duration-300 ${
               isLight
                 ? ""
                 : "drop-shadow-xl"
@@ -1228,7 +1235,7 @@ export default function OverviewTab({
             <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
             <div
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b ${
                 isLight ? "border-zinc-200" : "border-zinc-800"
               }`}
             >
@@ -1248,7 +1255,7 @@ export default function OverviewTab({
                   >
                     AI Live Shift Summary Report
                     <span
-                      className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+                      className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
                         isLight
                           ? "bg-orange-50 border-orange-200 text-orange-700"
                           : "bg-orange-500/10 border-orange-500/30 text-orange-400"
@@ -1288,7 +1295,7 @@ export default function OverviewTab({
               </button>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-3 max-h-[120px] overflow-y-auto">
               {summaryLoading ? (
                 <div className="space-y-3 py-2 animate-pulse">
                   <div
@@ -1314,7 +1321,7 @@ export default function OverviewTab({
                 </div>
               ) : (
                 <div
-                  className={`p-5 rounded-2xl border relative overflow-hidden transition-colors ${
+                  className={`p-3 rounded-2xl border relative overflow-hidden transition-colors ${
                     isLight
                       ? "bg-orange-50/20 border-orange-100/70 text-zinc-800"
                       : "bg-orange-950/5 border-orange-900/10 text-zinc-300"
@@ -1328,7 +1335,7 @@ export default function OverviewTab({
                     "
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-6 mt-4 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-[10px] text-zinc-500">
+                  <div className="flex flex-wrap items-center gap-6 mt-3 pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-500">
                     <div className="flex items-center gap-1.5">
                       <span
                         className={`w-2 h-2 rounded-full ${
@@ -1375,13 +1382,11 @@ export default function OverviewTab({
             </div>
           </div>
 
-          {/* Main Stats Charts & Active Targets */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
-            {/* Interactive Production & Revenue Chart */}
-            <div
-              className={`lg:col-span-2 ${metallicTheme}-liner-box p-6 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
+          {/* Interactive Production & Revenue Chart */}
+          <div
+            className={`flex-1 min-h-0 flex flex-col ${metallicTheme}-liner-box p-4 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+          >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 gap-4 shrink-0">
                 <div>
                   <div className="flex items-center gap-2">
                     <h3
@@ -1390,7 +1395,7 @@ export default function OverviewTab({
                       Performance Index
                     </h3>
                     <span
-                      className={`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                      className={`text-xs border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
                         isLight
                           ? "bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200"
                           : "bg-emerald-950/40 text-emerald-400 border-emerald-900/40"
@@ -1411,7 +1416,7 @@ export default function OverviewTab({
                   <button
                     type="button"
                     onClick={() => setChartView("hourly")}
-                    className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
+                    className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
                       chartView === "hourly"
                         ? "bg-amber-500 text-zinc-950 shadow-md"
                         : isLight
@@ -1424,7 +1429,7 @@ export default function OverviewTab({
                   <button
                     type="button"
                     onClick={() => setChartView("weekly")}
-                    className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
+                    className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
                       chartView === "weekly"
                         ? "bg-amber-500 text-zinc-950 shadow-md"
                         : isLight
@@ -1436,7 +1441,7 @@ export default function OverviewTab({
                   </button>
                 </div>
               </div>
-              <div className="h-72 w-full mt-4">
+              <div className="flex-1 min-h-[140px] w-full mt-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={chartView === "weekly" ? weeklyData : hourlyData}
@@ -1491,7 +1496,7 @@ export default function OverviewTab({
                       tickLine={false}
                       tick={{
                         fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 11,
+                        fontSize: 15,
                       }}
                     />
                     <YAxis
@@ -1500,7 +1505,7 @@ export default function OverviewTab({
                       tickLine={false}
                       tick={{
                         fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 11,
+                        fontSize: 15,
                       }}
                     />
                     <YAxis
@@ -1510,7 +1515,7 @@ export default function OverviewTab({
                       tickLine={false}
                       tick={{
                         fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 11,
+                        fontSize: 15,
                       }}
                     />
                     <Tooltip
@@ -1553,10 +1558,14 @@ export default function OverviewTab({
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+          </div>
+          </div>
+
+          {/* Right column: Branch Compare config + bar chart + champion breakdown */}
+          <div className="flex flex-col min-h-0 gap-3 overflow-y-auto xl:overflow-hidden">
             {/* Branch Compare Config Header */}
             <div
-              className={`lg:col-span-1 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 ${isLight ? "bg-white border border-zinc-200" : "bg-zinc-950 border border-zinc-900 shadow-xl shadow-amber-500/5"}`}
+              className={`shrink-0 rounded-3xl p-4 flex flex-col justify-between transition-all duration-300 ${isLight ? "bg-white border border-zinc-200" : "bg-zinc-950 border border-zinc-900 shadow-xl shadow-amber-500/5"}`}
             >
               <div>
                 <h3
@@ -1570,7 +1579,7 @@ export default function OverviewTab({
                   benchmarks.
                 </p>
 
-                <div className="mt-6 space-y-4">
+                <div className="mt-3 space-y-3">
                   <div>
                     <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">
                       Branch A
@@ -1637,28 +1646,27 @@ export default function OverviewTab({
                   : "View All Global Branches"}
               </button>
             </div>
-          </div>
 
-          <div className="mt-10">
+          <div className="flex-1 min-h-0 flex flex-col">
             {/* Comparison Dashboard Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 z-10 relative">
+            <div className="flex-1 min-h-0 grid grid-cols-1 2xl:grid-cols-3 gap-3 z-10 relative">
               {/* Left Column: Recharts Comparison Visualizer BarChart */}
               <div
-                className={`p-5 rounded-2xl border flex flex-col justify-between transition-colors ${
+                className={`2xl:col-span-2 min-h-0 flex flex-col p-3 rounded-2xl border transition-colors ${
                   isLight
                     ? "bg-zinc-50 border-zinc-200 shadow-inner"
                     : "bg-zinc-950/40 border-zinc-900"
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
+                <div className="flex-1 min-h-0 flex flex-col">
+                  <div className="flex items-center justify-between mb-2 shrink-0">
                     <span
-                      className={`text-[10px] font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                      className={`text-xs font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                     >
                       Dynamic Comparison Bar
                     </span>
                     <span
-                      className={`text-[10px] border rounded px-2.5 py-0.5 font-mono ${
+                      className={`text-xs border rounded px-2.5 py-0.5 font-mono ${
                         isLight
                           ? "bg-white border-zinc-200 text-zinc-700 shadow-sm"
                           : "bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300"
@@ -1675,7 +1683,7 @@ export default function OverviewTab({
                     </span>
                   </div>
 
-                  <div className="h-64 w-full">
+                  <div className="flex-1 min-h-[140px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={branchPerformanceData}
@@ -1766,7 +1774,7 @@ export default function OverviewTab({
                           tickLine={false}
                           tick={{
                             fill: isLight ? "#4f4f52" : "#a1a1aa",
-                            fontSize: 10,
+                            fontSize: 15,
                             fontWeight: "bold",
                           }}
                         />
@@ -1775,7 +1783,7 @@ export default function OverviewTab({
                           tickLine={false}
                           tick={{
                             fill: isLight ? "#71717a" : "#71717a",
-                            fontSize: 10,
+                            fontSize: 15,
                           }}
                         />
                         <Tooltip
@@ -1791,7 +1799,7 @@ export default function OverviewTab({
                                   }`}
                                 >
                                   <p
-                                    className={`text-[10px] font-mono uppercase font-bold select-none ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                                    className={`text-xs font-mono uppercase font-bold select-none ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                                   >
                                     {data.type}
                                   </p>
@@ -1800,7 +1808,7 @@ export default function OverviewTab({
                                   >
                                     {data.fullName}
                                   </p>
-                                  <div className="mt-2 space-y-1.5 font-mono text-[11px]">
+                                  <div className="mt-2 space-y-1.5 font-mono text-xs">
                                     <div className="flex justify-between gap-8">
                                       <span
                                         className={
@@ -1893,7 +1901,7 @@ export default function OverviewTab({
 
                 {/* Micro comparison labels */}
                 <div
-                  className={`grid ${branchPerformanceData.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2 border-t pt-3 mt-2 text-center text-[10px] font-sans ${
+                  className={`shrink-0 grid ${branchPerformanceData.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2 border-t pt-2 mt-2 text-center text-xs font-sans ${
                     isLight ? "border-zinc-200" : "border-zinc-900/80"
                   }`}
                 >
@@ -1922,10 +1930,10 @@ export default function OverviewTab({
               </div>
 
               {/* Right Column: Championship & Performance Breakdown */}
-              <div className="flex flex-col justify-between space-y-4">
+              <div className="min-h-0 flex flex-col justify-between gap-3 overflow-y-auto 2xl:overflow-hidden">
                 {/* Champion Branch Banner Card */}
                 <div
-                  className={`p-5 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
+                  className={`p-3 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
                     isLight
                       ? "bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5"
                       : "bg-zinc-950 border-emerald-950/80"
@@ -1939,7 +1947,7 @@ export default function OverviewTab({
                       className={`flex items-center justify-between pb-3 border-b ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
                     >
                       <span
-                        className={`text-[9px] font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
+                        className={`text-xs font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
                           isLight
                             ? "bg-emerald-50 border-emerald-200 text-emerald-700 font-bold"
                             : "bg-emerald-950/45 text-emerald-400 border-emerald-900/60"
@@ -1948,24 +1956,24 @@ export default function OverviewTab({
                         <span>🏆</span> Peak Efficiency Store
                       </span>
                       <span
-                        className={`font-mono font-extrabold text-[13px] ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                        className={`font-mono font-extrabold text-xs ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
                       >
                         {championBranch.efficiencyScore}%
                       </span>
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-2">
                       <h4
                         className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                       >
                         {championBranch.fullName}
                       </h4>
-                      <p className="text-[10px] text-zinc-500 font-mono mt-0.5 leading-none">
+                      <p className="text-xs text-zinc-500 font-mono mt-0.5 leading-none">
                         {championBranch.type}
                       </p>
 
                       <p
-                        className={`text-xs mt-3 leading-relaxed ${isLight ? "text-zinc-600 text-zinc-600" : "text-zinc-400"}`}
+                        className={`text-xs mt-2 leading-relaxed ${isLight ? "text-zinc-600 text-zinc-600" : "text-zinc-400"}`}
                       >
                         Analyzing overall labor costs, high-premium customer
                         transaction margins, and minimal seafood waste,{" "}
@@ -1986,10 +1994,10 @@ export default function OverviewTab({
                   </div>
 
                   <div
-                    className={`mt-4 pt-3.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
+                    className={`mt-3 pt-2.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
                   >
                     <div>
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">
+                      <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
                         Labor Yield
                       </span>
                       <span
@@ -1999,7 +2007,7 @@ export default function OverviewTab({
                       </span>
                     </div>
                     <div>
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">
+                      <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
                         Waste Control
                       </span>
                       <span
@@ -2014,13 +2022,13 @@ export default function OverviewTab({
 
                 {/* Summary Performance Note */}
                 <div
-                  className={`p-4 rounded-xl border text-[11px] leading-relaxed font-sans transition-colors ${
+                  className={`shrink-0 p-3 rounded-xl border text-xs leading-relaxed font-sans transition-colors ${
                     isLight
                       ? "bg-zinc-50 border-zinc-200 text-zinc-600"
                       : "bg-zinc-950 border-zinc-900 text-zinc-400"
                   }`}
                 >
-                  <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-[9px]">
+                  <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-xs">
                     💡 Strategic Multi-Branch Note
                   </span>
                   Sell products in Marks & Spencer are gourmet luxury lines
@@ -2033,6 +2041,8 @@ export default function OverviewTab({
               </div>
             </div>
           </div>
+          </div>
+        </div>
 
       </motion.div>
     </div>

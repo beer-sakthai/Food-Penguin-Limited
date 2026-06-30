@@ -113,7 +113,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
   }));
 
   return (
-    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+    <div className="w-full h-full flex flex-col md:overflow-y-auto md:pr-1">
       <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
@@ -167,7 +167,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
             <div key={item.name} className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
                <div className="flex justify-between items-center mb-2">
                  <h3 className={`text-sm font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>{item.name}</h3>
-                 <span className="text-2xl font-mono font-black" style={{ color: item.color }}>{item.value}%</span>
+                 <span className="text-3xl font-mono font-black" style={{ color: item.color }}>{item.value}%</span>
                </div>
                <div className={`w-full h-2 rounded-full overflow-hidden ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `\${item.value}%`, backgroundColor: item.color }} />
@@ -177,68 +177,72 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
         </div>
 
         {/* Charts Container */}
-        <div className="md:col-span-2 space-y-6 flex flex-col">
+        <div className="md:col-span-2 gap-6 flex flex-col md:h-[480px]">
           {/* Pie Chart */}
-          <div className={`flex-1 p-6 rounded-2xl border transition-all min-h-[300px] ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div className={`flex-1 min-h-[180px] p-6 rounded-2xl border transition-all flex flex-col ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
             <h3 className={`text-sm font-bold font-sans tracking-tight mb-4 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
               Composition ({mode === 'plan' ? 'Target Plan' : 'Actual Use'})
             </h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={currentData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label={({ name, percent }) => `\${name} \${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
-                >
-                  {currentData.map((entry, index) => (
-                    <Cell key={`finance-cell-${index}-${entry.name}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: isLight ? '#ffffff' : '#18181b', 
-                    borderColor: isLight ? '#e4e4e7' : '#27272a',
-                    color: isLight ? '#18181b' : '#f4f4f5',
-                    borderRadius: '12px',
-                    fontWeight: 600
-                  }}
-                  itemStyle={{ color: isLight ? '#18181b' : '#f4f4f5' }}
-                  formatter={(value: number) => [`\${value}%`, 'Share']}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="flex-1 min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={currentData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `\${name} \${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  >
+                    {currentData.map((entry, index) => (
+                      <Cell key={`finance-cell-${index}-${entry.name}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isLight ? '#ffffff' : '#18181b',
+                      borderColor: isLight ? '#e4e4e7' : '#27272a',
+                      color: isLight ? '#18181b' : '#f4f4f5',
+                      borderRadius: '12px',
+                      fontWeight: 600
+                    }}
+                    itemStyle={{ color: isLight ? '#18181b' : '#f4f4f5' }}
+                    formatter={(value: number) => [`\${value}%`, 'Share']}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
           {/* Variance Bar Chart */}
-          <div className={`p-6 rounded-2xl border transition-all h-[250px] ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div className={`flex-1 min-h-[160px] p-6 rounded-2xl border transition-all flex flex-col ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
             <h3 className={`text-sm font-bold font-sans tracking-tight mb-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
               Plan vs Use Variance
             </h3>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#3f3f46'} />
-                <XAxis dataKey="name" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={12} tickLine={false} axisLine={false} dy={5} />
-                <YAxis stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `\${v}%`} />
-                <Tooltip 
-                  cursor={{ fill: isLight ? '#f4f4f5' : '#27272a' }}
-                  contentStyle={{ 
-                    backgroundColor: isLight ? '#ffffff' : '#18181b', 
-                    borderColor: isLight ? '#e4e4e7' : '#27272a',
-                    borderRadius: '12px',
-                  }}
-                  itemStyle={{ fontWeight: 600 }}
-                />
-                <Legend iconType="circle" wrapperStyle={{ bottom: 0, fontSize: 12 }} />
-                <Bar dataKey="Plan" fill="#a1a1aa" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Use" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex-1 min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={comparisonData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#3f3f46'} />
+                  <XAxis dataKey="name" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={15} tickLine={false} axisLine={false} dy={5} />
+                  <YAxis stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={15} tickLine={false} axisLine={false} tickFormatter={(v) => `\${v}%`} />
+                  <Tooltip
+                    cursor={{ fill: isLight ? '#f4f4f5' : '#27272a' }}
+                    contentStyle={{
+                      backgroundColor: isLight ? '#ffffff' : '#18181b',
+                      borderColor: isLight ? '#e4e4e7' : '#27272a',
+                      borderRadius: '12px',
+                    }}
+                    itemStyle={{ fontWeight: 600 }}
+                  />
+                  <Legend iconType="circle" wrapperStyle={{ bottom: 0, fontSize: 15 }} />
+                  <Bar dataKey="Plan" fill="#a1a1aa" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Use" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
@@ -270,7 +274,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Operational Ledger & COGS Input
                     <span
-                      className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+                      className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
                         isLight
                           ? "bg-orange-50 border-orange-200 text-orange-700 font-bold"
                           : "bg-orange-500/10 border-orange-500/30 text-orange-400"
@@ -300,7 +304,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
               >
                 <div>
                   <label
-                    className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
                     Target Day of Week
                   </label>
@@ -324,7 +328,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                 </div>
                 <div>
                   <label
-                    className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
                     Calendar Date
                   </label>
@@ -342,7 +346,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                 </div>
                 <div>
                   <label
-                    className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
                     Primary Registered Supplier
                   </label>
@@ -382,7 +386,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Gross Revenue (€)
                       </label>
@@ -401,7 +405,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Sushi Waste Cost (€)
                       </label>
@@ -420,7 +424,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Staff Rostered (hrs)
                       </label>
@@ -438,7 +442,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Production Target (units)
                       </label>
@@ -456,7 +460,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Production Made (units)
                       </label>
@@ -490,7 +494,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Tazaki Supplier (€)
                       </label>
@@ -509,7 +513,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Sysco Supplier (€)
                       </label>
@@ -528,7 +532,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Bulza Supplier (€)
                       </label>
@@ -547,7 +551,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Sticker Supplier (€)
                       </label>
@@ -566,7 +570,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                     </div>
                     <div>
                       <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                       >
                         Others / Etc. (€)
                       </label>

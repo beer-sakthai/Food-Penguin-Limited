@@ -149,8 +149,8 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
   }).filter(supplier => supplier.items.length > 0 || supplier.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
-      <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
+    <div className="w-full h-full flex flex-col overflow-hidden gap-6">
+      <div className="shrink-0 flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
             <Package className={`${isLight ? 'text-indigo-600' : 'text-indigo-400'}`} size={28} />
@@ -177,7 +177,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 gap-4 content-start pr-1">
         {filteredSuppliers.length === 0 ? (
           <div className={`p-8 text-center rounded-2xl border ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
             No items found matching "{searchQuery}".

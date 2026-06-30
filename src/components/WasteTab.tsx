@@ -171,10 +171,10 @@ export default function WasteTab({
  };
 
  return (
- <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+ <div className="w-full h-full grid grid-cols-1 xl:grid-cols-2 gap-6 md:overflow-hidden">
 
       {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
-      <div className="lg:col-span-2 space-y-6">
+      <div className="lg:col-span-2 space-y-6 md:h-full md:overflow-y-auto md:pr-1">
 
  {/* Dynamic Allowance Index and Chart Split */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,8 +194,8 @@ export default function WasteTab({
  <Euro className="w-5 h-5" />
  </div>
  <div>
- <span className={`text-[10px] uppercase font-mono font-bold tracking-wide ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>Leakage Today</span>
- <span className={`text-lg font-sans font-bold block -mt-1 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+ <span className={`text-xs uppercase font-mono font-bold tracking-wide ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>Leakage Today</span>
+ <span className={`text-3xl font-sans font-bold block -mt-1 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  €{totalCostToday.toFixed(2)}
  </span>
  </div>
@@ -211,7 +211,7 @@ export default function WasteTab({
  style={{ width: `${Math.min((totalCostToday / 500) * 100, 100)}%` }}
  />
  </div>
- <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono mt-2">
+ <div className="flex justify-between items-center text-xs text-zinc-500 font-mono mt-2">
  <span>Safety Limit Target: €500.00 Max</span>
  <span className="font-bold text-rose-400">
  {((totalCostToday / 500) * 100).toFixed(1)}% of allowance consumed
@@ -220,7 +220,7 @@ export default function WasteTab({
  </div>
  </div>
 
- <div className={`rounded-xl border p-5 shadow-sm h-48 md:h-auto min-h-[220px] flex flex-col transition-all duration-300 ${
+ <div className={`rounded-xl border p-5 shadow-sm flex-1 min-h-[220px] flex flex-col transition-all duration-300 ${
  isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Leakage Proportions</h2>
@@ -234,7 +234,7 @@ export default function WasteTab({
  borderRadius: '12px', 
  border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
  color: isLight ? '#18181b' : '#fff', 
- fontSize: '12px' 
+ fontSize: '15px' 
  }}
  itemStyle={{ fontWeight: 'bold' }}
  formatter={(value: number) => `€${value.toFixed(2)}`}
@@ -258,7 +258,7 @@ export default function WasteTab({
  height={36} 
  iconType="circle" 
  iconSize={8} 
- wrapperStyle={{ fontSize: '10px', color: isLight ? '#52525b' : '#a1a1aa' }} 
+ wrapperStyle={{ fontSize: '15px', color: isLight ? '#52525b' : '#a1a1aa' }} 
  />
  </PieChart>
  </ResponsiveContainer>
@@ -280,7 +280,7 @@ export default function WasteTab({
  <div>
  <h3 className={`text-base font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  Daily Waste Benchmark vs Target
- <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+ <span className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
  isLight 
  ? 'bg-rose-50 border-rose-200 text-rose-700' 
  : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
@@ -293,7 +293,7 @@ export default function WasteTab({
  </div>
  </div>
 
- <div className="h-64 w-full mt-6">
+ <div className="flex-1 min-h-[180px] w-full mt-6">
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={barChartData} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
@@ -301,12 +301,12 @@ export default function WasteTab({
  dataKey="day" 
  tickLine={false} 
  axisLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
+ tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 15 }} 
  />
  <YAxis 
  tickLine={false} 
  axisLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
+ tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 15 }} 
  unit="€"
  />
  <Tooltip 
@@ -325,14 +325,14 @@ export default function WasteTab({
  verticalAlign="bottom" 
  height={36} 
  content={({ payload }) => (
- <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
+ <div className="flex justify-center gap-6 mt-4 text-xs font-sans">
  {payload?.map((entry: any, index: number) => (
  <div key={`item-${index}`} className="flex items-center gap-2">
  <span 
  className="w-3 h-3 rounded-full" 
  style={{ backgroundColor: entry.color }} 
  />
- <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
+ <span className={`font-semibold uppercase tracking-wider text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
  {entry.value === 'actual' ? 'Actual Waste Cost' : 'Budget Allowance'}
  </span>
  </div>
@@ -370,7 +370,7 @@ export default function WasteTab({
 
  <div className="overflow-x-auto">
  <table className="w-full text-left text-xs">
- <thead className={`font-mono text-[10px] uppercase tracking-wider border-b ${
+ <thead className={`font-mono text-xs uppercase tracking-wider border-b ${
  isLight ? 'bg-zinc-50 text-zinc-600 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800'
  }`}>
  <tr>
@@ -388,7 +388,7 @@ export default function WasteTab({
  <td className={`py-3 px-4 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{rec.category}</td>
  <td className="py-3 px-4 text-center font-mono font-medium">{rec.weight.toFixed(1)} kg</td>
  <td className="py-3 px-4 text-center">
- <span className={`inline-block px-2 py-0.5 rounded font-mono text-[9px] font-semibold ${reasonColors(rec.reason)}`}>
+ <span className={`inline-block px-2 py-0.5 rounded font-mono text-xs font-semibold ${reasonColors(rec.reason)}`}>
  {rec.reason}
  </span>
  </td>
@@ -403,7 +403,7 @@ export default function WasteTab({
       </div>
 
       {/* RIGHT ASPECT: LOGGING & AI STRATEGY */}
-      <div className="space-y-6">
+      <div className="space-y-6 md:h-full md:overflow-y-auto md:pr-1">
         
         {/* Input Form */}
         <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>

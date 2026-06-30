@@ -138,11 +138,11 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  };
 
  return (
- <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+ <div className="w-full h-full grid grid-cols-1 xl:grid-cols-2 gap-6 md:overflow-hidden">
 
       {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
-      <div className="lg:col-span-2 space-y-6">
- 
+      <div className="lg:col-span-2 space-y-6 md:h-full md:overflow-y-auto md:pr-1">
+
  {/* Active Cooking Grid */}
  <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-805 border-zinc-800">
@@ -150,20 +150,20 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  <h2 className="text-base font-sans font-semibold text-white">Kitchen Thru-rate Monitoring</h2>
  <p className="text-xs text-zinc-500">Active chef workflows and queue states</p>
  </div>
- <span className="p-1 px-3 text-[10px] rounded-full bg-emerald-950/40 text-emerald-450 font-mono font-bold border border-emerald-900/40">
+ <span className="p-1 px-3 text-xs rounded-full bg-emerald-950/40 text-emerald-450 font-mono font-bold border border-emerald-900/40">
  {tasks.filter(t => t.status === 'Cooking').length} Active Pots
  </span>
  </div>
 
- <div className="h-40 mt-6 mb-4">
+ <div className="flex-1 min-h-[120px] mt-6 mb-4">
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={statusData} layout="vertical" margin={{ top: 0, right: 0, left: 10, bottom: 0 }}>
  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#1f2937" />
- <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} />
- <YAxis type="category" dataKey="status" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10, fontWeight: 'bold' }} />
+ <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 15 }} />
+ <YAxis type="category" dataKey="status" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 15, fontWeight: 'bold' }} />
  <Tooltip 
  cursor={{ fill: '#1f2937' }}
- contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+ contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '15px' }}
  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
  />
  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
@@ -179,7 +179,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  {tasks.map((task) => (
  <div key={task.id} className="border border-zinc-800 rounded-xl p-4 bg-zinc-950 flex justify-between items-start text-white">
  <div className="space-y-1">
- <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-[9px] uppercase font-mono tracking-wide ${
+ <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-xs uppercase font-mono tracking-wide ${
  task.priority === 'high' ? 'bg-rose-950/40 text-rose-400 border border-rose-900/40' : task.priority === 'medium' ? 'bg-amber-950/40 text-amber-400 border border-amber-900/40' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
  }`}>
  {task.priority} speed
@@ -189,7 +189,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  </div>
 
  <div className="space-y-2 text-right">
- <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono font-bold ${
+ <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-mono font-bold ${
  task.status === 'Prepared' ? 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40' : 
  task.status === 'Cooking' ? 'bg-amber-950/40 text-amber-450 border border-amber-900/40 animate-pulse' : 'bg-zinc-900 text-zinc-400'
  }`}>
@@ -200,7 +200,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  {task.status === 'In Queue' && (
  <button
  onClick={() => onUpdateTaskStatus(task.id, 'Cooking')}
- className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white"
+ className="p-1 px-2 border text-xs rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white"
  >
  Cook
  </button>
@@ -208,7 +208,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  {task.status === 'Cooking' && (
  <button
  onClick={() => onUpdateTaskStatus(task.id, 'Prepared')}
- className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white font-semibold"
+ className="p-1 px-2 border text-xs rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white font-semibold"
  >
  Finish
  </button>
@@ -233,7 +233,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 <p className="text-xs text-zinc-500">Hourly units produced against target expectations</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-[10px] font-mono font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-4 text-xs font-mono font-bold uppercase tracking-wider">
                <div className="flex items-center gap-1.5 text-zinc-400">
                  <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Actual Volume
                </div>
@@ -282,25 +282,25 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                         strokeLinecap="round"
                       />
                     </svg>
-                    <span className={`absolute text-[10px] font-bold font-mono z-20 ${isLow ? 'text-rose-400' : 'text-zinc-200'}`}>
+                    <span className={`absolute text-xs font-bold font-mono z-20 ${isLow ? 'text-rose-400' : 'text-zinc-200'}`}>
                       {data.efficiency}%
                     </span>
                   </div>
-                  <span className="text-[9px] text-zinc-500 font-mono tracking-wider">{data.hour}</span>
+                  <span className="text-xs text-zinc-500 font-mono tracking-wider">{data.hour}</span>
                 </motion.div>
               );
             })}
           </div>
-          <div className="h-64 mt-6">
+          <div className="flex-1 min-h-[160px] mt-6">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={efficiencyData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
-                <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
-                <YAxis yAxisId="left" orientation="left" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 15 }} />
+                <YAxis yAxisId="left" orientation="left" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 15 }} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 15 }} />
                 <Tooltip 
                   cursor={{ fill: '#1f2937' }}
-                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '15px' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 />
                 <Bar yAxisId="left" dataKey="volume" name="Actual Volume" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
@@ -321,12 +321,12 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
               </h2>
               <p className="text-xs text-zinc-500">Weekly comparison of actual items plated versus daily targets</p>
             </div>
-            <span className="p-1 px-3 text-[10px] rounded-full bg-emerald-950/40 text-emerald-400 font-mono font-bold border border-emerald-900/40">
+            <span className="p-1 px-3 text-xs rounded-full bg-emerald-950/40 text-emerald-400 font-mono font-bold border border-emerald-900/40">
               92% Weekly Efficiency
             </span>
           </div>
 
-          <div className="h-64 mt-6">
+          <div className="flex-1 min-h-[160px] mt-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={[
                 { day: 'Mon', Output: 450, Target: 400 },
@@ -338,14 +338,14 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 { day: 'Sun', Output: 590, Target: 550 },
               ]} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 15 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 15 }} />
                 <Tooltip 
                   cursor={{ fill: '#1f2937', opacity: 0.3 }}
-                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '15px' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '15px', paddingTop: '10px' }} />
                 <Bar dataKey="Output" name="Actual Plated Items" fill="#10b981" radius={[3, 3, 0, 0]} barSize={20} />
                 <Bar dataKey="Target" name="Culinary Target" fill="#4b5563" radius={[3, 3, 0, 0]} barSize={20} />
               </BarChart>
@@ -364,9 +364,9 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  <div className="space-y-1">
  <h4 className="text-sm font-bold text-zinc-200">{rcp.name}</h4>
  <div className="flex flex-wrap gap-1 items-center">
- <span className="text-[10px] font-mono text-zinc-500 font-medium">Prep: {rcp.prepTime} mins | Allergens:</span>
+ <span className="text-xs font-mono text-zinc-500 font-medium">Prep: {rcp.prepTime} mins | Allergens:</span>
  {rcp.allergens.map((alg, i) => (
- <span key={i} className="px-1 text-[9px] bg-rose-950/40 text-rose-450 rounded border border-rose-900/30">{alg}</span>
+ <span key={i} className="px-1 text-xs bg-rose-950/40 text-rose-450 rounded border border-rose-900/30">{alg}</span>
  ))}
  </div>
  </div>
@@ -384,7 +384,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
       </div>
 
       {/* RIGHT: TASK INPUT & AI AUDIT */}
-      <div className="space-y-6">
+      <div className="space-y-6 md:h-full md:overflow-y-auto md:pr-1">
         
         {/* Add Task Form */}
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
@@ -481,7 +481,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                    className="p-2 border border-zinc-800 rounded bg-zinc-950 flex flex-col items-center gap-1 hover:border-amber-500/50 transition-colors"
                  >
                    <img src={d.data} alt={d.name} className="w-8 h-8 rounded" />
-                   <span className="text-[8px] font-bold text-zinc-400 text-center truncate w-full">{d.name}</span>
+                   <span className="text-xs font-bold text-zinc-400 text-center truncate w-full">{d.name}</span>
                  </button>
                ))}
              </div>
@@ -495,7 +495,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                  <Upload className="w-3 h-3" />
                  Select
                </button>
-               <span className="text-[10px] text-zinc-500 font-mono truncate flex-1">{fileLabel}</span>
+               <span className="text-xs text-zinc-500 font-mono truncate flex-1">{fileLabel}</span>
              </div>
 
              <button 
