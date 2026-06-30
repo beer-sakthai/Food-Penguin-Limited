@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState } from 'react';
 import { Truck, Search, Box, ChevronDown, Package, Tag, ShoppingCart } from 'lucide-react';
 

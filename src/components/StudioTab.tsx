@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState, useRef } from 'react';
 import { Camera, Image as ImageIcon, Send, Loader2, ScanLine, Download, AlertCircle, Copy, Check } from 'lucide-react';
 

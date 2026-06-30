@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React from 'react';
 import { SalesOrder } from '../types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

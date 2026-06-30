@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState, useMemo } from 'react';
 import { 
   LineChart, 

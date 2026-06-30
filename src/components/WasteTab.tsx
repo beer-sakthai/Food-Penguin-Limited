@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState, useEffect } from 'react';
 import { WasteRecord, DailyOperationalLog, CompanyTarget } from '../types';
 import { 

@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { InventoryItem, DailyOperationalLog } from '../types';
 import CapacityAnalytics from './CapacityAnalytics';

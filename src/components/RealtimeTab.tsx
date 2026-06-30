@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import React, { useState, useEffect } from 'react';
 import { Activity, Clock, AlertTriangle, TrendingUp, Cpu, Server, CheckCircle2 } from 'lucide-react';
 
