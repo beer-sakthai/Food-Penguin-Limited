@@ -138,7 +138,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  };
 
  return (
- <div className="grid w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start:grid-cols-3 gap-6">
+ <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
       {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
       <div className="lg:col-span-2 space-y-6">
