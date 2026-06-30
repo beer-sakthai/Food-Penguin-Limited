@@ -91,7 +91,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
                 type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
                   isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
                 }`}
                 placeholder="Enter username"
@@ -107,7 +107,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
                   isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
                 }`}
                 placeholder="Enter password"
@@ -121,7 +121,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
               <select
                 value={role}
                 onChange={e => setRole(e.target.value as 'Admin' | 'User')}
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none cursor-pointer ${
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] appearance-none cursor-pointer ${
                   isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
                 }`}
               >
@@ -144,7 +144,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
           <>
             <div className="relative my-5 flex py-1 items-center">
               <div className={`flex-grow border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}></div>
-              <span className={`flex-shrink mx-4 text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>Or Corporate Auth</span>
+              <span className={`flex-shrink mx-4 text-xs font-mono font-bold uppercase tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>Or Corporate Auth</span>
               <div className={`flex-grow border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}></div>
             </div>
 
@@ -195,7 +195,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
         
         {!isRegistering && (
           <div className="mt-4 text-center">
-            <span className={`text-[10px] uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            <span className={`text-xs uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
               Demo Credentials: user=admin pass=password
             </span>
           </div>

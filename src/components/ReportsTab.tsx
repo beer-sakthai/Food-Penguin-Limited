@@ -338,9 +338,9 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full h-full flex flex-col overflow-hidden gap-6">
       {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-xl border ${isLight ? 'bg-yellow-50 border-yellow-200 text-yellow-600' : 'bg-yellow-950/30 border-yellow-900/40 text-yellow-400'}`}>
@@ -376,7 +376,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       </div>
 
       {/* SEARCH AND CONTROLS CARD */}
-      <div className={`rounded-2xl border p-5 transition-all shadow-sm ${
+      <div className={`shrink-0 rounded-2xl border p-5 transition-all shadow-sm ${
         isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'
       }`}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 items-end">
@@ -566,7 +566,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       </div>
 
       {/* THREE-CARD STAT PREVIEW WITH ENTRY ANIMATIONS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-4">
         <AnimatePresence mode="popLayout">
           {activeReportDetails.metrics.map((metric, idx) => (
             <motion.div
@@ -579,10 +579,10 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
                 isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-zinc-900 border-zinc-800'
               }`}
             >
-              <span className={`text-[11px] font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              <span className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 {metric.label}
               </span>
-              <span className={`text-2xl font-mono font-black mt-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+              <span className={`text-3xl font-mono font-black mt-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
                 {metric.value}
               </span>
             </motion.div>
@@ -591,13 +591,13 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
       </div>
 
       {/* DATA PREVIEW TABLE & JULES CONSULTING */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden">
+
         {/* DATA PREVIEW TABLE CARD */}
-        <div className={`lg:col-span-2 rounded-2xl border p-5 overflow-hidden flex flex-col ${
+        <div className={`lg:col-span-2 rounded-2xl border p-5 overflow-hidden flex flex-col min-h-0 ${
           isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'
         }`}>
-          <div className="pb-4 flex items-center justify-between border-b border-zinc-800/20 mb-4">
+          <div className="shrink-0 pb-4 flex items-center justify-between border-b border-zinc-800/20 mb-4">
             <div>
               <h2 className={`text-base font-semibold ${isLight ? 'text-zinc-800' : 'text-white'}`}>
                 {activeSection} Report Preview
@@ -607,17 +607,17 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               </p>
             </div>
             <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-              activeReportDetails.count > 0 
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+              activeReportDetails.count > 0
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                 : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
             }`}>
               {activeReportDetails.count} records
             </span>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-zinc-800/10 flex-1 max-h-96">
+          <div className="overflow-x-auto overflow-y-auto rounded-xl border border-zinc-800/10 flex-1 min-h-0">
             <table className="w-full text-xs text-left">
-              <thead className={`text-[10px] font-bold uppercase tracking-wider sticky top-0 z-10 border-b border-zinc-800/25 ${
+              <thead className={`text-xs font-bold uppercase tracking-wider sticky top-0 z-10 border-b border-zinc-800/25 ${
                 isLight ? 'bg-zinc-100 text-zinc-600' : 'bg-zinc-950 text-zinc-400'
               }`}>
                 <tr>
@@ -651,7 +651,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
         </div>
 
         {/* JULES (GOOGLE AI) CONSULTING AUDITOR */}
-        <div className={`rounded-2xl border p-5 flex flex-col justify-between relative overflow-hidden ${
+        <div className={`rounded-2xl border p-5 flex flex-col justify-between relative overflow-hidden min-h-0 ${
           isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'
         }`}>
           {/* Decorative glowing gradient */}
@@ -666,7 +666,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
                 <h3 className={`text-sm font-bold ${isLight ? 'text-zinc-800' : 'text-white'}`}>
                   Consult Jules (Google AI)
                 </h3>
-                <p className="text-[10px] text-zinc-500">Executive Advisor & Margin Specialist</p>
+                <p className="text-xs text-zinc-500">Executive Advisor & Margin Specialist</p>
               </div>
             </div>
 
@@ -676,7 +676,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               {isAiLoading ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-3">
                   <div className="w-5 h-5 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
-                  <span className="text-[10px] font-mono text-yellow-500 animate-pulse uppercase font-bold tracking-wider">
+                  <span className="text-xs font-mono text-yellow-500 animate-pulse uppercase font-bold tracking-wider">
                     Jules is auditing report...
                   </span>
                 </div>

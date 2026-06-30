@@ -67,7 +67,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       {/* Header section */}
       <div className="flex items-center gap-3">
         <Share2 className={`w-8 h-8 ${isLight ? 'text-amber-500' : 'text-amber-400'}`} />
@@ -93,7 +93,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                 value={newItem}
                 onChange={e => setNewItem(e.target.value)}
                 placeholder="e.g. Flour, Packaging..."
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
                 required
               />
             </div>
@@ -106,7 +106,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                 onChange={e => setNewQty(e.target.value)}
                 min="1"
                 placeholder="0"
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
                 required
               />
             </div>
@@ -116,7 +116,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
               <select 
                 value={newFromBranch}
                 onChange={e => setNewFromBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
               >
                 <option value="Main Warehouse">Main Warehouse</option>
                 {branches.map(b => (
@@ -126,14 +126,14 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
             </div>
 
             <div className="flex justify-center my-0.5">
-              <span className={`text-[10px] uppercase font-bold tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-600'}`}>To</span>
+              <span className={`text-xs uppercase font-bold tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-600'}`}>To</span>
             </div>
 
             <div>
               <select 
                 value={newToBranch}
                 onChange={e => setNewToBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
               >
                 {branches.map(b => (
                   <option key={b} value={b}>{b}</option>
@@ -186,7 +186,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                       </div>
                       <p className={`text-xs mt-1 flex items-center gap-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
                         <span>{req.fromBranch}</span>
-                        <span className="text-[10px]">→</span>
+                        <span className="text-xs">→</span>
                         <span className="font-medium text-zinc-800 dark:text-zinc-200">{req.toBranch}</span>
                       </p>
                     </div>
@@ -195,10 +195,10 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
                   <div className="flex items-center gap-6">
                     <div className="text-right">
                       <div className={`text-sm font-bold font-mono ${isLight ? 'text-zinc-900' : 'text-white'}`}>x{req.quantity}</div>
-                      <div className={`text-[10px] mt-0.5 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>{req.date}</div>
+                      <div className={`text-xs mt-0.5 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>{req.date}</div>
                     </div>
                     <div className="w-24 text-right">
-                      <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-full border ${
+                      <span className={`text-xs uppercase font-bold tracking-wider px-2 py-1 rounded-full border ${
                         req.status === 'Delivered' ? (isLight ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-emerald-400 bg-emerald-950/40 border-emerald-900/50') :
                         req.status === 'Pending' ? (isLight ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-rose-400 bg-rose-950/40 border-rose-900/50') :
                         (isLight ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-amber-400 bg-amber-950/40 border-amber-900/50')

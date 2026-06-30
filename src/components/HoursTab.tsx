@@ -49,11 +49,11 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
  }
  };
 
- return (
- <div className="grid grid-cols-1 gap-6">
+  return (
+  <div className="w-full">
 
- {/* LEFT ASPECT: EMPLOYEES DIRECTORY & SIMULATORS */}
- <div className="space-y-6">
+  {/* MAIN TWO COLUMN LAYOUT */}
+  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
  {/* Shift Roster Summary metrics */}
  <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-sm text-white">
@@ -65,12 +65,12 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
 
  <div className="flex gap-3">
  <div className="bg-amber-950/40 border border-amber-900/40 p-3 rounded-2xl text-center min-w-[100px]">
- <span className="text-[9px] uppercase font-mono text-amber-400 block font-bold tracking-widest">Total Sched</span>
- <span className="text-xl font-black text-white block font-mono mt-1">{totalHoursScheduled}h</span>
+ <span className="text-xs uppercase font-mono text-amber-400 block font-bold tracking-widest">Total Sched</span>
+ <span className="text-3xl font-black text-white block font-mono mt-1">{totalHoursScheduled}h</span>
  </div>
  <div className="bg-emerald-950/40 border border-emerald-900/40 p-3 rounded-2xl text-center min-w-[100px]">
- <span className="text-[9px] uppercase font-mono text-emerald-450 block font-bold tracking-widest">Active Staff</span>
- <span className="text-xl font-black text-white block font-mono mt-1">
+ <span className="text-xs uppercase font-mono text-emerald-450 block font-bold tracking-widest">Active Staff</span>
+ <span className="text-3xl font-black text-white block font-mono mt-1">
  {hoursData.filter(e => e.status === 'Clocked In').length} / {hoursData.length}
  </span>
  </div>
@@ -81,14 +81,14 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={hoursData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
- <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} />
- <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+ <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 15 }} />
+ <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 15 }} />
  <Tooltip 
  cursor={{ fill: '#1f2937' }}
- contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '12px' }}
+ contentStyle={{ backgroundColor: '#09090b', borderRadius: '12px', border: '1px solid #27272a', color: '#fff', fontSize: '15px' }}
  itemStyle={{ fontWeight: 'bold' }}
  />
- <Legend wrapperStyle={{ fontSize: '10px' }} iconType="circle" iconSize={6} />
+ <Legend wrapperStyle={{ fontSize: '15px' }} iconType="circle" iconSize={6} />
  <Bar dataKey="scheduledHours" name="Scheduled" fill="#27272a" radius={[4, 4, 0, 0]} barSize={20} />
  <Bar dataKey="actualHours" name="Actual Logged" fill="#f97316" radius={[4, 4, 0, 0]} barSize={20} />
  </BarChart>
@@ -106,7 +106,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
 
           <div className="overflow-hidden border border-zinc-800 rounded-xl">
             <table className="w-full text-left text-sm">
-              <thead className="bg-zinc-950 font-mono text-[10px] uppercase text-zinc-500">
+              <thead className="bg-zinc-950 font-mono text-xs uppercase text-zinc-500">
                 <tr>
                   <th className="px-4 py-3">Team Member</th>
                   <th className="px-4 py-3">Role & Shift</th>
@@ -121,7 +121,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
                   return (
                     <tr key={emp.id} className="bg-zinc-900  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800/50 transition-colors">
                       <td className="px-4 py-3 font-medium text-zinc-200">{emp.name}</td>
-                      <td className="px-4 py-3 text-[10px] font-mono text-zinc-400">
+                      <td className="px-4 py-3 text-xs font-mono text-zinc-400">
                         <span className="uppercase font-bold">{emp.role}</span>
                         <span className="block opacity-70">{emp.shiftStart} - {emp.shiftEnd}</span>
                       </td>
