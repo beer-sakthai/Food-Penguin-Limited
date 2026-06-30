@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: '/Food-Penguin-Limited/',
     plugins: [react(), tailwindcss()],
     build: {
       chunkSizeWarningLimit: 2000,
