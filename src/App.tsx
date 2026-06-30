@@ -2349,8 +2349,191 @@ export default function App() {
           </div>
 
 
+          {/* Footer info links */}
+          <div
+            className={`p-2.5 border-t shrink-0 transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${
+                  isLight
+                    ? "bg-zinc-200 border-zinc-300 text-zinc-700"
+                    : "bg-zinc-900 border-zinc-800"
+                }`}
+              >
+                {currentUser?.photoURL ? (
+                  <img
+                    src={currentUser.photoURL}
+                    alt={currentUser.username}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-4 h-4" />
+                )}
+                <span
+                  className={`w-2 h-2 rounded-full ${isFirebaseSynced ? "bg-emerald-500 animate-pulse" : "bg-orange-500"} absolute -bottom-0.5 -right-0.5 border ${isLight ? "border-zinc-100" : "border-zinc-950"}`}
+                />
+              </div>
+              <div className="text-xs leading-tight flex-1 min-w-0">
+                <p
+                  className={`font-semibold truncate ${isLight ? "text-zinc-900 font-bold" : "text-white"}`}
+                  title={currentUser?.username || ""}
+                >
+                  {currentUser?.username || "Skipper Koala"}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <select
+                    value={userRole}
+                    onChange={(e) => setUserRole(e.target.value as any)}
+                    className={`bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
+                      isLight
+                        ? "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold"
+                        : "text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Staff">Staff</option>
+                    <option value="User">User</option>
+                  </select>
+                  <span className="text-zinc-500 font-mono text-xs">•</span>
+                  <button
+                    onClick={async () => {
+                      localStorage.removeItem("localCurrentUser");
+                      setCurrentUser(null);
+                      await signOut(auth).catch(() => {});
+                    }}
+                    className={`text-xs font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
+                      isLight ? "text-zinc-500 font-bold" : "text-zinc-400"
+                    }`}
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-2.5 h-2.5" />
+                    OUT
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div
+        className={`flex-1 flex flex-col min-w-0 transition-colors duration-500 ${isLight ? "bg-transparent" : "bg-transparent"}`}
+      >
+        {/* Global Toolbar */}
+        <header
+          className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
+            isLight
+              ? "bg-white border-zinc-200 text-zinc-900 shadow-sm"
+              : "bg-zinc-950 border-zinc-900 text-white shadow-md"
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            <h2
+              className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? "text-zinc-900" : "text-white"}`}
+            >
+              {tabMeta.find((t) => t.id === activeTab)?.label || activeTab} View
+            </h2>
+            <span
+              className={`hidden lg:inline-block text-xs font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
+                isLight
+                  ? "bg-zinc-100 text-zinc-600 border-zinc-200"
+                  : "bg-zinc-900 text-zinc-400 border-zinc-800"
+              }`}
+            >
+              Food chain ops portal
+            </span>
+
+            {/* Global Branch Selector Dropdown */}
+            <div
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${
+                isLight
+                  ? "bg-zinc-100 border-zinc-200"
+                  : "bg-zinc-900 border-zinc-800"
+              }`}
+            >
+              <span
+                className={`text-xs font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+              >
+                Store:
+              </span>
+              <select
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value as any)}
+                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-xs sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+                style={{ outline: "none" }}
+              >
+                <option
+                  value="Marks & Spencer - Cork City"
+                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
+                >
+                  Marks & Spencer Cork City
+                </option>
+                <option
+                  value="Tesco - Cork City"
+                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
+                >
+                  Tesco Cork City
+                </option>
+                <option
+                  value="Tesco - Mahon Point"
+                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
+                >
+                  Tesco Mahon Point
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <span className="text-xs font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
+                🇮🇪 Ireland Time (Dublin)
+              </span>
+              <span
+                className={`text-xs font-mono font-bold block mt-1 ${isLight ? "text-zinc-800" : "text-zinc-100"}`}
+              >
+                {irelandTime || "Updating live..."}
+              </span>
+            </div>
+
+            {/* Dynamic Day/Night Mode Switcher button */}
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${isLight ? "Dark" : "Day"} Mode`}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                isLight
+                  ? "bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm"
+                  : "bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              }`}
+            >
+              {isLight ? (
+                <Moon className="w-4.5 h-4.5 text-zinc-600" />
+              ) : (
+                <Sun className="w-4.5 h-4.5 text-amber-400" />
+              )}
+            </button>
+          </div>
+        </header>
+
+        {/* Active view port rendering */}
+        <main className="flex-1 p-6 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
+          <div className="max-w-6xl mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
+        </main>
+      </div>
+
+      <aside
+        className={`hidden md:flex md:w-72 md:self-start flex-col shrink-0 rounded-2xl shadow-xl border transition-all duration-300 sticky top-4 mt-4 mr-4 mb-4 max-h-[calc(100vh-2rem)] ${
+          isLight
+            ? "bg-white/70 border-zinc-200 text-zinc-800 backdrop-blur-xl"
+            : "bg-zinc-950/70 border-zinc-800 text-zinc-100 backdrop-blur-xl"
+        }`}
+      >
+        <div className="flex-col flex-1 overflow-y-auto flex">
           {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
-          <div className="px-2 py-1.5 mt-auto mb-1 hidden md:block">
+          <div className="px-2 py-1.5">
             <div
               className={`p-3 rounded-xl border relative overflow-hidden group transition-all duration-200 ${
                 isLight
@@ -4269,181 +4452,8 @@ export default function App() {
               )}
             </div>
           </div>
-
-          {/* Footer info links */}
-          <div
-            className={`p-2.5 border-t shrink-0 transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${
-                  isLight
-                    ? "bg-zinc-200 border-zinc-300 text-zinc-700"
-                    : "bg-zinc-900 border-zinc-800"
-                }`}
-              >
-                {currentUser?.photoURL ? (
-                  <img
-                    src={currentUser.photoURL}
-                    alt={currentUser.username}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-4 h-4" />
-                )}
-                <span
-                  className={`w-2 h-2 rounded-full ${isFirebaseSynced ? "bg-emerald-500 animate-pulse" : "bg-orange-500"} absolute -bottom-0.5 -right-0.5 border ${isLight ? "border-zinc-100" : "border-zinc-950"}`}
-                />
-              </div>
-              <div className="text-xs leading-tight flex-1 min-w-0">
-                <p
-                  className={`font-semibold truncate ${isLight ? "text-zinc-900 font-bold" : "text-white"}`}
-                  title={currentUser?.username || ""}
-                >
-                  {currentUser?.username || "Skipper Koala"}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <select
-                    value={userRole}
-                    onChange={(e) => setUserRole(e.target.value as any)}
-                    className={`bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
-                      isLight
-                        ? "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold"
-                        : "text-zinc-500 hover:text-zinc-300"
-                    }`}
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Staff">Staff</option>
-                    <option value="User">User</option>
-                  </select>
-                  <span className="text-zinc-500 font-mono text-xs">•</span>
-                  <button
-                    onClick={async () => {
-                      localStorage.removeItem("localCurrentUser");
-                      setCurrentUser(null);
-                      await signOut(auth).catch(() => {});
-                    }}
-                    className={`text-xs font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
-                      isLight ? "text-zinc-500 font-bold" : "text-zinc-400"
-                    }`}
-                    title="Sign Out"
-                  >
-                    <LogOut className="w-2.5 h-2.5" />
-                    OUT
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </aside>
-
-      <div
-        className={`flex-1 flex flex-col min-w-0 transition-colors duration-500 ${isLight ? "bg-transparent" : "bg-transparent"}`}
-      >
-        {/* Global Toolbar */}
-        <header
-          className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
-            isLight
-              ? "bg-white border-zinc-200 text-zinc-900 shadow-sm"
-              : "bg-zinc-950 border-zinc-900 text-white shadow-md"
-          }`}
-        >
-          <div className="flex items-center gap-2.5">
-            <h2
-              className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? "text-zinc-900" : "text-white"}`}
-            >
-              {tabMeta.find((t) => t.id === activeTab)?.label || activeTab} View
-            </h2>
-            <span
-              className={`hidden lg:inline-block text-xs font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
-                isLight
-                  ? "bg-zinc-100 text-zinc-600 border-zinc-200"
-                  : "bg-zinc-900 text-zinc-400 border-zinc-800"
-              }`}
-            >
-              Food chain ops portal
-            </span>
-
-            {/* Global Branch Selector Dropdown */}
-            <div
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${
-                isLight
-                  ? "bg-zinc-100 border-zinc-200"
-                  : "bg-zinc-900 border-zinc-800"
-              }`}
-            >
-              <span
-                className={`text-xs font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
-              >
-                Store:
-              </span>
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value as any)}
-                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-xs sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
-                style={{ outline: "none" }}
-              >
-                <option
-                  value="Marks & Spencer - Cork City"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Marks & Spencer Cork City
-                </option>
-                <option
-                  value="Tesco - Cork City"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Tesco Cork City
-                </option>
-                <option
-                  value="Tesco - Mahon Point"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Tesco Mahon Point
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <span className="text-xs font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
-                🇮🇪 Ireland Time (Dublin)
-              </span>
-              <span
-                className={`text-xs font-mono font-bold block mt-1 ${isLight ? "text-zinc-800" : "text-zinc-100"}`}
-              >
-                {irelandTime || "Updating live..."}
-              </span>
-            </div>
-
-            {/* Dynamic Day/Night Mode Switcher button */}
-            <button
-              onClick={toggleTheme}
-              title={`Switch to ${isLight ? "Dark" : "Day"} Mode`}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                isLight
-                  ? "bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-              }`}
-            >
-              {isLight ? (
-                <Moon className="w-4.5 h-4.5 text-zinc-600" />
-              ) : (
-                <Sun className="w-4.5 h-4.5 text-amber-400" />
-              )}
-            </button>
-          </div>
-        </header>
-
-        {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
-          <div className="max-w-7xl mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
-        </main>
-      </div>
 
       {/* Schedule Email Report Modal */}
       {isScheduleReportModalOpen && (
