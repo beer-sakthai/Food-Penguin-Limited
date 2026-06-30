@@ -100,7 +100,7 @@ export function Sidebar({
         className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
       >
         {/* Navigation Actions */}
-        <nav className="p-2.5 mt-1 space-y-0.5">
+        <nav className="p-3 mt-2 space-y-1">
           {tabMeta.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -110,46 +110,36 @@ export function Sidebar({
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-left py-1.5 px-2.5 rounded-lg text-xs font-semibold flex items-center gap-2.5 transition-colors duration-200 ${
+                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-sm font-semibold flex items-center justify-between transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
                   isActive
                     ? isLight
-                      ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm"
-                      : "bg-zinc-900 text-white font-bold shadow-inner"
+                      ? "bg-white text-zinc-950 font-bold shadow-md shadow-zinc-200/50 border border-zinc-200"
+                      : "bg-zinc-800/80 text-white font-bold shadow-lg shadow-black/20 border border-zinc-700"
                     : isLight
-                      ? "text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900"
-                      : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
+                      ? "text-zinc-600 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent"
+                      : "text-zinc-400 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] hover:bg-zinc-800/50 hover:text-white border border-transparent"
                 }`}
               >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 shrink-0 ${
-                    isActive
-                      ? "bg-orange-500 scale-125"
-                      : isLight
-                        ? "bg-transparent border border-zinc-300"
-                        : "bg-transparent border border-zinc-800"
-                  }`}
-                />
-                <span className="flex-1 flex items-center gap-2 justify-between">
-                  <span className="flex items-center gap-2">
-                    <span
-                      className={
-                        isActive
-                          ? "text-orange-500"
-                          : isLight
-                            ? "text-zinc-400"
-                            : "text-zinc-500"
-                      }
-                    >
-                      {tab.icon}
-                    </span>
-                    {tab.label}
+                <div className="flex items-center gap-3 min-w-0">
+                  <span
+                    className={`shrink-0 transition-colors ${
+                      isActive
+                        ? "text-orange-500"
+                        : isLight
+                          ? "text-zinc-400 group-hover:text-zinc-600"
+                          : "text-zinc-500 group-hover:text-zinc-300"
+                    }`}
+                  >
+                    {tab.icon}
                   </span>
-                  {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
-                    <span className="bg-red-500 text-white font-mono text-xs px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
-                      {lowStockCount}
-                    </span>
-                  )}
-                </span>
+                  <span className="truncate tracking-wide">{tab.label}</span>
+                </div>
+                
+                {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
+                  <span className="bg-red-500 text-white font-mono text-[10px] leading-none px-2 py-1 rounded-full font-black animate-pulse shrink-0 ml-2 shadow-sm shadow-red-500/30">
+                    {lowStockCount}
+                  </span>
+                )}
               </button>
             );
           })}
