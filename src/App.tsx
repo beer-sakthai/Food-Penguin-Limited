@@ -828,6 +828,7 @@ export default function App() {
 
  sortedDailyCapacityBreakdown.forEach((item, idx) => {
  const isBottleneck = item.projected > bottleneckThreshold;
+ const isMaxCap = item.projected >= 100;
 
  // Alternating row highlighting background
  if (idx % 2 === 1) {
@@ -1900,8 +1901,8 @@ export default function App() {
 	onChange={(e) => setBottleneckThreshold(Number(e.target.value))}
 	className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98]  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow duration-200"
 	style={{ 
-	  accentColor: '#eab308',
-	  background: `linear-gradient(to right, #eab308 0%, #eab308 ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} 100%)`
+	  accentColor: bottleneckThreshold >= 95 ? '#ef4444' : bottleneckThreshold >= 80 ? '#f59e0b' : '#10b981',
+	  background: `linear-gradient(to right, ${bottleneckThreshold >= 95 ? '#ef4444' : bottleneckThreshold >= 80 ? '#f59e0b' : '#10b981'} 0%, ${bottleneckThreshold >= 95 ? '#ef4444' : bottleneckThreshold >= 80 ? '#f59e0b' : '#10b981'} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? '#e4e4e7' : '#27272a'} 100%)`
 	}}
 	/>
 	<div className="flex justify-between text-[7px] text-zinc-500 font-mono leading-none">
@@ -1977,7 +1978,7 @@ export default function App() {
     key={item.day}
     value={item}
     id={`bottleneck-day-${item.day}`}
-    className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${ isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40' } ${ isBottleneck ? isLight ? 'bg-amber-50 border-2 border-amber-400 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_12px_rgba(245,158,11,0.4)] animate-[pulse_2s_ease-in-out_infinite]' : 'bg-amber-900/10 border-2 border-amber-500/60 p-2.5 rounded-xl my-1 shadow-[0_0_15px_rgba(245,158,11,0.3)] text-zinc-300 animate-[pulse_2s_ease-in-out_infinite]' : 'px-1 pt-1' } ${ focusedDay === item.day ? 'ring-2 ring-yellow-500 border-yellow-500 rounded-xl p-2.5 shadow-[0_0_20px_rgba(234,179,8,0.75)] scale-[1.02] bg-yellow-500/5 dark:bg-yellow-500/10 z-10' : '' }`}
+    className={`flex flex-col gap-1.5 pb-2 last:border-0 last:pb-0 transition-all duration-700 ${ isLight ? 'border-zinc-200' : 'border-b border-zinc-950/40' } ${ isMaxCap ? (isLight ? 'bg-red-50 border-2 border-red-500 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_20px_rgba(239,68,68,0.6)] animate-[pulse_1.5s_ease-in-out_infinite]' : 'bg-red-950/40 border-2 border-red-600 p-2.5 rounded-xl my-1 shadow-[0_0_25px_rgba(220,38,38,0.5)] text-red-100 animate-[pulse_1.5s_ease-in-out_infinite]') : isBottleneck ? (isLight ? 'bg-amber-50 border-2 border-amber-400 p-2.5 rounded-xl my-1 text-zinc-900 shadow-[0_0_12px_rgba(245,158,11,0.4)] animate-[pulse_2s_ease-in-out_infinite]' : 'bg-amber-900/10 border-2 border-amber-500/60 p-2.5 rounded-xl my-1 shadow-[0_0_15px_rgba(245,158,11,0.3)] text-zinc-300 animate-[pulse_2s_ease-in-out_infinite]') : 'px-1 pt-1' } ${ focusedDay === item.day ? 'ring-2 ring-yellow-500 border-yellow-500 rounded-xl p-2.5 shadow-[0_0_20px_rgba(234,179,8,0.75)] scale-[1.02] bg-yellow-500/5 dark:bg-yellow-500/10 z-10' : '' }`}
                           >
  <div className="flex justify-between items-center text-[10px] gap-2">
                             <div className="flex items-center gap-1.5 min-w-[70px]">
