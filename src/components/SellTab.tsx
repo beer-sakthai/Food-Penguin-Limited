@@ -298,14 +298,18 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
       </div>
 
       {/* PRODUCTS LIST */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-3">
         {branchProducts.map((p, i) => (
-          <div key={i} className={`p-6 rounded-2xl transition-transform hover:-translate-y-1 ${
-            isLight ? 'bg-white shadow-sm border border-zinc-200' : 'bg-zinc-900 border border-zinc-800'
+          <div key={i} className={`p-4 md:px-6 rounded-2xl flex items-center justify-between transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] cursor-default ${
+            isLight ? 'bg-white shadow-sm border border-zinc-200 hover:shadow-md' : 'bg-zinc-900 border border-zinc-800 hover:border-zinc-700'
           }`}>
-            <h3 className={`text-2xl font-bold leading-tight mb-2 ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{p.name}</h3>
-            <p className={`text-xl font-bold mb-6 ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>€{p.price.toFixed(2)}</p>
-            <Barcode value={p.barcode || '0000000000000'} isLight={isLight} />
+            <div className="flex-1 pr-4">
+              <h3 className={`text-lg md:text-xl font-bold leading-tight ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{p.name}</h3>
+              <p className={`text-base font-bold mt-1 ${isLight ? 'text-amber-600' : 'text-amber-400'}`}>€{p.price.toFixed(2)}</p>
+            </div>
+            <div className="shrink-0 -mt-2">
+              <Barcode value={p.barcode || '0000000000000'} isLight={isLight} />
+            </div>
           </div>
         ))}
       </div>
