@@ -171,7 +171,7 @@ export default function WasteTab({
  };
 
  return (
- <div className="grid w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start:grid-cols-3 gap-6">
+ <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
       {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
       <div className="lg:col-span-2 space-y-6">
