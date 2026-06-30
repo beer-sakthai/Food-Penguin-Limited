@@ -43,7 +43,14 @@ Everything funnels through `App.tsx`: it holds the seed state (imported from `sr
 - **Boundary validation on bulk edits.** Bulk forecast/capacity changes must pre-simulate the result and show a `lucide-react` `AlertTriangle` warning when values breach hard limits (e.g. `>110%` or `<0%`) before applying.
 
 ### Model-name caveat
-The README and GEMINI.md state the project "strictly" uses `gemini-1.5-flash`. The actual code in `server.ts` is the source of truth and is mixed: most text endpoints use `gemini-1.5-flash`, but `analyze-dish-photo` uses `gemini-3.1-pro-preview` and image generation uses `gemini-3-1-flash-image-preview` / `gemini-3-pro-image-preview`. When editing models, check `server.ts` directly rather than trusting the docs, and prefer flash unless the user says otherwise.
+The README and GEMINI.md state the project "strictly" uses `gemini-1.5-flash`. The actual code in `server.ts` is the source of truth and is mixed: most text endpoints use `gemini-1.5-flash`, but `analyze-dish-photo` uses `gemini-3.1-pro-preview` and image generation uses `gemini-3-1-flash-image-preview` / `gemini-3-pro-image-preview`. Several endpoints also carry stale `// Model: gemini-3.1-pro-preview` comments above code that actually calls `gemini-1.5-flash` — trust the `model:` string in the `generateContent` call, not the comment. When editing models, check `server.ts` directly rather than trusting the docs, and prefer flash unless the user says otherwise.
+
+### Stitch MCP for UI work (from .agents/AGENTS.md)
+When asked to design, build, or iterate on UI, prioritize the `StitchMCP` server tools (`generate_screen_from_text`, `create_project`, `create_design_system`, connects to stitch.withgoogle.com) over hand-coding a design from scratch, unless the user explicitly asks for manual coding.
+
+## Deployment
+
+`.github/workflows/deploy.yml` builds (`npm ci && npm run build`) and publishes `dist/` to GitHub Pages on every push to `main` (or manual `workflow_dispatch`). This is a static deploy of the Vite frontend only — it does not run `server.ts`, so on Pages the `/api/gemini/*` proxy doesn't exist and the app falls back to Simulation Mode entirely. Keep this in mind when changing build output paths or adding server-dependent features.
 
 ## Repo hygiene notes
 
