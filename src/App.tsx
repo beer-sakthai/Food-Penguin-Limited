@@ -2123,7 +2123,7 @@ export default function App() {
           className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
           {/* Navigation Actions */}
-          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
+          <nav className="p-4 mt-2 space-y-1">
             {tabMeta.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
