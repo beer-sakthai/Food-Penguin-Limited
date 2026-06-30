@@ -5,7 +5,20 @@
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Removed custom font-size override */
+@layer base {
+  input, textarea, select {
+    @apply font-sans;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-yellow-500 border-yellow-500 outline-none;
+    box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
+  }
+
+  button, .interactive-row {
+    @apply transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98];
+  }
+}
 
 @layer components {
   /* Common 3D properties */

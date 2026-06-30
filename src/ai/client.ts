@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-function isRealGeminiKey(key: string | undefined): boolean {
+export function isRealGeminiKey(key: string | undefined): boolean {
   if (!key) return false;
   const k = key.trim();
   if (k === "" || k === "MY_GEMINI_API_KEY" || k === "PLACEHOLDER" || k === "YOUR_GEMINI_API_KEY") {
@@ -16,7 +16,7 @@ function isRealGeminiKey(key: string | undefined): boolean {
 // Shared lazy-loaded Gemini client
 let aiClient: GoogleGenAI | null = null;
 
-function getAiClient(): GoogleGenAI {
+export function getAiClient(): GoogleGenAI {
   if (!aiClient) {
     const key = process.env.GEMINI_API_KEY;
     aiClient = new GoogleGenAI({
