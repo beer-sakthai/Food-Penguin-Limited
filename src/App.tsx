@@ -2397,7 +2397,7 @@ export default function App() {
  <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? 'bg-zinc-50' : 'bg-black'}`}>
  
  {/* Global Toolbar */}
- <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 border-zinc-900 text-white shadow-md' }`}>
+ <header className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-sm' : 'bg-zinc-950/70 backdrop-blur-3xl border-zinc-800/80 text-white shadow-2xl' }`}>
  <div className="flex items-center gap-2.5">
  <h2 className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  {tabMeta.find(t => t.id === activeTab)?.label || activeTab} View
