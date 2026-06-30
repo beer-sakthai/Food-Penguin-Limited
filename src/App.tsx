@@ -1978,7 +1978,7 @@ export default function App() {
       case "Suppliers":
         return <SuppliersTab theme={theme} />;
       case "Finance":
-        return <FinanceTab theme={theme} metallicTheme={metallicTheme} weeklyLogs={weeklyLogs} onAddOrUpdateLog={handleSaveLogEntry} />;
+        return <FinanceTab theme={theme} metallicTheme={metallicTheme} weeklyLogs={weeklyLogs} onAddOrUpdateLog={handleUpdateWeeklyLog} />;
       default:
         return (
           <OverviewTab
