@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChefHat, Lock, User, LogIn, UserPlus } from 'lucide-react';
-
-
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../firebase';
 
 interface LoginScreenProps {
   onLogin: (username: string, role: string) => void;
