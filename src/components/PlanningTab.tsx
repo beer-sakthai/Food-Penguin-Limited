@@ -104,7 +104,7 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  };
 
  return (
- <div className="grid grid-cols-1 gap-6">
+ <div className="grid w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
   {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
  <div className="space-y-6">

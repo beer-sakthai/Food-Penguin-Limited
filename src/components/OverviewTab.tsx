@@ -460,7 +460,7 @@ export default function OverviewTab({
   }, [rawBranchList]);
 
   return (
-    <div id="overview-viewport" className="space-y-6">
+    <div id="overview-viewport" className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       {/* Header Banner with Premium ambient bento design */}
       <div
         className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${

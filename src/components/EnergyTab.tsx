@@ -94,7 +94,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>

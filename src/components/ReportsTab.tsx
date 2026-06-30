@@ -338,7 +338,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

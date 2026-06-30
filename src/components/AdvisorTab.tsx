@@ -63,7 +63,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       {/* Top Header Card */}
       <div className={`p-8 rounded-3xl border ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'} relative overflow-hidden`}>
         <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />

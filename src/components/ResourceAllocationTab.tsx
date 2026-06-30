@@ -67,7 +67,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       {/* Header section */}
       <div className="flex items-center gap-3">
         <Share2 className={`w-8 h-8 ${isLight ? 'text-amber-500' : 'text-amber-400'}`} />
