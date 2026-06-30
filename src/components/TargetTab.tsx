@@ -93,7 +93,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  };
 
  return (
- <div className="grid w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start:grid-cols-3 gap-6">
+ <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
  
  {/* TARGET PROGRESS & PERFORMANCE OVERVIEW */}
  <div className="xl:col-span-2 space-y-6">
