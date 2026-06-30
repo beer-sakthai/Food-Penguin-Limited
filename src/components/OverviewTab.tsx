@@ -1273,6 +1273,7 @@ export default function OverviewTab({
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
           </motion.div>
+        </div>
 
           {/* Real-time AI Operations Shift Summary */}
           <div
@@ -2729,8 +2730,6 @@ export default function OverviewTab({
               </div>
             </form>
           </div>
-
-        </div>
       </motion.div>
     </div>
   );

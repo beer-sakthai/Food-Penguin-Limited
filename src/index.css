@@ -9,6 +9,53 @@ html {
   font-size: 20px;
 }
 
+@layer base {
+  body {
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  }
+  
+  body.dark {
+    /* Premium rich dark slate radial background */
+    background: radial-gradient(circle at 15% 50%, #15151c 0%, #0a0a0c 50%, #000000 100%) fixed;
+    color: #f4f4f5;
+  }
+
+  body:not(.dark) {
+    /* Premium soft warm light ambient background */
+    background: radial-gradient(circle at 15% 50%, #ffffff 0%, #fdfbf7 50%, #f0ede6 100%) fixed;
+    color: #18181b;
+  }
+
+  /* Sleek Scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(161, 161, 170, 0.4);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(161, 161, 170, 0.7);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(82, 82, 91, 0.5);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(82, 82, 91, 0.8);
+  }
+  
+  /* Beautiful glowing text selections */
+  ::selection {
+    background: rgba(234, 179, 8, 0.3);
+    text-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
+    color: inherit;
+  }
+}
+
 @layer components {
   /* Common 3D properties */
   .metallic-base {
