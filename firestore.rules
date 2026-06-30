@@ -15,10 +15,6 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email_verified == true;
     }
 
-    function isAdmin() {
-      return request.auth.token.role == 'admin';
-    }
-
     function isValidId(id) {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
@@ -113,9 +109,9 @@ service cloud.firestore {
 
     match /targets/{targetId} {
       allow read: if isSignedIn();
-      allow create: if isAdmin() && isValidId(targetId) && isValidCompanyTarget(incoming());
-      allow update: if isAdmin() && isValidId(targetId) && isValidCompanyTarget(incoming());
-      allow delete: if isAdmin() && isValidId(targetId);
+      allow create: if isVerified() && isValidId(targetId) && isValidCompanyTarget(incoming());
+      allow update: if isVerified() && isValidId(targetId) && isValidCompanyTarget(incoming());
+      allow delete: if isVerified() && isValidId(targetId);
     }
 
     match /hours/{hourId} {

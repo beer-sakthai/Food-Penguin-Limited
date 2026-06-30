@@ -5,19 +5,8 @@
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
-@layer base {
-  input, textarea, select {
-    @apply font-sans;
-  }
-  
-  input:focus, textarea:focus, select:focus {
-    @apply ring-2 ring-yellow-500 border-yellow-500 outline-none;
-    box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
-  }
-
-  button, .interactive-row {
-    @apply transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98];
-  }
+html {
+  font-size: 20px;
 }
 
 @layer components {
@@ -64,5 +53,60 @@
   }
   .text-3d-copper {
      @apply text-transparent bg-clip-text bg-gradient-to-b from-[#ffb48f] to-[#cd7f32] drop-shadow-md;
+  }
+
+  /* Gold, Silver, and Copper Metallic Liners & Glows */
+  .gold-liner-box {
+    border: 1.5px solid rgba(234, 179, 8, 0.4) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15), 0 0 14px rgba(234, 179, 8, 0.12) !important;
+    border-radius: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dark .gold-liner-box {
+    border: 1.5px solid rgba(234, 179, 8, 0.5) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 18px rgba(234, 179, 8, 0.16) !important;
+  }
+
+  .gold-liner-box:hover {
+    border-color: rgba(234, 179, 8, 0.8) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 25px rgba(234, 179, 8, 0.3) !important;
+    transform: translateY(-2px);
+  }
+  
+  .silver-liner-box {
+    border: 1.5px solid rgba(148, 163, 184, 0.4) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15), 0 0 14px rgba(148, 163, 184, 0.12) !important;
+    border-radius: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dark .silver-liner-box {
+    border: 1.5px solid rgba(203, 213, 225, 0.45) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 18px rgba(203, 213, 225, 0.15) !important;
+  }
+
+  .silver-liner-box:hover {
+    border-color: rgba(226, 232, 240, 0.75) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 25px rgba(203, 213, 225, 0.28) !important;
+    transform: translateY(-2px);
+  }
+
+  .copper-liner-box {
+    border: 1.5px solid rgba(249, 115, 22, 0.35) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15), 0 0 14px rgba(249, 115, 22, 0.1) !important;
+    border-radius: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dark .copper-liner-box {
+    border: 1.5px solid rgba(249, 115, 22, 0.45) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 18px rgba(249, 115, 22, 0.15) !important;
+  }
+
+  .copper-liner-box:hover {
+    border-color: rgba(249, 115, 22, 0.7) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 25px rgba(249, 115, 22, 0.25) !important;
+    transform: translateY(-2px);
   }
 }

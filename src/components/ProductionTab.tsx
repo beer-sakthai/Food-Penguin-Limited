@@ -138,13 +138,13 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  };
 
  return (
- <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       {/* LEFT: LIVE PRODUCTION QUEUE & TASKS */}
       <div className="lg:col-span-2 space-y-6">
  
  {/* Active Cooking Grid */}
- <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
+ <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-805 border-zinc-800">
  <div>
  <h2 className="text-base font-sans font-semibold text-white">Kitchen Thru-rate Monitoring</h2>
@@ -179,7 +179,9 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  {tasks.map((task) => (
  <div key={task.id} className="border border-zinc-800 rounded-xl p-4 bg-zinc-950 flex justify-between items-start text-white">
  <div className="space-y-1">
- <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-[9px] uppercase font-mono tracking-wide ${ task.priority === 'high' ? 'bg-rose-950/40 text-rose-400 border border-rose-900/40' : task.priority === 'medium' ? 'bg-amber-950/40 text-amber-400 border border-amber-900/40' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl text-zinc-400 border border-zinc-800' }`}>
+ <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-[9px] uppercase font-mono tracking-wide ${
+ task.priority === 'high' ? 'bg-rose-950/40 text-rose-400 border border-rose-900/40' : task.priority === 'medium' ? 'bg-amber-950/40 text-amber-400 border border-amber-900/40' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
+ }`}>
  {task.priority} speed
  </span>
  <h4 className="text-sm font-bold text-zinc-105 text-zinc-200">{task.itemName}</h4>
@@ -187,7 +189,10 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  </div>
 
  <div className="space-y-2 text-right">
- <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono font-bold ${ task.status === 'Prepared' ? 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40' : task.status === 'Cooking' ? 'bg-amber-950/40 text-amber-450 border border-amber-900/40 animate-pulse' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl text-zinc-400' }`}>
+ <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono font-bold ${
+ task.status === 'Prepared' ? 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40' : 
+ task.status === 'Cooking' ? 'bg-amber-950/40 text-amber-450 border border-amber-900/40 animate-pulse' : 'bg-zinc-900 text-zinc-400'
+ }`}>
  {task.status}
  </span>
 
@@ -195,7 +200,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  {task.status === 'In Queue' && (
  <button
  onClick={() => onUpdateTaskStatus(task.id, 'Cooking')}
- className="p-1 px-2 border text-[10px] rounded bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-white"
+ className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white"
  >
  Cook
  </button>
@@ -203,7 +208,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
  {task.status === 'Cooking' && (
  <button
  onClick={() => onUpdateTaskStatus(task.id, 'Prepared')}
- className="p-1 px-2 border text-[10px] rounded bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-white font-semibold"
+ className="p-1 px-2 border text-[10px] rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white font-semibold"
  >
  Finish
  </button>
@@ -217,7 +222,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
 
  
         {/* Production Volume & Efficiency Rates */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
             <div className="flex items-center gap-3">
               <div className="p-2 border border-emerald-900/40 bg-emerald-950/40 text-emerald-400 rounded-lg">
@@ -307,7 +312,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
         </div>
 
         {/* Daily Production Output vs Target Grouped Bar Chart */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-800 gap-2">
             <div>
               <h2 className="text-base font-sans font-semibold text-white flex items-center gap-2">
@@ -349,7 +354,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
         </div>
 
         {/* Master Recipes Catalogue */}
- <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-xl border border-zinc-800 p-5 shadow-sm text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
+ <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300">
  <h2 className="text-base font-sans font-semibold text-white pb-1">Ocean-to-Plate Recipe Standard</h2>
  <p className="text-xs text-zinc-500 pb-4">Approved corporate dish compositions and prep profiles</p>
 
@@ -382,7 +387,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
       <div className="space-y-6">
         
         {/* Add Task Form */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
           <div className="flex items-center gap-2 mb-4">
             <Plus className="w-5 h-5 text-amber-500" />
             <h2 className="text-base font-sans font-semibold">Queue New Dish</h2>
@@ -396,7 +401,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 value={taskItem}
                 onChange={e => setTaskItem(e.target.value)}
                 placeholder="e.g. Classic Cod Slabs"
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] bg-zinc-950 border-zinc-800 text-white"
+                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-white"
                 required
               />
             </div>
@@ -406,7 +411,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
               <select 
                 value={assignedTo}
                 onChange={e => setAssignedTo(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] bg-zinc-950 border-zinc-800 text-zinc-300"
+                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-zinc-300"
               >
                 <option value="Chef Skipper">Chef Skipper (Grill)</option>
                 <option value="Chef Rico">Chef Rico (Fryer)</option>
@@ -423,7 +428,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                   min="1"
                   value={qty}
                   onChange={e => setQty(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] bg-zinc-950 border-zinc-800 text-white"
+                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-white"
                   required
                 />
               </div>
@@ -432,7 +437,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 <select 
                   value={priority}
                   onChange={e => setPriority(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] bg-zinc-950 border-zinc-800 text-zinc-300"
+                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 bg-zinc-950 border-zinc-800 text-zinc-300"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -441,7 +446,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
               </div>
             </div>
 
-            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2 hover:-translate-y-0.5">
+            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
               <ChefHat className="w-4 h-4" />
               Dispatch Order
             </button>
@@ -449,7 +454,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
         </div>
 
         {/* AI Culinary Auditor */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 shadow-sm text-white transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
              <h2 className="text-base font-sans font-semibold flex items-center gap-2 text-white">
               <Camera className="w-4 h-4 text-amber-500" />
@@ -473,7 +478,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                    key={i}
                    onClick={() => selectPresetDish(d)}
                    title={d.desc}
-                   className="p-2 border border-zinc-800 rounded bg-zinc-950 flex flex-col items-center gap-1  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:border-amber-500/50 transition-colors"
+                   className="p-2 border border-zinc-800 rounded bg-zinc-950 flex flex-col items-center gap-1 hover:border-amber-500/50 transition-colors"
                  >
                    <img src={d.data} alt={d.name} className="w-8 h-8 rounded" />
                    <span className="text-[8px] font-bold text-zinc-400 text-center truncate w-full">{d.name}</span>
@@ -485,7 +490,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                <button
                  type="button"
                  onClick={handleUploadClick}
-                 className="flex items-center gap-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-mono font-bold text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-md"
+                 className="flex items-center gap-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-mono font-bold text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
                >
                  <Upload className="w-3 h-3" />
                  Select
@@ -496,7 +501,11 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
              <button 
                 onClick={handleRunAudit}
                 disabled={auditorLoading || !selectedPhoto}
-                className={`w-full flex items-center justify-center gap-2 py-2.5 mt-2 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${ (auditorLoading || !selectedPhoto) ? 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl text-zinc-600 cursor-not-allowed' : 'bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-700 text-white' }`}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 mt-2 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${
+                  (auditorLoading || !selectedPhoto)
+                    ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                    : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                }`}
               >
                 {auditorLoading ? 'INSPECTING...' : 'RUN AUDIT'}
               </button>
@@ -510,6 +519,6 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
         </div>
 
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useState } from 'react';
 import { InventoryItem, DailyOperationalLog } from '../types';
 import CapacityAnalytics from './CapacityAnalytics';
@@ -99,18 +98,20 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  case 'Healthy': return 'bg-emerald-950/40 text-emerald-450 border border-emerald-900/40';
  case 'Low': return 'bg-amber-950/40 text-amber-450 border border-amber-900/40';
  case 'Critical': return 'bg-rose-950/40 text-rose-450 border border-rose-900/40 animate-pulse';
- default: return 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl text-zinc-500 border border-zinc-800';
+ default: return 'bg-zinc-900 text-zinc-500 border border-zinc-800';
  }
  };
 
  return (
- <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-1 gap-6">
+ <div className="grid grid-cols-1 gap-6">
 
  {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
  <div className="space-y-6">
 
  {/* Stock Level Matrix */}
- <div className={`rounded-xl border p-5 shadow-sm transition-all ${ isLight ? 'bg-white/95 backdrop-blur-md shadow-lg border-zinc-200' : 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border-zinc-800 text-white' }`}>
+ <div className={`rounded-xl border p-5 shadow-sm transition-all ${
+ isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'
+ }`}>
  <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-800' : 'text-white'}`}>Cold Chain Inventory Planning</h2>
@@ -120,7 +121,11 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  <button
  onClick={handleSuggestRestock}
  disabled={isSuggesting}
- className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm ${ isLight ? 'bg-yellow-50  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-yellow-100 text-yellow-700 border border-yellow-200' : 'bg-yellow-950/40 hover:bg-yellow-900/60 text-yellow-400 border border-yellow-900/50' }`}
+ className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm ${
+ isLight 
+ ? 'bg-yellow-50  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-yellow-100 text-yellow-700 border border-yellow-200'
+ : 'bg-yellow-950/40 hover:bg-yellow-900/60 text-yellow-400 border border-yellow-900/50'
+ }`}
  >
  {isSuggesting ? (
  <span className="w-3.5 h-3.5 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
@@ -132,7 +137,9 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  </div>
  
  {suggestionLog && (
- <div className={`mb-4 p-3 rounded-lg border text-[10px] font-mono whitespace-pre-wrap max-h-32 overflow-y-auto ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-400' }`}>
+ <div className={`mb-4 p-3 rounded-lg border text-[10px] font-mono whitespace-pre-wrap max-h-32 overflow-y-auto ${
+ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-400'
+ }`}>
  {suggestionLog}
  </div>
  )}
@@ -142,7 +149,9 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  const suggestedValue = aiSuggestions ? aiSuggestions[item.id] : null;
  
  return (
- <div key={item.id} className={`border p-4 rounded-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${ isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800' }`}>
+ <div key={item.id} className={`border p-4 rounded-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${
+ isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800'
+ }`}>
  <div className="space-y-1 md:w-1/3">
  <div className="flex items-center gap-2">
  <span className={`font-sans font-bold text-sm ${isLight ? 'text-zinc-800' : 'text-white'}`}>{item.name}</span>
@@ -160,7 +169,9 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  </div>
  <div className={`w-full h-2 rounded-full overflow-hidden border ${isLight ? 'bg-zinc-200 border-zinc-300' : 'bg-zinc-900/80 border-zinc-800'}`}>
  <div 
- className={`h-full rounded-full transition-all duration-300 ${ item.stockLevel <= 20 ? 'bg-rose-500' : item.stockLevel <= 50 ? 'bg-amber-500' : 'bg-emerald-500' }`}
+ className={`h-full rounded-full transition-all duration-300 ${
+ item.stockLevel <= 20 ? 'bg-rose-500' : item.stockLevel <= 50 ? 'bg-amber-500' : 'bg-emerald-500'
+ }`}
  style={{ width: `${item.stockLevel}%` }}
  />
  </div>
@@ -175,7 +186,15 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  <button
  onClick={() => onOrderRestock(item.id)}
  disabled={item.status === 'Healthy'}
- className={`px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${ item.status === 'Healthy' ? isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50' : isLight ? 'bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl border border-zinc-800 text-white hover:bg-gradient-to-br from-zinc-800 to-zinc-900/90 backdrop-blur-md border-white/10 shadow-xl shadow' : 'bg-zinc-950 border border-zinc-800 text-white hover:bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border-white/5 shadow-2xl shadow' }`}
+ className={`px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${
+ item.status === 'Healthy'
+ ? isLight 
+ ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' 
+ : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50'
+ : isLight
+ ? 'bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 shadow'
+ : 'bg-zinc-950 border border-zinc-800 text-white hover:bg-zinc-900 shadow'
+ }`}
  >
  <ArrowDownToLine className="w-3.5 h-3.5" />
  Restock
@@ -191,6 +210,6 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
 
  </div>
 
- </motion.div>
+ </div>
  );
 }
