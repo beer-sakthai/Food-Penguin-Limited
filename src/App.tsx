@@ -2199,7 +2199,7 @@ export default function App() {
 
         {/* Active view port rendering */}
         <main className="flex-1 p-6 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
-          <div className="max-w-6xl mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
+          <div className="mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
         </main>
       </div>
 
@@ -4418,3 +4418,4 @@ export default function App() {
     </div>
   );
 }
+
