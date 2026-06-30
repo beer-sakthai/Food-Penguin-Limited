@@ -40,7 +40,7 @@ import PlanningTab from "./components/PlanningTab";
 import EnergyTab from "./components/EnergyTab";
 import SuppliersTab from "./components/SuppliersTab";
 import FinanceTab from "./components/FinanceTab";
-import RealtimeTab from "./components/RealtimeTab";
+
 import ResourceAllocationTab from "./components/ResourceAllocationTab";
 import ReportsTab from "./components/ReportsTab";
 import LoginScreen from "./components/LoginScreen";
@@ -1825,11 +1825,7 @@ export default function App() {
       label: "Strategic Advisor",
       icon: <BrainCircuit className="w-4 h-4" />,
     },
-    {
-      id: "Realtime",
-      label: "Real-time",
-      icon: <Activity className="w-4 h-4" />,
-    },
+
     {
       id: "Sell",
       label: "Branch Product",
@@ -1906,8 +1902,7 @@ export default function App() {
         );
       case "Advisor":
         return <AdvisorTab theme={theme} />;
-      case "Realtime":
-        return <RealtimeTab theme={theme} />;
+
       case "Sell": {
         const filteredOrders = orders.filter(
           (o) => !o.branch || o.branch === selectedBranch,
@@ -2146,9 +2141,7 @@ export default function App() {
                   <span
                     className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
                       isActive
-                        ? tab.id === "Real-time"
-                          ? "bg-rose-500 animate-pulse"
-                          : "bg-orange-500 scale-125"
+                        ? "bg-orange-500 scale-125"
                         : isLight
                           ? "bg-transparent border border-zinc-300"
                           : "bg-transparent border border-zinc-800"
