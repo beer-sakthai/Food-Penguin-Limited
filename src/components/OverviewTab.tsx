@@ -630,7 +630,10 @@ export default function OverviewTab({
                   levels:{" "}
                   <span className="font-extrabold text-amber-600 dark:text-amber-400">
                     {lowStockItems
-                      .map((item) => `${item.name} (${item.currentQty} ${item.unit})`)
+                      .map(
+                        (item) =>
+                          `${item.name} (${item.currentQty} ${item.unit})`,
+                      )
                       .join(", ")}
                   </span>
                   .
@@ -1223,123 +1226,138 @@ export default function OverviewTab({
         <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-1 xl:grid-cols-2 gap-3">
           {/* Left column: AI Shift Summary + Performance Index chart */}
           <div className="flex flex-col min-h-0 gap-3 overflow-hidden">
-          {/* Real-time AI Operations Shift Summary */}
-          <div
-            id="ai-shift-summary"
-            className={`shrink-0 crystal-liner-box p-4 overflow-hidden relative font-sans transition-all duration-300 ${
-              isLight
-                ? ""
-                : "drop-shadow-xl"
-            }`}
-          >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
-
+            {/* Real-time AI Operations Shift Summary */}
             <div
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b ${
-                isLight ? "border-zinc-200" : "border-zinc-800"
+              id="ai-shift-summary"
+              className={`shrink-0 crystal-liner-box p-4 overflow-hidden relative font-sans transition-all duration-300 ${
+                isLight ? "" : "drop-shadow-xl"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 border rounded-2xl transition-all duration-300 ${
-                    isLight
-                      ? "bg-orange-50 border-orange-100 text-orange-600"
-                      : "bg-orange-950/30 border-orange-900/40 text-orange-400"
-                  }`}
-                >
-                  <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
-                </div>
-                <div>
-                  <h3
-                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                  >
-                    AI Live Shift Summary Report
-                    <span
-                      className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
-                        isLight
-                          ? "bg-orange-50 border-orange-200 text-orange-700"
-                          : "bg-orange-500/10 border-orange-500/30 text-orange-400"
-                      }`}
-                    >
-                      Live Analysis
-                    </span>
-                  </h3>
-                  <p className="subtitle text-xs text-zinc-500">
-                    Cognitive evaluation of performance metrics for{" "}
-                    {selectedBranch} on {activeLog.day} ({activeLog.date})
-                  </p>
-                </div>
-              </div>
+              <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
-              <button
-                onClick={fetchShiftSummary}
-                disabled={summaryLoading}
-                type="button"
-                className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${
-                  isLight
-                    ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                    : "bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white"
+              <div
+                className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b ${
+                  isLight ? "border-zinc-200" : "border-zinc-800"
                 }`}
               >
-                {summaryLoading ? (
-                  <>
-                    <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <BrainCircuit className="w-3.5 h-3.5" />
-                    Regenerate Feedback
-                  </>
-                )}
-              </button>
-            </div>
-
-            <div className="mt-3 max-h-[120px] overflow-y-auto">
-              {summaryLoading ? (
-                <div className="space-y-3 py-2 animate-pulse">
+                <div className="flex items-center gap-3">
                   <div
-                    className={`h-4 rounded-full w-3/4 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
-                  />
-                  <div
-                    className={`h-4 rounded-full w-5/6 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
-                  />
-                  <div
-                    className={`h-4 rounded-full w-2/3 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
-                  />
-                </div>
-              ) : summaryError ? (
-                <div
-                  className={`p-4 rounded-2xl border text-xs font-mono/80 ${
-                    isLight
-                      ? "bg-rose-50 border-rose-200 text-rose-700"
-                      : "bg-rose-950/20 border-rose-900/40 text-rose-400"
-                  }`}
-                >
-                  ⚠️ Failed to fetch live summary feedback: {summaryError}.
-                  Please verify your API key is correctly configured.
-                </div>
-              ) : (
-                <div
-                  className={`p-3 rounded-2xl border relative overflow-hidden transition-colors ${
-                    isLight
-                      ? "bg-orange-50/20 border-orange-100/70 text-zinc-800"
-                      : "bg-orange-950/5 border-orange-900/10 text-zinc-300"
-                  }`}
-                >
-                  <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full filter blur-xl pointer-events-none" />
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap font-sans relative z-10 italic">
-                    "
-                    {shiftSummary ||
-                      "Selecting metrics and compiling the shift trajectory summary..."}
-                    "
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-6 mt-3 pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-500">
-                    <div className="flex items-center gap-1.5">
+                    className={`p-3 border rounded-2xl transition-all duration-300 ${
+                      isLight
+                        ? "bg-orange-50 border-orange-100 text-orange-600"
+                        : "bg-orange-950/30 border-orange-900/40 text-orange-400"
+                    }`}
+                  >
+                    <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3
+                      className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    >
+                      AI Live Shift Summary Report
                       <span
-                        className={`w-2 h-2 rounded-full ${
-                          Math.min(
+                        className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
+                          isLight
+                            ? "bg-orange-50 border-orange-200 text-orange-700"
+                            : "bg-orange-500/10 border-orange-500/30 text-orange-400"
+                        }`}
+                      >
+                        Live Analysis
+                      </span>
+                    </h3>
+                    <p className="subtitle text-xs text-zinc-500">
+                      Cognitive evaluation of performance metrics for{" "}
+                      {selectedBranch} on {activeLog.day} ({activeLog.date})
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={fetchShiftSummary}
+                  disabled={summaryLoading}
+                  type="button"
+                  className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${
+                    isLight
+                      ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                      : "bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white"
+                  }`}
+                >
+                  {summaryLoading ? (
+                    <>
+                      <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <BrainCircuit className="w-3.5 h-3.5" />
+                      Regenerate Feedback
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="mt-3 max-h-[120px] overflow-y-auto">
+                {summaryLoading ? (
+                  <div className="space-y-3 py-2 animate-pulse">
+                    <div
+                      className={`h-4 rounded-full w-3/4 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
+                    />
+                    <div
+                      className={`h-4 rounded-full w-5/6 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
+                    />
+                    <div
+                      className={`h-4 rounded-full w-2/3 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
+                    />
+                  </div>
+                ) : summaryError ? (
+                  <div
+                    className={`p-4 rounded-2xl border text-xs font-mono/80 ${
+                      isLight
+                        ? "bg-rose-50 border-rose-200 text-rose-700"
+                        : "bg-rose-950/20 border-rose-900/40 text-rose-400"
+                    }`}
+                  >
+                    ⚠️ Failed to fetch live summary feedback: {summaryError}.
+                    Please verify your API key is correctly configured.
+                  </div>
+                ) : (
+                  <div
+                    className={`p-3 rounded-2xl border relative overflow-hidden transition-colors ${
+                      isLight
+                        ? "bg-orange-50/20 border-orange-100/70 text-zinc-800"
+                        : "bg-orange-950/5 border-orange-900/10 text-zinc-300"
+                    }`}
+                  >
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full filter blur-xl pointer-events-none" />
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap font-sans relative z-10 italic">
+                      "
+                      {shiftSummary ||
+                        "Selecting metrics and compiling the shift trajectory summary..."}
+                      "
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-6 mt-3 pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-500">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            Math.min(
+                              100,
+                              Math.max(
+                                50,
+                                Math.round(
+                                  95 -
+                                    (activeLog.waste / (activeLog.sales || 1)) *
+                                      110,
+                                ),
+                              ),
+                            ) >= 80
+                              ? "bg-emerald-500"
+                              : "bg-amber-500"
+                          }`}
+                        />
+                        <span>
+                          Efficiency Score:{" "}
+                          {Math.min(
                             100,
                             Math.max(
                               50,
@@ -1349,43 +1367,26 @@ export default function OverviewTab({
                                     110,
                               ),
                             ),
-                          ) >= 80
-                            ? "bg-emerald-500"
-                            : "bg-amber-500"
-                        }`}
-                      />
-                      <span>
-                        Efficiency Score:{" "}
-                        {Math.min(
-                          100,
-                          Math.max(
-                            50,
-                            Math.round(
-                              95 -
-                                (activeLog.waste / (activeLog.sales || 1)) *
-                                  110,
-                            ),
-                          ),
-                        )}
-                        %
-                      </span>
-                    </div>
-                    <div>Sales: €{activeLog.sales.toLocaleString()}</div>
-                    <div>Waste: €{activeLog.waste.toFixed(2)}</div>
-                    <div>
-                      Production Items: {activeLog.productionMade}/
-                      {activeLog.productionTarget}
+                          )}
+                          %
+                        </span>
+                      </div>
+                      <div>Sales: €{activeLog.sales.toLocaleString()}</div>
+                      <div>Waste: €{activeLog.waste.toFixed(2)}</div>
+                      <div>
+                        Production Items: {activeLog.productionMade}/
+                        {activeLog.productionTarget}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Interactive Production & Revenue Chart */}
-          <div
-            className={`flex-1 min-h-0 flex flex-col ${metallicTheme}-liner-box p-4 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
-          >
+            {/* Interactive Production & Revenue Chart */}
+            <div
+              className={`flex-1 min-h-0 flex flex-col ${metallicTheme}-liner-box p-4 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 gap-4 shrink-0">
                 <div>
                   <div className="flex items-center gap-2">
@@ -1558,7 +1559,7 @@ export default function OverviewTab({
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-          </div>
+            </div>
           </div>
 
           {/* Right column: Branch Compare config + bar chart + champion breakdown */}
@@ -1647,400 +1648,406 @@ export default function OverviewTab({
               </button>
             </div>
 
-          <div className="flex-1 min-h-0 flex flex-col">
-            {/* Comparison Dashboard Grid */}
-            <div className="flex-1 min-h-0 grid grid-cols-1 2xl:grid-cols-3 gap-3 z-10 relative">
-              {/* Left Column: Recharts Comparison Visualizer BarChart */}
-              <div
-                className={`2xl:col-span-2 min-h-0 flex flex-col p-3 rounded-2xl border transition-colors ${
-                  isLight
-                    ? "bg-zinc-50 border-zinc-200 shadow-inner"
-                    : "bg-zinc-950/40 border-zinc-900"
-                }`}
-              >
-                <div className="flex-1 min-h-0 flex flex-col">
-                  <div className="flex items-center justify-between mb-2 shrink-0">
-                    <span
-                      className={`text-xs font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
-                    >
-                      Dynamic Comparison Bar
-                    </span>
-                    <span
-                      className={`text-xs border rounded px-2.5 py-0.5 font-mono ${
-                        isLight
-                          ? "bg-white border-zinc-200 text-zinc-700 shadow-sm"
-                          : "bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300"
-                      }`}
-                    >
-                      Scale:{" "}
-                      {branchCompareMetric === "sales"
-                        ? "Euro (€)"
-                        : branchCompareMetric === "production"
-                          ? "Units (Pcs)"
-                          : branchCompareMetric === "waste"
-                            ? "Percentage (%)"
-                            : "Index Points (0-100)"}
-                    </span>
-                  </div>
-
-                  <div className="flex-1 min-h-[140px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={branchPerformanceData}
-                        margin={{ top: 15, right: 10, left: 10, bottom: 0 }}
-                      >
-                        <defs>
-                          <linearGradient
-                            id="gradMS"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#f59e0b"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#d97706"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="gradTescoCork"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#10b981"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#059669"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="gradTescoMahon"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#a855f7"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#7c3aed"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="gradAvg"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#3b82f6"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#2563eb"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          stroke={isLight ? "#e2e2e5" : "#222"}
-                          vertical={false}
-                        />
-                        <XAxis
-                          dataKey="name"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{
-                            fill: isLight ? "#4f4f52" : "#a1a1aa",
-                            fontSize: 15,
-                            fontWeight: "bold",
-                          }}
-                        />
-                        <YAxis
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{
-                            fill: isLight ? "#71717a" : "#71717a",
-                            fontSize: 15,
-                          }}
-                        />
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const data = payload[0].payload;
-                              return (
-                                <div
-                                  className={`border p-4 rounded-xl shadow-xl transition-all ${
-                                    isLight
-                                      ? "bg-white border-zinc-200 text-zinc-900"
-                                      : "bg-zinc-950 border-zinc-800 text-white"
-                                  }`}
-                                >
-                                  <p
-                                    className={`text-xs font-mono uppercase font-bold select-none ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
-                                  >
-                                    {data.type}
-                                  </p>
-                                  <p
-                                    className={`text-sm font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                                  >
-                                    {data.fullName}
-                                  </p>
-                                  <div className="mt-2 space-y-1.5 font-mono text-xs">
-                                    <div className="flex justify-between gap-8">
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-500"
-                                            : "text-zinc-400"
-                                        }
-                                      >
-                                        Sales revenue:
-                                      </span>
-                                      <span className="font-bold text-amber-600 dark:text-amber-500">
-                                        €{data.sales.toLocaleString()}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between gap-8">
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-500"
-                                            : "text-zinc-400"
-                                        }
-                                      >
-                                        Rolled Output:
-                                      </span>
-                                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                                        {data.production.toLocaleString()} Pcs
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between gap-8">
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-500"
-                                            : "text-zinc-400"
-                                        }
-                                      >
-                                        Waste Rate:
-                                      </span>
-                                      <span className="font-bold text-rose-600 dark:text-rose-450">
-                                        {data.wastePct}%
-                                      </span>
-                                    </div>
-                                    <div
-                                      className={`flex justify-between gap-8 pt-1 border-t ${isLight ? "border-zinc-200" : "border-zinc-900"}`}
-                                    >
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-600 text-zinc-600"
-                                            : "text-zinc-300"
-                                        }
-                                      >
-                                        Efficiency Score:
-                                      </span>
-                                      <span className="font-extrabold text-blue-600 dark:text-blue-400">
-                                        {data.efficiencyScore}/100
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Bar
-                          dataKey={
-                            branchCompareMetric === "sales"
-                              ? "sales"
-                              : branchCompareMetric === "production"
-                                ? "production"
-                                : branchCompareMetric === "waste"
-                                  ? "wastePct"
-                                  : "efficiencyScore"
-                          }
-                          radius={[6, 6, 0, 0]}
-                          maxBarSize={60}
-                        >
-                          {branchPerformanceData.map((entry, index) => (
-                            <Cell
-                              key={`overview-cell-${index}-${entry.id || entry.name}`}
-                              fill={entry.fill || entry.color}
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                {/* Micro comparison labels */}
+            <div className="flex-1 min-h-0 flex flex-col">
+              {/* Comparison Dashboard Grid */}
+              <div className="flex-1 min-h-0 grid grid-cols-1 2xl:grid-cols-3 gap-3 z-10 relative">
+                {/* Left Column: Recharts Comparison Visualizer BarChart */}
                 <div
-                  className={`shrink-0 grid ${branchPerformanceData.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2 border-t pt-2 mt-2 text-center text-xs font-sans ${
-                    isLight ? "border-zinc-200" : "border-zinc-900/80"
-                  }`}
-                >
-                  {branchPerformanceData.map((branch) => (
-                    <div key={branch.id} className="flex flex-col items-center">
-                      <span
-                        className={`font-semibold ${isLight ? "text-zinc-600" : "text-zinc-500"}`}
-                      >
-                        {branch.name}
-                      </span>
-                      <span
-                        className="font-mono font-bold mt-0.5"
-                        style={{ color: branch.color }}
-                      >
-                        {branchCompareMetric === "sales"
-                          ? `€${branch.sales.toLocaleString()}`
-                          : branchCompareMetric === "production"
-                            ? `${branch.production.toLocaleString()} Pcs`
-                            : branchCompareMetric === "waste"
-                              ? `${branch.wastePct}%`
-                              : `${branch.efficiencyScore} pts`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Championship & Performance Breakdown */}
-              <div className="min-h-0 flex flex-col justify-between gap-3 overflow-y-auto 2xl:overflow-hidden">
-                {/* Champion Branch Banner Card */}
-                <div
-                  className={`p-3 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
+                  className={`2xl:col-span-2 min-h-0 flex flex-col p-3 rounded-2xl border transition-colors ${
                     isLight
-                      ? "bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5"
-                      : "bg-zinc-950 border-emerald-950/80"
+                      ? "bg-zinc-50 border-zinc-200 shadow-inner"
+                      : "bg-zinc-950/40 border-zinc-900"
                   }`}
                 >
-                  {/* Subtle visual gradient glow for the champion */}
-                  <div className="absolute right-0 bottom-0 w-36 h-36 bg-gradient-to-tr from-emerald-500/20 to-transparent rounded-full filter blur-xl pointer-events-none" />
-
-                  <div>
-                    <div
-                      className={`flex items-center justify-between pb-3 border-b ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
-                    >
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <div className="flex items-center justify-between mb-2 shrink-0">
                       <span
-                        className={`text-xs font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
+                        className={`text-xs font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                      >
+                        Dynamic Comparison Bar
+                      </span>
+                      <span
+                        className={`text-xs border rounded px-2.5 py-0.5 font-mono ${
                           isLight
-                            ? "bg-emerald-50 border-emerald-200 text-emerald-700 font-bold"
-                            : "bg-emerald-950/45 text-emerald-400 border-emerald-900/60"
+                            ? "bg-white border-zinc-200 text-zinc-700 shadow-sm"
+                            : "bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300"
                         }`}
                       >
-                        <span>🏆</span> Peak Efficiency Store
-                      </span>
-                      <span
-                        className={`font-mono font-extrabold text-xs ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
-                      >
-                        {championBranch.efficiencyScore}%
+                        Scale:{" "}
+                        {branchCompareMetric === "sales"
+                          ? "Euro (€)"
+                          : branchCompareMetric === "production"
+                            ? "Units (Pcs)"
+                            : branchCompareMetric === "waste"
+                              ? "Percentage (%)"
+                              : "Index Points (0-100)"}
                       </span>
                     </div>
 
-                    <div className="mt-2">
-                      <h4
-                        className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                      >
-                        {championBranch.fullName}
-                      </h4>
-                      <p className="text-xs text-zinc-500 font-mono mt-0.5 leading-none">
-                        {championBranch.type}
-                      </p>
-
-                      <p
-                        className={`text-xs mt-2 leading-relaxed ${isLight ? "text-zinc-600 text-zinc-600" : "text-zinc-400"}`}
-                      >
-                        Analyzing overall labor costs, high-premium customer
-                        transaction margins, and minimal seafood waste,{" "}
-                        <strong
-                          className={`font-bold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                    <div className="flex-1 min-h-[140px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={branchPerformanceData}
+                          margin={{ top: 15, right: 10, left: 10, bottom: 0 }}
                         >
-                          {championBranch.name}
-                        </strong>{" "}
-                        holds the highest corporate return ratio at{" "}
-                        <strong
-                          className={`font-mono ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                        >
-                          €{championBranch.laborProd}/hr
-                        </strong>{" "}
-                        yield per employee hour.
-                      </p>
+                          <defs>
+                            <linearGradient
+                              id="gradMS"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#f59e0b"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#d97706"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="gradTescoCork"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#10b981"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#059669"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="gradTescoMahon"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#a855f7"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#7c3aed"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="gradAvg"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#2563eb"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke={isLight ? "#e2e2e5" : "#222"}
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{
+                              fill: isLight ? "#4f4f52" : "#a1a1aa",
+                              fontSize: 15,
+                              fontWeight: "bold",
+                            }}
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{
+                              fill: isLight ? "#71717a" : "#71717a",
+                              fontSize: 15,
+                            }}
+                          />
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload;
+                                return (
+                                  <div
+                                    className={`border p-4 rounded-xl shadow-xl transition-all ${
+                                      isLight
+                                        ? "bg-white border-zinc-200 text-zinc-900"
+                                        : "bg-zinc-950 border-zinc-800 text-white"
+                                    }`}
+                                  >
+                                    <p
+                                      className={`text-xs font-mono uppercase font-bold select-none ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                                    >
+                                      {data.type}
+                                    </p>
+                                    <p
+                                      className={`text-sm font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                                    >
+                                      {data.fullName}
+                                    </p>
+                                    <div className="mt-2 space-y-1.5 font-mono text-xs">
+                                      <div className="flex justify-between gap-8">
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-500"
+                                              : "text-zinc-400"
+                                          }
+                                        >
+                                          Sales revenue:
+                                        </span>
+                                        <span className="font-bold text-amber-600 dark:text-amber-500">
+                                          €{data.sales.toLocaleString()}
+                                        </span>
+                                      </div>
+                                      <div className="flex justify-between gap-8">
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-500"
+                                              : "text-zinc-400"
+                                          }
+                                        >
+                                          Rolled Output:
+                                        </span>
+                                        <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                          {data.production.toLocaleString()} Pcs
+                                        </span>
+                                      </div>
+                                      <div className="flex justify-between gap-8">
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-500"
+                                              : "text-zinc-400"
+                                          }
+                                        >
+                                          Waste Rate:
+                                        </span>
+                                        <span className="font-bold text-rose-600 dark:text-rose-450">
+                                          {data.wastePct}%
+                                        </span>
+                                      </div>
+                                      <div
+                                        className={`flex justify-between gap-8 pt-1 border-t ${isLight ? "border-zinc-200" : "border-zinc-900"}`}
+                                      >
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-600 text-zinc-600"
+                                              : "text-zinc-300"
+                                          }
+                                        >
+                                          Efficiency Score:
+                                        </span>
+                                        <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                          {data.efficiencyScore}/100
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar
+                            dataKey={
+                              branchCompareMetric === "sales"
+                                ? "sales"
+                                : branchCompareMetric === "production"
+                                  ? "production"
+                                  : branchCompareMetric === "waste"
+                                    ? "wastePct"
+                                    : "efficiencyScore"
+                            }
+                            radius={[6, 6, 0, 0]}
+                            maxBarSize={60}
+                          >
+                            {branchPerformanceData.map((entry, index) => (
+                              <Cell
+                                key={`overview-cell-${index}-${entry.id || entry.name}`}
+                                fill={entry.fill || entry.color}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
 
+                  {/* Micro comparison labels */}
                   <div
-                    className={`mt-3 pt-2.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
+                    className={`shrink-0 grid ${branchPerformanceData.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2 border-t pt-2 mt-2 text-center text-xs font-sans ${
+                      isLight ? "border-zinc-200" : "border-zinc-900/80"
+                    }`}
                   >
-                    <div>
-                      <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
-                        Labor Yield
-                      </span>
-                      <span
-                        className={`text-xs font-mono font-extrabold ${isLight ? "text-zinc-800" : "text-white"}`}
+                    {branchPerformanceData.map((branch) => (
+                      <div
+                        key={branch.id}
+                        className="flex flex-col items-center"
                       >
-                        €{championBranch.laborProd}/hr
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
-                        Waste Control
-                      </span>
-                      <span
-                        className={`text-xs font-mono font-extrabold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
-                      >
-                        {Math.max(0, Math.round(100 - championBranch.wastePct))}
-                        % Control
-                      </span>
-                    </div>
+                        <span
+                          className={`font-semibold ${isLight ? "text-zinc-600" : "text-zinc-500"}`}
+                        >
+                          {branch.name}
+                        </span>
+                        <span
+                          className="font-mono font-bold mt-0.5"
+                          style={{ color: branch.color }}
+                        >
+                          {branchCompareMetric === "sales"
+                            ? `€${branch.sales.toLocaleString()}`
+                            : branchCompareMetric === "production"
+                              ? `${branch.production.toLocaleString()} Pcs`
+                              : branchCompareMetric === "waste"
+                                ? `${branch.wastePct}%`
+                                : `${branch.efficiencyScore} pts`}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Summary Performance Note */}
-                <div
-                  className={`shrink-0 p-3 rounded-xl border text-xs leading-relaxed font-sans transition-colors ${
-                    isLight
-                      ? "bg-zinc-50 border-zinc-200 text-zinc-600"
-                      : "bg-zinc-950 border-zinc-900 text-zinc-400"
-                  }`}
-                >
-                  <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-xs">
-                    💡 Strategic Multi-Branch Note
-                  </span>
-                  Sell products in Marks & Spencer are gourmet luxury lines
-                  featuring <strong>75% average margins</strong>. Tesco stores
-                  support high-volume meal deals and family-packed Trays with{" "}
-                  <strong>78% labor optimization metrics</strong>. Staffing
-                  schedules must remain aligned with peak regional purchase
-                  hours.
+                {/* Right Column: Championship & Performance Breakdown */}
+                <div className="min-h-0 flex flex-col justify-between gap-3 overflow-y-auto 2xl:overflow-hidden">
+                  {/* Champion Branch Banner Card */}
+                  <div
+                    className={`p-3 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
+                      isLight
+                        ? "bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5"
+                        : "bg-zinc-950 border-emerald-950/80"
+                    }`}
+                  >
+                    {/* Subtle visual gradient glow for the champion */}
+                    <div className="absolute right-0 bottom-0 w-36 h-36 bg-gradient-to-tr from-emerald-500/20 to-transparent rounded-full filter blur-xl pointer-events-none" />
+
+                    <div>
+                      <div
+                        className={`flex items-center justify-between pb-3 border-b ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
+                      >
+                        <span
+                          className={`text-xs font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
+                            isLight
+                              ? "bg-emerald-50 border-emerald-200 text-emerald-700 font-bold"
+                              : "bg-emerald-950/45 text-emerald-400 border-emerald-900/60"
+                          }`}
+                        >
+                          <span>🏆</span> Peak Efficiency Store
+                        </span>
+                        <span
+                          className={`font-mono font-extrabold text-xs ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                        >
+                          {championBranch.efficiencyScore}%
+                        </span>
+                      </div>
+
+                      <div className="mt-2">
+                        <h4
+                          className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                        >
+                          {championBranch.fullName}
+                        </h4>
+                        <p className="text-xs text-zinc-500 font-mono mt-0.5 leading-none">
+                          {championBranch.type}
+                        </p>
+
+                        <p
+                          className={`text-xs mt-2 leading-relaxed ${isLight ? "text-zinc-600 text-zinc-600" : "text-zinc-400"}`}
+                        >
+                          Analyzing overall labor costs, high-premium customer
+                          transaction margins, and minimal seafood waste,{" "}
+                          <strong
+                            className={`font-bold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                          >
+                            {championBranch.name}
+                          </strong>{" "}
+                          holds the highest corporate return ratio at{" "}
+                          <strong
+                            className={`font-mono ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                          >
+                            €{championBranch.laborProd}/hr
+                          </strong>{" "}
+                          yield per employee hour.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`mt-3 pt-2.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
+                    >
+                      <div>
+                        <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
+                          Labor Yield
+                        </span>
+                        <span
+                          className={`text-xs font-mono font-extrabold ${isLight ? "text-zinc-800" : "text-white"}`}
+                        >
+                          €{championBranch.laborProd}/hr
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
+                          Waste Control
+                        </span>
+                        <span
+                          className={`text-xs font-mono font-extrabold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                        >
+                          {Math.max(
+                            0,
+                            Math.round(100 - championBranch.wastePct),
+                          )}
+                          % Control
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Summary Performance Note */}
+                  <div
+                    className={`shrink-0 p-3 rounded-xl border text-xs leading-relaxed font-sans transition-colors ${
+                      isLight
+                        ? "bg-zinc-50 border-zinc-200 text-zinc-600"
+                        : "bg-zinc-950 border-zinc-900 text-zinc-400"
+                    }`}
+                  >
+                    <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-xs">
+                      💡 Strategic Multi-Branch Note
+                    </span>
+                    Sell products in Marks & Spencer are gourmet luxury lines
+                    featuring <strong>75% average margins</strong>. Tesco stores
+                    support high-volume meal deals and family-packed Trays with{" "}
+                    <strong>78% labor optimization metrics</strong>. Staffing
+                    schedules must remain aligned with peak regional purchase
+                    hours.
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </motion.div>
