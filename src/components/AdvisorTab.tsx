@@ -63,7 +63,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full flex flex-col gap-6">
       {/* Top Header Card */}
       <div className={`p-8 rounded-3xl border ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'} relative overflow-hidden`}>
         <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
@@ -84,12 +84,12 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase tracking-wider ${
+            <span className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider ${
               isLight ? 'bg-zinc-100 text-zinc-600 border border-zinc-200' : 'bg-zinc-950 text-zinc-400 border border-zinc-800'
             }`}>
               Powered by gemini-3.1-pro-preview
             </span>
-            <span className="px-3 py-1.5 rounded-xl bg-amber-500 text-zinc-950 text-[10px] font-extrabold tracking-wider uppercase animate-pulse">
+            <span className="px-3 py-1.5 rounded-xl bg-amber-500 text-zinc-950 text-xs font-extrabold tracking-wider uppercase animate-pulse">
               Thinking Level: HIGH
             </span>
           </div>
@@ -196,6 +196,37 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
             </div>
           )}
 
+          {!advisorResponse && !loading && (
+            <div className={`p-5 rounded-3xl border ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900/70 border-zinc-800'}`}>
+              <div className="flex items-center gap-2 mb-3">
+                <Lightbulb className="w-4 h-4 text-amber-500" />
+                <span className={`text-xs font-black uppercase tracking-wider ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>
+                  What to ask next
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Which supplier delay should we fix first?",
+                  "Where can we save two staff hours today?",
+                  "What stock risk needs action before closing?",
+                ].map((question) => (
+                  <button
+                    key={question}
+                    type="button"
+                    onClick={() => setStrategicPrompt(question)}
+                    className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all active:scale-[0.98] ${
+                      isLight
+                        ? 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100'
+                        : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900'
+                    }`}
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Loading Indicator */}
           {loading && (
             <div className={`p-8 rounded-3xl border space-y-4 py-16 text-center ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
@@ -207,7 +238,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
                 <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
                   <div className="h-full bg-amber-500 animate-[pulse_1.5s_infinite] w-full" />
                 </div>
-                <p className="text-[10px] text-zinc-500 font-mono">Exploring Dublin microclimate variables, transportation routes, and branch performance limits.</p>
+                <p className="text-xs text-zinc-500 font-mono">Exploring Dublin microclimate variables, transportation routes, and branch performance limits.</p>
               </div>
             </div>
           )}
@@ -223,11 +254,11 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
             >
               <div className="flex items-center gap-2">
                 <Sparkles size={16} className="text-orange-500" />
-                <span className={`text-[10px] uppercase font-mono tracking-wider font-extrabold block ${isLight ? 'text-orange-700' : 'text-orange-400'}`}>
+                <span className={`text-xs uppercase font-mono tracking-wider font-extrabold block ${isLight ? 'text-orange-700' : 'text-orange-400'}`}>
                   🧠 Reasoning Pathway (Thought Process Summary):
                 </span>
               </div>
-              <p className={`text-xs font-mono leading-relaxed whitespace-pre-wrap ${isLight ? 'text-zinc-600' : 'text-orange-200'}`}>
+              <p className={`text-xs font-mono leading-relaxed whitespace-pre-wrap max-h-40 overflow-y-auto pr-1 custom-scrollbar ${isLight ? 'text-zinc-600' : 'text-orange-200'}`}>
                 {thinkingProcess}
               </p>
             </motion.div>
@@ -248,7 +279,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
                   Formulated Corporate Strategy
                 </span>
               </div>
-              <div className={`text-xs font-sans leading-relaxed whitespace-pre-wrap space-y-2 ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>
+              <div className={`text-xs font-sans leading-relaxed whitespace-pre-wrap space-y-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>
                 {advisorResponse}
               </div>
             </motion.div>

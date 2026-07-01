@@ -94,7 +94,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
@@ -190,9 +190,9 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={isLight ? '#e4e4e7' : '#3f3f46'} vertical={false} />
-              <XAxis dataKey="time" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis yAxisId="left" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}kWh`} />
-              <YAxis yAxisId="right" orientation="right" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={12} tickLine={false} axisLine={false} />
+              <XAxis dataKey="time" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={15} tickLine={false} axisLine={false} />
+              <YAxis yAxisId="left" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={15} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}kWh`} />
+              <YAxis yAxisId="right" orientation="right" stroke={isLight ? '#71717a' : '#a1a1aa'} fontSize={15} tickLine={false} axisLine={false} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: isLight ? '#ffffff' : '#18181b', 
@@ -203,7 +203,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
                 }}
                 itemStyle={{ color: isLight ? '#18181b' : '#f4f4f5', fontWeight: 600 }}
               />
-              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} />
+              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '15px' }} />
               <Bar yAxisId="right" dataKey="volume" name="Production Volume" fill={isLight ? '#e4e4e7' : '#3f3f46'} radius={[4, 4, 0, 0]} />
               <Line yAxisId="left" type="monotone" dataKey="energy" name="Energy Use (kWh)" stroke="#eab308" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: isLight ? '#ffffff' : '#18181b' }} activeDot={{ r: 6, stroke: '#eab308' }} />
             </ComposedChart>

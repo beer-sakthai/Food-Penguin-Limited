@@ -56,7 +56,7 @@ interface OverviewTabProps {
   orders: SalesOrder[];
   selectedBranch: string;
   theme?: "dark" | "light";
-  metallicTheme?: "gold" | "silver" | "copper";
+  metallicTheme?: "gold" | "silver" | "copper" | "crystal";
   lowStockItems?: InventoryItem[];
 }
 
@@ -151,65 +151,6 @@ export default function OverviewTab({
       log.cogs.others
     );
   }, 0);
-
-  // States for Daily Operational and Supplier COG Ledger Inputs
-  const [entryDay, setEntryDay] = useState<
-    "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun"
-  >("Sun");
-  const [entryDate, setEntryDate] = useState("2026-06-21");
-  const [entrySales, setEntrySales] = useState("14820");
-  const [entryWaste, setEntryWaste] = useState("412.50");
-  const [entryHours, setEntryHours] = useState("124");
-  const [entryProdTarget, setEntryProdTarget] = useState("11500");
-  const [entryProdMade, setEntryProdMade] = useState("11240");
-  const [entryTazaki, setEntryTazaki] = useState("4890");
-  const [entrySysco, setEntrySysco] = useState("1100");
-  const [entryBulza, setEntryBulza] = useState("820");
-  const [entrySticker, setEntrySticker] = useState("240");
-  const [entryOthers, setEntryOthers] = useState("380");
-  const [entrySupplierName, setEntrySupplierName] = useState<
-    "Tazaki" | "Sysco" | "Bulza" | "Sticker" | "Others"
-  >("Others");
-
-  useEffect(() => {
-    const existing = weeklyLogs.find((l) => l.day === entryDay);
-    if (existing) {
-      setEntryDate(existing.date);
-      setEntrySales(existing.sales.toString());
-      setEntryWaste(existing.waste.toString());
-      setEntryHours(existing.hours.toString());
-      setEntryProdTarget(existing.productionTarget.toString());
-      setEntryProdMade(existing.productionMade.toString());
-      setEntryTazaki(existing.cogs.tazaki.toString());
-      setEntrySysco(existing.cogs.sysco.toString());
-      setEntryBulza(existing.cogs.bulza.toString());
-      setEntrySticker(existing.cogs.sticker.toString());
-      setEntryOthers(existing.cogs.others.toString());
-      setEntrySupplierName(existing.supplierName || "Others");
-    }
-  }, [entryDay, weeklyLogs]);
-
-  const handleSaveOperationalLog = (e: React.FormEvent) => {
-    e.preventDefault();
-    const updatedRecord: DailyOperationalLog = {
-      day: entryDay,
-      date: entryDate,
-      sales: parseFloat(entrySales) || 0,
-      waste: parseFloat(entryWaste) || 0,
-      hours: parseFloat(entryHours) || 0,
-      productionTarget: parseInt(entryProdTarget, 10) || 0,
-      productionMade: parseInt(entryProdMade, 10) || 0,
-      supplierName: entrySupplierName,
-      cogs: {
-        tazaki: parseFloat(entryTazaki) || 0,
-        sysco: parseFloat(entrySysco) || 0,
-        bulza: parseFloat(entryBulza) || 0,
-        sticker: parseFloat(entrySticker) || 0,
-        others: parseFloat(entryOthers) || 0,
-      },
-    };
-    onAddOrUpdateLog(updatedRecord);
-  };
 
   // Recharts Chart Data (correlated metrics across hours/days)
   const [chartView, setChartView] = useState<"weekly" | "hourly">("weekly");
@@ -519,10 +460,13 @@ export default function OverviewTab({
   }, [rawBranchList]);
 
   return (
-    <div id="overview-viewport" className="space-y-6">
+    <div
+      id="overview-viewport"
+      className="w-full max-w-7xl mx-auto h-full flex flex-col overflow-hidden gap-y-4"
+    >
       {/* Header Banner with Premium ambient bento design */}
       <div
-        className={`rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
+        className={`shrink-0 rounded-2xl p-4 md:p-5 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 border transition-colors duration-200 ${
           isLight
             ? "bg-white border-zinc-200 text-zinc-900"
             : "bg-zinc-900 border-zinc-800 text-white"
@@ -541,7 +485,7 @@ export default function OverviewTab({
               }`}
             >
               <Sparkles className="w-3 h-3 animate-pulse" />
-              Sushi Intelligence Portal Active
+              Live kitchen dashboard
             </div>
             {irelandTime && (
               <span
@@ -556,11 +500,11 @@ export default function OverviewTab({
             )}
           </div>
           <h1
-            className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
-              isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"
+            className={`text-2xl md:text-3xl font-sans font-extrabold tracking-tight mb-2 ${
+              isLight ? "text-zinc-900" : "text-white"
             }`}
           >
-            Sushi Ops Strategy Center
+            Today's Food Penguin Snapshot
           </h1>
           <p
             className={`text-sm leading-relaxed ${
@@ -569,22 +513,25 @@ export default function OverviewTab({
                 : "text-zinc-300"
             }`}
           >
-            Premium Sushi Production Company is currently executing at{" "}
+            A quick view of sales, production, waste, hours, and stock for{" "}
+            <span className="font-semibold text-zinc-900 dark:text-white">
+              {selectedBranch}
+            </span>
+            . Current efficiency is{" "}
             <span className="text-orange-600 dark:text-orange-400 font-semibold">
               {metrics.aiHealthScore}% efficiency
             </span>
-            . Cooking objectives are on target, and waste reports show an
-            improvement of{" "}
+            , with waste improving by{" "}
             <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-              18.2% vs last Friday
+              18.2%
             </span>
-            .
+            compared with last Friday.
           </p>
         </div>
 
         {/* Date-Range Selector Box */}
         <div
-          className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
+          className={`relative z-10 backdrop-blur-md p-4 rounded-xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
             isLight
               ? "bg-zinc-100/60 border-zinc-200"
               : "bg-zinc-950/60 border-zinc-800"
@@ -598,48 +545,47 @@ export default function OverviewTab({
             <Calendar
               className={`w-3.5 h-3.5 ${isLight ? "text-orange-600" : "text-orange-400"}`}
             />
-            <span>Audit Calendar Week</span>
+            <span>Week Filter</span>
           </div>
           <p
-            className={`text-[10px] ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+            className={`text-xs ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
           >
-            Filter general dashboard throughput, COGS, waste stats, and bar
-            charts
+            Choose the week used for the dashboard numbers and charts.
           </p>
           <select
             value={selectedWeekRange}
             onChange={(e) => onSelectedWeekRangeChange(e.target.value)}
-            className={`w-full focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 rounded-xl px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
+            className={`w-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 rounded-lg px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
               isLight
-                ? "bg-white border-zinc-200 text-orange-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-700"
-                : "bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-355"
+                ? "bg-white border-zinc-200 text-orange-600 active:scale-[0.98] hover:text-orange-700"
+                : "bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-300"
             }`}
           >
             <option
               value="2026-06-15 to 2026-06-21"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
             >
-              Week 25 (Jun 15 - Jun 21, 2026) [Active]
+                Week 25 (Jun 15 - Jun 21, 2026)
             </option>
             <option
               value="2026-06-22 to 2026-06-28"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
             >
-              Week 26 (Jun 22 - Jun 28, 2026) [Future]
+                Week 26 (Jun 22 - Jun 28, 2026)
             </option>
             <option
               value="2026-06-08 to 2026-06-14"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
             >
-              Week 24 (Jun 08 - Jun 14, 2026) [Historical]
+                Week 24 (Jun 08 - Jun 14, 2026)
             </option>
           </select>
           <div
-            className={`flex items-center justify-between text-[9px] font-mono mt-1 pt-2 border-t ${
+            className={`flex items-center justify-between text-xs font-mono mt-1 pt-2 border-t ${
               isLight ? "border-zinc-200" : "border-zinc-900"
             }`}
           >
-            <span className="text-zinc-500">Selected Date Range:</span>
+            <span className="text-zinc-500">Selected:</span>
             <span className="text-orange-500 font-bold">
               {selectedWeekRange}
             </span>
@@ -653,14 +599,14 @@ export default function OverviewTab({
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="space-y-6"
+        className="flex flex-col flex-1 min-h-0 overflow-hidden gap-y-3"
       >
         {/* Low Stock Alerts Notification Banner */}
         {lowStockItems.length > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`p-5 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
+            className={`shrink-0 p-3 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
               isLight
                 ? "bg-amber-50 border-amber-200 text-amber-950 shadow-sm"
                 : "bg-amber-950/15 border border-amber-900/40 text-amber-200"
@@ -678,15 +624,17 @@ export default function OverviewTab({
               </div>
               <div>
                 <h4 className="text-sm font-black tracking-tight">
-                  Critical Inventory Warning: {lowStockItems.length}{" "}
-                  {lowStockItems.length === 1 ? "Item" : "Items"} with Low Stock
+                  Stock needs attention: {lowStockItems.length}{" "}
+                  {lowStockItems.length === 1 ? "item" : "items"}
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  The following raw materials are currently below minimum safety
-                  levels:{" "}
+                  These ingredients are below the level you set:{" "}
                   <span className="font-extrabold text-amber-600 dark:text-amber-400">
                     {lowStockItems
-                      .map((item) => `${item.name} (${item.currentQty} ${item.unit})`)
+                      .map(
+                        (item) =>
+                          `${item.name} (${item.currentQty} ${item.unit})`,
+                      )
                       .join(", ")}
                   </span>
                   .
@@ -695,16 +643,16 @@ export default function OverviewTab({
             </div>
             <button
               onClick={() => onNavigateTab("Planning")}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs rounded-xl shadow-md transition-all hover:-translate-y-0.5 active:scale-[0.98] shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs rounded-lg shadow-sm transition-all active:scale-[0.98] shrink-0 cursor-pointer"
             >
-              Review & Restock Planning
+              Open planning
             </button>
           </motion.div>
         )}
 
         {/* Weekday Quick Select Tabs */}
         <div
-          className={`flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl border transition-colors ${
+          className={`shrink-0 flex flex-wrap items-center justify-between gap-4 p-2.5 rounded-xl border transition-colors ${
             isLight ? "bg-white border-zinc-200" : "bg-zinc-950 border-zinc-900"
           }`}
         >
@@ -717,11 +665,11 @@ export default function OverviewTab({
                 isLight ? "text-zinc-700" : "text-zinc-300"
               }`}
             >
-              Display Mode: {activeLog.date} ({activeLog.day}) Audit
+              Viewing {activeLog.day}, {activeLog.date}
             </span>
           </div>
           <div
-            className={`flex items-center p-1 rounded-2xl border shadow-inner transition-colors ${
+            className={`flex items-center p-1 rounded-lg border shadow-inner transition-colors ${
               isLight
                 ? "bg-zinc-100 border-zinc-200"
                 : "bg-zinc-900 border-zinc-800"
@@ -735,11 +683,11 @@ export default function OverviewTab({
                     key={day}
                     onClick={() => setSelectedDayTab(day)}
                     type="button"
-                    className={`px-3.5 py-1.5 text-xs rounded-xl font-mono font-bold transition-all ${
+                    className={`px-3.5 py-1.5 text-xs rounded-md font-mono font-bold transition-all ${
                       isActive
                         ? "bg-orange-500 text-white shadow-md"
                         : isLight
-                          ? "text-zinc-500 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-600 hover:bg-white"
+                          ? "text-zinc-500 active:scale-[0.98] hover:text-orange-600 hover:bg-white"
                           : "text-zinc-400 hover:text-white"
                     }`}
                   >
@@ -752,7 +700,7 @@ export default function OverviewTab({
         </div>
 
         {/* KPI Bento Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
+        <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-3">
           {/* Card 1: Sell Today */}
           <motion.div
             key={activeLog.date + "-sell-" + activeLog.sales}
@@ -770,17 +718,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Gross Revenue
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
-                    €{activeLog.sales.toLocaleString()}
+                    EUR {activeLog.sales.toLocaleString()}
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}
                   >
                     <TrendingUp className="w-3 h-3" />
                     +8.5% daily avg
@@ -862,20 +810,20 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Throughput
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     {activeLog.productionMade.toLocaleString()}{" "}
-                    <span className="text-[10px] text-zinc-500 font-normal">
+                    <span className="text-xs text-zinc-500 font-normal">
                       units
                     </span>
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-zinc-500" : "text-zinc-400 text-zinc-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-zinc-500" : "text-zinc-400 text-zinc-400"}`}
                   >
                     Target: {activeLog.productionTarget.toLocaleString()}
                   </span>
@@ -960,17 +908,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Seafood Waste
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
-                    €{activeLog.waste.toFixed(2)}
+                    EUR {activeLog.waste.toFixed(2)}
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
                   >
                     <CheckCircle2 className="w-3 h-3" />
                     Within limit
@@ -980,7 +928,7 @@ export default function OverviewTab({
                   className={`p-2.5 border transition-all duration-300 rounded-xl ${
                     isLight
                       ? "bg-zinc-100 border-zinc-200 text-rose-600 group-hover:bg-rose-500 group-hover:text-white"
-                      : "bg-zinc-950 border-zinc-800 text-rose-455 group-hover:bg-rose-500 group-hover:text-white"
+                      : "bg-zinc-950 border-zinc-800 text-rose-400 group-hover:bg-rose-500 group-hover:text-white"
                   }`}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -1056,17 +1004,17 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Worked Hours
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
                     {activeLog.hours} hrs
                   </h3>
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold mt-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
                   >
                     Staffing Optimal
                   </span>
@@ -1150,19 +1098,19 @@ export default function OverviewTab({
               <div className="flex justify-between items-start">
                 <div>
                   <p
-                    className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                    className={`text-xs font-mono uppercase tracking-widest font-bold ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                   >
                     Total COGS (GOC)
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
-                    €{totalCogsActiveDay.toLocaleString()}
+                    EUR {totalCogsActiveDay.toLocaleString()}
                   </h3>
                   <span
-                    className={`inline-flex mt-1 text-[9px] font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                    className={`inline-flex mt-1 text-xs font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    Weekly: €{totalCogsWeek.toLocaleString()}
+                    Weekly: EUR {totalCogsWeek.toLocaleString()}
                   </span>
                 </div>
                 <div
@@ -1177,16 +1125,16 @@ export default function OverviewTab({
               </div>
 
               {/* Supplier Breakdowns */}
-              <div className="mt-4 space-y-2 text-[9px] font-sans">
+              <div className="mt-4 space-y-2 text-xs font-sans">
                 <div>
                   <div
                     className={`flex justify-between font-mono ${isLight ? "text-zinc-600 text-zinc-600 font-semibold" : "text-zinc-400"}`}
                   >
                     <span>Tazaki (Ingredients)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.tazaki.toLocaleString()}
+                      EUR {activeLog.cogs.tazaki.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1207,9 +1155,9 @@ export default function OverviewTab({
                   >
                     <span>Sysco (Ssh Grains)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.sysco.toLocaleString()}
+                      EUR {activeLog.cogs.sysco.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1230,9 +1178,9 @@ export default function OverviewTab({
                   >
                     <span>Bulza (Display Box)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.bulza.toLocaleString()}
+                      EUR {activeLog.cogs.bulza.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1253,9 +1201,9 @@ export default function OverviewTab({
                   >
                     <span>Sticker (Thermal Label)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.sticker.toLocaleString()}
+                      EUR {activeLog.cogs.sticker.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1275,123 +1223,142 @@ export default function OverviewTab({
           </motion.div>
         </div>
 
-          {/* Real-time AI Operations Shift Summary */}
-          <div
-            id="ai-shift-summary"
-            className={`crystal-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${
-              isLight
-                ? ""
-                : "drop-shadow-xl"
-            }`}
-          >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
-
+        {/* Flexible region: AI Summary + Charts + Branch Compare share the remaining viewport space */}
+        <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-1 xl:grid-cols-2 gap-3">
+          {/* Left column: AI Shift Summary + Performance Index chart */}
+          <div className="flex flex-col min-h-0 gap-3 overflow-hidden">
+            {/* Real-time AI Operations Shift Summary */}
             <div
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
-                isLight ? "border-zinc-200" : "border-zinc-800"
+              id="ai-shift-summary"
+              className={`shrink-0 crystal-liner-box p-4 overflow-hidden relative font-sans transition-all duration-300 ${
+                isLight ? "" : "drop-shadow-xl"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 border rounded-2xl transition-all duration-300 ${
-                    isLight
-                      ? "bg-orange-50 border-orange-100 text-orange-600"
-                      : "bg-orange-950/30 border-orange-900/40 text-orange-400"
-                  }`}
-                >
-                  <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
-                </div>
-                <div>
-                  <h3
-                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                  >
-                    AI Live Shift Summary Report
-                    <span
-                      className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
-                        isLight
-                          ? "bg-orange-50 border-orange-200 text-orange-700"
-                          : "bg-orange-500/10 border-orange-500/30 text-orange-400"
-                      }`}
-                    >
-                      Live Analysis
-                    </span>
-                  </h3>
-                  <p className="subtitle text-xs text-zinc-500">
-                    Cognitive evaluation of performance metrics for{" "}
-                    {selectedBranch} on {activeLog.day} ({activeLog.date})
-                  </p>
-                </div>
-              </div>
+              <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
-              <button
-                onClick={fetchShiftSummary}
-                disabled={summaryLoading}
-                type="button"
-                className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${
-                  isLight
-                    ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                    : "bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white"
+              <div
+                className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b ${
+                  isLight ? "border-zinc-200" : "border-zinc-800"
                 }`}
               >
-                {summaryLoading ? (
-                  <>
-                    <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <BrainCircuit className="w-3.5 h-3.5" />
-                    Regenerate Feedback
-                  </>
-                )}
-              </button>
-            </div>
-
-            <div className="mt-6">
-              {summaryLoading ? (
-                <div className="space-y-3 py-2 animate-pulse">
+                <div className="flex items-center gap-3">
                   <div
-                    className={`h-4 rounded-full w-3/4 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
-                  />
-                  <div
-                    className={`h-4 rounded-full w-5/6 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
-                  />
-                  <div
-                    className={`h-4 rounded-full w-2/3 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
-                  />
-                </div>
-              ) : summaryError ? (
-                <div
-                  className={`p-4 rounded-2xl border text-xs font-mono/80 ${
-                    isLight
-                      ? "bg-rose-50 border-rose-200 text-rose-700"
-                      : "bg-rose-950/20 border-rose-900/40 text-rose-400"
-                  }`}
-                >
-                  ⚠️ Failed to fetch live summary feedback: {summaryError}.
-                  Please verify your API key is correctly configured.
-                </div>
-              ) : (
-                <div
-                  className={`p-5 rounded-2xl border relative overflow-hidden transition-colors ${
-                    isLight
-                      ? "bg-orange-50/20 border-orange-100/70 text-zinc-800"
-                      : "bg-orange-950/5 border-orange-900/10 text-zinc-300"
-                  }`}
-                >
-                  <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full filter blur-xl pointer-events-none" />
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap font-sans relative z-10 italic">
-                    "
-                    {shiftSummary ||
-                      "Selecting metrics and compiling the shift trajectory summary..."}
-                    "
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-6 mt-4 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-[10px] text-zinc-500">
-                    <div className="flex items-center gap-1.5">
+                    className={`p-3 border rounded-2xl transition-all duration-300 ${
+                      isLight
+                        ? "bg-orange-50 border-orange-100 text-orange-600"
+                        : "bg-orange-950/30 border-orange-900/40 text-orange-400"
+                    }`}
+                  >
+                    <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3
+                      className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    >
+                      AI Live Shift Summary Report
                       <span
-                        className={`w-2 h-2 rounded-full ${
-                          Math.min(
+                        className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
+                          isLight
+                            ? "bg-orange-50 border-orange-200 text-orange-700"
+                            : "bg-orange-500/10 border-orange-500/30 text-orange-400"
+                        }`}
+                      >
+                        Live Analysis
+                      </span>
+                    </h3>
+                    <p className="subtitle text-xs text-zinc-500">
+                      Cognitive evaluation of performance metrics for{" "}
+                      {selectedBranch} on {activeLog.day} ({activeLog.date})
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={fetchShiftSummary}
+                  disabled={summaryLoading}
+                  type="button"
+                  className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 border  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:shadow-md disabled:opacity-50 ${
+                    isLight
+                      ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                      : "bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white"
+                  }`}
+                >
+                  {summaryLoading ? (
+                    <>
+                      <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <BrainCircuit className="w-3.5 h-3.5" />
+                      Regenerate Feedback
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="mt-3 max-h-[120px] overflow-y-auto">
+                {summaryLoading ? (
+                  <div className="space-y-3 py-2 animate-pulse">
+                    <div
+                      className={`h-4 rounded-full w-3/4 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
+                    />
+                    <div
+                      className={`h-4 rounded-full w-5/6 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
+                    />
+                    <div
+                      className={`h-4 rounded-full w-2/3 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
+                    />
+                  </div>
+                ) : summaryError ? (
+                  <div
+                    className={`p-4 rounded-2xl border text-xs font-mono/80 ${
+                      isLight
+                        ? "bg-rose-50 border-rose-200 text-rose-700"
+                        : "bg-rose-950/20 border-rose-900/40 text-rose-400"
+                    }`}
+                  >
+                    Failed to fetch live summary feedback: {summaryError}.
+                    Please verify your API key is correctly configured.
+                  </div>
+                ) : (
+                  <div
+                    className={`p-3 rounded-2xl border relative overflow-hidden transition-colors ${
+                      isLight
+                        ? "bg-orange-50/20 border-orange-100/70 text-zinc-800"
+                        : "bg-orange-950/5 border-orange-900/10 text-zinc-300"
+                    }`}
+                  >
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full filter blur-xl pointer-events-none" />
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap font-sans relative z-10 italic">
+                      "
+                      {shiftSummary ||
+                        "Selecting metrics and compiling the shift trajectory summary..."}
+                      "
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-6 mt-3 pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-500">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            Math.min(
+                              100,
+                              Math.max(
+                                50,
+                                Math.round(
+                                  95 -
+                                    (activeLog.waste / (activeLog.sales || 1)) *
+                                      110,
+                                ),
+                              ),
+                            ) >= 80
+                              ? "bg-emerald-500"
+                              : "bg-amber-500"
+                          }`}
+                        />
+                        <span>
+                          Efficiency Score:{" "}
+                          {Math.min(
                             100,
                             Math.max(
                               50,
@@ -1401,46 +1368,27 @@ export default function OverviewTab({
                                     110,
                               ),
                             ),
-                          ) >= 80
-                            ? "bg-emerald-500"
-                            : "bg-amber-500"
-                        }`}
-                      />
-                      <span>
-                        Efficiency Score:{" "}
-                        {Math.min(
-                          100,
-                          Math.max(
-                            50,
-                            Math.round(
-                              95 -
-                                (activeLog.waste / (activeLog.sales || 1)) *
-                                  110,
-                            ),
-                          ),
-                        )}
-                        %
-                      </span>
-                    </div>
-                    <div>Sales: €{activeLog.sales.toLocaleString()}</div>
-                    <div>Waste: €{activeLog.waste.toFixed(2)}</div>
-                    <div>
-                      Production Items: {activeLog.productionMade}/
-                      {activeLog.productionTarget}
+                          )}
+                          %
+                        </span>
+                      </div>
+                      <div>Sales: EUR {activeLog.sales.toLocaleString()}</div>
+                      <div>Waste: EUR {activeLog.waste.toFixed(2)}</div>
+                      <div>
+                        Production Items: {activeLog.productionMade}/
+                        {activeLog.productionTarget}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Main Stats Charts & Active Targets */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
             {/* Interactive Production & Revenue Chart */}
             <div
-              className={`lg:col-span-2 ${metallicTheme}-liner-box p-6 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+              className={`flex-1 min-h-0 flex flex-col ${metallicTheme}-liner-box p-4 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 gap-4 shrink-0">
                 <div>
                   <div className="flex items-center gap-2">
                     <h3
@@ -1449,9 +1397,9 @@ export default function OverviewTab({
                       Performance Index
                     </h3>
                     <span
-                      className={`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                      className={`text-xs border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
                         isLight
-                          ? "bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-emerald-950/40 text-emerald-400 border-emerald-900/40"
                       }`}
                     >
@@ -1470,7 +1418,7 @@ export default function OverviewTab({
                   <button
                     type="button"
                     onClick={() => setChartView("hourly")}
-                    className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
+                    className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
                       chartView === "hourly"
                         ? "bg-amber-500 text-zinc-950 shadow-md"
                         : isLight
@@ -1483,7 +1431,7 @@ export default function OverviewTab({
                   <button
                     type="button"
                     onClick={() => setChartView("weekly")}
-                    className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
+                    className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
                       chartView === "weekly"
                         ? "bg-amber-500 text-zinc-950 shadow-md"
                         : isLight
@@ -1495,7 +1443,7 @@ export default function OverviewTab({
                   </button>
                 </div>
               </div>
-              <div className="h-72 w-full mt-4">
+              <div className="flex-1 min-h-[140px] w-full mt-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={chartView === "weekly" ? weeklyData : hourlyData}
@@ -1550,7 +1498,7 @@ export default function OverviewTab({
                       tickLine={false}
                       tick={{
                         fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 11,
+                        fontSize: 15,
                       }}
                     />
                     <YAxis
@@ -1559,7 +1507,7 @@ export default function OverviewTab({
                       tickLine={false}
                       tick={{
                         fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 11,
+                        fontSize: 15,
                       }}
                     />
                     <YAxis
@@ -1569,7 +1517,7 @@ export default function OverviewTab({
                       tickLine={false}
                       tick={{
                         fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 11,
+                        fontSize: 15,
                       }}
                     />
                     <Tooltip
@@ -1613,9 +1561,13 @@ export default function OverviewTab({
                 </ResponsiveContainer>
               </div>
             </div>
+          </div>
+
+          {/* Right column: Branch Compare config + bar chart + champion breakdown */}
+          <div className="flex flex-col min-h-0 gap-3 overflow-y-auto xl:overflow-hidden">
             {/* Branch Compare Config Header */}
             <div
-              className={`lg:col-span-1 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 ${isLight ? "bg-white border border-zinc-200" : "bg-zinc-950 border border-zinc-900 shadow-xl shadow-amber-500/5"}`}
+              className={`shrink-0 rounded-3xl p-4 flex flex-col justify-between transition-all duration-300 ${isLight ? "bg-white border border-zinc-200" : "bg-zinc-950 border border-zinc-900 shadow-xl shadow-amber-500/5"}`}
             >
               <div>
                 <h3
@@ -1629,7 +1581,7 @@ export default function OverviewTab({
                   benchmarks.
                 </p>
 
-                <div className="mt-6 space-y-4">
+                <div className="mt-3 space-y-3">
                   <div>
                     <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">
                       Branch A
@@ -1640,7 +1592,7 @@ export default function OverviewTab({
                         setCompareBranchA(e.target.value);
                         setCompareMode("twoBranches");
                       }}
-                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
                         isLight
                           ? "bg-zinc-50 border-zinc-200 text-zinc-900"
                           : "bg-zinc-900 border-zinc-800 text-white"
@@ -1666,7 +1618,7 @@ export default function OverviewTab({
                         setCompareBranchB(e.target.value);
                         setCompareMode("twoBranches");
                       }}
-                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
                         isLight
                           ? "bg-zinc-50 border-zinc-200 text-zinc-900"
                           : "bg-zinc-900 border-zinc-800 text-white"
@@ -1696,1040 +1648,409 @@ export default function OverviewTab({
                   : "View All Global Branches"}
               </button>
             </div>
-          </div>
 
-          <div className="mt-10">
-            {/* Comparison Dashboard Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 z-10 relative">
-              {/* Left Column: Recharts Comparison Visualizer BarChart */}
-              <div
-                className={`p-5 rounded-2xl border flex flex-col justify-between transition-colors ${
-                  isLight
-                    ? "bg-zinc-50 border-zinc-200 shadow-inner"
-                    : "bg-zinc-950/40 border-zinc-900"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      className={`text-[10px] font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
-                    >
-                      Dynamic Comparison Bar
-                    </span>
-                    <span
-                      className={`text-[10px] border rounded px-2.5 py-0.5 font-mono ${
-                        isLight
-                          ? "bg-white border-zinc-200 text-zinc-700 shadow-sm"
-                          : "bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300"
-                      }`}
-                    >
-                      Scale:{" "}
-                      {branchCompareMetric === "sales"
-                        ? "Euro (€)"
-                        : branchCompareMetric === "production"
-                          ? "Units (Pcs)"
-                          : branchCompareMetric === "waste"
-                            ? "Percentage (%)"
-                            : "Index Points (0-100)"}
-                    </span>
-                  </div>
-
-                  <div className="h-64 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={branchPerformanceData}
-                        margin={{ top: 15, right: 10, left: 10, bottom: 0 }}
+            <div className="flex-1 min-h-0 flex flex-col">
+              {/* Comparison Dashboard Grid */}
+              <div className="flex-1 min-h-0 grid grid-cols-1 2xl:grid-cols-3 gap-3 z-10 relative">
+                {/* Left Column: Recharts Comparison Visualizer BarChart */}
+                <div
+                  className={`2xl:col-span-2 min-h-0 flex flex-col p-3 rounded-2xl border transition-colors ${
+                    isLight
+                      ? "bg-zinc-50 border-zinc-200 shadow-inner"
+                      : "bg-zinc-950/40 border-zinc-900"
+                  }`}
+                >
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <div className="flex items-center justify-between mb-2 shrink-0">
+                      <span
+                        className={`text-xs font-mono uppercase font-bold tracking-widest pl-1 ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                       >
-                        <defs>
-                          <linearGradient
-                            id="gradMS"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#f59e0b"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#d97706"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="gradTescoCork"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#10b981"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#059669"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="gradTescoMahon"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#a855f7"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#7c3aed"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="gradAvg"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor="#3b82f6"
-                              stopOpacity={0.9}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor="#2563eb"
-                              stopOpacity={0.3}
-                            />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          stroke={isLight ? "#e2e2e5" : "#222"}
-                          vertical={false}
-                        />
-                        <XAxis
-                          dataKey="name"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{
-                            fill: isLight ? "#4f4f52" : "#a1a1aa",
-                            fontSize: 10,
-                            fontWeight: "bold",
-                          }}
-                        />
-                        <YAxis
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{
-                            fill: isLight ? "#71717a" : "#71717a",
-                            fontSize: 10,
-                          }}
-                        />
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const data = payload[0].payload;
-                              return (
-                                <div
-                                  className={`border p-4 rounded-xl shadow-xl transition-all ${
-                                    isLight
-                                      ? "bg-white border-zinc-200 text-zinc-900"
-                                      : "bg-zinc-950 border-zinc-800 text-white"
-                                  }`}
-                                >
-                                  <p
-                                    className={`text-[10px] font-mono uppercase font-bold select-none ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                        Dynamic Comparison Bar
+                      </span>
+                      <span
+                        className={`text-xs border rounded px-2.5 py-0.5 font-mono ${
+                          isLight
+                            ? "bg-white border-zinc-200 text-zinc-700 shadow-sm"
+                            : "bg-zinc-900 border-zinc-800 text-zinc-300"
+                        }`}
+                      >
+                        Scale:{" "}
+                        {branchCompareMetric === "sales"
+                          ? "Euro (EUR)"
+                          : branchCompareMetric === "production"
+                            ? "Units (Pcs)"
+                            : branchCompareMetric === "waste"
+                              ? "Percentage (%)"
+                              : "Index Points (0-100)"}
+                      </span>
+                    </div>
+
+                    <div className="flex-1 min-h-[140px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={branchPerformanceData}
+                          margin={{ top: 15, right: 10, left: 10, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient
+                              id="gradMS"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#f59e0b"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#d97706"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="gradTescoCork"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#10b981"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#059669"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="gradTescoMahon"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#a855f7"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#7c3aed"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="gradAvg"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.9}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="#2563eb"
+                                stopOpacity={0.3}
+                              />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke={isLight ? "#e2e2e5" : "#222"}
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{
+                              fill: isLight ? "#4f4f52" : "#a1a1aa",
+                              fontSize: 15,
+                              fontWeight: "bold",
+                            }}
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{
+                              fill: isLight ? "#71717a" : "#71717a",
+                              fontSize: 15,
+                            }}
+                          />
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload;
+                                return (
+                                  <div
+                                    className={`border p-4 rounded-xl shadow-xl transition-all ${
+                                      isLight
+                                        ? "bg-white border-zinc-200 text-zinc-900"
+                                        : "bg-zinc-950 border-zinc-800 text-white"
+                                    }`}
                                   >
-                                    {data.type}
-                                  </p>
-                                  <p
-                                    className={`text-sm font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                                  >
-                                    {data.fullName}
-                                  </p>
-                                  <div className="mt-2 space-y-1.5 font-mono text-[11px]">
-                                    <div className="flex justify-between gap-8">
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-500"
-                                            : "text-zinc-400"
-                                        }
-                                      >
-                                        Sales revenue:
-                                      </span>
-                                      <span className="font-bold text-amber-600 dark:text-amber-500">
-                                        €{data.sales.toLocaleString()}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between gap-8">
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-500"
-                                            : "text-zinc-400"
-                                        }
-                                      >
-                                        Rolled Output:
-                                      </span>
-                                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                                        {data.production.toLocaleString()} Pcs
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between gap-8">
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-500"
-                                            : "text-zinc-400"
-                                        }
-                                      >
-                                        Waste Rate:
-                                      </span>
-                                      <span className="font-bold text-rose-600 dark:text-rose-450">
-                                        {data.wastePct}%
-                                      </span>
-                                    </div>
-                                    <div
-                                      className={`flex justify-between gap-8 pt-1 border-t ${isLight ? "border-zinc-200" : "border-zinc-900"}`}
+                                    <p
+                                      className={`text-xs font-mono uppercase font-bold select-none ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                                     >
-                                      <span
-                                        className={
-                                          isLight
-                                            ? "text-zinc-600 text-zinc-600"
-                                            : "text-zinc-300"
-                                        }
+                                      {data.type}
+                                    </p>
+                                    <p
+                                      className={`text-sm font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                                    >
+                                      {data.fullName}
+                                    </p>
+                                    <div className="mt-2 space-y-1.5 font-mono text-xs">
+                                      <div className="flex justify-between gap-8">
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-500"
+                                              : "text-zinc-400"
+                                          }
+                                        >
+                                          Sales revenue:
+                                        </span>
+                                        <span className="font-bold text-amber-600 dark:text-amber-500">
+                                          EUR {data.sales.toLocaleString()}
+                                        </span>
+                                      </div>
+                                      <div className="flex justify-between gap-8">
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-500"
+                                              : "text-zinc-400"
+                                          }
+                                        >
+                                          Rolled Output:
+                                        </span>
+                                        <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                          {data.production.toLocaleString()} Pcs
+                                        </span>
+                                      </div>
+                                      <div className="flex justify-between gap-8">
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-500"
+                                              : "text-zinc-400"
+                                          }
+                                        >
+                                          Waste Rate:
+                                        </span>
+                                        <span className="font-bold text-rose-600 dark:text-rose-450">
+                                          {data.wastePct}%
+                                        </span>
+                                      </div>
+                                      <div
+                                        className={`flex justify-between gap-8 pt-1 border-t ${isLight ? "border-zinc-200" : "border-zinc-900"}`}
                                       >
-                                        Efficiency Score:
-                                      </span>
-                                      <span className="font-extrabold text-blue-600 dark:text-blue-400">
-                                        {data.efficiencyScore}/100
-                                      </span>
+                                        <span
+                                          className={
+                                            isLight
+                                              ? "text-zinc-600 text-zinc-600"
+                                              : "text-zinc-300"
+                                          }
+                                        >
+                                          Efficiency Score:
+                                        </span>
+                                        <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                          {data.efficiencyScore}/100
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              );
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar
+                            dataKey={
+                              branchCompareMetric === "sales"
+                                ? "sales"
+                                : branchCompareMetric === "production"
+                                  ? "production"
+                                  : branchCompareMetric === "waste"
+                                    ? "wastePct"
+                                    : "efficiencyScore"
                             }
-                            return null;
-                          }}
-                        />
-                        <Bar
-                          dataKey={
-                            branchCompareMetric === "sales"
-                              ? "sales"
-                              : branchCompareMetric === "production"
-                                ? "production"
-                                : branchCompareMetric === "waste"
-                                  ? "wastePct"
-                                  : "efficiencyScore"
-                          }
-                          radius={[6, 6, 0, 0]}
-                          maxBarSize={60}
-                        >
-                          {branchPerformanceData.map((entry, index) => (
-                            <Cell
-                              key={`overview-cell-${index}-${entry.id || entry.name}`}
-                              fill={entry.fill || entry.color}
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                {/* Micro comparison labels */}
-                <div
-                  className={`grid ${branchPerformanceData.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2 border-t pt-3 mt-2 text-center text-[10px] font-sans ${
-                    isLight ? "border-zinc-200" : "border-zinc-900/80"
-                  }`}
-                >
-                  {branchPerformanceData.map((branch) => (
-                    <div key={branch.id} className="flex flex-col items-center">
-                      <span
-                        className={`font-semibold ${isLight ? "text-zinc-600" : "text-zinc-500"}`}
-                      >
-                        {branch.name}
-                      </span>
-                      <span
-                        className="font-mono font-bold mt-0.5"
-                        style={{ color: branch.color }}
-                      >
-                        {branchCompareMetric === "sales"
-                          ? `€${branch.sales.toLocaleString()}`
-                          : branchCompareMetric === "production"
-                            ? `${branch.production.toLocaleString()} Pcs`
-                            : branchCompareMetric === "waste"
-                              ? `${branch.wastePct}%`
-                              : `${branch.efficiencyScore} pts`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Championship & Performance Breakdown */}
-              <div className="flex flex-col justify-between space-y-4">
-                {/* Champion Branch Banner Card */}
-                <div
-                  className={`p-5 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
-                    isLight
-                      ? "bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5"
-                      : "bg-zinc-950 border-emerald-950/80"
-                  }`}
-                >
-                  {/* Subtle visual gradient glow for the champion */}
-                  <div className="absolute right-0 bottom-0 w-36 h-36 bg-gradient-to-tr from-emerald-500/20 to-transparent rounded-full filter blur-xl pointer-events-none" />
-
-                  <div>
-                    <div
-                      className={`flex items-center justify-between pb-3 border-b ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
-                    >
-                      <span
-                        className={`text-[9px] font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
-                          isLight
-                            ? "bg-emerald-50 border-emerald-200 text-emerald-700 font-bold"
-                            : "bg-emerald-950/45 text-emerald-400 border-emerald-900/60"
-                        }`}
-                      >
-                        <span>🏆</span> Peak Efficiency Store
-                      </span>
-                      <span
-                        className={`font-mono font-extrabold text-[13px] ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
-                      >
-                        {championBranch.efficiencyScore}%
-                      </span>
-                    </div>
-
-                    <div className="mt-4">
-                      <h4
-                        className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                      >
-                        {championBranch.fullName}
-                      </h4>
-                      <p className="text-[10px] text-zinc-500 font-mono mt-0.5 leading-none">
-                        {championBranch.type}
-                      </p>
-
-                      <p
-                        className={`text-xs mt-3 leading-relaxed ${isLight ? "text-zinc-600 text-zinc-600" : "text-zinc-400"}`}
-                      >
-                        Analyzing overall labor costs, high-premium customer
-                        transaction margins, and minimal seafood waste,{" "}
-                        <strong
-                          className={`font-bold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
-                        >
-                          {championBranch.name}
-                        </strong>{" "}
-                        holds the highest corporate return ratio at{" "}
-                        <strong
-                          className={`font-mono ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                        >
-                          €{championBranch.laborProd}/hr
-                        </strong>{" "}
-                        yield per employee hour.
-                      </p>
+                            radius={[6, 6, 0, 0]}
+                            maxBarSize={60}
+                          >
+                            {branchPerformanceData.map((entry, index) => (
+                              <Cell
+                                key={`overview-cell-${index}-${entry.id || entry.name}`}
+                                fill={entry.fill || entry.color}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
 
+                  {/* Micro comparison labels */}
                   <div
-                    className={`mt-4 pt-3.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
+                    className={`shrink-0 grid ${branchPerformanceData.length === 2 ? "grid-cols-2" : "grid-cols-3"} gap-2 border-t pt-2 mt-2 text-center text-xs font-sans ${
+                      isLight ? "border-zinc-200" : "border-zinc-900/80"
+                    }`}
                   >
+                    {branchPerformanceData.map((branch) => (
+                      <div
+                        key={branch.id}
+                        className="flex flex-col items-center"
+                      >
+                        <span
+                          className={`font-semibold ${isLight ? "text-zinc-600" : "text-zinc-500"}`}
+                        >
+                          {branch.name}
+                        </span>
+                        <span
+                          className="font-mono font-bold mt-0.5"
+                          style={{ color: branch.color }}
+                        >
+                          {branchCompareMetric === "sales"
+                            ? `EUR ${branch.sales.toLocaleString()}`
+                            : branchCompareMetric === "production"
+                              ? `${branch.production.toLocaleString()} Pcs`
+                              : branchCompareMetric === "waste"
+                                ? `${branch.wastePct}%`
+                                : `${branch.efficiencyScore} pts`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Column: Championship & Performance Breakdown */}
+                <div className="min-h-0 flex flex-col justify-between gap-3 overflow-y-auto 2xl:overflow-hidden">
+                  {/* Champion Branch Banner Card */}
+                  <div
+                    className={`p-3 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
+                      isLight
+                        ? "bg-zinc-50 border-emerald-200 shadow-sm shadow-emerald-500/5"
+                        : "bg-zinc-950 border-emerald-950/80"
+                    }`}
+                  >
+                    {/* Subtle visual gradient glow for the champion */}
+                    <div className="absolute right-0 bottom-0 w-36 h-36 bg-gradient-to-tr from-emerald-500/20 to-transparent rounded-full filter blur-xl pointer-events-none" />
+
                     <div>
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">
-                        Labor Yield
-                      </span>
-                      <span
-                        className={`text-xs font-mono font-extrabold ${isLight ? "text-zinc-800" : "text-white"}`}
+                      <div
+                        className={`flex items-center justify-between pb-3 border-b ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
                       >
-                        €{championBranch.laborProd}/hr
-                      </span>
+                        <span
+                          className={`text-xs font-mono uppercase border px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1 leading-none shadow-sm ${
+                            isLight
+                              ? "bg-emerald-50 border-emerald-200 text-emerald-700 font-bold"
+                              : "bg-emerald-950/45 text-emerald-400 border-emerald-900/60"
+                          }`}
+                        >
+                          Peak Efficiency Store
+                        </span>
+                        <span
+                          className={`font-mono font-extrabold text-xs ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                        >
+                          {championBranch.efficiencyScore}%
+                        </span>
+                      </div>
+
+                      <div className="mt-2">
+                        <h4
+                          className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                        >
+                          {championBranch.fullName}
+                        </h4>
+                        <p className="text-xs text-zinc-500 font-mono mt-0.5 leading-none">
+                          {championBranch.type}
+                        </p>
+
+                        <p
+                          className={`text-xs mt-2 leading-relaxed ${isLight ? "text-zinc-600 text-zinc-600" : "text-zinc-400"}`}
+                        >
+                          Analyzing overall labor costs, high-premium customer
+                          transaction margins, and minimal seafood waste,{" "}
+                          <strong
+                            className={`font-bold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                          >
+                            {championBranch.name}
+                          </strong>{" "}
+                          holds the highest corporate return ratio at{" "}
+                          <strong
+                            className={`font-mono ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                          >
+                            EUR {championBranch.laborProd}/hr
+                          </strong>{" "}
+                          yield per employee hour.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">
-                        Waste Control
-                      </span>
-                      <span
-                        className={`text-xs font-mono font-extrabold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
-                      >
-                        {Math.max(0, Math.round(100 - championBranch.wastePct))}
-                        % Control
-                      </span>
+
+                    <div
+                      className={`mt-3 pt-2.5 border-t grid grid-cols-2 gap-3 text-left ${isLight ? "border-zinc-200" : "border-zinc-900/80"}`}
+                    >
+                      <div>
+                        <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
+                          Labor Yield
+                        </span>
+                        <span
+                          className={`text-xs font-mono font-extrabold ${isLight ? "text-zinc-800" : "text-white"}`}
+                        >
+                          EUR {championBranch.laborProd}/hr
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-xs font-mono text-zinc-500 uppercase block tracking-wider">
+                          Waste Control
+                        </span>
+                        <span
+                          className={`text-xs font-mono font-extrabold ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
+                        >
+                          {Math.max(
+                            0,
+                            Math.round(100 - championBranch.wastePct),
+                          )}
+                          % Control
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Summary Performance Note */}
-                <div
-                  className={`p-4 rounded-xl border text-[11px] leading-relaxed font-sans transition-colors ${
-                    isLight
-                      ? "bg-zinc-50 border-zinc-200 text-zinc-600"
-                      : "bg-zinc-950 border-zinc-900 text-zinc-400"
-                  }`}
-                >
-                  <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-[9px]">
-                    💡 Strategic Multi-Branch Note
-                  </span>
-                  Sell products in Marks & Spencer are gourmet luxury lines
-                  featuring <strong>75% average margins</strong>. Tesco stores
-                  support high-volume meal deals and family-packed Trays with{" "}
-                  <strong>78% labor optimization metrics</strong>. Staffing
-                  schedules must remain aligned with peak regional purchase
-                  hours.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Department Visual Analytics Dashboard */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 font-sans">
-            {/* Sell Tab Chart: Monthly Revenue Trajectory */}
-            <div
-              className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
-                isLight
-                  ? "bg-white border border-zinc-200"
-                  : "bg-zinc-950 border border-zinc-900 shadow-xl"
-              }`}
-            >
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
-                    <TrendingUp className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3
-                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                    >
-                      Monthly Sales Trend
-                    </h3>
-                    <p className="text-[10px] text-zinc-500 font-mono">
-                      REVENUE TRAJECTORY (6-MONTH)
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded font-bold text-amber-500">
-                  €286K YTD
-                </span>
-              </div>
-              <div className="h-56 w-full mt-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={[
-                      { month: "Jan", Sales: 42000 },
-                      { month: "Feb", Sales: 48000 },
-                      { month: "Mar", Sales: 51000 },
-                      { month: "Apr", Sales: 49000 },
-                      { month: "May", Sales: 55000 },
-                      { month: "Jun", Sales: 62000 },
-                    ]}
-                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                  {/* Summary Performance Note */}
+                  <div
+                    className={`shrink-0 p-3 rounded-xl border text-xs leading-relaxed font-sans transition-colors ${
+                      isLight
+                        ? "bg-zinc-50 border-zinc-200 text-zinc-600"
+                        : "bg-zinc-950 border-zinc-900 text-zinc-400"
+                    }`}
                   >
-                    <defs>
-                      <linearGradient
-                        id="sellTrendGrad"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#f59e0b"
-                          stopOpacity={0.3}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#f59e0b"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke={isLight ? "#e4e4e7" : "#27272a"}
-                    />
-                    <XAxis
-                      dataKey="month"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 10,
-                      }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 10,
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: isLight ? "#fff" : "#18181b",
-                        borderRadius: "12px",
-                        border: `1px solid ${isLight ? "#e4e4e7" : "#27272a"}`,
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="Sales"
-                      stroke="#f59e0b"
-                      strokeWidth={2.5}
-                      fill="url(#sellTrendGrad)"
-                      dot={{ r: 3, strokeWidth: 1.5, fill: "#f59e0b" }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Production Tab Chart: Daily Output vs Target */}
-            <div
-              className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
-                isLight
-                  ? "bg-white border border-zinc-200"
-                  : "bg-zinc-950 border border-zinc-900 shadow-xl"
-              }`}
-            >
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
-                    <Activity className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3
-                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                    >
-                      Daily Output vs. Target
-                    </h3>
-                    <p className="text-[10px] text-zinc-500 font-mono">
-                      PRODUCTION VOLUMES (WEEKLY)
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded font-bold text-emerald-500">
-                  92% Target Pace
-                </span>
-              </div>
-              <div className="h-56 w-full mt-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={[
-                      { day: "Mon", Output: 450, Target: 400 },
-                      { day: "Tue", Output: 380, Target: 400 },
-                      { day: "Wed", Output: 520, Target: 450 },
-                      { day: "Thu", Output: 480, Target: 480 },
-                      { day: "Fri", Output: 610, Target: 550 },
-                      { day: "Sat", Output: 680, Target: 600 },
-                      { day: "Sun", Output: 590, Target: 550 },
-                    ]}
-                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke={isLight ? "#e4e4e7" : "#27272a"}
-                    />
-                    <XAxis
-                      dataKey="day"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 10,
-                      }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fill: isLight ? "#71717a" : "#a1a1aa",
-                        fontSize: 10,
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: isLight ? "#fff" : "#18181b",
-                        borderRadius: "12px",
-                        border: `1px solid ${isLight ? "#e4e4e7" : "#27272a"}`,
-                      }}
-                    />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      wrapperStyle={{ fontSize: "10px", paddingTop: "5px" }}
-                    />
-                    <Bar
-                      dataKey="Output"
-                      name="Actual Output"
-                      fill="#10b981"
-                      radius={[3, 3, 0, 0]}
-                      maxBarSize={15}
-                    />
-                    <Bar
-                      dataKey="Target"
-                      name="Culinary Target"
-                      fill="#64748b"
-                      radius={[3, 3, 0, 0]}
-                      maxBarSize={15}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Waste Tab Chart: Waste Categories Pie Chart */}
-            <div
-              className={`p-6 rounded-3xl transition-all duration-300 hover:-translate-y-0.5 ${
-                isLight
-                  ? "bg-white border border-zinc-200"
-                  : "bg-zinc-950 border border-zinc-900 shadow-xl"
-              }`}
-            >
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500">
-                    <Trash2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3
-                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                    >
-                      Waste by Category
-                    </h3>
-                    <p className="text-[10px] text-zinc-500 font-mono">
-                      LEAKAGE METRIC PROPORTIONS
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded font-bold text-rose-500">
-                  €2,890 Total
-                </span>
-              </div>
-              <div className="h-56 w-full mt-6 relative flex flex-col justify-center">
-                <div className="h-44 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: isLight ? "#fff" : "#18181b",
-                          borderRadius: "12px",
-                          border: `1px solid ${isLight ? "#e4e4e7" : "#27272a"}`,
-                        }}
-                      />
-                      <Pie
-                        data={[
-                          { name: "Expired", value: 1240 },
-                          { name: "Overproduced", value: 890 },
-                          { name: "Quality Issue", value: 450 },
-                          { name: "Accidents", value: 310 },
-                        ]}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={45}
-                        outerRadius={65}
-                        paddingAngle={4}
-                        dataKey="value"
-                      >
-                        {[
-                          { name: "Expired", color: "#f43f5e" },
-                          { name: "Overproduced", color: "#f59e0b" },
-                          { name: "Quality Issue", color: "#6366f1" },
-                          { name: "Accidents", color: "#64748b" },
-                        ].map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Legend
-                        iconType="circle"
-                        iconSize={6}
-                        layout="horizontal"
-                        align="center"
-                        verticalAlign="bottom"
-                        wrapperStyle={{
-                          fontSize: "9px",
-                          color: isLight ? "#52525b" : "#a1a1aa",
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Daily Sushi Ops & COGS Ledger Entry Form */}
-          <div
-            className={`${metallicTheme}-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
-          >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
-
-            <div
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
-                isLight ? "border-zinc-200" : "border-zinc-800"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 border rounded-2xl transition-all duration-300 ${
-                    isLight
-                      ? "bg-zinc-100 border-zinc-200 text-orange-600"
-                      : "bg-zinc-950 border-zinc-800 text-orange-400"
-                  }`}
-                >
-                  <Calendar className="w-5 h-5 flex-shrink-0" />
-                </div>
-                <div className="z-10">
-                  <h3
-                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
-                  >
-                    Operational Ledger & COGS Input
-                    <span
-                      className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
-                        isLight
-                          ? "bg-orange-50 border-orange-200 text-orange-700 font-bold"
-                          : "bg-orange-500/10 border-orange-500/30 text-orange-400"
-                      }`}
-                    >
-                      Ledger Direct Writer
+                    <span className="font-mono text-amber-500 dark:text-amber-400 font-bold block mb-1 uppercase tracking-wide text-xs">
+                      Multi-Branch Note
                     </span>
-                  </h3>
-                  <p className="subtitle text-xs text-zinc-500">
-                    Record sales, waste, hours, targets, and supplier cost
-                    breakdown for any date
-                  </p>
+                    Sell products in Marks & Spencer are gourmet luxury lines
+                    featuring <strong>75% average margins</strong>. Tesco stores
+                    support high-volume meal deals and family-packed Trays with{" "}
+                    <strong>78% labor optimization metrics</strong>. Staffing
+                    schedules must remain aligned with peak regional purchase
+                    hours.
+                  </div>
                 </div>
               </div>
             </div>
-
-            <form
-              onSubmit={handleSaveOperationalLog}
-              className="mt-5 space-y-6 z-10 relative"
-            >
-              <div
-                className={`grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl border transition-all duration-300 ${
-                  isLight
-                    ? "bg-zinc-50 border-zinc-200"
-                    : "bg-zinc-950 border-zinc-905"
-                }`}
-              >
-                <div>
-                  <label
-                    className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Target Day of Week
-                  </label>
-                  <select
-                    value={entryDay}
-                    onChange={(e) => setEntryDay(e.target.value as any)}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                      isLight
-                        ? "bg-white border-zinc-300 text-zinc-900 font-semibold"
-                        : "bg-zinc-900 border-zinc-800 text-white"
-                    }`}
-                  >
-                    <option value="Mon">Monday</option>
-                    <option value="Tue">Tuesday</option>
-                    <option value="Wed">Wednesday</option>
-                    <option value="Thu">Thursday</option>
-                    <option value="Fri">Friday</option>
-                    <option value="Sat">Saturday</option>
-                    <option value="Sun">Sunday</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Calendar Date
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={entryDate}
-                    onChange={(e) => setEntryDate(e.target.value)}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                      isLight
-                        ? "bg-white border-zinc-300 text-zinc-900 font-semibold"
-                        : "bg-zinc-900 border-zinc-800 text-white"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label
-                    className={`text-[10px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Primary Registered Supplier
-                  </label>
-                  <select
-                    value={entrySupplierName}
-                    onChange={(e) =>
-                      setEntrySupplierName(e.target.value as any)
-                    }
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                      isLight
-                        ? "bg-white border-zinc-300 text-zinc-900 font-semibold"
-                        : "bg-zinc-900 border-zinc-800 text-white"
-                    }`}
-                  >
-                    <option value="Tazaki">Tazaki</option>
-                    <option value="Sysco">Sysco</option>
-                    <option value="Bulza">Bulza</option>
-                    <option value="Sticker">Sticker</option>
-                    <option value="Others">Others</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4 font-sans">
-                {/* Column A: Productivity Metrics */}
-                <div className="space-y-4">
-                  <h4
-                    className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
-                      isLight
-                        ? "border-zinc-200 text-zinc-600 text-zinc-600"
-                        : "border-zinc-800 text-zinc-400"
-                    }`}
-                  >
-                    <Layers className="w-3.5 h-3.5 text-orange-400" />
-                    Operational & Yield Inputs
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Gross Revenue (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entrySales}
-                        onChange={(e) => setEntrySales(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Sushi Waste Cost (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryWaste}
-                        onChange={(e) => setEntryWaste(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Staff Rostered (hrs)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        value={entryHours}
-                        onChange={(e) => setEntryHours(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Production Target (units)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        value={entryProdTarget}
-                        onChange={(e) => setEntryProdTarget(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Production Made (units)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        value={entryProdMade}
-                        onChange={(e) => setEntryProdMade(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Column B: Supplier COGS breakdown */}
-                <div className="space-y-4">
-                  <h4
-                    className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
-                      isLight
-                        ? "border-zinc-200 text-zinc-600 text-zinc-600"
-                        : "border-zinc-800 text-zinc-400"
-                    }`}
-                  >
-                    <Settings className="w-3.5 h-3.5 text-emerald-400" />
-                    Supplier COGS Breakdown (GOC)
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Tazaki Supplier (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryTazaki}
-                        onChange={(e) => setEntryTazaki(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Sysco Supplier (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entrySysco}
-                        onChange={(e) => setEntrySysco(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Bulza Supplier (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryBulza}
-                        onChange={(e) => setEntryBulza(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Sticker Supplier (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entrySticker}
-                        onChange={(e) => setEntrySticker(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`text-[9px] font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Others / Etc. (€)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryOthers}
-                        onChange={(e) => setEntryOthers(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className={`flex justify-end pt-4 border-t ${isLight ? "border-zinc-200" : "border-zinc-800"}`}
-              >
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
-                >
-                  <Save className="w-4 h-4" />
-                  Commit Active Operational Records
-                </button>
-              </div>
-            </form>
           </div>
+        </div>
       </motion.div>
     </div>
   );

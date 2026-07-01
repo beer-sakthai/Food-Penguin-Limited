@@ -49,38 +49,38 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  const avgLabor = data.reduce((sum, d) => sum + d.laborEff, 0) / data.length;
 
  return (
- <div className={`rounded-xl border p-5 shadow-sm transition-all mt-6 relative overflow-hidden ${
+ <div className={`rounded-xl border p-5 shadow-sm transition-all relative overflow-hidden h-full flex flex-col md:overflow-hidden min-h-0 ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-950 border-zinc-900 text-white'
  }`}>
  <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${isLight ? 'from-yellow-400 to-yellow-300' : 'from-yellow-600 to-yellow-500'}`} />
- 
- <div className="pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+ <div className="pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
  <div>
  <h2 className={`text-base font-sans font-semibold tracking-tight ${isLight ? 'text-zinc-800' : 'text-white'}`}>Capacity & Labor Analytics</h2>
  <p className={`text-xs mt-0.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Weekly Production Performance vs. Labor Efficiency Index</p>
  </div>
  </div>
 
- <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+ <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 shrink-0">
  <div className={`p-4 rounded-xl border flex flex-col justify-center ${isLight ? 'bg-zinc-50/80 border-zinc-200' : 'bg-zinc-900/50 border-zinc-850'}`}>
- <span className={`text-[9.5px] font-mono tracking-widest uppercase mb-1.5 opacity-80 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Avg Target Match</span>
- <div className={`text-2xl font-bold font-sans tracking-tight ${avgPerf >= 100 ? 'text-emerald-500' : 'text-amber-500'}`}>
+ <span className={`text-xs font-mono tracking-widest uppercase mb-1.5 opacity-80 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Avg Target Match</span>
+ <div className={`text-3xl font-bold font-sans tracking-tight ${avgPerf >= 100 ? 'text-emerald-500' : 'text-amber-500'}`}>
  {avgPerf.toFixed(1)}%
  </div>
  </div>
  <div className={`p-4 rounded-xl border flex flex-col justify-center ${isLight ? 'bg-zinc-50/80 border-zinc-200' : 'bg-zinc-900/50 border-zinc-850'}`}>
- <span className={`text-[9.5px] font-mono tracking-widest uppercase mb-1.5 opacity-80 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Avg Labor Efficiency</span>
- <div className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-yellow-600' : 'text-yellow-400'}`}>
- {avgLabor.toFixed(1)} <span className={`text-[10px] ml-0.5 tracking-normal font-sans opacity-75`}>units/hour</span>
+ <span className={`text-xs font-mono tracking-widest uppercase mb-1.5 opacity-80 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Avg Labor Efficiency</span>
+ <div className={`text-3xl font-bold font-sans tracking-tight ${isLight ? 'text-yellow-600' : 'text-yellow-400'}`}>
+ {avgLabor.toFixed(1)} <span className={`text-xs ml-0.5 tracking-normal font-sans opacity-75`}>units/hour</span>
  </div>
  </div>
  </div>
 
- <div className="w-full overflow-x-auto custom-scrollbar pb-2">
+ <div className="w-full overflow-x-auto overflow-y-auto custom-scrollbar pb-2 flex-1 min-h-0">
  <div className="min-w-[500px]">
  <div className="flex justify-between items-center mb-4 px-2">
- <span className={`text-[10px] font-mono font-bold tracking-widest uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Production Target Met</span>
- <span className={`text-[10px] font-mono font-bold tracking-widest uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Labor Efficiency Heat</span>
+ <span className={`text-xs font-mono font-bold tracking-widest uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Production Target Met</span>
+ <span className={`text-xs font-mono font-bold tracking-widest uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Labor Efficiency Heat</span>
  </div>
  
  <div className="flex items-end justify-between px-2 gap-3" style={{ height: chartHeight }}>
@@ -101,7 +101,7 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end">
  {/* Tooltip */}
  <div className={`absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 flex flex-col items-center drop-shadow-xl ${isLight ? 'filter' : ''}`}>
- <div className={`text-[10px] font-mono p-2 rounded shadow-lg border ${
+ <div className={`text-xs font-mono p-2 rounded shadow-lg border ${
  isLight ? 'bg-zinc-900 text-zinc-50 border-zinc-800' : 'bg-white text-zinc-900 border-zinc-200'
  }`}>
  <span className="font-bold">{d.day}</span>
@@ -133,18 +133,18 @@ export default function CapacityAnalytics({ weeklyLogs, isLight }: CapacityAnaly
  />
  )}
 
- <span className="text-[9px] text-white font-bold font-mono tracking-tighter opacity-0 group-hover:opacity-100 drop-shadow-md">
+ <span className="text-xs text-white font-bold font-mono tracking-tighter opacity-0 group-hover:opacity-100 drop-shadow-md">
  {d.perfPct.toFixed(0)}%
  </span>
  </div>
- <div className={`w-full text-center mt-3 text-[10px] font-mono font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
+ <div className={`w-full text-center mt-3 text-xs font-mono font-bold uppercase tracking-wider ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
  {d.day}
  </div>
  </div>
  );
  })}
  </div>
- <div className={`mt-5 border-t pt-4 flex flex-wrap items-center justify-center gap-6 text-[9px] font-mono uppercase tracking-widest ${isLight ? 'text-zinc-500 border-zinc-200' : 'text-zinc-500 border-zinc-850'}`}>
+ <div className={`mt-5 border-t pt-4 flex flex-wrap items-center justify-center gap-6 text-xs font-mono uppercase tracking-widest ${isLight ? 'text-zinc-500 border-zinc-200' : 'text-zinc-500 border-zinc-850'}`}>
  <div className="flex items-center gap-2">
  <span className={`w-3.5 h-3.5 rounded border ${isLight ? 'bg-emerald-500/80 border-emerald-600' : 'bg-emerald-600/80 border-emerald-500'}`} /> 
  Target Met / Over

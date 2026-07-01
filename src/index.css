@@ -3,10 +3,24 @@
 
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  /* Three-size dashboard typography */
+  --font-size-xs: 14px;
+  --font-size-sm: 14px;
+  --font-size-base: 18px;
+  --font-size-lg: 18px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 32px;
+  --font-size-5xl: 32px;
+  --font-size-6xl: 32px;
+  --font-size-7xl: 32px;
+  --font-size-8xl: 32px;
 }
 
 html {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 @layer base {
@@ -21,9 +35,9 @@ html {
   }
   
   .dark body {
-    /* Premium rich dark slate radial background */
-    background: radial-gradient(circle at 15% 50%, #15151c 0%, #0a0a0c 50%, #000000 100%) fixed;
-    color: #f4f4f5;
+    /* Clean flat soft-dark background for minimalist zen theme */
+    background-color: #131313;
+    color: #e5e2e1;
   }
 
   body {
@@ -122,92 +136,218 @@ html {
 
   /* White Mirror Glass Metallic Liners & Glows */
   .gold-liner-box {
-    background: rgba(255, 255, 255, 0.65) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(254, 243, 199, 0.3)) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 32px 0 rgba(234, 179, 8, 0.1), inset 0 0 0 1.5px rgba(234, 179, 8, 0.4) !important;
+    border: 1px solid rgba(234, 179, 8, 0.2) !important;
+    box-shadow: 0 8px 30px rgba(234, 179, 8, 0.04), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
     border-radius: 1.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .dark .gold-liner-box {
-    background: rgba(20, 20, 25, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 0 8px 32px 0 rgba(234, 179, 8, 0.2), inset 0 0 0 1.5px rgba(234, 179, 8, 0.4) !important;
+    background: linear-gradient(135deg, rgba(24, 24, 27, 0.75), rgba(15, 15, 18, 0.85)) !important;
+    border: 1px solid rgba(234, 179, 8, 0.22) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
   }
 
   .gold-liner-box:hover {
-    box-shadow: 0 12px 45px 0 rgba(234, 179, 8, 0.25), inset 0 0 0 2px rgba(234, 179, 8, 0.6) !important;
-    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(234, 179, 8, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
+  }
+  
+  .dark .gold-liner-box:hover {
+    box-shadow: 0 16px 48px rgba(234, 179, 8, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
   }
   
   .silver-liner-box {
-    background: rgba(255, 255, 255, 0.65) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(241, 245, 249, 0.3)) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 32px 0 rgba(148, 163, 184, 0.1), inset 0 0 0 1.5px rgba(148, 163, 184, 0.4) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 8px 30px rgba(148, 163, 184, 0.04), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
     border-radius: 1.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .dark .silver-liner-box {
-    background: rgba(20, 20, 25, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 0 8px 32px 0 rgba(148, 163, 184, 0.2), inset 0 0 0 1.5px rgba(148, 163, 184, 0.4) !important;
+    background: linear-gradient(135deg, rgba(24, 24, 27, 0.75), rgba(15, 15, 18, 0.85)) !important;
+    border: 1px solid rgba(148, 163, 184, 0.22) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
   }
 
   .silver-liner-box:hover {
-    box-shadow: 0 12px 45px 0 rgba(148, 163, 184, 0.25), inset 0 0 0 2px rgba(148, 163, 184, 0.6) !important;
-    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(148, 163, 184, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
+  }
+  
+  .dark .silver-liner-box:hover {
+    box-shadow: 0 16px 48px rgba(148, 163, 184, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
   }
 
   .copper-liner-box {
-    background: rgba(255, 255, 255, 0.65) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 237, 213, 0.3)) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 32px 0 rgba(249, 115, 22, 0.1), inset 0 0 0 1.5px rgba(249, 115, 22, 0.4) !important;
+    border: 1px solid rgba(249, 115, 22, 0.2) !important;
+    box-shadow: 0 8px 30px rgba(249, 115, 22, 0.04), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
     border-radius: 1.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .dark .copper-liner-box {
-    background: rgba(20, 20, 25, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 0 8px 32px 0 rgba(249, 115, 22, 0.2), inset 0 0 0 1.5px rgba(249, 115, 22, 0.4) !important;
+    background: linear-gradient(135deg, rgba(24, 24, 27, 0.75), rgba(15, 15, 18, 0.85)) !important;
+    border: 1px solid rgba(249, 115, 22, 0.22) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
   }
 
   .copper-liner-box:hover {
-    box-shadow: 0 12px 45px 0 rgba(249, 115, 22, 0.25), inset 0 0 0 2px rgba(249, 115, 22, 0.6) !important;
-    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(249, 115, 22, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
+  }
+  
+  .dark .copper-liner-box:hover {
+    box-shadow: 0 16px 48px rgba(249, 115, 22, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
   }
 
   /* Crystal Magic Glass Theme */
   .crystal-liner-box {
-    background: rgba(255, 255, 255, 0.5) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(243, 232, 255, 0.25)) !important;
     backdrop-filter: blur(16px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 8px 24px 0 rgba(192, 132, 252, 0.1), inset 0 0 0 1.5px rgba(192, 132, 252, 0.3) !important;
+    border: 1px solid rgba(192, 132, 252, 0.2) !important;
+    box-shadow: 0 8px 30px rgba(192, 132, 252, 0.04), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
     border-radius: 1.5rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark .crystal-liner-box {
-    background: rgba(30, 30, 35, 0.5) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 32px 0 rgba(192, 132, 252, 0.15), inset 0 0 0 1.5px rgba(192, 132, 252, 0.3) !important;
+    background: linear-gradient(135deg, rgba(24, 24, 27, 0.75), rgba(15, 15, 18, 0.85)) !important;
+    border: 1px solid rgba(192, 132, 252, 0.22) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
   }
 
   .crystal-liner-box:hover {
-    box-shadow: 0 10px 40px 0 rgba(192, 132, 252, 0.25), inset 0 0 0 2px rgba(192, 132, 252, 0.5) !important;
-    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(192, 132, 252, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
+  }
+
+  .dark .crystal-liner-box:hover {
+    box-shadow: 0 16px 48px rgba(192, 132, 252, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
   }
 
   .crystal-liner-box:active {
-    box-shadow: 0 4px 20px 0 rgba(192, 132, 252, 0.2), inset 0 0 0 2px rgba(192, 132, 252, 0.6) !important;
     transform: translateY(-1px) scale(0.98);
   }
+}
+
+/* Compact layout overrides to fit everything on a single page (1 screen) */
+@media (min-width: 768px) {
+  /* Reduce outer padding of the main panel */
+  main {
+    padding: 1rem !important; /* Shrunk from p-6 */
+  }
+
+  /* Make container spaces smaller */
+  .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse))) !important; /* Shrunk from 1.5rem */
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse)) !important;
+  }
+  
+  .gap-6 {
+    gap: 0.875rem !important; /* Shrunk from 1.5rem */
+  }
+  
+  .gap-5 {
+    gap: 0.75rem !important; /* Shrunk from 1.25rem */
+  }
+
+  /* Reduce padding inside all liner box containers */
+  .gold-liner-box, .silver-liner-box, .copper-liner-box, .crystal-liner-box {
+    padding: 1rem !important; /* Shrunk from p-5/p-6 */
+  }
+
+  /* Reduce standard card padding classes */
+  .p-6 {
+    padding: 1rem !important;
+  }
+  .p-5 {
+    padding: 0.875rem !important;
+  }
+  .p-8 {
+    padding: 1.25rem !important;
+  }
+
+  /* Shrink chart heights dynamically */
+  .h-72 {
+    height: 12.5rem !important; /* Shrunk from 18rem to 200px */
+  }
+  
+  .h-96 {
+    max-height: 16rem !important; /* Shrunk from 24rem to 256px */
+  }
+
+  /* Reduce element margins */
+  .mt-6 {
+    margin-top: 1rem !important;
+  }
+  .mt-4 {
+    margin-top: 0.75rem !important;
+  }
+  .mb-6 {
+    margin-bottom: 1rem !important;
+  }
+  .mb-4 {
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+/* Subtle app frame */
+.versace-frame-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 9999;
+  pointer-events: none;
+  background: linear-gradient(90deg, #f97316, #f59e0b, #10b981);
+  opacity: 0.85;
+}
+
+.versace-frame-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 9999;
+  pointer-events: none;
+  background: linear-gradient(90deg, #10b981, #f59e0b, #f97316);
+  opacity: 0.5;
+}
+
+.versace-frame-left {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 6px;
+  z-index: 9999;
+  pointer-events: none;
+  background: linear-gradient(180deg, #f97316, #f59e0b, #10b981);
+  opacity: 0.5;
+}
+
+.versace-frame-right {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 6px;
+  z-index: 9999;
+  pointer-events: none;
+  background: linear-gradient(180deg, #10b981, #f59e0b, #f97316);
+  opacity: 0.5;
 }
