@@ -106,6 +106,9 @@ const rolePermissions: Record<
 > = {
   Admin: [
     "Overview",
+    "Branch_MS",
+    "Branch_Tesco_Cork",
+    "Branch_Tesco_Mahon",
     "Advisor",
     "Realtime",
     "Sell",
@@ -123,6 +126,9 @@ const rolePermissions: Record<
   ],
   Manager: [
     "Overview",
+    "Branch_MS",
+    "Branch_Tesco_Cork",
+    "Branch_Tesco_Mahon",
     "Advisor",
     "Realtime",
     "Target",
@@ -139,6 +145,9 @@ const rolePermissions: Record<
   ],
   Staff: [
     "Overview",
+    "Branch_MS",
+    "Branch_Tesco_Cork",
+    "Branch_Tesco_Mahon",
     "Advisor",
     "Realtime",
     "Sell",
@@ -148,7 +157,7 @@ const rolePermissions: Record<
     "Suppliers",
     "Reports",
   ],
-  User: ["Overview", "Advisor", "Realtime"], // User can only view data
+  User: ["Overview", "Branch_MS", "Branch_Tesco_Cork", "Branch_Tesco_Mahon", "Advisor", "Realtime"], // User can only view data
 };
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
@@ -552,15 +561,17 @@ export default function App() {
   }, [currentUser]);
 
   const [selectedBranch, setSelectedBranch] = useState<
-    "Marks & Spencer - Cork City" | "Tesco - Cork City" | "Tesco - Mahon Point"
-  >("Marks & Spencer - Cork City");
+    "Marks & Spencer - Cork City" | "Tesco - Cork City" | "Tesco - Mahon Point" | "All Branches"
+  >("All Branches");
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
   const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
   const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
 
   const recipes = useMemo<Recipe[]>(() => {
     const isMS = selectedBranch === "Marks & Spencer - Cork City";
-    const activeProducts = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+    const activeProducts = selectedBranch === "All Branches" 
+      ? [...MS_PRODUCTS, ...TESCO_PRODUCTS].filter((v,i,a)=>a.findIndex(v2=>(v2.name===v.name))===i)
+      : isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
 
     const getIngredients = (category: string, name: string) => {
       const lowerName = name.toLowerCase();
@@ -673,7 +684,9 @@ export default function App() {
   useEffect(() => {
     if (isFirebaseSynced) return;
     const isMS = selectedBranch === "Marks & Spencer - Cork City";
-    const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+    const products = selectedBranch === "All Branches"
+      ? [...MS_PRODUCTS, ...TESCO_PRODUCTS]
+      : isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
 
     if (products.length >= 4) {
       setTasks([
@@ -1822,6 +1835,21 @@ export default function App() {
       icon: <LayoutDashboard className="w-4 h-4" />,
     },
     {
+      id: "Branch_MS",
+      label: "M&S Cork City",
+      icon: <Store className="w-4 h-4" />,
+    },
+    {
+      id: "Branch_Tesco_Cork",
+      label: "Tesco Cork City",
+      icon: <Store className="w-4 h-4" />,
+    },
+    {
+      id: "Branch_Tesco_Mahon",
+      label: "Tesco Mahon Point",
+      icon: <Store className="w-4 h-4" />,
+    },
+    {
       id: "Advisor",
       label: "Strategic Advisor",
       icon: <BrainCircuit className="w-4 h-4" />,
@@ -1879,9 +1907,25 @@ export default function App() {
     }
   }, [userRole, activeTab]);
 
+  // Sync selectedBranch when clicking on sidebar branch tabs
+  useEffect(() => {
+    if (activeTab === "Overview") {
+      setSelectedBranch("All Branches");
+    } else if (activeTab === "Branch_MS") {
+      setSelectedBranch("Marks & Spencer - Cork City");
+    } else if (activeTab === "Branch_Tesco_Cork") {
+      setSelectedBranch("Tesco - Cork City");
+    } else if (activeTab === "Branch_Tesco_Mahon") {
+      setSelectedBranch("Tesco - Mahon Point");
+    }
+  }, [activeTab]);
+
   const renderActiveView = () => {
     switch (activeTab) {
       case "Overview":
+      case "Branch_MS":
+      case "Branch_Tesco_Cork":
+      case "Branch_Tesco_Mahon":
         return (
           <OverviewTab
             metrics={metrics}
@@ -2125,46 +2169,7 @@ export default function App() {
               Food chain ops portal
             </span>
 
-            {/* Global Branch Selector Dropdown */}
-            <div
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${
-                isLight
-                  ? "bg-zinc-100 border-zinc-200"
-                  : "bg-zinc-900 border-zinc-800"
-              }`}
-            >
-              <span
-                className={`text-xs font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
-              >
-                Store:
-              </span>
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value as any)}
-                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-xs sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
-                style={{ outline: "none" }}
-              >
-                <option
-                  value="Marks & Spencer - Cork City"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Marks & Spencer Cork City
-                </option>
-                <option
-                  value="Tesco - Cork City"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Tesco Cork City
-                </option>
-                <option
-                  value="Tesco - Mahon Point"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Tesco Mahon Point
-                </option>
-              </select>
-            </div>
-          </div>
+
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
