@@ -87,15 +87,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Username</label>
             <div className="relative">
               <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-              <input className="input-gold-glow"
-                type="text"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
-                  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
-                }`}
-                placeholder="Enter username"
-              />
+              <input className={`input-gold-glow w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black' }`} type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"/>
             </div>
           </div>
 
@@ -103,28 +95,14 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Password</label>
             <div className="relative">
               <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-              <input className="input-gold-glow"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
-                  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
-                }`}
-                placeholder="Enter password"
-              />
+              <input className={`input-gold-glow w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black' }`} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"/>
             </div>
           </div>
 
           {isRegistering && (
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Role</label>
-              <select className="input-gold-glow"
-                value={role}
-                onChange={e => setRole(e.target.value as 'Admin' | 'User')}
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] appearance-none cursor-pointer ${
-                  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
-                }`}
-              >
+              <select className={`input-gold-glow w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] appearance-none cursor-pointer ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black' }`} value={role} onChange={e => setRole(e.target.value as 'Admin' | 'User')}>
                 <option value="User">User (View Only)</option>
                 <option value="Admin">Admin (Full Access)</option>
               </select>
@@ -182,13 +160,10 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
 
         <div className={`mt-6 pt-6 border-t text-center text-sm ${isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-400'}`}>
           {isRegistering ? 'Already have an account? ' : 'Need an account? '}
-          <button className="btn-interactive" 
-            onClick={() => {
+          <button className="btn-interactive font-bold text-amber-500 hover:text-amber-400 underline transition-colors" onClick={() => {
               setIsRegistering(!isRegistering);
               setError('');
-            }}
-            className="font-bold text-amber-500 hover:text-amber-400 underline transition-colors"
-          >
+            }}>
             {isRegistering ? 'Sign in' : 'Register now'}
           </button>
         </div>

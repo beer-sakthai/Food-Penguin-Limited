@@ -104,22 +104,10 @@ export function Sidebar({
           {tabMeta.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
-              <button className="btn-interactive"
-                key={tab.id}
-                onClick={() => {
+              <button className={`btn-interactive w-full text-left py-2.5 px-3.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${ isActive ? isLight ? "bg-orange-50 text-zinc-950 font-bold shadow-sm border border-orange-200" : "bg-orange-500/12 text-white font-bold shadow-sm border border-orange-500/30" : isLight ? "text-zinc-600 active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent" : "text-zinc-400 active:scale-[0.98] hover:bg-zinc-800/70 hover:text-white border border-transparent" }`} key={tab.id} onClick={() => {
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
-                }}
-                className={`w-full text-left py-2.5 px-3.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                  isActive
-                    ? isLight
-                      ? "bg-orange-50 text-zinc-950 font-bold shadow-sm border border-orange-200"
-                      : "bg-orange-500/12 text-white font-bold shadow-sm border border-orange-500/30"
-                    : isLight
-                      ? "text-zinc-600 active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent"
-                      : "text-zinc-400 active:scale-[0.98] hover:bg-zinc-800/70 hover:text-white border border-transparent"
-                }`}
-              >
+                }}>
                 <div className="flex items-center gap-3 min-w-0">
                   <span
                     className={`shrink-0 transition-colors ${
@@ -179,15 +167,7 @@ export function Sidebar({
                 {currentUser?.username || "Food Penguin User"}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <select className="input-gold-glow"
-                  value={userRole}
-                  onChange={(e) => setUserRole(e.target.value)}
-                  className={`bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
-                    isLight
-                      ? "text-zinc-500 active:scale-[0.98] hover:text-zinc-800 font-bold"
-                      : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
+                <select className={`input-gold-glow bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? "text-zinc-500 active:scale-[0.98] hover:text-zinc-800 font-bold" : "text-zinc-500 hover:text-zinc-300" }`} value={userRole} onChange={(e) => setUserRole(e.target.value)}>
                   <option value="Admin">Admin</option>
                   <option value="Manager">Manager</option>
                   <option value="Staff">Staff</option>

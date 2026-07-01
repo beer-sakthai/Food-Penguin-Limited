@@ -552,15 +552,7 @@ export default function OverviewTab({
           >
             Choose the week used for the dashboard numbers and charts.
           </p>
-          <select className="input-gold-glow"
-            value={selectedWeekRange}
-            onChange={(e) => onSelectedWeekRangeChange(e.target.value)}
-            className={`w-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 rounded-lg px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
-              isLight
-                ? "bg-white border-zinc-200 text-orange-600 active:scale-[0.98] hover:text-orange-700"
-                : "bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-300"
-            }`}
-          >
+          <select className={`input-gold-glow w-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 rounded-lg px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${ isLight ? "bg-white border-zinc-200 text-orange-600 active:scale-[0.98] hover:text-orange-700" : "bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-300" }`} value={selectedWeekRange} onChange={(e) => onSelectedWeekRangeChange(e.target.value)}>
             <option
               value="2026-06-15 to 2026-06-21"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
@@ -641,10 +633,7 @@ export default function OverviewTab({
                 </p>
               </div>
             </div>
-            <button className="btn-interactive"
-              onClick={() => onNavigateTab("Planning")}
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs rounded-lg shadow-sm transition-all active:scale-[0.98] shrink-0 cursor-pointer"
-            >
+            <button className="btn-interactive px-4 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs rounded-lg shadow-sm transition-all active:scale-[0.98] shrink-0 cursor-pointer" onClick={() => onNavigateTab("Planning")}>
               Open planning
             </button>
           </motion.div>
@@ -679,18 +668,7 @@ export default function OverviewTab({
               (day) => {
                 const isActive = selectedDayTab === day;
                 return (
-                  <button className="btn-interactive"
-                    key={day}
-                    onClick={() => setSelectedDayTab(day)}
-                    type="button"
-                    className={`px-3.5 py-1.5 text-xs rounded-md font-mono font-bold transition-all ${
-                      isActive
-                        ? "bg-orange-500 text-white shadow-md"
-                        : isLight
-                          ? "text-zinc-500 active:scale-[0.98] hover:text-orange-600 hover:bg-white"
-                          : "text-zinc-400 hover:text-white"
-                    }`}
-                  >
+                  <button className={`btn-interactive px-3.5 py-1.5 text-xs rounded-md font-mono font-bold transition-all ${ isActive ? "bg-orange-500 text-white shadow-md" : isLight ? "text-zinc-500 active:scale-[0.98] hover:text-orange-600 hover:bg-white" : "text-zinc-400 hover:text-white" }`} key={day} onClick={() => setSelectedDayTab(day)} type="button">
                     {day}
                   </button>
                 );
@@ -1415,30 +1393,10 @@ export default function OverviewTab({
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="btn-interactive"
-                    type="button"
-                    onClick={() => setChartView("hourly")}
-                    className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
-                      chartView === "hourly"
-                        ? "bg-amber-500 text-zinc-950 shadow-md"
-                        : isLight
-                          ? "text-zinc-500 hover:text-amber-700 hover:bg-white"
-                          : "text-zinc-400 hover:bg-zinc-800"
-                    }`}
-                  >
+                  <button className={`btn-interactive px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${ chartView === "hourly" ? "bg-amber-500 text-zinc-950 shadow-md" : isLight ? "text-zinc-500 hover:text-amber-700 hover:bg-white" : "text-zinc-400 hover:bg-zinc-800" }`} type="button" onClick={() => setChartView("hourly")}>
                     Hourly
                   </button>
-                  <button className="btn-interactive"
-                    type="button"
-                    onClick={() => setChartView("weekly")}
-                    className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
-                      chartView === "weekly"
-                        ? "bg-amber-500 text-zinc-950 shadow-md"
-                        : isLight
-                          ? "text-zinc-500 hover:text-amber-700 hover:bg-white"
-                          : "text-zinc-400 hover:bg-zinc-800"
-                    }`}
-                  >
+                  <button className={`btn-interactive px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${ chartView === "weekly" ? "bg-amber-500 text-zinc-950 shadow-md" : isLight ? "text-zinc-500 hover:text-amber-700 hover:bg-white" : "text-zinc-400 hover:bg-zinc-800" }`} type="button" onClick={() => setChartView("weekly")}>
                     Weekly
                   </button>
                 </div>
@@ -1586,18 +1544,10 @@ export default function OverviewTab({
                     <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">
                       Branch A
                     </label>
-                    <select className="input-gold-glow"
-                      value={compareBranchA}
-                      onChange={(e) => {
+                    <select className={`input-gold-glow w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${ isLight ? "bg-zinc-50 border-zinc-200 text-zinc-900" : "bg-zinc-900 border-zinc-800 text-white" }`} value={compareBranchA} onChange={(e) => {
                         setCompareBranchA(e.target.value);
                         setCompareMode("twoBranches");
-                      }}
-                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
-                        isLight
-                          ? "bg-zinc-50 border-zinc-200 text-zinc-900"
-                          : "bg-zinc-900 border-zinc-800 text-white"
-                      }`}
-                    >
+                      }}>
                       <option value="m_s_cork">M&S Cork</option>
                       <option value="tesco_cork">Tesco Cork</option>
                       <option value="tesco_mahon">Tesco Mahon</option>
@@ -1612,18 +1562,10 @@ export default function OverviewTab({
                     <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">
                       Branch B
                     </label>
-                    <select className="input-gold-glow"
-                      value={compareBranchB}
-                      onChange={(e) => {
+                    <select className={`input-gold-glow w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${ isLight ? "bg-zinc-50 border-zinc-200 text-zinc-900" : "bg-zinc-900 border-zinc-800 text-white" }`} value={compareBranchB} onChange={(e) => {
                         setCompareBranchB(e.target.value);
                         setCompareMode("twoBranches");
-                      }}
-                      className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${
-                        isLight
-                          ? "bg-zinc-50 border-zinc-200 text-zinc-900"
-                          : "bg-zinc-900 border-zinc-800 text-white"
-                      }`}
-                    >
+                      }}>
                       <option value="m_s_cork">M&S Cork</option>
                       <option value="tesco_cork">Tesco Cork</option>
                       <option value="tesco_mahon">Tesco Mahon</option>
@@ -1631,18 +1573,9 @@ export default function OverviewTab({
                   </div>
                 </div>
               </div>
-              <button className="btn-interactive"
-                onClick={() =>
+              <button className={`btn-interactive w-full mt-6 px-4 py-3 rounded-xl border font-bold text-sm transition-all ${ compareMode === "all" ? "bg-amber-500 text-zinc-950 border-amber-600" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 bg-opacity-60 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white" }`} onClick={() =>
                   setCompareMode(compareMode === "all" ? "twoBranches" : "all")
-                }
-                className={`w-full mt-6 px-4 py-3 rounded-xl border font-bold text-sm transition-all ${
-                  compareMode === "all"
-                    ? "bg-amber-500 text-zinc-950 border-amber-600"
-                    : isLight
-                      ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                      : "bg-zinc-900 bg-opacity-60 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white"
-                }`}
-              >
+                }>
                 {compareMode === "all"
                   ? "Viewing All Active Branches"
                   : "View All Global Branches"}

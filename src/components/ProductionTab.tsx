@@ -198,18 +198,12 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
 
  <div className="flex gap-1 justify-end font-sans">
  {task.status === 'In Queue' && (
- <button className="btn-interactive"
- onClick={() => onUpdateTaskStatus(task.id, 'Cooking')}
- className="p-1 px-2 border text-xs rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white"
- >
+ <button className="btn-interactive p-1 px-2 border text-xs rounded bg-zinc-900 border-zinc-800 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white" onClick={() => onUpdateTaskStatus(task.id, 'Cooking')}>
  Cook
  </button>
  )}
  {task.status === 'Cooking' && (
- <button className="btn-interactive"
- onClick={() => onUpdateTaskStatus(task.id, 'Prepared')}
- className="p-1 px-2 border text-xs rounded bg-zinc-900 border-zinc-800  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white font-semibold"
- >
+ <button className="btn-interactive p-1 px-2 border text-xs rounded bg-zinc-900 border-zinc-800 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-800 text-white font-semibold" onClick={() => onUpdateTaskStatus(task.id, 'Prepared')}>
  Finish
  </button>
  )}
@@ -396,23 +390,12 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
           <form onSubmit={handleSubmitTask} className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Dish Name</label>
-              <input className="input-gold-glow" 
-                type="text" 
-                value={taskItem}
-                onChange={e => setTaskItem(e.target.value)}
-                placeholder="e.g. Classic Cod Slabs"
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-white"
-                required
-              />
+              <input className="input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-white" type="text" value={taskItem} onChange={e => setTaskItem(e.target.value)} placeholder="e.g. Classic Cod Slabs" required/>
             </div>
             
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Chef Station</label>
-              <select className="input-gold-glow" 
-                value={assignedTo}
-                onChange={e => setAssignedTo(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-zinc-300"
-              >
+              <select className="input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-zinc-300" value={assignedTo} onChange={e => setAssignedTo(e.target.value)}>
                 <option value="Chef Skipper">Chef Skipper (Grill)</option>
                 <option value="Chef Rico">Chef Rico (Fryer)</option>
                 <option value="Chef Kowalski">Chef Kowalski (Prep)</option>
@@ -423,22 +406,11 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Quantity</label>
-                <input className="input-gold-glow" 
-                  type="number" 
-                  min="1"
-                  value={qty}
-                  onChange={e => setQty(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-white"
-                  required
-                />
+                <input className="input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-white" type="number" min="1" value={qty} onChange={e => setQty(parseInt(e.target.value) || 1)} required/>
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Priority</label>
-                <select className="input-gold-glow" 
-                  value={priority}
-                  onChange={e => setPriority(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-zinc-300"
-                >
+                <select className="input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] bg-zinc-950 border-zinc-800 text-zinc-300" value={priority} onChange={e => setPriority(e.target.value as any)}>
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
@@ -474,12 +446,7 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
              
              <div className="grid grid-cols-3 gap-2 mb-3">
                {SAMPLE_MOCK_DISHES.map((d, i) => (
-                 <button className="btn-interactive" 
-                   key={i}
-                   onClick={() => selectPresetDish(d)}
-                   title={d.desc}
-                   className="p-2 border border-zinc-800 rounded bg-zinc-950 flex flex-col items-center gap-1 hover:border-amber-500/50 transition-colors"
-                 >
+                 <button className="btn-interactive p-2 border border-zinc-800 rounded bg-zinc-950 flex flex-col items-center gap-1 hover:border-amber-500/50 transition-colors" key={i} onClick={() => selectPresetDish(d)} title={d.desc}>
                    <img src={d.data} alt={d.name} className="w-8 h-8 rounded" />
                    <span className="text-xs font-bold text-zinc-400 text-center truncate w-full">{d.name}</span>
                  </button>

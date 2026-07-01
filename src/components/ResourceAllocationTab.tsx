@@ -88,36 +88,17 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
           <form onSubmit={handleAllocate} className="space-y-4">
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Resource / Item</label>
-              <input className="input-gold-glow" 
-                type="text" 
-                value={newItem}
-                onChange={e => setNewItem(e.target.value)}
-                placeholder="e.g. Flour, Packaging..."
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
-                required
-              />
+              <input className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`} type="text" value={newItem} onChange={e => setNewItem(e.target.value)} placeholder="e.g. Flour, Packaging..." required/>
             </div>
             
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Quantity</label>
-              <input className="input-gold-glow" 
-                type="number" 
-                value={newQty}
-                onChange={e => setNewQty(e.target.value)}
-                min="1"
-                placeholder="0"
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`}
-                required
-              />
+              <input className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'}`} type="number" value={newQty} onChange={e => setNewQty(e.target.value)} min="1" placeholder="0" required/>
             </div>
 
             <div className="pt-2">
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>From Branch</label>
-              <select className="input-gold-glow" 
-                value={newFromBranch}
-                onChange={e => setNewFromBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
-              >
+              <select className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`} value={newFromBranch} onChange={e => setNewFromBranch(e.target.value)}>
                 <option value="Main Warehouse">Main Warehouse</option>
                 {branches.map(b => (
                   <option key={b} value={b}>{b}</option>
@@ -130,11 +111,7 @@ export default function ResourceAllocationTab({ theme, branches }: ResourceAlloc
             </div>
 
             <div>
-              <select className="input-gold-glow" 
-                value={newToBranch}
-                onChange={e => setNewToBranch(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
-              >
+              <select className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`} value={newToBranch} onChange={e => setNewToBranch(e.target.value)}>
                 {branches.map(b => (
                   <option key={b} value={b}>{b}</option>
                 ))}

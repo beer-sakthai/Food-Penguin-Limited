@@ -203,19 +203,7 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  Suggest: +{suggestedValue}{item.unit}
  </span>
  )}
- <button className="btn-interactive"
- onClick={() => onOrderRestock(item.id)}
- disabled={item.status === 'Healthy'}
- className={`px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${
- item.status === 'Healthy'
- ? isLight 
- ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' 
- : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50'
- : isLight
- ? 'bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 shadow'
- : 'bg-zinc-950 border border-zinc-800 text-white hover:bg-zinc-900 shadow'
- }`}
- >
+ <button className={`btn-interactive px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${ item.status === 'Healthy' ? isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50' : isLight ? 'bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 shadow' : 'bg-zinc-950 border border-zinc-800 text-white hover:bg-zinc-900 shadow' }`} onClick={() => onOrderRestock(item.id)} disabled={item.status === 'Healthy'}>
  <ArrowDownToLine className="w-3.5 h-3.5" />
  Restock
  </button>

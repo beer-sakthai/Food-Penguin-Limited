@@ -284,18 +284,7 @@ export default function DataAnalystTab({
             </div>
             <div className={`flex rounded-xl border p-1 ${isLight ? "bg-zinc-100 border-zinc-200" : "bg-zinc-950 border-zinc-800"}`}>
               {(["profit", "waste", "labor", "stock"] as AnalystView[]).map((item) => (
-                <button className="btn-interactive"
-                  key={item}
-                  type="button"
-                  onClick={() => setView(item)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition-all ${
-                    view === item
-                      ? "bg-orange-500 text-zinc-950"
-                      : isLight
-                        ? "text-zinc-500 hover:text-zinc-900"
-                        : "text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition-all ${ view === item ? "bg-orange-500 text-zinc-950" : isLight ? "text-zinc-500 hover:text-zinc-900" : "text-zinc-400 hover:text-white" }`} key={item} type="button" onClick={() => setView(item)}>
                   {item}
                 </button>
               ))}

@@ -108,18 +108,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
             </span>
             <div className="grid grid-cols-1 gap-3">
               {STRATEGIC_PRESETS.map((preset, idx) => (
-                <button className="btn-interactive"
-                  key={idx}
-                  type="button"
-                  onClick={() => setStrategicPrompt(preset.prompt)}
-                  className={`p-4 rounded-2xl border text-left transition-all hover:-translate-y-0.5 active:scale-[0.98] group cursor-pointer ${
-                    strategicPrompt === preset.prompt
-                      ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
-                      : isLight
-                        ? 'bg-zinc-50 border-zinc-200 hover:bg-zinc-100/80'
-                        : 'bg-zinc-950 border-zinc-850 hover:bg-zinc-900/40'
-                  }`}
-                >
+                <button className={`btn-interactive p-4 rounded-2xl border text-left transition-all hover:-translate-y-0.5 active:scale-[0.98] group cursor-pointer ${ strategicPrompt === preset.prompt ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_15px_rgba(234,179,8,0.15)]' : isLight ? 'bg-zinc-50 border-zinc-200 hover:bg-zinc-100/80' : 'bg-zinc-950 border-zinc-850 hover:bg-zinc-900/40' }`} key={idx} type="button" onClick={() => setStrategicPrompt(preset.prompt)}>
                   <span className="block font-black text-xs text-zinc-800 dark:text-zinc-100 group-hover:text-amber-500 transition-colors">
                     {preset.title}
                   </span>
@@ -148,13 +137,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
 
           {/* Controls */}
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <button className="btn-interactive"
-              type="button"
-              onClick={() => setStrategicPrompt("")}
-              className={`px-4 py-3 rounded-2xl text-xs font-bold border flex items-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer ${
-                isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100' : 'bg-zinc-950 border-zinc-850 text-zinc-400 hover:bg-zinc-900'
-              }`}
-            >
+            <button className={`btn-interactive px-4 py-3 rounded-2xl text-xs font-bold border flex items-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100' : 'bg-zinc-950 border-zinc-850 text-zinc-400 hover:bg-zinc-900' }`} type="button" onClick={() => setStrategicPrompt("")}>
               <RefreshCw size={14} /> Reset Prompt
             </button>
             <button
@@ -210,16 +193,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
                   "Where can we save two staff hours today?",
                   "What stock risk needs action before closing?",
                 ].map((question) => (
-                  <button className="btn-interactive"
-                    key={question}
-                    type="button"
-                    onClick={() => setStrategicPrompt(question)}
-                    className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all active:scale-[0.98] ${
-                      isLight
-                        ? 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900'
-                    }`}
-                  >
+                  <button className={`btn-interactive rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all active:scale-[0.98] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100' : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900' }`} key={question} type="button" onClick={() => setStrategicPrompt(question)}>
                     {question}
                   </button>
                 ))}

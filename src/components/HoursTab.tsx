@@ -178,14 +178,10 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
               >
                 {complianceLoading ? "Checking..." : "Check swap"}
               </button>
-              <button className="btn-interactive"
-                type="button"
-                onClick={() => {
+              <button className="btn-interactive rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-400 transition-all hover:bg-zinc-800 hover:text-zinc-200 active:scale-[0.98]" type="button" onClick={() => {
                   setSchedulerPrompt("");
                   setSchedulingResult("");
-                }}
-                className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-400 transition-all hover:bg-zinc-800 hover:text-zinc-200 active:scale-[0.98]"
-              >
+                }}>
                 Clear
               </button>
             </div>
@@ -230,15 +226,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
                     {employee.status}
                   </p>
                 </div>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => onToggleClockStatus(employee.id)}
-                  className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-mono font-bold uppercase transition-all active:scale-[0.98] ${
-                    employee.status === "Clocked In"
-                      ? "border-rose-900/50 bg-rose-950/30 text-rose-400 hover:bg-rose-950"
-                      : "border-emerald-900/50 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-950"
-                  }`}
-                >
+                <button className={`btn-interactive shrink-0 rounded-lg border px-2.5 py-1 text-xs font-mono font-bold uppercase transition-all active:scale-[0.98] ${ employee.status === "Clocked In" ? "border-rose-900/50 bg-rose-950/30 text-rose-400 hover:bg-rose-950" : "border-emerald-900/50 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-950" }`} type="button" onClick={() => onToggleClockStatus(employee.id)}>
                   {employee.status === "Clocked In" ? "Clock out" : "Clock in"}
                 </button>
               </div>

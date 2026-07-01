@@ -239,60 +239,29 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <form onSubmit={handleSubmit} className="space-y-4">
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target Header Name</label>
- <input className="input-gold-glow"
- type="text"
- required
- value={name}
- onChange={(e) => setName(e.target.value)}
- placeholder="e.g. Kyoto Salmon goal"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
- />
+ <input className="input-gold-glow w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:outline-none" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Kyoto Salmon goal"/>
  </div>
 
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Assessment Metric</label>
- <input className="input-gold-glow"
- type="text"
- required
- value={metric}
- onChange={(e) => setMetric(e.target.value)}
- placeholder="e.g. Sales (€)"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
- />
+ <input className="input-gold-glow w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:outline-none" type="text" required value={metric} onChange={(e) => setMetric(e.target.value)} placeholder="e.g. Sales (€)"/>
  </div>
 
  <div className="grid grid-cols-2 gap-3.5">
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target value</label>
- <input className="input-gold-glow"
- type="number"
- required
- value={targetValue || ''}
- onChange={(e) => setTargetValue(parseInt(e.target.value) || 0)}
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none font-mono"
- />
+ <input className="input-gold-glow w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:outline-none font-mono" type="number" required value={targetValue || ''} onChange={(e) => setTargetValue(parseInt(e.target.value) || 0)}/>
  </div>
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Unit label</label>
- <input className="input-gold-glow"
- type="text"
- required
- value={unit}
- onChange={(e) => setUnit(e.target.value)}
- placeholder="units, €, kg"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
- />
+ <input className="input-gold-glow w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:outline-none" type="text" required value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="units, €, kg"/>
  </div>
  </div>
 
  <div className="grid grid-cols-2 gap-3.5">
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Category</label>
- <select className="input-gold-glow"
- value={category}
- onChange={(e) => setCategory(e.target.value as any)}
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
- >
+ <select className="input-gold-glow w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:outline-none" value={category} onChange={(e) => setCategory(e.target.value as any)}>
  <option value="Sell">Sell</option>
  <option value="Production">Production</option>
  <option value="Waste">Waste</option>
@@ -301,14 +270,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  </div>
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target Deadline</label>
- <input className="input-gold-glow"
- type="text"
- required
- value={deadline}
- onChange={(e) => setDeadline(e.target.value)}
- placeholder="End of Friday"
- className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
- />
+ <input className="input-gold-glow w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:outline-none" type="text" required value={deadline} onChange={(e) => setDeadline(e.target.value)} placeholder="End of Friday"/>
  </div>
  </div>
 

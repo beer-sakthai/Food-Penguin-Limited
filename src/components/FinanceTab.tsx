@@ -127,33 +127,11 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
 
         {/* View Toggle */}
         <div className={`flex p-1 rounded-xl shadow-sm ${isLight ? 'bg-zinc-200/50' : 'bg-black/50'} w-full md:w-auto`}>
-          <button className="btn-interactive"
-            onClick={() => setMode('plan')}
-            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
-              mode === 'plan'
-                ? isLight 
-                  ? 'bg-white text-zinc-900 shadow-sm' 
-                  : 'bg-zinc-800 text-white shadow-md shadow-black/50'
-                : isLight
-                  ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50'
-                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
-            }`}
-          >
+          <button className={`btn-interactive flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'plan' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`} onClick={() => setMode('plan')}>
             <Target size={16} className={mode === 'plan' ? 'text-emerald-500' : ''} />
             Plan Structure
           </button>
-          <button className="btn-interactive"
-            onClick={() => setMode('use')}
-            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
-              mode === 'use'
-                ? isLight 
-                  ? 'bg-white text-zinc-900 shadow-sm' 
-                  : 'bg-zinc-800 text-white shadow-md shadow-black/50'
-                : isLight
-                  ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50'
-                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
-            }`}
-          >
+          <button className={`btn-interactive flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'use' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`} onClick={() => setMode('use')}>
             <Activity size={16} className={mode === 'use' ? 'text-orange-500' : ''} />
             Actual Use
           </button>
@@ -308,15 +286,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Target Day of Week
                   </label>
-                  <select className="input-gold-glow"
-                    value={entryDay}
-                    onChange={(e) => setEntryDay(e.target.value as any)}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                      isLight
-                        ? "bg-white border-zinc-300 text-zinc-900 font-semibold"
-                        : "bg-zinc-900 border-zinc-800 text-white"
-                    }`}
-                  >
+                  <select className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white" }`} value={entryDay} onChange={(e) => setEntryDay(e.target.value as any)}>
                     <option value="Mon">Monday</option>
                     <option value="Tue">Tuesday</option>
                     <option value="Wed">Wednesday</option>
@@ -332,17 +302,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Calendar Date
                   </label>
-                  <input className="input-gold-glow"
-                    type="date"
-                    required
-                    value={entryDate}
-                    onChange={(e) => setEntryDate(e.target.value)}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                      isLight
-                        ? "bg-white border-zinc-300 text-zinc-900 font-semibold"
-                        : "bg-zinc-900 border-zinc-800 text-white"
-                    }`}
-                  />
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white" }`} type="date" required value={entryDate} onChange={(e) => setEntryDate(e.target.value)}/>
                 </div>
                 <div>
                   <label
@@ -350,17 +310,9 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Primary Registered Supplier
                   </label>
-                  <select className="input-gold-glow"
-                    value={entrySupplierName}
-                    onChange={(e) =>
+                  <select className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white" }`} value={entrySupplierName} onChange={(e) =>
                       setEntrySupplierName(e.target.value as any)
-                    }
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                      isLight
-                        ? "bg-white border-zinc-300 text-zinc-900 font-semibold"
-                        : "bg-zinc-900 border-zinc-800 text-white"
-                    }`}
-                  >
+                    }>
                     <option value="Tazaki">Tazaki</option>
                     <option value="Sysco">Sysco</option>
                     <option value="Bulza">Bulza</option>
@@ -390,18 +342,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Gross Revenue (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entrySales}
-                        onChange={(e) => setEntrySales(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entrySales} onChange={(e) => setEntrySales(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -409,18 +350,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Sushi Waste Cost (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryWaste}
-                        onChange={(e) => setEntryWaste(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryWaste} onChange={(e) => setEntryWaste(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -428,17 +358,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Staff Rostered (hrs)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        required
-                        value={entryHours}
-                        onChange={(e) => setEntryHours(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" required value={entryHours} onChange={(e) => setEntryHours(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -446,17 +366,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Production Target (units)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        required
-                        value={entryProdTarget}
-                        onChange={(e) => setEntryProdTarget(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" required value={entryProdTarget} onChange={(e) => setEntryProdTarget(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -464,17 +374,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Production Made (units)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        required
-                        value={entryProdMade}
-                        onChange={(e) => setEntryProdMade(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" required value={entryProdMade} onChange={(e) => setEntryProdMade(e.target.value)}/>
                     </div>
                   </div>
                 </div>
@@ -498,18 +398,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Tazaki Supplier (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryTazaki}
-                        onChange={(e) => setEntryTazaki(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryTazaki} onChange={(e) => setEntryTazaki(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -517,18 +406,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Sysco Supplier (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entrySysco}
-                        onChange={(e) => setEntrySysco(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entrySysco} onChange={(e) => setEntrySysco(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -536,18 +414,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Bulza Supplier (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryBulza}
-                        onChange={(e) => setEntryBulza(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryBulza} onChange={(e) => setEntryBulza(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -555,18 +422,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Sticker Supplier (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entrySticker}
-                        onChange={(e) => setEntrySticker(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entrySticker} onChange={(e) => setEntrySticker(e.target.value)}/>
                     </div>
                     <div>
                       <label
@@ -574,18 +430,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Others / Etc. (€)
                       </label>
-                      <input className="input-gold-glow"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={entryOthers}
-                        onChange={(e) => setEntryOthers(e.target.value)}
-                        className={`w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-300 text-zinc-900"
-                            : "bg-zinc-950 border-zinc-800 text-white"
-                        }`}
-                      />
+                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryOthers} onChange={(e) => setEntryOthers(e.target.value)}/>
                     </div>
                   </div>
                 </div>

@@ -243,27 +243,11 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
         {/* PAGINATION CONTROLS */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-8">
-            <button className="btn-interactive"
-              onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-              disabled={currentPage === 0}
-              className={`flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all ${
-                currentPage === 0 
-                  ? 'opacity-30 cursor-not-allowed'
-                  : 'hover:-translate-y-0.5 active:scale-[0.98] hover:text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 rounded-md p-1'
-              }`}
-            >
+            <button className={`btn-interactive flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all ${ currentPage === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:-translate-y-0.5 active:scale-[0.98] hover:text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 rounded-md p-1' }`} onClick={() => setCurrentPage(p => Math.max(0, p - 1))} disabled={currentPage === 0}>
               <ChevronLeft className="w-4 h-4" /> Prev
             </button>
             
-            <button className="btn-interactive"
-              onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
-              disabled={currentPage === totalPages - 1}
-              className={`flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all ${
-                currentPage === totalPages - 1
-                  ? 'opacity-30 cursor-not-allowed'
-                  : 'hover:-translate-y-0.5 active:scale-[0.98] hover:text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 rounded-md p-1'
-              }`}
-            >
+            <button className={`btn-interactive flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all ${ currentPage === totalPages - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:-translate-y-0.5 active:scale-[0.98] hover:text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 rounded-md p-1' }`} onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))} disabled={currentPage === totalPages - 1}>
               Next <ChevronRight className="w-4 h-4" />
             </button>
           </div>

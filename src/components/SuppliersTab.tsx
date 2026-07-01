@@ -163,17 +163,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
         
         <div className="relative">
           <Search size={18} className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-          <input className="input-gold-glow"
-            type="text"
-            placeholder="Search items or suppliers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-sm ${
-              isLight 
-                ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' 
-                : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800'
-            }`}
-          />
+          <input className={`input-gold-glow pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-sm ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800' }`} type="text" placeholder="Search items or suppliers..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
         </div>
       </div>
 
@@ -194,12 +184,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
                   isLight ? 'bg-white border-zinc-200' : 'bg-black border-zinc-800'
                 }`}
               >
-                <button className="btn-interactive"
-                  onClick={() => toggleSupplier(supplier.id)}
-                  className={`w-full px-5 py-4 flex items-center justify-between transition-colors ${
-                    isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50'
-                  }`}
-                >
+                <button className={`btn-interactive w-full px-5 py-4 flex items-center justify-between transition-colors ${ isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50' }`} onClick={() => toggleSupplier(supplier.id)}>
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${isLight ? 'bg-indigo-50 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400'}`}>
                       <Icon size={20} />

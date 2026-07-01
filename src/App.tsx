@@ -2307,26 +2307,10 @@ export default function App() {
                 Visual Mode
               </span>
               <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
-                    isLight 
-                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" 
-                      : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
+                <button className={`btn-interactive flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${ isLight ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-zinc-500 hover:text-zinc-300" }`} type="button" onClick={() => setTheme("light")}>
                   <Sun className="w-3 h-3 text-amber-500" /> Day
                 </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
-                    !isLight 
-                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" 
-                      : "text-zinc-500 hover:text-zinc-700"
-                  }`}
-                >
+                <button className={`btn-interactive flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${ !isLight ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" : "text-zinc-500 hover:text-zinc-700" }`} type="button" onClick={() => setTheme("dark")}>
                   <Moon className="w-3 h-3 text-zinc-400" /> Night
                 </button>
               </div>
@@ -2339,47 +2323,17 @@ export default function App() {
               </span>
               <div className="grid grid-cols-3 gap-1">
                 {/* Gold Button */}
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("gold")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "gold"
-                      ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "gold" ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("gold")}>
                   🥇 Gold
                 </button>
 
                 {/* Silver Button */}
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("silver")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "silver"
-                      ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "silver" ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("silver")}>
                   🥈 Silver
                 </button>
 
                 {/* Copper Button */}
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("copper")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "copper"
-                      ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "copper" ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("copper")}>
                   🥉 Copper
                 </button>
               </div>
@@ -2472,22 +2426,10 @@ export default function App() {
             {tabMeta.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
-                <button className="btn-interactive"
-                  key={tab.id}
-                  onClick={() => {
+                <button className={`btn-interactive w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${ isActive ? isLight ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm" : "bg-zinc-900 text-white font-bold shadow-inner" : isLight ? "text-zinc-600 text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900" : "text-zinc-500 hover:bg-zinc-905 hover:text-white" }`} key={tab.id} onClick={() => {
                     setActiveTab(tab.id);
                     setIsMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
-                    isActive
-                      ? isLight
-                        ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm"
-                        : "bg-zinc-900 text-white font-bold shadow-inner"
-                      : isLight
-                        ? "text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900"
-                        : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
-                  }`}
-                >
+                  }}>
                   <span
                     className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
                       isActive
@@ -2543,15 +2485,7 @@ export default function App() {
               />
 
               <div className="flex items-center justify-between mb-2">
-                <button className="btn-interactive"
-                  onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
-                  className={`flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${
-                    isLight
-                      ? " hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900"
-                      : "hover:text-white"
-                  }`}
-                  title="Click to view daily breakdown"
-                >
+                <button className={`btn-interactive flex items-center gap-1.5 transition-colors cursor-pointer text-left focus:outline-none ${ isLight ? " hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "hover:text-white" }`} onClick={() => setIsCapacityExpanded(!isCapacityExpanded)} title="Click to view daily breakdown">
                   <p
                     className={`text-xs uppercase font-mono font-bold tracking-wider select-none ${
                       isLight ? "text-zinc-500" : "text-zinc-400"
@@ -2621,14 +2555,7 @@ export default function App() {
                     Overlay Branch Trends
                   </span>
                   {overlayBranches.length > 0 && (
-                    <button className="btn-interactive"
-                      onClick={() => setOverlayBranches([])}
-                      className={`px-1.5 py-0.5 rounded text-xs font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${
-                        isLight
-                          ? "bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700"
-                          : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-                      }`}
-                    >
+                    <button className={`btn-interactive px-1.5 py-0.5 rounded text-xs font-bold border cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all ${ isLight ? "bg-zinc-200 hover:bg-zinc-300 border-zinc-300 text-zinc-700" : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300" }`} onClick={() => setOverlayBranches([])}>
                       Clear Overlay
                     </button>
                   )}
@@ -2695,21 +2622,13 @@ export default function App() {
                     }
 
                     return (
-                      <button className="btn-interactive"
-                        key={branch}
-                        onClick={() => {
+                      <button className={`btn-interactive px-2 py-1 rounded-md border text-xs font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${ isSelected ? style.activeBg : `${isLight ? "bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100" : "bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800"} opacity-75` }`} key={branch} onClick={() => {
                           setOverlayBranches((prev) =>
                             prev.includes(branch)
                               ? prev.filter((b) => b !== branch)
                               : [...prev, branch],
                           );
-                        }}
-                        className={`px-2 py-1 rounded-md border text-xs font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
-                          isSelected
-                            ? style.activeBg
-                            : `${isLight ? "bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100" : "bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800"} opacity-75`
-                        }`}
-                      >
+                        }}>
                         {shortName}
                       </button>
                     );
@@ -2966,34 +2885,17 @@ export default function App() {
                     </p>
                     <div className="flex items-center gap-1.5">
                       {/* Global 'Clear All Filters' Button (Gold Liner Style) */}
-                      <button className="btn-interactive"
-                        onClick={() => {
+                      <button className={`btn-interactive p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-xs uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${ capacitySortBy !== "date" || capacitySmoothing !== "raw" || capacityImpactFilter !== "all" || bulkSelectedDays.length > 0 ? isLight ? "bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer" : "bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer" : "opacity-40 cursor-not-allowed " + (isLight ? "bg-zinc-100 border-zinc-200 text-zinc-400" : "bg-zinc-800/50 border-zinc-700/35 text-zinc-600") }`} onClick={() => {
                           setCapacitySortBy("date");
                           setCapacitySmoothing("raw");
                           setCapacityImpactFilter("all");
                           setBulkSelectedDays([]);
-                        }}
-                        disabled={
+                        }} disabled={
                           capacitySortBy === "date" &&
                           capacitySmoothing === "raw" &&
                           capacityImpactFilter === "all" &&
                           bulkSelectedDays.length === 0
-                        }
-                        className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-xs uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
-                          capacitySortBy !== "date" ||
-                          capacitySmoothing !== "raw" ||
-                          capacityImpactFilter !== "all" ||
-                          bulkSelectedDays.length > 0
-                            ? isLight
-                              ? "bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)] cursor-pointer"
-                              : "bg-yellow-500/15 border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/25 shadow-[0_0_12px_rgba(234,179,8,0.2)] cursor-pointer"
-                            : "opacity-40 cursor-not-allowed " +
-                              (isLight
-                                ? "bg-zinc-100 border-zinc-200 text-zinc-400"
-                                : "bg-zinc-800/50 border-zinc-700/35 text-zinc-600")
-                        }`}
-                        title="Clear all daily capacity filters, sorting, smoothing, and bulk selections"
-                      >
+                        } title="Clear all daily capacity filters, sorting, smoothing, and bulk selections">
                         <RotateCcw
                           className={`w-2.5 h-2.5 ${capacitySortBy !== "date" || capacitySmoothing !== "raw" || capacityImpactFilter !== "all" || bulkSelectedDays.length > 0 ? "text-yellow-500" : ""}`}
                         />
@@ -3031,15 +2933,7 @@ export default function App() {
                           PDF
                         </span>
                       </button>
-                      <button className="btn-interactive"
-                        onClick={() => setIsScheduleReportModalOpen(true)}
-                        className={`p-1 px-1.5 rounded  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${
-                          isLight
-                            ? "bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900"
-                            : "bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700"
-                        }`}
-                        title="Schedule automated email report delivery"
-                      >
+                      <button className={`btn-interactive p-1 px-1.5 rounded hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-white transition-all cursor-pointer flex items-center gap-1 border ${ isLight ? "bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900" : "bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700" }`} onClick={() => setIsScheduleReportModalOpen(true)} title="Schedule automated email report delivery">
                         <Mail className="w-2.5 h-2.5 text-rose-400" />
                         <span
                           className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
@@ -3069,20 +2963,11 @@ export default function App() {
                       >
                         Impact Filter:
                       </span>
-                      <select className="input-gold-glow"
-                        id="capacity-impact-filter-select"
-                        value={capacityImpactFilter}
-                        onChange={(e) =>
+                      <select className={`input-gold-glow text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-200 text-amber-600" : "bg-zinc-900 border-zinc-800/80 text-amber-400 hover:text-amber-300" }`} id="capacity-impact-filter-select" value={capacityImpactFilter} onChange={(e) =>
                           setCapacityImpactFilter(
                             e.target.value as "all" | "critical" | "low"
                           )
-                        }
-                        className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${
-                          isLight
-                            ? "bg-white border-zinc-200 text-amber-600"
-                            : "bg-zinc-900 border-zinc-800/80 text-amber-400 hover:text-amber-300"
-                        }`}
-                      >
+                        }>
                         <option
                           value="all"
                           className={
@@ -3122,19 +3007,11 @@ export default function App() {
                       >
                         Order by:
                       </span>
-                      <select className="input-gold-glow"
-                        value={capacitySortBy}
-                        onChange={(e) =>
+                      <select className={`input-gold-glow text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${ isLight ? "bg-white border-zinc-200 text-amber-600" : "bg-zinc-900 border-zinc-800/80 text-amber-400 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300" }`} value={capacitySortBy} onChange={(e) =>
                           setCapacitySortBy(
                             e.target.value as "date" | "bottleneck" | "custom",
                           )
-                        }
-                        className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
-                          isLight
-                            ? "bg-white border-zinc-200 text-amber-600"
-                            : "bg-zinc-900 border-zinc-800/80 text-amber-400  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300"
-                        }`}
-                      >
+                        }>
                         <option
                           value="date"
                           className={
@@ -3181,29 +3058,10 @@ export default function App() {
                       <div
                         className={`flex rounded p-0.5 border ${isLight ? "bg-zinc-200 border-zinc-200" : "bg-zinc-900 border-zinc-800/80"}`}
                       >
-                        <button className="btn-interactive"
-                          onClick={() => setCapacitySmoothing("raw")}
-                          className={`text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
-                            capacitySmoothing === "raw"
-                              ? "bg-orange-500 text-white shadow-sm"
-                              : isLight
-                                ? "text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300"
-                                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
-                          }`}
-                        >
+                        <button className={`btn-interactive text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${ capacitySmoothing === "raw" ? "bg-orange-500 text-white shadow-sm" : isLight ? "text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800" }`} onClick={() => setCapacitySmoothing("raw")}>
                           Raw
                         </button>
-                        <button className="btn-interactive"
-                          onClick={() => setCapacitySmoothing("smoothed")}
-                          className={`text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
-                            capacitySmoothing === "smoothed"
-                              ? "bg-orange-500 text-white shadow-sm"
-                              : isLight
-                                ? "text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300"
-                                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
-                          }`}
-                          title="3-Day Moving Average Smoothed"
-                        >
+                        <button className={`btn-interactive text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${ capacitySmoothing === "smoothed" ? "bg-orange-500 text-white shadow-sm" : isLight ? "text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900 hover:bg-zinc-300" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800" }`} onClick={() => setCapacitySmoothing("smoothed")} title="3-Day Moving Average Smoothed">
                           Smooth 3D
                         </button>
                       </div>
@@ -3222,19 +3080,9 @@ export default function App() {
                         />
                         Compare Mode:
                       </span>
-                      <button className="btn-interactive"
-                        onClick={() =>
+                      <button className={`btn-interactive text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${ compareModeEnabled ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800" }`} onClick={() =>
                           setCompareModeEnabled(!compareModeEnabled)
-                        }
-                        type="button"
-                        className={`text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
-                          compareModeEnabled
-                            ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]"
-                            : isLight
-                              ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                              : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800"
-                        }`}
-                      >
+                        } type="button">
                         {compareModeEnabled ? "COMPARE ON" : "OFF"}
                       </button>
                     </div>
@@ -3259,22 +3107,12 @@ export default function App() {
                           />
                           Quick Adjust:
                         </span>
-                        <button className="btn-interactive"
-                          onClick={() => {
+                        <button className={`btn-interactive text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${ quickAdjustEnabled ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800" }`} onClick={() => {
                             setQuickAdjustEnabled(!quickAdjustEnabled);
                             if (quickAdjustEnabled) {
                               handleResetOverrides();
                             }
-                          }}
-                          type="button"
-                          className={`text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
-                            quickAdjustEnabled
-                              ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm"
-                              : isLight
-                                ? "bg-zinc-100 border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200"
-                                : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800"
-                          }`}
-                        >
+                          }} type="button">
                           {quickAdjustEnabled ? "What-If ON" : "OFF"}
                         </button>
                       </div>
@@ -3291,10 +3129,7 @@ export default function App() {
                             </span>
                             <div className="flex items-center gap-2">
                               {bulkSelectedDays.length > 0 && (
-                                <button className="btn-interactive"
-                                  onClick={() => setBulkSelectedDays([])}
-                                  className="hover:underline text-xs tracking-wider"
-                                >
+                                <button className="btn-interactive hover:underline text-xs tracking-wider" onClick={() => setBulkSelectedDays([])}>
                                   Clear Selection
                                 </button>
                               )}
@@ -3310,26 +3145,17 @@ export default function App() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <input className="input-gold-glow"
-                              type="range"
-                              min={bulkSelectedDays.length > 0 ? "-50" : "10"}
-                              max={bulkSelectedDays.length > 0 ? "50" : "110"}
-                              step="5"
-                              value={
+                            <input className="input-gold-glow flex-1 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-500 hover:accent-amber-400 active:scale-[0.98] transition-all duration-200" type="range" min={bulkSelectedDays.length > 0 ? "-50" : "10"} max={bulkSelectedDays.length > 0 ? "50" : "110"} step="5" value={
                                 bulkSelectedDays.length > 0
                                   ? bulkOverrideValue
                                   : globalAdjustValue
-                              }
-                              onChange={(e) => {
+                              } onChange={(e) => {
                                 if (bulkSelectedDays.length > 0) {
                                   setBulkOverrideValue(Number(e.target.value));
                                 } else {
                                   setGlobalAdjustValue(Number(e.target.value));
                                 }
-                              }}
-                              className="flex-1 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-500 hover:accent-amber-400 active:scale-[0.98] transition-all duration-200"
-                              style={{ accentColor: "#f59e0b" }}
-                            />
+                              }} style={{ accentColor: "#f59e0b" }}/>
                             {(() => {
                               const isBulk = bulkSelectedDays.length > 0;
                               const hasWarning =
@@ -3354,8 +3180,7 @@ export default function App() {
                                       <AlertTriangle className="w-3.5 h-3.5" />
                                     </div>
                                   )}
-                                  <button className="btn-interactive"
-                                    onClick={() => {
+                                  <button className="btn-interactive bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-xs font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200" onClick={() => {
                                       if (isBulk) {
                                         const newOverrides = {
                                           ...capacityOverrides,
@@ -3379,9 +3204,7 @@ export default function App() {
                                       } else {
                                         handleGlobalOverride();
                                       }
-                                    }}
-                                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-xs font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
-                                  >
+                                    }}>
                                     Apply{" "}
                                     {isBulk
                                       ? `${bulkOverrideValue > 0 ? "+" : ""}${bulkOverrideValue}%`
@@ -3407,22 +3230,9 @@ export default function App() {
                     <div className="flex justify-between items-center text-xs text-zinc-500 font-bold uppercase tracking-widest leading-none">
                       <div className="flex items-center gap-1">
                         <span>Bottleneck Threshold</span>
-                        <button className="btn-interactive"
-                          type="button"
-                          onClick={() =>
+                        <button className={`btn-interactive p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-95 ${ showThresholdTooltip ? "text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10" : isLight ? "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50" }`} type="button" onClick={() =>
                             setShowThresholdTooltip(!showThresholdTooltip)
-                          }
-                          onMouseEnter={() => setShowThresholdTooltip(true)}
-                          onMouseLeave={() => setShowThresholdTooltip(false)}
-                          className={`p-0.5 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-95 ${
-                            showThresholdTooltip
-                              ? "text-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] bg-yellow-500/10"
-                              : isLight
-                                ? "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/50"
-                                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
-                          }`}
-                          title="Information Tooltip"
-                        >
+                          } onMouseEnter={() => setShowThresholdTooltip(true)} onMouseLeave={() => setShowThresholdTooltip(false)} title="Information Tooltip">
                           <Info className="w-3 h-3" />
                         </button>
                       </div>
@@ -3502,21 +3312,12 @@ export default function App() {
                         </div>
                       </div>
                     )}
-                    <input className="input-gold-glow"
-                      type="range"
-                      min="50"
-                      max="100"
-                      step="1"
-                      value={bottleneckThreshold}
-                      onChange={(e) =>
+                    <input className="input-gold-glow w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow duration-200" type="range" min="50" max="100" step="1" value={bottleneckThreshold} onChange={(e) =>
                         setBottleneckThreshold(Number(e.target.value))
-                      }
-                      className="w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
-                      style={{
+                      } style={{
                         accentColor: "#eab308",
                         background: `linear-gradient(to right, #eab308 0%, #eab308 ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? "#e4e4e7" : "#27272a"} ${((bottleneckThreshold - 50) / 50) * 100}%, ${isLight ? "#e4e4e7" : "#27272a"} 100%)`,
-                      }}
-                    />
+                      }}/>
                     <div className="flex justify-between text-xs text-zinc-500 font-mono leading-none">
                       <span>50%</span>
                       <span>75%</span>
@@ -3569,8 +3370,7 @@ export default function App() {
                                 Capacity on <strong className="text-zinc-700 dark:text-zinc-300 font-bold">{maxProjectedItem.day}</strong> exceeds your safe {bottleneckThreshold}% limit.
                               </span>
                             </div>
-                            <button className="btn-interactive"
-                              onClick={() => {
+                            <button className={`btn-interactive p-1 rounded text-xs font-mono font-bold tracking-wider hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer ${ isLight ? "text-amber-800 bg-amber-100/70 hover:bg-amber-200/80 border border-amber-200" : "text-amber-400 bg-amber-950/50 hover:bg-amber-900/50 border border-amber-900/50 hover:border-amber-500/50" }`} onClick={() => {
                                 const el = document.getElementById(
                                   `bottleneck-day-${maxProjectedItem.day}`,
                                 );
@@ -3583,14 +3383,7 @@ export default function App() {
                                 setTimeout(() => {
                                   setFocusedDay(null);
                                 }, 2500);
-                              }}
-                              className={`p-1 rounded text-xs font-mono font-bold tracking-wider hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer ${
-                                isLight
-                                  ? "text-amber-800 bg-amber-100/70 hover:bg-amber-200/80 border border-amber-200"
-                                  : "text-amber-400 bg-amber-950/50 hover:bg-amber-900/50 border border-amber-900/50 hover:border-amber-500/50"
-                              }`}
-                              title={`Scroll to ${maxProjectedItem.day} inside Daily Capacity Breakdown`}
-                            >
+                              }} title={`Scroll to ${maxProjectedItem.day} inside Daily Capacity Breakdown`}>
                               <span>Jump</span>
                               <span>to</span>
                             </button>
@@ -3599,14 +3392,7 @@ export default function App() {
                           {/* Quick Fix Button Section */}
                           <div className="pl-1.5 flex flex-col gap-2">
                             {(!quickFixRecommendation && !quickFixLoading) && (
-                              <button className="btn-interactive"
-                                onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}
-                                className={`w-full py-1.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
-                                  isLight
-                                    ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 font-extrabold shadow-[0_2px_8px_rgba(234,179,8,0.3)] hover:from-yellow-400 hover:to-amber-400"
-                                    : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-zinc-950 font-extrabold shadow-[0_2px_12px_rgba(234,179,8,0.25)] hover:from-yellow-400 hover:to-amber-400"
-                                }`}
-                              >
+                              <button className={`btn-interactive w-full py-1.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${ isLight ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 font-extrabold shadow-[0_2px_8px_rgba(234,179,8,0.3)] hover:from-yellow-400 hover:to-amber-400" : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-zinc-950 font-extrabold shadow-[0_2px_12px_rgba(234,179,8,0.25)] hover:from-yellow-400 hover:to-amber-400" }`} onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}>
                                 <span>AI</span>
                                 <span>Jules Quick Fix</span>
                               </button>
@@ -3628,10 +3414,7 @@ export default function App() {
                             {quickFixError && (
                               <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-500 text-xs font-medium leading-relaxed">
                                 {quickFixError}
-                                <button className="btn-interactive"
-                                  onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}
-                                  className="block underline font-bold mt-1 text-rose-600 dark:text-rose-400 uppercase tracking-widest text-xs"
-                                >
+                                <button className="btn-interactive block underline font-bold mt-1 text-rose-600 dark:text-rose-400 uppercase tracking-widest text-xs" onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}>
                                   Retry Fix
                                 </button>
                               </div>
@@ -3655,14 +3438,11 @@ export default function App() {
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-1.5">
-                                    <button className="btn-interactive"
-                                      onClick={() => {
+                                    <button className="btn-interactive px-1.5 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer" onClick={() => {
                                         setQuickFixRecommendation(null);
                                         setQuickFixAdjustment(null);
                                         setQuickFixDay(null);
-                                      }}
-                                      className="px-1.5 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                                    >
+                                      }}>
                                       Dismiss
                                     </button>
                                     <button
@@ -3769,22 +3549,13 @@ export default function App() {
                                 >
                                   <GripVertical size={12} />
                                 </div>
-                                <button className="btn-interactive"
-                                  type="button"
-                                  onClick={() => {
+                                <button className={`btn-interactive p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:scale-105 active:scale-95 shadow-sm shrink-0 ${ isLight ? "hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950" : "hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100" }`} type="button" onClick={() => {
                                     setExpandedDays((prev) =>
                                       prev.includes(item.day)
                                         ? prev.filter((d) => d !== item.day)
                                         : [...prev, item.day],
                                     );
-                                  }}
-                                  className={`p-0.5 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:scale-105 active:scale-95 shadow-sm shrink-0 ${
-                                    isLight
-                                      ? "hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950"
-                                      : "hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100"
-                                  }`}
-                                  title="Toggle contributing items"
-                                >
+                                  }} title="Toggle contributing items">
                                   {expandedDays.includes(item.day) ? (
                                     <ChevronUp size={11} />
                                   ) : (
@@ -3792,12 +3563,9 @@ export default function App() {
                                   )}
                                 </button>
                                 {quickAdjustEnabled && (
-                                  <input className="input-gold-glow"
-                                    type="checkbox"
-                                    checked={bulkSelectedDays.includes(
+                                  <input className="input-gold-glow w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] focus:ring-2 cursor-pointer transition-colors accent-amber-500" type="checkbox" checked={bulkSelectedDays.includes(
                                       item.day,
-                                    )}
-                                    onChange={(e) => {
+                                    )} onChange={(e) => {
                                       if (e.target.checked) {
                                         setBulkSelectedDays([
                                           ...bulkSelectedDays,
@@ -3810,9 +3578,7 @@ export default function App() {
                                           ),
                                         );
                                       }
-                                    }}
-                                    className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] focus:ring-2 cursor-pointer transition-colors accent-amber-500"
-                                  />
+                                    }}/>
                                 )}
                                 <span
                                   className={`font-sans font-bold flex items-center gap-1 flex-wrap ${isLight ? "text-zinc-800" : "text-zinc-300"}`}
@@ -4173,41 +3939,23 @@ export default function App() {
                                 }`}
                               >
                                 <div className="flex border rounded-lg p-0.5 bg-zinc-900 dark:bg-zinc-950 border-zinc-800 shrink-0">
-                                  <button className="btn-interactive"
-                                    onClick={() =>
+                                  <button className={`btn-interactive text-xs px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ !capacityOverrides[item.day] || capacityOverrides[item.day].mode === "ai" ? "bg-amber-500 text-zinc-950 shadow-sm font-extrabold" : "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200" }`} onClick={() =>
                                       handleToggleOverrideMode(
                                         item.day,
                                         "ai",
                                         item.projected,
                                       )
-                                    }
-                                    type="button"
-                                    className={`text-xs px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
-                                      !capacityOverrides[item.day] ||
-                                      capacityOverrides[item.day].mode === "ai"
-                                        ? "bg-amber-500 text-zinc-950 shadow-sm font-extrabold"
-                                        : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200"
-                                    }`}
-                                  >
+                                    } type="button">
                                     <Sparkles className="w-2 h-2 shrink-0" />
                                     AI
                                   </button>
-                                  <button className="btn-interactive"
-                                    onClick={() =>
+                                  <button className={`btn-interactive text-xs px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${ capacityOverrides[item.day]?.mode === "manual" ? "bg-orange-500 text-white shadow-sm font-extrabold" : "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200" }`} onClick={() =>
                                       handleToggleOverrideMode(
                                         item.day,
                                         "manual",
                                         item.projected,
                                       )
-                                    }
-                                    type="button"
-                                    className={`text-xs px-1.5 py-0.5 rounded-md font-mono font-bold transition-all uppercase flex items-center gap-0.5 cursor-pointer ${
-                                      capacityOverrides[item.day]?.mode ===
-                                      "manual"
-                                        ? "bg-orange-500 text-white shadow-sm font-extrabold"
-                                        : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-200"
-                                    }`}
-                                  >
+                                    } type="button">
                                     <SlidersHorizontal className="w-2 h-2 shrink-0" />
                                     SIM
                                   </button>
@@ -4216,34 +3964,20 @@ export default function App() {
                                 {capacityOverrides[item.day]?.mode ===
                                 "manual" ? (
                                   <div className="flex-1 flex items-center gap-1.5 justify-end">
-                                    <button className="btn-interactive"
-                                      type="button"
-                                      onClick={() =>
+                                    <button className="btn-interactive text-xs text-zinc-500 hover:text-amber-500 font-mono uppercase tracking-widest underline decoration-dotted transition-colors mr-1 cursor-pointer active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200" type="button" onClick={() =>
                                         handleClearSingleOverride(item.day)
-                                      }
-                                      className="text-xs text-zinc-500 hover:text-amber-500 font-mono uppercase tracking-widest underline decoration-dotted transition-colors mr-1 cursor-pointer active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
-                                      title="Reset to AI Forecast"
-                                    >
+                                      } title="Reset to AI Forecast">
                                       Reset AI
                                     </button>
-                                    <input className="input-gold-glow"
-                                      type="range"
-                                      min="10"
-                                      max="110"
-                                      step="5"
-                                      value={
+                                    <input className="input-gold-glow w-16 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200" type="range" min="10" max="110" step="5" value={
                                         capacityOverrides[item.day]?.value ??
                                         item.projected
-                                      }
-                                      onChange={(e) =>
+                                      } onChange={(e) =>
                                         handleUpdateOverrideValue(
                                           item.day,
                                           Number(e.target.value),
                                         )
-                                      }
-                                      className="w-16 h-1 bg-zinc-300 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-orange-500 hover:accent-orange-400 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
-                                      style={{ accentColor: "#f97316" }}
-                                    />
+                                      } style={{ accentColor: "#f97316" }}/>
                                     <div className="flex flex-col items-end shrink-0 w-8">
                                       <span className="font-mono text-xs font-bold text-orange-500 text-right">
                                         {capacityOverrides[item.day]?.value}%
@@ -4462,26 +4196,10 @@ export default function App() {
                 Visual Mode
               </span>
               <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
-                    isLight 
-                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" 
-                      : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
+                <button className={`btn-interactive flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${ isLight ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-zinc-500 hover:text-zinc-300" }`} type="button" onClick={() => setTheme("light")}>
                   <Sun className="w-3 h-3 text-amber-500" /> Day
                 </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
-                    !isLight 
-                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" 
-                      : "text-zinc-500 hover:text-zinc-700"
-                  }`}
-                >
+                <button className={`btn-interactive flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${ !isLight ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" : "text-zinc-500 hover:text-zinc-700" }`} type="button" onClick={() => setTheme("dark")}>
                   <Moon className="w-3 h-3 text-zinc-400" /> Night
                 </button>
               </div>
@@ -4494,47 +4212,17 @@ export default function App() {
               </span>
               <div className="grid grid-cols-3 gap-1">
                 {/* Gold Button */}
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("gold")}
-                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "gold"
-                      ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "gold" ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("gold")}>
                   Gold
                 </button>
 
                 {/* Silver Button */}
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("silver")}
-                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "silver"
-                      ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "silver" ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("silver")}>
                   Silver
                 </button>
 
                 {/* Copper Button */}
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("copper")}
-                  className={`py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "copper"
-                      ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "copper" ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("copper")}>
                   Copper
                 </button>
               </div>
@@ -4584,32 +4272,18 @@ export default function App() {
                   {currentUser?.username || "Skipper Koala"}
                 </p>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <select className="input-gold-glow"
-                    value={userRole}
-                    onChange={(e) => setUserRole(e.target.value as any)}
-                    className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
-                      isLight
-                        ? "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold"
-                        : "text-zinc-500 hover:text-zinc-300"
-                    }`}
-                  >
+                  <select className={`input-gold-glow bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold" : "text-zinc-500 hover:text-zinc-300" }`} value={userRole} onChange={(e) => setUserRole(e.target.value as any)}>
                     <option value="Admin">Admin</option>
                     <option value="Manager">Manager</option>
                     <option value="Staff">Staff</option>
                     <option value="User">User</option>
                   </select>
                   <span className="text-zinc-500 font-mono text-[8px]">•</span>
-                  <button className="btn-interactive"
-                    onClick={async () => {
+                  <button className={`btn-interactive text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${ isLight ? "text-zinc-500 font-bold" : "text-zinc-400" }`} onClick={async () => {
                       localStorage.removeItem("localCurrentUser");
                       setCurrentUser(null);
                       await signOut(auth).catch(() => {});
-                    }}
-                    className={`text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${
-                      isLight ? "text-zinc-500 font-bold" : "text-zinc-400"
-                    }`}
-                    title="Sign Out"
-                  >
+                    }} title="Sign Out">
                     <LogOut className="w-2.5 h-2.5" />
                     OUT
                   </button>
@@ -4757,16 +4431,7 @@ export default function App() {
                   tone: "text-blue-500",
                 },
               ].map((item) => (
-                <button className="btn-interactive"
-                  key={item.label}
-                  type="button"
-                  onClick={() => setActiveTab(item.tab)}
-                  className={`w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-left transition-all active:scale-[0.98] ${
-                    isLight
-                      ? "bg-white border-zinc-200 hover:bg-zinc-100"
-                      : "bg-zinc-950/60 border-zinc-800 hover:bg-zinc-900"
-                  }`}
-                >
+                <button className={`btn-interactive w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-left transition-all active:scale-[0.98] ${ isLight ? "bg-white border-zinc-200 hover:bg-zinc-100" : "bg-zinc-950/60 border-zinc-800 hover:bg-zinc-900" }`} key={item.label} type="button" onClick={() => setActiveTab(item.tab)}>
                   <span
                     className={`text-xs font-bold ${isLight ? "text-zinc-700" : "text-zinc-200"}`}
                   >
@@ -4815,26 +4480,10 @@ export default function App() {
                 Visual Mode
               </span>
               <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
-                    isLight
-                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
-                      : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
+                <button className={`btn-interactive flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${ isLight ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-zinc-500 hover:text-zinc-300" }`} type="button" onClick={() => setTheme("light")}>
                   <Sun className="w-3 h-3 text-amber-500" /> Day
                 </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
-                    !isLight
-                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
-                      : "text-zinc-500 hover:text-zinc-700"
-                  }`}
-                >
+                <button className={`btn-interactive flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${ !isLight ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" : "text-zinc-500 hover:text-zinc-700" }`} type="button" onClick={() => setTheme("dark")}>
                   <Moon className="w-3 h-3 text-zinc-400" /> Night
                 </button>
               </div>
@@ -4847,43 +4496,13 @@ export default function App() {
                 Metallic Edition
               </span>
               <div className="grid grid-cols-3 gap-1">
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("gold")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "gold"
-                      ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "gold" ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("gold")}>
                   Gold
                 </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("silver")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "silver"
-                      ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "silver" ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("silver")}>
                   Silver
                 </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => changeMetallicTheme("copper")}
-                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
-                    metallicTheme === "copper"
-                      ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
-                      : isLight
-                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
+                <button className={`btn-interactive py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${ metallicTheme === "copper" ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold" : isLight ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white" }`} type="button" onClick={() => changeMetallicTheme("copper")}>
                   Copper
                 </button>
               </div>
@@ -4917,20 +4536,7 @@ export default function App() {
                   .replace(" - Mahon Point", " Mahon");
                 const isSelected = selectedBranch === branch;
                 return (
-                  <button className="btn-interactive"
-                    key={branch}
-                    type="button"
-                    onClick={() => setSelectedBranch(branch as typeof selectedBranch)}
-                    className={`w-full flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
-                      isSelected
-                        ? isLight
-                          ? "bg-orange-50 border-orange-200"
-                          : "bg-orange-500/10 border-orange-500/30"
-                        : isLight
-                          ? "bg-white border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
-                          : "bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900"
-                    }`}
-                  >
+                  <button className={`btn-interactive w-full flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${ isSelected ? isLight ? "bg-orange-50 border-orange-200" : "bg-orange-500/10 border-orange-500/30" : isLight ? "bg-white border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100" : "bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900" }`} key={branch} type="button" onClick={() => setSelectedBranch(branch as typeof selectedBranch)}>
                     <span
                       className={`truncate mr-2 ${
                         isSelected
@@ -4974,15 +4580,7 @@ export default function App() {
                   Weekly Capacity
                 </span>
               </div>
-              <button className="btn-interactive"
-                type="button"
-                onClick={() => setIsCapacityExpanded((prev) => !prev)}
-                className={`text-[8px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${
-                  isLight
-                    ? "bg-zinc-100 border-zinc-200 text-zinc-600"
-                    : "bg-zinc-950 border-zinc-800 text-zinc-400"
-                }`}
-              >
+              <button className={`btn-interactive text-[8px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${ isLight ? "bg-zinc-100 border-zinc-200 text-zinc-600" : "bg-zinc-950 border-zinc-800 text-zinc-400" }`} type="button" onClick={() => setIsCapacityExpanded((prev) => !prev)}>
                 {isCapacityExpanded ? "Collapse" : "Expand"}
               </button>
             </div>
@@ -5060,26 +4658,10 @@ export default function App() {
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setActiveTab("Planning")}
-                  className={`rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${
-                    isLight
-                      ? "bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-700"
-                      : "bg-zinc-100 text-zinc-950 border-zinc-200 hover:bg-white"
-                  }`}
-                >
+                <button className={`btn-interactive rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${ isLight ? "bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-700" : "bg-zinc-100 text-zinc-950 border-zinc-200 hover:bg-white" }`} type="button" onClick={() => setActiveTab("Planning")}>
                   Open Planning
                 </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setActiveTab("Reports")}
-                  className={`rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${
-                    isLight
-                      ? "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100"
-                      : "bg-zinc-900 text-zinc-100 border-zinc-800 hover:bg-zinc-800"
-                  }`}
-                >
+                <button className={`btn-interactive rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${ isLight ? "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100" : "bg-zinc-900 text-zinc-100 border-zinc-800 hover:bg-zinc-800" }`} type="button" onClick={() => setActiveTab("Reports")}>
                   Open Reports
                 </button>
               </div>
@@ -5090,6 +4672,7 @@ export default function App() {
 
       </div>
     </div>
+
 
       {/* Schedule Email Report Modal */}
       {isScheduleReportModalOpen && (
@@ -5121,24 +4704,10 @@ export default function App() {
                   Delivery Frequency
                 </label>
                 <div className="flex bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-1">
-                  <button className="btn-interactive"
-                    onClick={() => setReportFrequency("daily")}
-                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
-                      reportFrequency === "daily"
-                        ? "bg-rose-500 text-white shadow"
-                        : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-                    }`}
-                  >
+                  <button className={`btn-interactive flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === "daily" ? "bg-rose-500 text-white shadow" : "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800" }`} onClick={() => setReportFrequency("daily")}>
                     Daily
                   </button>
-                  <button className="btn-interactive"
-                    onClick={() => setReportFrequency("weekly")}
-                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
-                      reportFrequency === "weekly"
-                        ? "bg-rose-500 text-white shadow"
-                        : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-                    }`}
-                  >
+                  <button className={`btn-interactive flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${ reportFrequency === "weekly" ? "bg-rose-500 text-white shadow" : "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800" }`} onClick={() => setReportFrequency("weekly")}>
                     Weekly
                   </button>
                 </div>
@@ -5150,33 +4719,15 @@ export default function App() {
                   Target Email Address
                   <span className="text-rose-500">*</span>
                 </label>
-                <input className="input-gold-glow"
-                  type="email"
-                  placeholder="ops.reports@company.com"
-                  value={reportEmailAddress}
-                  onChange={(e) => setReportEmailAddress(e.target.value)}
-                  className={`w-full px-3 py-2 text-xs font-mono rounded border outline-none focus:border-yellow-500 transition-colors ${
-                    isLight
-                      ? "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400"
-                      : "bg-black border-zinc-800 text-white placeholder:text-zinc-600"
-                  }`}
-                />
+                <input className={`input-gold-glow w-full px-3 py-2 text-xs font-mono rounded border outline-none focus:border-yellow-500 transition-colors ${ isLight ? "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400" : "bg-black border-zinc-800 text-white placeholder:text-zinc-600" }`} type="email" placeholder="ops.reports@company.com" value={reportEmailAddress} onChange={(e) => setReportEmailAddress(e.target.value)}/>
               </div>
             </div>
 
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800">
-              <button className="btn-interactive"
-                onClick={() => setIsScheduleReportModalOpen(false)}
-                className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider font-mono rounded transition-colors ${
-                  isLight
-                    ? "text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
-                    : "text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800"
-                }`}
-              >
+              <button className={`btn-interactive flex-1 py-2 text-xs font-bold uppercase tracking-wider font-mono rounded transition-colors ${ isLight ? "text-zinc-600 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100" : "text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800" }`} onClick={() => setIsScheduleReportModalOpen(false)}>
                 Cancel
               </button>
-              <button className="btn-interactive"
-                onClick={() => {
+              <button className="btn-interactive flex-[2] py-2 text-xs font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-1.5" onClick={() => {
                   if (reportEmailAddress) {
                     setIsScheduleReportModalOpen(false);
                     // Add some dummy action like clearing the input
@@ -5184,205 +4735,7 @@ export default function App() {
                       setReportEmailAddress("");
                     }, 300);
                   }
-                }}
-                disabled={!reportEmailAddress}
-                className="flex-[2] py-2 text-xs font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
-              >
-                <Clock className="w-3 h-3" />
-                Activate Schedule
-            </div>
-            <div className="space-y-2">
-              {dailyCapacityBreakdown.slice(0, 3).map((day) => (
-                <div key={day.day} className={`rounded-lg border px-2 py-1.5 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
-                  <div className="flex items-center justify-between gap-2 text-[9px] font-mono uppercase tracking-wider">
-                    <span className={isLight ? "text-zinc-500" : "text-zinc-400"}>{day.day}</span>
-                    <span className={day.projectedLoad >= bottleneckThreshold ? "text-amber-500" : isLight ? "text-zinc-700" : "text-zinc-200"}>
-                      {day.projectedLoad}%
-                    </span>
-                  </div>
-                  <div className={`mt-1 h-1.5 rounded-full overflow-hidden ${isLight ? "bg-zinc-100" : "bg-zinc-900"}`}>
-                    <div className={`h-full rounded-full ${day.projectedLoad >= bottleneckThreshold ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${day.projectedLoad}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div
-            className={`mx-0 p-3 gold-liner-box transition-all ${
-              isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"
-            }`}
-          >
-            <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}>
-              <CalendarDays className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`} />
-              <span className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
-                Today Focus
-              </span>
-            </div>
-            <div className="space-y-3">
-              <div className={`rounded-xl border p-3 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
-                <p className={`text-[9px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
-                  Current view
-                </p>
-                <p className={`mt-1 text-sm font-bold ${isLight ? "text-zinc-900" : "text-white"}`}>
-                  {tabMeta.find((tab) => tab.id === activeTab)?.label || activeTab}
-                </p>
-                <p className={`mt-1 text-[10px] ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
-                  {selectedBranch}
-                </p>
-              </div>
-              <div className={`rounded-xl border p-3 ${isLight ? "border-orange-200 bg-orange-50" : "border-orange-500/20 bg-orange-500/10"}`}>
-                <p className={`text-[9px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
-                  Immediate action
-                </p>
-                <p className={`mt-1 text-sm font-bold ${isLight ? "text-orange-700" : "text-orange-300"}`}>
-                  {lowStockCount > 0
-                    ? `Review ${lowStockCount} low-stock item${lowStockCount === 1 ? "" : "s"}`
-                    : "Stock levels are clear"}
-                </p>
-                <p className={`mt-1 text-[10px] ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
-                  Capacity {capacityPct}% against forecast {projectedCapacityPct}%.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                {lowStockItems.slice(0, 2).map((item) => (
-                  <div key={item.id} className={`flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-[10px] ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
-                    <span className={`truncate ${isLight ? "text-zinc-700" : "text-zinc-300"}`}>{item.itemName}</span>
-                    <span className={`font-mono shrink-0 ${item.status === "Critical" ? "text-rose-500" : "text-amber-500"}`}>
-                      {item.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setActiveTab("Planning")}
-                  className={`rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${
-                    isLight
-                      ? "bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-700"
-                      : "bg-zinc-100 text-zinc-950 border-zinc-200 hover:bg-white"
-                  }`}
-                >
-                  Open Planning
-                </button>
-                <button className="btn-interactive"
-                  type="button"
-                  onClick={() => setActiveTab("Reports")}
-                  className={`rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${
-                    isLight
-                      ? "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100"
-                      : "bg-zinc-900 text-zinc-100 border-zinc-800 hover:bg-zinc-800"
-                  }`}
-                >
-                  Open Reports
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      </div>
-    </div>
-
-      {/* Schedule Email Report Modal */}
-      {isScheduleReportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-fadeIn">
-          <div
-            className={`w-full max-w-sm rounded-[1.25rem] shadow-2xl p-6 relative border animate-zoomIn ${
-              isLight
-                ? "bg-white border-zinc-200"
-                : "bg-zinc-950 border-zinc-800"
-            }`}
-          >
-            <h3
-              className={`text-sm font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-white"}`}
-            >
-              <Mail className="w-4 h-4 text-rose-500" />
-              Schedule Capacity Summary PDF
-            </h3>
-            <p
-              className={`text-xs uppercase font-mono font-bold tracking-widest mt-2 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-            >
-              Automated Report Delivery
-            </p>
-
-            <div className="mt-5 space-y-4">
-              <div className="flex flex-col gap-1.5">
-                <label
-                  className={`text-xs font-bold uppercase tracking-wider font-mono ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
-                >
-                  Delivery Frequency
-                </label>
-                <div className="flex bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-1">
-                  <button className="btn-interactive"
-                    onClick={() => setReportFrequency("daily")}
-                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
-                      reportFrequency === "daily"
-                        ? "bg-rose-500 text-white shadow"
-                        : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-                    }`}
-                  >
-                    Daily
-                  </button>
-                  <button className="btn-interactive"
-                    onClick={() => setReportFrequency("weekly")}
-                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
-                      reportFrequency === "weekly"
-                        ? "bg-rose-500 text-white shadow"
-                        : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-                    }`}
-                  >
-                    Weekly
-                  </button>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label
-                  className={`text-xs font-bold uppercase tracking-wider font-mono flex gap-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
-                >
-                  Target Email Address
-                  <span className="text-rose-500">*</span>
-                </label>
-                <input className="input-gold-glow"
-                  type="email"
-                  placeholder="ops.reports@company.com"
-                  value={reportEmailAddress}
-                  onChange={(e) => setReportEmailAddress(e.target.value)}
-                  className={`w-full px-3 py-2 text-xs font-mono rounded border outline-none focus:border-yellow-500 transition-colors ${
-                    isLight
-                      ? "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400"
-                      : "bg-black border-zinc-800 text-white placeholder:text-zinc-600"
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800">
-              <button className="btn-interactive"
-                onClick={() => setIsScheduleReportModalOpen(false)}
-                className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider font-mono rounded transition-colors ${
-                  isLight
-                    ? "text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
-                    : "text-zinc-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800"
-                }`}
-              >
-                Cancel
-              </button>
-              <button className="btn-interactive"
-                onClick={() => {
-                  if (reportEmailAddress) {
-                    setIsScheduleReportModalOpen(false);
-                    // Add some dummy action like clearing the input
-                    setTimeout(() => {
-                      setReportEmailAddress("");
-                    }, 300);
-                  }
-                }}
-                disabled={!reportEmailAddress}
-                className="flex-[2] py-2 text-xs font-bold uppercase tracking-wider font-mono rounded bg-rose-500 text-white  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-rose-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5"
-              >
+                }} disabled={!reportEmailAddress}>
                 <Clock className="w-3 h-3" />
                 Activate Schedule
               </button>
@@ -5390,6 +4743,7 @@ export default function App() {
           </div>
         </div>
       )}
+    </div>
   );
 }
 

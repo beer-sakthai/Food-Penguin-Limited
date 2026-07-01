@@ -415,11 +415,7 @@ export default function WasteTab({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Item</label>
-              <select className="input-gold-glow" 
-                value={newItem}
-                onChange={e => handleProductChange(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
-              >
+              <select className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`} value={newItem} onChange={e => handleProductChange(e.target.value)}>
                 {products.map(p => (
                   <option key={p.name} value={p.name}>{p.name}</option>
                 ))}
@@ -429,15 +425,7 @@ export default function WasteTab({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Weight (kg)</label>
-                <input className="input-gold-glow" 
-                  type="number" 
-                  step="0.1"
-                  min="0.1"
-                  value={weight}
-                  onChange={e => handleWeightChange(parseFloat(e.target.value))}
-                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
-                  required
-                />
+                <input className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`} type="number" step="0.1" min="0.1" value={weight} onChange={e => handleWeightChange(parseFloat(e.target.value))} required/>
               </div>
               <div>
                 <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Value (€)</label>
@@ -453,11 +441,7 @@ export default function WasteTab({
 
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Reason</label>
-              <select className="input-gold-glow" 
-                value={reason}
-                onChange={e => setReason(e.target.value as any)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
-              >
+              <select className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`} value={reason} onChange={e => setReason(e.target.value as any)}>
                 <option value="Expired">Expired</option>
                 <option value="Overproduced">Overproduced</option>
                 <option value="Quality Issue">Quality Issue</option>
@@ -483,11 +467,7 @@ export default function WasteTab({
           <p className="text-xs text-zinc-500 mb-4">Select a high-loss category to generate predictive preservation tactics and repurposing hacks.</p>
           
           <div className="space-y-3">
-             <select className="input-gold-glow" 
-                value={helpCat}
-                onChange={e => setHelpCat(e.target.value)}
-                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
-              >
+             <select className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`} value={helpCat} onChange={e => setHelpCat(e.target.value)}>
                 <option value="Seafood">Seafood</option>
                 <option value="Produce">Produce</option>
                 <option value="Dairy">Dairy</option>

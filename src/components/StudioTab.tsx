@@ -139,16 +139,10 @@ export default function StudioTab({ theme }: StudioTabProps) {
         </p>
 
         <div className="flex justify-center gap-4 mt-8">
-          <button className="btn-interactive" 
-            onClick={() => setActiveMode('marketing')}
-            className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'marketing' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
-          >
+          <button className={`btn-interactive px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'marketing' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`} onClick={() => setActiveMode('marketing')}>
             Ad Generator
           </button>
-          <button className="btn-interactive" 
-            onClick={() => setActiveMode('audit')}
-            className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'audit' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
-          >
+          <button className={`btn-interactive px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'audit' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`} onClick={() => setActiveMode('audit')}>
             Quality Auditor
           </button>
         </div>
@@ -166,28 +160,10 @@ export default function StudioTab({ theme }: StudioTabProps) {
             </div>
             {/* Model Selector Tag */}
             <div className={`p-1.5 rounded-xl flex gap-1.5 ${isLight ? 'bg-zinc-100' : 'bg-zinc-950 border border-zinc-800'}`}>
-              <button className="btn-interactive"
-                type="button"
-                onClick={() => setImageModel('gemini-3.1-flash-image-preview')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  imageModel === 'gemini-3.1-flash-image-preview'
-                    ? 'bg-amber-500 text-white shadow-sm'
-                    : 'text-zinc-500 hover:text-zinc-300'
-                }`}
-                title="Use fast, lightweight image generator model"
-              >
+              <button className={`btn-interactive px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${ imageModel === 'gemini-3.1-flash-image-preview' ? 'bg-amber-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300' }`} type="button" onClick={() => setImageModel('gemini-3.1-flash-image-preview')} title="Use fast, lightweight image generator model">
                 Fast / Flash
               </button>
-              <button className="btn-interactive"
-                type="button"
-                onClick={() => setImageModel('gemini-3-pro-image-preview')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  imageModel === 'gemini-3-pro-image-preview'
-                    ? 'bg-amber-500 text-white shadow-sm'
-                    : 'text-zinc-500 hover:text-zinc-300'
-                }`}
-                title="Use supreme, high-fidelity studio quality generator model"
-              >
+              <button className={`btn-interactive px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${ imageModel === 'gemini-3-pro-image-preview' ? 'bg-amber-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300' }`} type="button" onClick={() => setImageModel('gemini-3-pro-image-preview')} title="Use supreme, high-fidelity studio quality generator model">
                 Studio / Pro
               </button>
             </div>
@@ -201,18 +177,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
               </span>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {PRESETS.map((preset, idx) => (
-                  <button className="btn-interactive"
-                    key={idx}
-                    type="button"
-                    onClick={() => setAdPrompt(preset.prompt)}
-                    className={`p-3.5 rounded-2xl border text-left transition-all hover:-translate-y-0.5 active:scale-[0.98] group cursor-pointer ${
-                      adPrompt === preset.prompt
-                        ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
-                        : isLight
-                          ? 'bg-zinc-50 border-zinc-200 hover:bg-zinc-100/80 hover:border-zinc-300'
-                          : 'bg-zinc-950 border-zinc-850 hover:bg-zinc-900/50 hover:border-zinc-800'
-                    }`}
-                  >
+                  <button className={`btn-interactive p-3.5 rounded-2xl border text-left transition-all hover:-translate-y-0.5 active:scale-[0.98] group cursor-pointer ${ adPrompt === preset.prompt ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_15px_rgba(234,179,8,0.15)]' : isLight ? 'bg-zinc-50 border-zinc-200 hover:bg-zinc-100/80 hover:border-zinc-300' : 'bg-zinc-950 border-zinc-850 hover:bg-zinc-900/50 hover:border-zinc-800' }`} key={idx} type="button" onClick={() => setAdPrompt(preset.prompt)}>
                     <span className="block font-bold text-xs text-zinc-800 dark:text-zinc-200 group-hover:text-amber-500 transition-colors">
                       {preset.title}
                     </span>
@@ -243,15 +208,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
               </label>
               <div className="flex flex-wrap gap-2.5">
                 {ASPECT_RATIOS.map(ratio => (
-                  <button className="btn-interactive"
-                    key={ratio}
-                    onClick={() => setAspectRatio(ratio)}
-                    className={`px-3.5 py-2 rounded-xl font-bold font-mono text-xs tracking-wider transition-all border cursor-pointer ${
-                      aspectRatio === ratio 
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-[0_2px_8px_rgba(245,158,11,0.3)] transform -translate-y-0.5' 
-                        : isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-700' : 'bg-zinc-950 border-zinc-850 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-                    }`}
-                  >
+                  <button className={`btn-interactive px-3.5 py-2 rounded-xl font-bold font-mono text-xs tracking-wider transition-all border cursor-pointer ${ aspectRatio === ratio ? 'bg-amber-500 text-white border-amber-600 shadow-[0_2px_8px_rgba(245,158,11,0.3)] transform -translate-y-0.5' : isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-700' : 'bg-zinc-950 border-zinc-850 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200' }`} key={ratio} onClick={() => setAspectRatio(ratio)}>
                     {ratio}
                   </button>
                 ))}
@@ -344,10 +301,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                   <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-md">
                     <img src={previewImage} alt="Preview" className="w-full h-auto object-cover" />
                   </div>
-                  <button className="btn-interactive" 
-                    onClick={() => { setPreviewImage(null); setAuditResult(null); }}
-                    className={`mt-4 px-6 py-2 rounded-xl font-bold border transition-all ${isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800'}`}
-                  >
+                  <button className={`btn-interactive mt-4 px-6 py-2 rounded-xl font-bold border transition-all ${isLight ? 'bg-white text-zinc-600 border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800'}`} onClick={() => { setPreviewImage(null); setAuditResult(null); }}>
                     Upload Another Photo
                   </button>
                 </div>
@@ -362,14 +316,11 @@ export default function StudioTab({ theme }: StudioTabProps) {
                     <div className={`p-6 rounded-2xl shadow-inner ${isLight ? 'bg-zinc-50 text-zinc-800 border border-zinc-200' : 'bg-zinc-950 text-zinc-200 border border-zinc-800'}`}>
                       <div className="text-base font-medium whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto pr-1 custom-scrollbar">{auditResult}</div>
                       <div className="mt-4 flex justify-end">
-                        <button className="btn-interactive" 
-                          onClick={() => {
+                        <button className={`btn-interactive flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all ${isLight ? 'bg-zinc-200 text-zinc-700 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-300' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`} onClick={() => {
                             navigator.clipboard.writeText(auditResult);
                             setCopied(true);
                             setTimeout(() => setCopied(false), 2000);
-                          }}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all ${isLight ? 'bg-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-300' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
-                        >
+                          }}>
                           {copied ? <><Check size={14} className="text-emerald-500" /> Copied</> : <><Copy size={14} /> Copy Log</>}
                         </button>
                       </div>
