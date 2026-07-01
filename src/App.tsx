@@ -2168,8 +2168,7 @@ export default function App() {
             >
               Food chain ops portal
             </span>
-
-
+          </div>
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
