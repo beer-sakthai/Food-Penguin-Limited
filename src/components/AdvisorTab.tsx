@@ -63,7 +63,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
   };
 
   return (
-    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+    <div className="w-full flex flex-col gap-6">
       {/* Top Header Card */}
       <div className={`p-8 rounded-3xl border ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'} relative overflow-hidden`}>
         <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
@@ -193,6 +193,37 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
               <p className="text-xs text-zinc-500 mt-2 max-w-sm mx-auto">
                 Select one of the presets on the left or type your custom operations challenge, then compute an assessment to formulate an executive strategy.
               </p>
+            </div>
+          )}
+
+          {!advisorResponse && !loading && (
+            <div className={`p-5 rounded-3xl border ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900/70 border-zinc-800'}`}>
+              <div className="flex items-center gap-2 mb-3">
+                <Lightbulb className="w-4 h-4 text-amber-500" />
+                <span className={`text-xs font-black uppercase tracking-wider ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>
+                  What to ask next
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Which supplier delay should we fix first?",
+                  "Where can we save two staff hours today?",
+                  "What stock risk needs action before closing?",
+                ].map((question) => (
+                  <button
+                    key={question}
+                    type="button"
+                    onClick={() => setStrategicPrompt(question)}
+                    className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all active:scale-[0.98] ${
+                      isLight
+                        ? 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100'
+                        : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:bg-zinc-900'
+                    }`}
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
