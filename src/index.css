@@ -239,6 +239,25 @@ html {
   .crystal-liner-box:active {
     transform: translateY(-1px) scale(0.98);
   }
+
+  /* Mandatory Micro-animations for Buttons */
+  .btn-interactive {
+    @apply transition-all;
+  }
+  .btn-interactive:hover {
+    transform: translateY(-0.125rem);
+  }
+  .btn-interactive:active {
+    transform: scale(0.98);
+  }
+
+  /* Mandatory Gold Glow for Inputs */
+  .input-gold-glow {
+    @apply transition-all focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500;
+  }
+  .input-gold-glow:focus {
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.2), inset 0 1px 2px rgba(234, 179, 8, 0.1);
+  }
 }
 
 /* Compact layout overrides to fit everything on a single page (1 screen) */

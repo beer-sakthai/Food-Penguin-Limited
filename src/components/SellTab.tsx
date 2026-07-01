@@ -243,7 +243,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
         {/* PAGINATION CONTROLS */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-8">
-            <button
+            <button className="btn-interactive"
               onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
               disabled={currentPage === 0}
               className={`flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all ${
@@ -255,7 +255,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
               <ChevronLeft className="w-4 h-4" /> Prev
             </button>
             
-            <button
+            <button className="btn-interactive"
               onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={currentPage === totalPages - 1}
               className={`flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all ${

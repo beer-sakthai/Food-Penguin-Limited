@@ -223,7 +223,7 @@ export default function DataAnalystTab({
         <button
           type="button"
           onClick={exportSummary}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-zinc-950 shadow-sm transition-all hover:bg-orange-400 active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-zinc-950 shadow-sm transition-all hover:bg-orange-400 active:scale-[0.98] btn-interactive"
         >
           <Download className="h-4 w-4" />
           Export analysis
@@ -284,7 +284,7 @@ export default function DataAnalystTab({
             </div>
             <div className={`flex rounded-xl border p-1 ${isLight ? "bg-zinc-100 border-zinc-200" : "bg-zinc-950 border-zinc-800"}`}>
               {(["profit", "waste", "labor", "stock"] as AnalystView[]).map((item) => (
-                <button
+                <button className="btn-interactive"
                   key={item}
                   type="button"
                   onClick={() => setView(item)}

@@ -87,7 +87,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Username</label>
             <div className="relative">
               <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-              <input
+              <input className="input-gold-glow"
                 type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
@@ -103,7 +103,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Password</label>
             <div className="relative">
               <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-              <input
+              <input className="input-gold-glow"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -118,7 +118,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
           {isRegistering && (
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Role</label>
-              <select
+              <select className="input-gold-glow"
                 value={role}
                 onChange={e => setRole(e.target.value as 'Admin' | 'User')}
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] appearance-none cursor-pointer ${
@@ -133,7 +133,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
 
           <button
             type="submit"
-            className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-md shadow-amber-500/10"
+            className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-md shadow-amber-500/10 btn-interactive"
           >
             {isRegistering ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
             {isRegistering ? 'Create Account' : 'Sign In'}
@@ -182,7 +182,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
 
         <div className={`mt-6 pt-6 border-t text-center text-sm ${isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-400'}`}>
           {isRegistering ? 'Already have an account? ' : 'Need an account? '}
-          <button 
+          <button className="btn-interactive" 
             onClick={() => {
               setIsRegistering(!isRegistering);
               setError('');

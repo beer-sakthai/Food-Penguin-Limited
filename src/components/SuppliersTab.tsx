@@ -163,7 +163,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
         
         <div className="relative">
           <Search size={18} className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-          <input
+          <input className="input-gold-glow"
             type="text"
             placeholder="Search items or suppliers..."
             value={searchQuery}
@@ -194,7 +194,7 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
                   isLight ? 'bg-white border-zinc-200' : 'bg-black border-zinc-800'
                 }`}
               >
-                <button
+                <button className="btn-interactive"
                   onClick={() => toggleSupplier(supplier.id)}
                   className={`w-full px-5 py-4 flex items-center justify-between transition-colors ${
                     isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50'

@@ -203,7 +203,7 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  Suggest: +{suggestedValue}{item.unit}
  </span>
  )}
- <button
+ <button className="btn-interactive"
  onClick={() => onOrderRestock(item.id)}
  disabled={item.status === 'Healthy'}
  className={`px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${

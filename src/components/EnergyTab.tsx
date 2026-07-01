@@ -174,7 +174,7 @@ export default function EnergyTab({ theme = 'dark', weeklyLogs = [] }: EnergyTab
           <button 
             onClick={generateReport}
             disabled={isGenerating}
-            className="w-full py-2 bg-yellow-500 text-zinc-900 text-xs font-bold uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 z-10 flex items-center justify-center gap-2"
+            className="w-full py-2 bg-yellow-500 text-zinc-900 text-xs font-bold uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 z-10 flex items-center justify-center gap-2 btn-interactive"
           >
             {isGenerating ? <RefreshCw size={14} className="animate-spin" /> : "Run Compliance"}
           </button>

@@ -174,11 +174,11 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
                 type="button"
                 onClick={handleRosterResolve}
                 disabled={complianceLoading || !schedulerPrompt.trim()}
-                className="rounded-2xl bg-orange-500 px-4 py-3 text-xs font-black uppercase tracking-wider text-zinc-950 shadow-sm transition-all hover:bg-orange-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-2xl bg-orange-500 px-4 py-3 text-xs font-black uppercase tracking-wider text-zinc-950 shadow-sm transition-all hover:bg-orange-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 btn-interactive"
               >
                 {complianceLoading ? "Checking..." : "Check swap"}
               </button>
-              <button
+              <button className="btn-interactive"
                 type="button"
                 onClick={() => {
                   setSchedulerPrompt("");
@@ -230,7 +230,7 @@ export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursSch
                     {employee.status}
                   </p>
                 </div>
-                <button
+                <button className="btn-interactive"
                   type="button"
                   onClick={() => onToggleClockStatus(employee.id)}
                   className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-mono font-bold uppercase transition-all active:scale-[0.98] ${

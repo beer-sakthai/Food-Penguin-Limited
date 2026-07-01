@@ -387,7 +387,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
               Operational Department
             </label>
             <div className="relative">
-              <select
+              <select className="input-gold-glow"
                 value={activeSection}
                 onChange={(e) => setActiveSection(e.target.value as ReportSection)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all duration-200 bg-transparent ${
@@ -411,7 +411,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             <label className={`text-xs font-semibold flex items-center gap-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
               <Calendar className="w-3.5 h-3.5" /> Start Date
             </label>
-            <input
+            <input className="input-gold-glow"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -427,7 +427,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             <label className={`text-xs font-semibold flex items-center gap-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
               <Calendar className="w-3.5 h-3.5" /> End Date
             </label>
-            <input
+            <input className="input-gold-glow"
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
@@ -445,7 +445,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             </label>
             
             {activeSection === 'Sell' && (
-              <select
+              <select className="input-gold-glow"
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
@@ -461,7 +461,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             )}
 
             {activeSection === 'Target' && (
-              <select
+              <select className="input-gold-glow"
                 value={targetCategoryFilter}
                 onChange={(e) => setTargetCategoryFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
@@ -478,7 +478,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             )}
 
             {activeSection === 'Production' && (
-              <select
+              <select className="input-gold-glow"
                 value={taskPriorityFilter}
                 onChange={(e) => setTaskPriorityFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
@@ -494,7 +494,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             )}
 
             {activeSection === 'Waste' && (
-              <select
+              <select className="input-gold-glow"
                 value={wasteReasonFilter}
                 onChange={(e) => setWasteReasonFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
@@ -511,7 +511,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             )}
 
             {activeSection === 'Hours' && (
-              <select
+              <select className="input-gold-glow"
                 value={hoursRoleFilter}
                 onChange={(e) => setHoursRoleFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
@@ -528,7 +528,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             )}
 
             {activeSection === 'Planning' && (
-              <select
+              <select className="input-gold-glow"
                 value={planningSupplierFilter}
                 onChange={(e) => setPlanningSupplierFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${
@@ -546,7 +546,7 @@ Please analyze this dataset specifically targeting margin leaks, labor waste, fo
             )}
 
             {activeSection === 'Real-time' && (
-              <select
+              <select className="input-gold-glow"
                 value={alertStatusFilter}
                 onChange={(e) => setAlertStatusFilter(e.target.value)}
                 className={`w-full text-xs rounded-xl p-2.5 border transition-all bg-transparent ${

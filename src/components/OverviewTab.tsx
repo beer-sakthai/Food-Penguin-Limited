@@ -552,7 +552,7 @@ export default function OverviewTab({
           >
             Choose the week used for the dashboard numbers and charts.
           </p>
-          <select
+          <select className="input-gold-glow"
             value={selectedWeekRange}
             onChange={(e) => onSelectedWeekRangeChange(e.target.value)}
             className={`w-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 rounded-lg px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
@@ -641,7 +641,7 @@ export default function OverviewTab({
                 </p>
               </div>
             </div>
-            <button
+            <button className="btn-interactive"
               onClick={() => onNavigateTab("Planning")}
               className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs rounded-lg shadow-sm transition-all active:scale-[0.98] shrink-0 cursor-pointer"
             >
@@ -679,7 +679,7 @@ export default function OverviewTab({
               (day) => {
                 const isActive = selectedDayTab === day;
                 return (
-                  <button
+                  <button className="btn-interactive"
                     key={day}
                     onClick={() => setSelectedDayTab(day)}
                     type="button"
@@ -1415,7 +1415,7 @@ export default function OverviewTab({
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <button className="btn-interactive"
                     type="button"
                     onClick={() => setChartView("hourly")}
                     className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
@@ -1428,7 +1428,7 @@ export default function OverviewTab({
                   >
                     Hourly
                   </button>
-                  <button
+                  <button className="btn-interactive"
                     type="button"
                     onClick={() => setChartView("weekly")}
                     className={`px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
@@ -1586,7 +1586,7 @@ export default function OverviewTab({
                     <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">
                       Branch A
                     </label>
-                    <select
+                    <select className="input-gold-glow"
                       value={compareBranchA}
                       onChange={(e) => {
                         setCompareBranchA(e.target.value);
@@ -1612,7 +1612,7 @@ export default function OverviewTab({
                     <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">
                       Branch B
                     </label>
-                    <select
+                    <select className="input-gold-glow"
                       value={compareBranchB}
                       onChange={(e) => {
                         setCompareBranchB(e.target.value);
@@ -1631,7 +1631,7 @@ export default function OverviewTab({
                   </div>
                 </div>
               </div>
-              <button
+              <button className="btn-interactive"
                 onClick={() =>
                   setCompareMode(compareMode === "all" ? "twoBranches" : "all")
                 }

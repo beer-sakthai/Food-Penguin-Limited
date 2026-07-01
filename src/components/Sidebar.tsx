@@ -104,7 +104,7 @@ export function Sidebar({
           {tabMeta.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
-              <button
+              <button className="btn-interactive"
                 key={tab.id}
                 onClick={() => {
                   setActiveTab(tab.id);
@@ -179,7 +179,7 @@ export function Sidebar({
                 {currentUser?.username || "Food Penguin User"}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <select
+                <select className="input-gold-glow"
                   value={userRole}
                   onChange={(e) => setUserRole(e.target.value)}
                   className={`bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${

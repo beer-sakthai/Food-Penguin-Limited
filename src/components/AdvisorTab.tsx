@@ -108,7 +108,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
             </span>
             <div className="grid grid-cols-1 gap-3">
               {STRATEGIC_PRESETS.map((preset, idx) => (
-                <button
+                <button className="btn-interactive"
                   key={idx}
                   type="button"
                   onClick={() => setStrategicPrompt(preset.prompt)}
@@ -148,7 +148,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
 
           {/* Controls */}
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <button
+            <button className="btn-interactive"
               type="button"
               onClick={() => setStrategicPrompt("")}
               className={`px-4 py-3 rounded-2xl text-xs font-bold border flex items-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer ${
@@ -160,7 +160,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
             <button
               onClick={handleAskAdvisor}
               disabled={loading || !strategicPrompt.trim()}
-              className="px-6 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-2xl font-black text-xs shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98] hover:-translate-y-0.5 cursor-pointer"
+              className="px-6 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-2xl font-black text-xs shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98] hover:-translate-y-0.5 cursor-pointer btn-interactive"
             >
               {loading ? (
                 <>
@@ -210,7 +210,7 @@ export default function AdvisorTab({ theme }: AdvisorTabProps) {
                   "Where can we save two staff hours today?",
                   "What stock risk needs action before closing?",
                 ].map((question) => (
-                  <button
+                  <button className="btn-interactive"
                     key={question}
                     type="button"
                     onClick={() => setStrategicPrompt(question)}

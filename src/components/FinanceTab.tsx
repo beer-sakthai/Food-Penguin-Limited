@@ -127,7 +127,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
 
         {/* View Toggle */}
         <div className={`flex p-1 rounded-xl shadow-sm ${isLight ? 'bg-zinc-200/50' : 'bg-black/50'} w-full md:w-auto`}>
-          <button
+          <button className="btn-interactive"
             onClick={() => setMode('plan')}
             className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
               mode === 'plan'
@@ -142,7 +142,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
             <Target size={16} className={mode === 'plan' ? 'text-emerald-500' : ''} />
             Plan Structure
           </button>
-          <button
+          <button className="btn-interactive"
             onClick={() => setMode('use')}
             className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
               mode === 'use'
@@ -308,7 +308,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Target Day of Week
                   </label>
-                  <select
+                  <select className="input-gold-glow"
                     value={entryDay}
                     onChange={(e) => setEntryDay(e.target.value as any)}
                     className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${
@@ -332,7 +332,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Calendar Date
                   </label>
-                  <input
+                  <input className="input-gold-glow"
                     type="date"
                     required
                     value={entryDate}
@@ -350,7 +350,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                   >
                     Primary Registered Supplier
                   </label>
-                  <select
+                  <select className="input-gold-glow"
                     value={entrySupplierName}
                     onChange={(e) =>
                       setEntrySupplierName(e.target.value as any)
@@ -390,7 +390,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Gross Revenue (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -409,7 +409,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Sushi Waste Cost (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -428,7 +428,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Staff Rostered (hrs)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         required
                         value={entryHours}
@@ -446,7 +446,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Production Target (units)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         required
                         value={entryProdTarget}
@@ -464,7 +464,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Production Made (units)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         required
                         value={entryProdMade}
@@ -498,7 +498,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Tazaki Supplier (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -517,7 +517,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Sysco Supplier (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -536,7 +536,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Bulza Supplier (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -555,7 +555,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Sticker Supplier (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -574,7 +574,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       >
                         Others / Etc. (€)
                       </label>
-                      <input
+                      <input className="input-gold-glow"
                         type="number"
                         step="0.01"
                         required
@@ -596,7 +596,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
               >
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+                  className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 btn-interactive"
                 >
                   <Save className="w-4 h-4" />
                   Commit Active Operational Records

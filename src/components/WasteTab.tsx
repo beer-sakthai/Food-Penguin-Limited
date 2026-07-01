@@ -415,7 +415,7 @@ export default function WasteTab({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Item</label>
-              <select 
+              <select className="input-gold-glow" 
                 value={newItem}
                 onChange={e => handleProductChange(e.target.value)}
                 className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
@@ -429,7 +429,7 @@ export default function WasteTab({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Weight (kg)</label>
-                <input 
+                <input className="input-gold-glow" 
                   type="number" 
                   step="0.1"
                   min="0.1"
@@ -453,7 +453,7 @@ export default function WasteTab({
 
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Reason</label>
-              <select 
+              <select className="input-gold-glow" 
                 value={reason}
                 onChange={e => setReason(e.target.value as any)}
                 className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
@@ -465,7 +465,7 @@ export default function WasteTab({
               </select>
             </div>
 
-            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
+            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2 btn-interactive">
               <Plus className="w-4 h-4" />
               Log Waste Record
             </button>
@@ -483,7 +483,7 @@ export default function WasteTab({
           <p className="text-xs text-zinc-500 mb-4">Select a high-loss category to generate predictive preservation tactics and repurposing hacks.</p>
           
           <div className="space-y-3">
-             <select 
+             <select className="input-gold-glow" 
                 value={helpCat}
                 onChange={e => setHelpCat(e.target.value)}
                 className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}

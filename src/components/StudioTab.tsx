@@ -139,13 +139,13 @@ export default function StudioTab({ theme }: StudioTabProps) {
         </p>
 
         <div className="flex justify-center gap-4 mt-8">
-          <button 
+          <button className="btn-interactive" 
             onClick={() => setActiveMode('marketing')}
             className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'marketing' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
           >
             Ad Generator
           </button>
-          <button 
+          <button className="btn-interactive" 
             onClick={() => setActiveMode('audit')}
             className={`px-8 py-3 rounded-full font-bold transition-all border ${activeMode === 'audit' ? 'bg-yellow-500 text-white border-yellow-600 shadow-md' : isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'}`}
           >
@@ -166,7 +166,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
             </div>
             {/* Model Selector Tag */}
             <div className={`p-1.5 rounded-xl flex gap-1.5 ${isLight ? 'bg-zinc-100' : 'bg-zinc-950 border border-zinc-800'}`}>
-              <button
+              <button className="btn-interactive"
                 type="button"
                 onClick={() => setImageModel('gemini-3.1-flash-image-preview')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -178,7 +178,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
               >
                 Fast / Flash
               </button>
-              <button
+              <button className="btn-interactive"
                 type="button"
                 onClick={() => setImageModel('gemini-3-pro-image-preview')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -201,7 +201,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
               </span>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {PRESETS.map((preset, idx) => (
-                  <button
+                  <button className="btn-interactive"
                     key={idx}
                     type="button"
                     onClick={() => setAdPrompt(preset.prompt)}
@@ -243,7 +243,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
               </label>
               <div className="flex flex-wrap gap-2.5">
                 {ASPECT_RATIOS.map(ratio => (
-                  <button
+                  <button className="btn-interactive"
                     key={ratio}
                     onClick={() => setAspectRatio(ratio)}
                     className={`px-3.5 py-2 rounded-xl font-bold font-mono text-xs tracking-wider transition-all border cursor-pointer ${
@@ -261,7 +261,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
             <button 
               onClick={handleGenerateAd}
               disabled={isGenerating || !adPrompt.trim()}
-              className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98] hover:-translate-y-0.5 cursor-pointer"
+              className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98] hover:-translate-y-0.5 cursor-pointer btn-interactive"
             >
               {isGenerating ? (
                 <><Loader2 size={24} className="animate-spin text-zinc-950" /> Crafting Premium Asset...</>
@@ -318,7 +318,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
               accept="image/*" 
               ref={fileInputRef}
               onChange={handlePhotoUpload}
-              className="hidden" 
+              className="hidden input-gold-glow" 
             />
             
             {!previewImage && !isAnalyzing ? (
@@ -344,7 +344,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                   <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-md">
                     <img src={previewImage} alt="Preview" className="w-full h-auto object-cover" />
                   </div>
-                  <button 
+                  <button className="btn-interactive" 
                     onClick={() => { setPreviewImage(null); setAuditResult(null); }}
                     className={`mt-4 px-6 py-2 rounded-xl font-bold border transition-all ${isLight ? 'bg-white text-zinc-600 border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50' : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800'}`}
                   >
@@ -362,7 +362,7 @@ export default function StudioTab({ theme }: StudioTabProps) {
                     <div className={`p-6 rounded-2xl shadow-inner ${isLight ? 'bg-zinc-50 text-zinc-800 border border-zinc-200' : 'bg-zinc-950 text-zinc-200 border border-zinc-800'}`}>
                       <div className="text-base font-medium whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto pr-1 custom-scrollbar">{auditResult}</div>
                       <div className="mt-4 flex justify-end">
-                        <button 
+                        <button className="btn-interactive" 
                           onClick={() => {
                             navigator.clipboard.writeText(auditResult);
                             setCopied(true);

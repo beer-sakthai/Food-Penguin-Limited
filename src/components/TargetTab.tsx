@@ -203,7 +203,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <button
  onClick={handleOptimizeTarget}
  disabled={loadingSuggestion}
- className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-2 shadow-md active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+ className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:bg-zinc-950 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-2 shadow-md active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 btn-interactive"
  >
  {loadingSuggestion ? (
  <>
@@ -239,7 +239,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <form onSubmit={handleSubmit} className="space-y-4">
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target Header Name</label>
- <input
+ <input className="input-gold-glow"
  type="text"
  required
  value={name}
@@ -251,7 +251,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
 
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Assessment Metric</label>
- <input
+ <input className="input-gold-glow"
  type="text"
  required
  value={metric}
@@ -264,7 +264,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <div className="grid grid-cols-2 gap-3.5">
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target value</label>
- <input
+ <input className="input-gold-glow"
  type="number"
  required
  value={targetValue || ''}
@@ -274,7 +274,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  </div>
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Unit label</label>
- <input
+ <input className="input-gold-glow"
  type="text"
  required
  value={unit}
@@ -288,7 +288,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  <div className="grid grid-cols-2 gap-3.5">
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Category</label>
- <select
+ <select className="input-gold-glow"
  value={category}
  onChange={(e) => setCategory(e.target.value as any)}
  className="w-full mt-1.5 p-2.5 bg-zinc-950 border border-zinc-800 text-white rounded-xl text-xs focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 focus:outline-none"
@@ -301,7 +301,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
  </div>
  <div>
  <label className="text-xs font-mono text-zinc-400 uppercase font-semibold">Target Deadline</label>
- <input
+ <input className="input-gold-glow"
  type="text"
  required
  value={deadline}
@@ -314,7 +314,7 @@ export default function TargetTab({ targets, onAddTarget }: TargetTabProps) {
 
  <button
  type="submit"
- className="w-full py-2.5 mt-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 shadow-md border border-zinc-800 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+ className="w-full py-2.5 mt-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 shadow-md border border-zinc-800 active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 btn-interactive"
  >
  <Plus className="w-4 h-4 text-orange-400 animate-pulse" />
  Publish New Corporate Target
