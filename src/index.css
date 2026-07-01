@@ -4,25 +4,18 @@
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 
-  /* Consolidated Typography (Only 3 distinct sizes) */
-  
-  /* Size 1: Detail/Body Text (~14.7px) */
-  --font-size-xs: 1.05rem;
-  --font-size-sm: 1.05rem;
-  --font-size-base: 1.05rem;
-
-  /* Size 2: Headline Text (~35px, the biggest) */
-  --font-size-lg: 2.5rem;
-  --font-size-xl: 2.5rem;
-  --font-size-2xl: 2.5rem;
-
-  /* Size 3: Number/Big Metric Text (~21px, mid-size) */
-  --font-size-3xl: 1.5rem;
-  --font-size-4xl: 1.5rem;
-  --font-size-5xl: 1.5rem;
-  --font-size-6xl: 1.5rem;
-  --font-size-7xl: 1.5rem;
-  --font-size-8xl: 1.5rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 3.75rem;
+  --font-size-7xl: 4.5rem;
+  --font-size-8xl: 6rem;
 }
 
 html {
@@ -158,8 +151,8 @@ html {
   }
 
   .gold-liner-box:hover {
-    box-shadow: 0 16px 48px rgba(234, 179, 8, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
-    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(234, 179, 8, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
   }
   
   .dark .gold-liner-box:hover {
@@ -183,8 +176,8 @@ html {
   }
 
   .silver-liner-box:hover {
-    box-shadow: 0 16px 48px rgba(148, 163, 184, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
-    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(148, 163, 184, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
   }
   
   .dark .silver-liner-box:hover {
@@ -208,8 +201,8 @@ html {
   }
 
   .copper-liner-box:hover {
-    box-shadow: 0 16px 48px rgba(249, 115, 22, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
-    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(249, 115, 22, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
   }
   
   .dark .copper-liner-box:hover {
@@ -234,8 +227,8 @@ html {
   }
 
   .crystal-liner-box:hover {
-    box-shadow: 0 16px 48px rgba(192, 132, 252, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
-    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(192, 132, 252, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
   }
 
   .dark .crystal-liner-box:hover {
@@ -309,21 +302,17 @@ html {
   }
 }
 
-/* Versace Gold Frame Styles */
+/* Subtle app frame */
 .versace-frame-top {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 14px;
+  height: 6px;
   z-index: 9999;
   pointer-events: none;
-  background: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 0 12 L 4 12 L 4 4 L 20 4 L 20 20 L 8 20 L 8 8 L 16 8 L 16 16 L 12 16 L 12 12 L 24 12' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-x center,
-    linear-gradient(to bottom, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
-  background-size: 10px 10px, 100% 100%;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 14px 100%);
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+  background: linear-gradient(90deg, #f97316, #f59e0b, #10b981);
+  opacity: 0.85;
 }
 
 .versace-frame-bottom {
@@ -331,15 +320,11 @@ html {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 14px;
+  height: 6px;
   z-index: 9999;
   pointer-events: none;
-  background: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 0 12 L 4 12 L 4 4 L 20 4 L 20 20 L 8 20 L 8 8 L 16 8 L 16 16 L 12 16 L 12 12 L 24 12' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-x center,
-    linear-gradient(to top, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
-  background-size: 10px 10px, 100% 100%;
-  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
-  filter: drop-shadow(0 -4px 6px rgba(0, 0, 0, 0.4));
+  background: linear-gradient(90deg, #10b981, #f59e0b, #f97316);
+  opacity: 0.5;
 }
 
 .versace-frame-left {
@@ -347,15 +332,11 @@ html {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 14px;
+  width: 6px;
   z-index: 9999;
   pointer-events: none;
-  background: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 12 0 L 12 4 L 4 4 L 4 20 L 20 20 L 20 8 L 8 8 L 8 16 L 16 16 L 16 12 L 12 12 L 12 24' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-y center,
-    linear-gradient(to right, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
-  background-size: 10px 10px, 100% 100%;
-  clip-path: polygon(0 0, 100% 14px, 100% calc(100% - 14px), 0 100%);
-  filter: drop-shadow(4px 0 6px rgba(0, 0, 0, 0.4));
+  background: linear-gradient(180deg, #f97316, #f59e0b, #10b981);
+  opacity: 0.5;
 }
 
 .versace-frame-right {
@@ -363,13 +344,9 @@ html {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 14px;
+  width: 6px;
   z-index: 9999;
   pointer-events: none;
-  background: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 12 0 L 12 4 L 4 4 L 4 20 L 20 20 L 20 8 L 8 8 L 8 16 L 16 16 L 16 12 L 12 12 L 12 24' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-y center,
-    linear-gradient(to left, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
-  background-size: 10px 10px, 100% 100%;
-  clip-path: polygon(100% 0, 100% 100%, 0 calc(100% - 14px), 0 14px);
-  filter: drop-shadow(-4px 0 6px rgba(0, 0, 0, 0.4));
+  background: linear-gradient(180deg, #10b981, #f59e0b, #f97316);
+  opacity: 0.5;
 }

@@ -56,7 +56,7 @@ interface OverviewTabProps {
   orders: SalesOrder[];
   selectedBranch: string;
   theme?: "dark" | "light";
-  metallicTheme?: "gold" | "silver" | "copper";
+  metallicTheme?: "gold" | "silver" | "copper" | "crystal";
   lowStockItems?: InventoryItem[];
 }
 
@@ -462,11 +462,11 @@ export default function OverviewTab({
   return (
     <div
       id="overview-viewport"
-      className="w-full max-w-7xl mx-auto h-full flex flex-col overflow-hidden gap-y-3"
+      className="w-full max-w-7xl mx-auto h-full flex flex-col overflow-hidden gap-y-4"
     >
       {/* Header Banner with Premium ambient bento design */}
       <div
-        className={`shrink-0 rounded-3xl p-4 md:p-5 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition-colors duration-200 ${
+        className={`shrink-0 rounded-2xl p-4 md:p-5 relative overflow-hidden shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 border transition-colors duration-200 ${
           isLight
             ? "bg-white border-zinc-200 text-zinc-900"
             : "bg-zinc-900 border-zinc-800 text-white"
@@ -485,7 +485,7 @@ export default function OverviewTab({
               }`}
             >
               <Sparkles className="w-3 h-3 animate-pulse" />
-              Sushi Intelligence Portal Active
+              Live kitchen dashboard
             </div>
             {irelandTime && (
               <span
@@ -500,11 +500,11 @@ export default function OverviewTab({
             )}
           </div>
           <h1
-            className={`text-2xl font-sans font-extrabold tracking-tight mb-2 ${
-              isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"
+            className={`text-2xl md:text-3xl font-sans font-extrabold tracking-tight mb-2 ${
+              isLight ? "text-zinc-900" : "text-white"
             }`}
           >
-            Sushi Ops Strategy Center
+            Today's Food Penguin Snapshot
           </h1>
           <p
             className={`text-sm leading-relaxed ${
@@ -513,22 +513,25 @@ export default function OverviewTab({
                 : "text-zinc-300"
             }`}
           >
-            Premium Sushi Production Company is currently executing at{" "}
+            A quick view of sales, production, waste, hours, and stock for{" "}
+            <span className="font-semibold text-zinc-900 dark:text-white">
+              {selectedBranch}
+            </span>
+            . Current efficiency is{" "}
             <span className="text-orange-600 dark:text-orange-400 font-semibold">
               {metrics.aiHealthScore}% efficiency
             </span>
-            . Cooking objectives are on target, and waste reports show an
-            improvement of{" "}
+            , with waste improving by{" "}
             <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-              18.2% vs last Friday
+              18.2%
             </span>
-            .
+            compared with last Friday.
           </p>
         </div>
 
         {/* Date-Range Selector Box */}
         <div
-          className={`relative z-10 backdrop-blur-md p-5 rounded-2xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
+          className={`relative z-10 backdrop-blur-md p-4 rounded-xl border w-full lg:w-72 flex flex-col gap-2 shrink-0 transition-colors ${
             isLight
               ? "bg-zinc-100/60 border-zinc-200"
               : "bg-zinc-950/60 border-zinc-800"
@@ -542,40 +545,39 @@ export default function OverviewTab({
             <Calendar
               className={`w-3.5 h-3.5 ${isLight ? "text-orange-600" : "text-orange-400"}`}
             />
-            <span>Audit Calendar Week</span>
+            <span>Week Filter</span>
           </div>
           <p
             className={`text-xs ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
           >
-            Filter general dashboard throughput, COGS, waste stats, and bar
-            charts
+            Choose the week used for the dashboard numbers and charts.
           </p>
           <select
             value={selectedWeekRange}
             onChange={(e) => onSelectedWeekRangeChange(e.target.value)}
-            className={`w-full focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 rounded-xl px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
+            className={`w-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 rounded-lg px-3 py-2.5 text-xs font-mono font-bold tracking-tight mt-1 transition-all cursor-pointer shadow-inner focus:outline-none ${
               isLight
-                ? "bg-white border-zinc-200 text-orange-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-700"
-                : "bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-355"
+                ? "bg-white border-zinc-200 text-orange-600 active:scale-[0.98] hover:text-orange-700"
+                : "bg-zinc-900 border-zinc-800 text-orange-400 hover:text-orange-300"
             }`}
           >
             <option
               value="2026-06-15 to 2026-06-21"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
             >
-              Week 25 (Jun 15 - Jun 21, 2026) [Active]
+                Week 25 (Jun 15 - Jun 21, 2026)
             </option>
             <option
               value="2026-06-22 to 2026-06-28"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
             >
-              Week 26 (Jun 22 - Jun 28, 2026) [Future]
+                Week 26 (Jun 22 - Jun 28, 2026)
             </option>
             <option
               value="2026-06-08 to 2026-06-14"
               className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950"} font-mono text-xs`}
             >
-              Week 24 (Jun 08 - Jun 14, 2026) [Historical]
+                Week 24 (Jun 08 - Jun 14, 2026)
             </option>
           </select>
           <div
@@ -583,7 +585,7 @@ export default function OverviewTab({
               isLight ? "border-zinc-200" : "border-zinc-900"
             }`}
           >
-            <span className="text-zinc-500">Selected Date Range:</span>
+            <span className="text-zinc-500">Selected:</span>
             <span className="text-orange-500 font-bold">
               {selectedWeekRange}
             </span>
@@ -604,7 +606,7 @@ export default function OverviewTab({
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`shrink-0 p-3 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
+            className={`shrink-0 p-3 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 ${
               isLight
                 ? "bg-amber-50 border-amber-200 text-amber-950 shadow-sm"
                 : "bg-amber-950/15 border border-amber-900/40 text-amber-200"
@@ -622,12 +624,11 @@ export default function OverviewTab({
               </div>
               <div>
                 <h4 className="text-sm font-black tracking-tight">
-                  Critical Inventory Warning: {lowStockItems.length}{" "}
-                  {lowStockItems.length === 1 ? "Item" : "Items"} with Low Stock
+                  Stock needs attention: {lowStockItems.length}{" "}
+                  {lowStockItems.length === 1 ? "item" : "items"}
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  The following raw materials are currently below minimum safety
-                  levels:{" "}
+                  These ingredients are below the level you set:{" "}
                   <span className="font-extrabold text-amber-600 dark:text-amber-400">
                     {lowStockItems
                       .map(
@@ -642,16 +643,16 @@ export default function OverviewTab({
             </div>
             <button
               onClick={() => onNavigateTab("Planning")}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs rounded-xl shadow-md transition-all hover:-translate-y-0.5 active:scale-[0.98] shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs rounded-lg shadow-sm transition-all active:scale-[0.98] shrink-0 cursor-pointer"
             >
-              Review & Restock Planning
+              Open planning
             </button>
           </motion.div>
         )}
 
         {/* Weekday Quick Select Tabs */}
         <div
-          className={`shrink-0 flex flex-wrap items-center justify-between gap-4 p-2.5 rounded-3xl border transition-colors ${
+          className={`shrink-0 flex flex-wrap items-center justify-between gap-4 p-2.5 rounded-xl border transition-colors ${
             isLight ? "bg-white border-zinc-200" : "bg-zinc-950 border-zinc-900"
           }`}
         >
@@ -664,11 +665,11 @@ export default function OverviewTab({
                 isLight ? "text-zinc-700" : "text-zinc-300"
               }`}
             >
-              Display Mode: {activeLog.date} ({activeLog.day}) Audit
+              Viewing {activeLog.day}, {activeLog.date}
             </span>
           </div>
           <div
-            className={`flex items-center p-1 rounded-2xl border shadow-inner transition-colors ${
+            className={`flex items-center p-1 rounded-lg border shadow-inner transition-colors ${
               isLight
                 ? "bg-zinc-100 border-zinc-200"
                 : "bg-zinc-900 border-zinc-800"
@@ -682,11 +683,11 @@ export default function OverviewTab({
                     key={day}
                     onClick={() => setSelectedDayTab(day)}
                     type="button"
-                    className={`px-3.5 py-1.5 text-xs rounded-xl font-mono font-bold transition-all ${
+                    className={`px-3.5 py-1.5 text-xs rounded-md font-mono font-bold transition-all ${
                       isActive
                         ? "bg-orange-500 text-white shadow-md"
                         : isLight
-                          ? "text-zinc-500 text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-orange-600 hover:bg-white"
+                          ? "text-zinc-500 active:scale-[0.98] hover:text-orange-600 hover:bg-white"
                           : "text-zinc-400 hover:text-white"
                     }`}
                   >
@@ -724,7 +725,7 @@ export default function OverviewTab({
                   <h3
                     className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
-                    €{activeLog.sales.toLocaleString()}
+                    EUR {activeLog.sales.toLocaleString()}
                   </h3>
                   <span
                     className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}
@@ -914,7 +915,7 @@ export default function OverviewTab({
                   <h3
                     className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
-                    €{activeLog.waste.toFixed(2)}
+                    EUR {activeLog.waste.toFixed(2)}
                   </h3>
                   <span
                     className={`inline-flex items-center gap-1 text-xs font-semibold mt-1 ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
@@ -927,7 +928,7 @@ export default function OverviewTab({
                   className={`p-2.5 border transition-all duration-300 rounded-xl ${
                     isLight
                       ? "bg-zinc-100 border-zinc-200 text-rose-600 group-hover:bg-rose-500 group-hover:text-white"
-                      : "bg-zinc-950 border-zinc-800 text-rose-455 group-hover:bg-rose-500 group-hover:text-white"
+                      : "bg-zinc-950 border-zinc-800 text-rose-400 group-hover:bg-rose-500 group-hover:text-white"
                   }`}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -1104,12 +1105,12 @@ export default function OverviewTab({
                   <h3
                     className={`text-3xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                   >
-                    €{totalCogsActiveDay.toLocaleString()}
+                    EUR {totalCogsActiveDay.toLocaleString()}
                   </h3>
                   <span
                     className={`inline-flex mt-1 text-xs font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    Weekly: €{totalCogsWeek.toLocaleString()}
+                    Weekly: EUR {totalCogsWeek.toLocaleString()}
                   </span>
                 </div>
                 <div
@@ -1131,9 +1132,9 @@ export default function OverviewTab({
                   >
                     <span>Tazaki (Ingredients)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.tazaki.toLocaleString()}
+                      EUR {activeLog.cogs.tazaki.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1154,9 +1155,9 @@ export default function OverviewTab({
                   >
                     <span>Sysco (Ssh Grains)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.sysco.toLocaleString()}
+                      EUR {activeLog.cogs.sysco.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1177,9 +1178,9 @@ export default function OverviewTab({
                   >
                     <span>Bulza (Display Box)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.bulza.toLocaleString()}
+                      EUR {activeLog.cogs.bulza.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1200,9 +1201,9 @@ export default function OverviewTab({
                   >
                     <span>Sticker (Thermal Label)</span>
                     <span
-                      className={`font-semibold ${isLight ? "text-zinc-905 text-zinc-900" : "text-zinc-200"}`}
+                      className={`font-semibold ${isLight ? "text-zinc-900" : "text-zinc-200"}`}
                     >
-                      €{activeLog.cogs.sticker.toLocaleString()}
+                      EUR {activeLog.cogs.sticker.toLocaleString()}
                     </span>
                   </div>
                   <div
@@ -1317,7 +1318,7 @@ export default function OverviewTab({
                         : "bg-rose-950/20 border-rose-900/40 text-rose-400"
                     }`}
                   >
-                    ⚠️ Failed to fetch live summary feedback: {summaryError}.
+                    Failed to fetch live summary feedback: {summaryError}.
                     Please verify your API key is correctly configured.
                   </div>
                 ) : (
@@ -1371,8 +1372,8 @@ export default function OverviewTab({
                           %
                         </span>
                       </div>
-                      <div>Sales: €{activeLog.sales.toLocaleString()}</div>
-                      <div>Waste: €{activeLog.waste.toFixed(2)}</div>
+                      <div>Sales: EUR {activeLog.sales.toLocaleString()}</div>
+                      <div>Waste: EUR {activeLog.waste.toFixed(2)}</div>
                       <div>
                         Production Items: {activeLog.productionMade}/
                         {activeLog.productionTarget}
@@ -1398,7 +1399,7 @@ export default function OverviewTab({
                     <span
                       className={`text-xs border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
                         isLight
-                          ? "bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-emerald-950/40 text-emerald-400 border-emerald-900/40"
                       }`}
                     >
@@ -1670,12 +1671,12 @@ export default function OverviewTab({
                         className={`text-xs border rounded px-2.5 py-0.5 font-mono ${
                           isLight
                             ? "bg-white border-zinc-200 text-zinc-700 shadow-sm"
-                            : "bg-zinc-905 bg-zinc-900 border-zinc-800 text-zinc-300"
+                            : "bg-zinc-900 border-zinc-800 text-zinc-300"
                         }`}
                       >
                         Scale:{" "}
                         {branchCompareMetric === "sales"
-                          ? "Euro (€)"
+                          ? "Euro (EUR)"
                           : branchCompareMetric === "production"
                             ? "Units (Pcs)"
                             : branchCompareMetric === "waste"
@@ -1821,7 +1822,7 @@ export default function OverviewTab({
                                           Sales revenue:
                                         </span>
                                         <span className="font-bold text-amber-600 dark:text-amber-500">
-                                          €{data.sales.toLocaleString()}
+                                          EUR {data.sales.toLocaleString()}
                                         </span>
                                       </div>
                                       <div className="flex justify-between gap-8">
@@ -1921,7 +1922,7 @@ export default function OverviewTab({
                           style={{ color: branch.color }}
                         >
                           {branchCompareMetric === "sales"
-                            ? `€${branch.sales.toLocaleString()}`
+                            ? `EUR ${branch.sales.toLocaleString()}`
                             : branchCompareMetric === "production"
                               ? `${branch.production.toLocaleString()} Pcs`
                               : branchCompareMetric === "waste"
@@ -1939,7 +1940,7 @@ export default function OverviewTab({
                   <div
                     className={`p-3 rounded-2xl border relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-300 ${
                       isLight
-                        ? "bg-zinc-50 border-emerald-250 border-emerald-200 shadow-sm shadow-emerald-500/5"
+                        ? "bg-zinc-50 border-emerald-200 shadow-sm shadow-emerald-500/5"
                         : "bg-zinc-950 border-emerald-950/80"
                     }`}
                   >
@@ -1957,7 +1958,7 @@ export default function OverviewTab({
                               : "bg-emerald-950/45 text-emerald-400 border-emerald-900/60"
                           }`}
                         >
-                          <span>🏆</span> Peak Efficiency Store
+                          Peak Efficiency Store
                         </span>
                         <span
                           className={`font-mono font-extrabold text-xs ${isLight ? "text-emerald-700" : "text-emerald-400"}`}
@@ -1990,7 +1991,7 @@ export default function OverviewTab({
                           <strong
                             className={`font-mono ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
                           >
-                            €{championBranch.laborProd}/hr
+                            EUR {championBranch.laborProd}/hr
                           </strong>{" "}
                           yield per employee hour.
                         </p>
@@ -2007,7 +2008,7 @@ export default function OverviewTab({
                         <span
                           className={`text-xs font-mono font-extrabold ${isLight ? "text-zinc-800" : "text-white"}`}
                         >
-                          €{championBranch.laborProd}/hr
+                          EUR {championBranch.laborProd}/hr
                         </span>
                       </div>
                       <div>
@@ -2035,8 +2036,8 @@ export default function OverviewTab({
                         : "bg-zinc-950 border-zinc-900 text-zinc-400"
                     }`}
                   >
-                    <span className="font-mono text-amber-500 dark:text-amber-550 font-bold block mb-1 uppercase tracking-wide text-xs">
-                      💡 Strategic Multi-Branch Note
+                    <span className="font-mono text-amber-500 dark:text-amber-400 font-bold block mb-1 uppercase tracking-wide text-xs">
+                      Multi-Branch Note
                     </span>
                     Sell products in Marks & Spencer are gourmet luxury lines
                     featuring <strong>75% average margins</strong>. Tesco stores

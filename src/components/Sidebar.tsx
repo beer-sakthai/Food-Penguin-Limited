@@ -42,10 +42,10 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
+      className={`w-full md:w-64 flex flex-col shrink-0 shadow-lg md:border-r border-b md:border-b-0 transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
         isLight
-          ? "bg-white/70 border-zinc-200 text-zinc-800 backdrop-blur-xl"
-          : "bg-zinc-950/70 border-zinc-800 text-zinc-100 backdrop-blur-xl"
+          ? "bg-white/95 border-zinc-200 text-zinc-800 backdrop-blur-xl"
+          : "bg-zinc-950/95 border-zinc-800 text-zinc-100 backdrop-blur-xl"
       }`}
     >
       {/* Brand Header */}
@@ -53,7 +53,7 @@ export function Sidebar({
         className={`p-4 md:p-6 border-b flex items-center justify-between gap-3 transition-colors ${isLight ? "border-zinc-150" : "border-zinc-900"}`}
       >
         <div className="flex items-center gap-3 w-full">
-          <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group shrink-0">
+          <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20 relative group shrink-0">
             <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">
               FP
             </span>
@@ -82,13 +82,13 @@ export function Sidebar({
             <span
               className={`text-xs font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
             >
-              Limited
+              Personal dashboard
             </span>
           </div>
         </div>
         {/* Mobile Menu Toggle Button */}
         <button
-          className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"} hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all `}
+          className={`md:hidden p-2 rounded-lg shrink-0 ${isLight ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"} active:scale-[0.98] transition-all `}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -110,14 +110,14 @@ export function Sidebar({
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-left py-2.5 px-3.5 rounded-xl text-sm font-semibold flex items-center justify-between transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
+                className={`w-full text-left py-2.5 px-3.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                   isActive
                     ? isLight
-                      ? "bg-white text-zinc-950 font-bold shadow-md shadow-zinc-200/50 border border-zinc-200"
-                      : "bg-zinc-800/80 text-white font-bold shadow-lg shadow-black/20 border border-zinc-700"
+                      ? "bg-orange-50 text-zinc-950 font-bold shadow-sm border border-orange-200"
+                      : "bg-orange-500/12 text-white font-bold shadow-sm border border-orange-500/30"
                     : isLight
-                      ? "text-zinc-600 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent"
-                      : "text-zinc-400 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] hover:bg-zinc-800/50 hover:text-white border border-transparent"
+                      ? "text-zinc-600 active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent"
+                      : "text-zinc-400 active:scale-[0.98] hover:bg-zinc-800/70 hover:text-white border border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -145,7 +145,7 @@ export function Sidebar({
           })}
         </nav>
 
-        {/* Footer info links */}
+        {/* User footer */}
         <div
           className={`p-2.5 border-t shrink-0 transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
         >
@@ -176,7 +176,7 @@ export function Sidebar({
                 className={`font-semibold truncate ${isLight ? "text-zinc-900 font-bold" : "text-white"}`}
                 title={currentUser?.username || ""}
               >
-                {currentUser?.username || "Skipper Koala"}
+                {currentUser?.username || "Food Penguin User"}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <select
@@ -184,7 +184,7 @@ export function Sidebar({
                   onChange={(e) => setUserRole(e.target.value)}
                   className={`bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
                     isLight
-                      ? "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold"
+                      ? "text-zinc-500 active:scale-[0.98] hover:text-zinc-800 font-bold"
                       : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
