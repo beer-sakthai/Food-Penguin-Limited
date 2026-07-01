@@ -41,6 +41,7 @@ import EnergyTab from "./components/EnergyTab";
 import SuppliersTab from "./components/SuppliersTab";
 import FinanceTab from "./components/FinanceTab";
 import RealtimeTab from "./components/RealtimeTab";
+import DataAnalystTab from "./components/DataAnalystTab";
 import ResourceAllocationTab from "./components/ResourceAllocationTab";
 import ReportsTab from "./components/ReportsTab";
 import LoginScreen from "./components/LoginScreen";
@@ -81,6 +82,7 @@ import {
   Store,
   FileSpreadsheet,
   GripVertical,
+  BarChart3,
 } from "lucide-react";
 
 import { RotateCcw, Info, LogOut, GitCompare, BrainCircuit } from "lucide-react";
@@ -117,6 +119,7 @@ const rolePermissions: Record<
     "Energy",
     "Suppliers",
     "Finance",
+    "DataAnalyst",
     "Studio",
     "Reports",
   ],
@@ -133,6 +136,7 @@ const rolePermissions: Record<
     "Energy",
     "Suppliers",
     "Finance",
+    "DataAnalyst",
     "Studio",
     "Reports",
   ],
@@ -145,9 +149,10 @@ const rolePermissions: Record<
     "Energy",
     "Waste",
     "Suppliers",
+    "DataAnalyst",
     "Reports",
   ],
-  User: ["Overview", "Advisor", "Realtime"], // User can only view data
+  User: ["Overview", "Advisor", "Realtime", "DataAnalyst"], // User can only view data
 };
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
@@ -1865,6 +1870,11 @@ export default function App() {
       icon: <DollarSign className="w-4 h-4" />,
     },
     {
+      id: "DataAnalyst",
+      label: "Data Analyst",
+      icon: <BarChart3 className="w-4 h-4" />,
+    },
+    {
       id: "Reports",
       label: "Reports Hub",
       icon: <FileSpreadsheet className="w-4 h-4" />,
@@ -1984,6 +1994,19 @@ export default function App() {
         return <SuppliersTab theme={theme} />;
       case "Finance":
         return <FinanceTab theme={theme} />;
+      case "DataAnalyst":
+        return (
+          <DataAnalystTab
+            theme={theme}
+            orders={orders}
+            targets={targets}
+            wasteRecords={wasteRecords}
+            hoursData={hoursData}
+            inventory={processedInventory}
+            weeklyLogs={weeklyLogs}
+            selectedBranch={selectedBranch}
+          />
+        );
       default:
         return (
           <OverviewTab
