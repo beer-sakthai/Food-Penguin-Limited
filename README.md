@@ -15,6 +15,7 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
   * **Branch Product Module:** Track active POS sales, transaction ledgers, margins, barcodes, and revenue bar charts. Includes multi-select checkboxes and bulk actions like 'Print Labels' and 'Hide from POS' for enhanced workflow.
   * **Resource Allocation Module [NEW]:** Manage and track inter-branch inventory transfers. Features multi-branch distribution tracking, bulk status updates, and visual transfer histories.
   * **Production Module [UPDATED]:** Kitchen throughput monitoring, task queuing, recipe formulation, and chef workflows. Now includes hourly efficiency volume vs target tracking and an embedded AI Culinary Auditor for dish quality compliance.
+  * **Menu Engineering Module [NEW]:** An advanced analytics tab for optimizing menu profitability. Features an interactive 2x2 scatter plot that classifies menu items into Stars, Plowhorses, Puzzles, and Dogs based on sales volume and profit margin. Includes an on-demand AI suggestion engine ("Jules") that analyzes the data and provides actionable recommendations for price adjustments to maximize revenue and recover costs.
   * **Waste Module [UPDATED]:** Financial leakage tracking with interactive pie chart distributions. Allows staff to log waste events by weight/value with specific reasons (Expired, Overproduced) and includes an AI Action Strategy generator to propose preservation and repurposing techniques.
   * **Hours Module:** Workforce scheduling, clocked-in time tracking, planned hour comparison vs logged times and variance tracking analysis.
   * **Target Module:** Corporate-wide milestone tracking, completion bar charts, progress validations, and AI-optimized targets.
@@ -51,14 +52,19 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    ```
+
 2. Navigate to the project directory:
+
    ```bash
    cd food-penguin
    ```
+
 3. Install dependencies:
+
    ```bash
    npm install
    ```
