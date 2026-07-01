@@ -2080,18 +2080,26 @@ export default function App() {
   return (
     <div
       id="app-workspace"
-      className={`h-screen w-screen overflow-hidden flex flex-col md:flex-row font-sans antialiased transition-colors duration-500 ${
+      className={`h-screen w-screen overflow-hidden p-[1cm] box-border font-sans antialiased transition-colors duration-500 ${
         isLight
-          ? "bg-transparent text-zinc-900"
-          : "bg-transparent text-zinc-100"
+          ? "bg-zinc-100 text-zinc-900"
+          : "bg-zinc-950 text-zinc-100"
       }`}
     >
+      <div
+        className={`h-full w-full overflow-hidden rounded-[28px] border shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_80px_rgba(0,0,0,0.35)] ${
+          isLight
+            ? "bg-white border-zinc-200"
+            : "bg-zinc-950 border-zinc-800"
+        }`}
+      >
+        <div className="h-full w-full grid grid-cols-1 md:grid-cols-[252px_minmax(0,1fr)] xl:grid-cols-[252px_minmax(0,1fr)_312px]">
       {/* SIDEBAR: NAVIGATION */}
       <aside
-        className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
+        className={`w-full h-full flex flex-col shrink-0 border-b md:border-b-0 md:border-r transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden md:relative md:inset-auto" : "relative z-40"} ${
           isLight
-            ? "bg-white/70 border-zinc-200 text-zinc-800 backdrop-blur-xl"
-            : "bg-zinc-950/70 border-zinc-800 text-zinc-100 backdrop-blur-xl"
+            ? "bg-white text-zinc-800 border-zinc-200"
+            : "bg-zinc-950 text-zinc-100 border-zinc-800"
         }`}
       >
         {/* Brand Header */}
@@ -2145,6 +2153,7 @@ export default function App() {
         <div
           className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
+          <div className="md:hidden">
           {/* Aesthetic & Theme Panel */}
           <div className={`mx-4 mt-4 p-3 gold-liner-box transition-all ${
             isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
@@ -2318,6 +2327,8 @@ export default function App() {
                 );
               })}
             </div>
+          </div>
+
           </div>
 
           {/* Navigation Actions */}
@@ -4370,7 +4381,7 @@ export default function App() {
       </aside>
 
       <div
-        className={`flex-1 flex flex-col min-w-0 transition-colors duration-500 ${isLight ? "bg-transparent" : "bg-transparent"}`}
+        className={`flex h-full min-h-0 flex-col min-w-0 overflow-hidden transition-colors duration-500 ${isLight ? "bg-transparent" : "bg-transparent"}`}
       >
         {/* Global Toolbar */}
         <header
@@ -4469,10 +4480,312 @@ export default function App() {
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto bg-transparent">
-          <div className="max-w-7xl mx-auto">{renderActiveView()}</div>
+        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-transparent px-4 py-4 md:px-6 md:py-5">
+          <div className="mx-auto max-w-7xl min-w-0">{renderActiveView()}</div>
         </main>
       </div>
+
+      <aside
+        className={`hidden xl:flex h-full min-h-0 w-full flex-col shrink-0 border-l transition-colors duration-300 overflow-hidden ${
+          isLight
+            ? "bg-zinc-50 text-zinc-900 border-zinc-200"
+            : "bg-zinc-950 text-zinc-100 border-zinc-800"
+        }`}
+      >
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-4">
+          <div
+            className={`mx-0 p-3 gold-liner-box transition-all ${
+              isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-2.5 pb-1.5 border-b border-yellow-500/20">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse shrink-0" />
+              <span className="text-[10px] font-sans font-black uppercase tracking-wider text-yellow-500">
+                Aesthetic Studio
+              </span>
+            </div>
+            <div className="flex flex-col gap-1 mb-2.5">
+              <span
+                className={`text-[7.5px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+              >
+                Visual Mode
+              </span>
+              <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
+                <button
+                  type="button"
+                  onClick={() => setTheme("light")}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
+                    isLight
+                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
+                      : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <Sun className="w-3 h-3 text-amber-500" /> Day
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTheme("dark")}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[8.5px] font-bold uppercase transition-all cursor-pointer ${
+                    !isLight
+                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
+                      : "text-zinc-500 hover:text-zinc-700"
+                  }`}
+                >
+                  <Moon className="w-3 h-3 text-zinc-400" /> Night
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span
+                className={`text-[7.5px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+              >
+                Metallic Edition
+              </span>
+              <div className="grid grid-cols-3 gap-1">
+                <button
+                  type="button"
+                  onClick={() => changeMetallicTheme("gold")}
+                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                    metallicTheme === "gold"
+                      ? "bg-gradient-to-br from-[#dfa033] to-[#6a460b] text-white border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.4)] font-extrabold"
+                      : isLight
+                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Gold
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeMetallicTheme("silver")}
+                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                    metallicTheme === "silver"
+                      ? "bg-gradient-to-br from-[#b0b5b9] to-[#3a4146] text-white border-zinc-400 shadow-[0_0_8px_rgba(148,163,184,0.4)] font-extrabold"
+                      : isLight
+                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Silver
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeMetallicTheme("copper")}
+                  className={`py-1 rounded text-[8px] font-bold uppercase tracking-wider transition-all border cursor-pointer hover:-translate-y-0.5 active:scale-95 ${
+                    metallicTheme === "copper"
+                      ? "bg-gradient-to-br from-[#c96c42] to-[#471d0b] text-white border-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)] font-extrabold"
+                      : isLight
+                        ? "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Copper
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`mx-0 p-3 gold-liner-box transition-all ${
+              isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"
+            }`}
+          >
+            <div
+              className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
+            >
+              <Store className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`} />
+              <span
+                className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+              >
+                Global Branches
+              </span>
+            </div>
+            <div className="space-y-1.5 font-sans">
+              {[
+                "Marks & Spencer - Cork City",
+                "Tesco - Cork City",
+                "Tesco - Mahon Point",
+              ].map((branch) => {
+                const shortName = branch
+                  .replace("Marks & Spencer", "M&S")
+                  .replace(" - Cork City", " Cork")
+                  .replace(" - Mahon Point", " Mahon");
+                const isSelected = selectedBranch === branch;
+                return (
+                  <button
+                    key={branch}
+                    type="button"
+                    onClick={() => setSelectedBranch(branch as typeof selectedBranch)}
+                    className={`w-full flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
+                      isSelected
+                        ? isLight
+                          ? "bg-orange-50 border-orange-200"
+                          : "bg-orange-500/10 border-orange-500/30"
+                        : isLight
+                          ? "bg-white border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
+                          : "bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900"
+                    }`}
+                  >
+                    <span
+                      className={`truncate mr-2 ${
+                        isSelected
+                          ? isLight
+                            ? "text-orange-700 font-bold"
+                            : "text-orange-400 font-bold"
+                          : isLight
+                            ? "text-zinc-700 font-medium"
+                            : "text-zinc-300 font-medium"
+                      }`}
+                    >
+                      {shortName}
+                    </span>
+                    <span
+                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1.5 ${isLight ? "text-emerald-500 font-bold" : "text-[9px] px-2 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black"}`}
+                    >
+                      {isLight && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      )}
+                      Live
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div
+            className={`mx-0 p-3 gold-liner-box transition-all ${
+              isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-between mb-3 pb-2 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
+            >
+              <div className="flex items-center gap-2">
+                <Activity className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`} />
+                <span
+                  className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                >
+                  Weekly Capacity
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCapacityExpanded((prev) => !prev)}
+                className={`text-[8px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${
+                  isLight
+                    ? "bg-zinc-100 border-zinc-200 text-zinc-600"
+                    : "bg-zinc-950 border-zinc-800 text-zinc-400"
+                }`}
+              >
+                {isCapacityExpanded ? "Collapse" : "Expand"}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className={`rounded-xl border p-3 ${isLight ? "border-orange-200 bg-orange-50" : "border-orange-500/20 bg-orange-500/10"}`}>
+                <p className={`text-[9px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>Current</p>
+                <p className={`mt-1 text-[26px] font-black leading-none ${isLight ? "text-orange-600" : "text-orange-400"}`}>{capacityPct}%</p>
+              </div>
+              <div className={`rounded-xl border p-3 ${isLight ? "border-emerald-200 bg-emerald-50" : "border-emerald-500/20 bg-emerald-500/10"}`}>
+                <p className={`text-[9px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>Forecast</p>
+                <p className={`mt-1 text-[26px] font-black leading-none ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{projectedCapacityPct}%</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {dailyCapacityBreakdown.slice(0, 3).map((day) => (
+                <div key={day.day} className={`rounded-lg border px-2 py-1.5 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
+                  <div className="flex items-center justify-between gap-2 text-[9px] font-mono uppercase tracking-wider">
+                    <span className={isLight ? "text-zinc-500" : "text-zinc-400"}>{day.day}</span>
+                    <span className={day.projectedLoad >= bottleneckThreshold ? "text-amber-500" : isLight ? "text-zinc-700" : "text-zinc-200"}>
+                      {day.projectedLoad}%
+                    </span>
+                  </div>
+                  <div className={`mt-1 h-1.5 rounded-full overflow-hidden ${isLight ? "bg-zinc-100" : "bg-zinc-900"}`}>
+                    <div className={`h-full rounded-full ${day.projectedLoad >= bottleneckThreshold ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${day.projectedLoad}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className={`mx-0 p-3 gold-liner-box transition-all ${
+              isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"
+            }`}
+          >
+            <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}>
+              <CalendarDays className={`w-3.5 h-3.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`} />
+              <span className={`text-[10px] font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
+                Today Focus
+              </span>
+            </div>
+            <div className="space-y-3">
+              <div className={`rounded-xl border p-3 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
+                <p className={`text-[9px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
+                  Current view
+                </p>
+                <p className={`mt-1 text-sm font-bold ${isLight ? "text-zinc-900" : "text-white"}`}>
+                  {tabMeta.find((tab) => tab.id === activeTab)?.label || activeTab}
+                </p>
+                <p className={`mt-1 text-[10px] ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
+                  {selectedBranch}
+                </p>
+              </div>
+              <div className={`rounded-xl border p-3 ${isLight ? "border-orange-200 bg-orange-50" : "border-orange-500/20 bg-orange-500/10"}`}>
+                <p className={`text-[9px] uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
+                  Immediate action
+                </p>
+                <p className={`mt-1 text-sm font-bold ${isLight ? "text-orange-700" : "text-orange-300"}`}>
+                  {lowStockCount > 0
+                    ? `Review ${lowStockCount} low-stock item${lowStockCount === 1 ? "" : "s"}`
+                    : "Stock levels are clear"}
+                </p>
+                <p className={`mt-1 text-[10px] ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
+                  Capacity {capacityPct}% against forecast {projectedCapacityPct}%.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                {lowStockItems.slice(0, 2).map((item) => (
+                  <div key={item.id} className={`flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-[10px] ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
+                    <span className={`truncate ${isLight ? "text-zinc-700" : "text-zinc-300"}`}>{item.itemName}</span>
+                    <span className={`font-mono shrink-0 ${item.status === "Critical" ? "text-rose-500" : "text-amber-500"}`}>
+                      {item.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("Planning")}
+                  className={`rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${
+                    isLight
+                      ? "bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-700"
+                      : "bg-zinc-100 text-zinc-950 border-zinc-200 hover:bg-white"
+                  }`}
+                >
+                  Open Planning
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("Reports")}
+                  className={`rounded-xl border px-3 py-2 text-[9px] font-bold uppercase tracking-wider transition-colors ${
+                    isLight
+                      ? "bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100"
+                      : "bg-zinc-900 text-zinc-100 border-zinc-800 hover:bg-zinc-800"
+                  }`}
+                >
+                  Open Reports
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      </div>
+    </div>
 
       {/* Schedule Email Report Modal */}
       {isScheduleReportModalOpen && (
