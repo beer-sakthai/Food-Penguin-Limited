@@ -308,3 +308,68 @@ html {
     margin-bottom: 0.75rem !important;
   }
 }
+
+/* Versace Gold Frame Styles */
+.versace-frame-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  z-index: 9999;
+  pointer-events: none;
+  background: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 0 12 L 4 12 L 4 4 L 20 4 L 20 20 L 8 20 L 8 8 L 16 8 L 16 16 L 12 16 L 12 12 L 24 12' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-x center,
+    linear-gradient(to bottom, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
+  background-size: 10px 10px, 100% 100%;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 14px 100%);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+}
+
+.versace-frame-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  z-index: 9999;
+  pointer-events: none;
+  background: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 0 12 L 4 12 L 4 4 L 20 4 L 20 20 L 8 20 L 8 8 L 16 8 L 16 16 L 12 16 L 12 12 L 24 12' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-x center,
+    linear-gradient(to top, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
+  background-size: 10px 10px, 100% 100%;
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
+  filter: drop-shadow(0 -4px 6px rgba(0, 0, 0, 0.4));
+}
+
+.versace-frame-left {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 14px;
+  z-index: 9999;
+  pointer-events: none;
+  background: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 12 0 L 12 4 L 4 4 L 4 20 L 20 20 L 20 8 L 8 8 L 8 16 L 16 16 L 16 12 L 12 12 L 12 24' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-y center,
+    linear-gradient(to right, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
+  background-size: 10px 10px, 100% 100%;
+  clip-path: polygon(0 0, 100% 14px, 100% calc(100% - 14px), 0 100%);
+  filter: drop-shadow(4px 0 6px rgba(0, 0, 0, 0.4));
+}
+
+.versace-frame-right {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  z-index: 9999;
+  pointer-events: none;
+  background: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M 12 0 L 12 4 L 4 4 L 4 20 L 20 20 L 20 8 L 8 8 L 8 16 L 16 16 L 16 12 L 12 12 L 12 24' fill='none' stroke='%23ffd700' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") repeat-y center,
+    linear-gradient(to left, #f3e5ab 0%, #d4af37 15%, #5c3d08 30%, #1a1102 35%, #1a1102 65%, #5c3d08 70%, #d4af37 85%, #f3e5ab 100%);
+  background-size: 10px 10px, 100% 100%;
+  clip-path: polygon(100% 0, 100% 100%, 0 calc(100% - 14px), 0 14px);
+  filter: drop-shadow(-4px 0 6px rgba(0, 0, 0, 0.4));
+}

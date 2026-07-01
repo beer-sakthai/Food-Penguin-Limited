@@ -61,7 +61,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center font-sans ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
+    <div className={`h-full w-full flex items-center justify-center font-sans ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
       <div className={`w-full max-w-md p-8 gold-liner-box ${isLight ? 'bg-white shadow-zinc-200/50' : 'bg-zinc-950 shadow-amber-500/5'}`}>
         
         <div className="flex flex-col items-center justify-center mb-8">
