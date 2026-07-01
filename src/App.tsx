@@ -13,6 +13,7 @@ import {
   initialWeeklyLogs,
   alternativeWeeklyLogsMap,
   initialAlerts,
+  initialMenuEngineeringItems,
 } from "./data";
 import {
   CoreMetrics,
@@ -25,6 +26,7 @@ import {
   InventoryItem,
   DailyOperationalLog,
   RealtimeAlert,
+  MenuEngineeringItem,
 } from "./types";
 
 // Tab Views
@@ -46,6 +48,7 @@ import DataAnalystTab from "./components/DataAnalystTab";
 import ResourceAllocationTab from "./components/ResourceAllocationTab";
 import ReportsTab from "./components/ReportsTab";
 import LoginScreen from "./components/LoginScreen";
+import MenuEngineeringTab from "./components/MenuEngineeringTab";
 import { MS_PRODUCTS, TESCO_PRODUCTS } from "./components/SellTab";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 
@@ -116,6 +119,7 @@ const rolePermissions: Record<
     "Sell",
     "Target",
     "Production",
+    "MenuEngineering",
     "Waste",
     "Hours",
     "Planning",
@@ -136,6 +140,7 @@ const rolePermissions: Record<
     "Realtime",
     "Target",
     "Production",
+    "MenuEngineering",
     "Waste",
     "Hours",
     "Planning",
@@ -735,6 +740,7 @@ export default function App() {
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
   const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
+  const [menuItems, setMenuItems] = useState<MenuEngineeringItem[]>(initialMenuEngineeringItems);
 
   // Automatically flags inventory items based on stock level and reorder thresholds
   const autoFlagInventory = (items: InventoryItem[]): InventoryItem[] => {
@@ -1875,6 +1881,11 @@ export default function App() {
       label: "Production",
       icon: <ChefHat className="w-4 h-4" />,
     },
+    {
+      id: "MenuEngineering",
+      label: "Menu Engineering",
+      icon: <ChefHat className="w-4 h-4" />,
+    },
     { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
     { id: "Hours", label: "Hours", icon: <CalendarDays className="w-4 h-4" /> },
     { id: "Planning", label: "Planning", icon: <Boxes className="w-4 h-4" /> },
@@ -2045,6 +2056,15 @@ export default function App() {
             inventory={processedInventory}
             weeklyLogs={weeklyLogs}
             selectedBranch={selectedBranch}
+          />
+        );
+      case "MenuEngineering":
+        return (
+          <MenuEngineeringTab
+            theme={theme}
+            metallicTheme={metallicTheme}
+            menuItems={menuItems}
+            onUpdateMenuItems={setMenuItems}
           />
         );
       default:
@@ -4746,6 +4766,3 @@ export default function App() {
     </div>
   );
 }
-
-
-export default App;

@@ -572,9 +572,103 @@ As Jules, the AI Strategy Officer for Food Penguin Limited, provide a concise fi
   }
 });
 
+// --- Menu Engineering Price Suggestions API ---
+app.post("/api/gemini/menu-engineering-suggestions", async (req, res) => {
+  try {
+    const { menuItems } = req.body;
+    if (!menuItems || !Array.isArray(menuItems)) {
+      return res.status(400).json({ error: "menuItems array is required" });
+    }
+
+    const simulateResponse = () => {
+      return {
+        recommendations: `### ✦ Jules' Strategic Recommendations (Simulation Mode)
+
+1. **Tokyo Dragon Roll (Star) Optimization:**
+   - Your high volume suggests strong demand inelasticity. A small upward shift in price will yield direct net profit gains.
+   - **Recommendation:** Increase price from €18.00 to €19.50.
+
+2. **Volcano Baked Scallop Roll (Dog) Cost Recovery:**
+   - Ingredient costs for scallops (€5.00) are eroding margins. An upward price adjustment is required to cover costs.
+   - **Recommendation:** Adjust price from €16.50 to €17.50, or negotiate seafood supplier rates.
+
+3. **California Roll Classic (Plowhorse) Margin Shift:**
+   - This item is high volume but has moderate profit margins.
+   - **Recommendation:** A subtle shift from €12.00 to €12.75 to capture incremental margin on high-velocity transactions.`,
+        adjustments: [
+          {
+            itemId: "R-1",
+            suggestedPrice: 19.50,
+            reason: "High volume indicates low price sensitivity. Increasing price by €1.50 captures margin directly."
+          },
+          {
+            itemId: "R-5",
+            suggestedPrice: 17.50,
+            reason: "High COGS (€10.30 total ingredients vs €16.50 price) demands price adjustment to restore acceptable profit margin."
+          },
+          {
+            itemId: "R-4",
+            suggestedPrice: 12.75,
+            reason: "Moderate profit margin on very high volume. Small increment significantly lifts monthly gross profit."
+          }
+        ]
+      };
+    };
+
+    if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
+      return res.json(simulateResponse());
+    }
+
+    try {
+      const ai = getAiClient();
+      const prompt = `Here are the current menu items:\n${JSON.stringify(menuItems, null, 2)}\n\nAnalyze these items using menu engineering principles (Stars, Puzzles, Plowhorses, Dogs) and suggest adjustments. You must return a JSON response matching the schema.`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: prompt,
+        config: {
+          temperature: 0.3,
+          systemInstruction: "You are Jules, the Chief AI Strategy Officer for 'Food Penguin Limited'.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              recommendations: { type: Type.STRING },
+              adjustments: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    itemId: { type: Type.STRING },
+                    suggestedPrice: { type: Type.NUMBER },
+                    reason: { type: Type.STRING }
+                  },
+                  required: ["itemId", "suggestedPrice", "reason"]
+                }
+              }
+            },
+            required: ["recommendations", "adjustments"]
+          }
+        }
+      });
+
+      const responseText = response.text || "";
+      const result = JSON.parse(responseText);
+      return res.json(result);
+    } catch (apiErr) {
+      console.warn("Gemini menu-engineering-suggestions failed, falling back to simulation:", apiErr);
+      return res.json(simulateResponse());
+    }
+  } catch (err: any) {
+    console.error("Menu engineering suggestions error: ", err);
+    res.status(500).json({ error: err.message || "An error occurred during menu analysis." });
+  }
+});
+
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
   });
 };
 
 startServer();
+

@@ -8,8 +8,11 @@ import {
   EmployeeHour,
   InventoryItem,
   RealtimeAlert,
-  DailyOperationalLog
+  DailyOperationalLog,
+  IngredientCost,
+  MenuEngineeringItem
 } from './types';
+
 
 export const initialMetrics: CoreMetrics = {
   salesToday: 14820,
@@ -380,4 +383,94 @@ export const alternativeWeeklyLogsMap: Record<string, DailyOperationalLog[]> = {
     }
   ]
 };
+
+export const initialMenuEngineeringItems: MenuEngineeringItem[] = [
+  {
+    id: 'R-1',
+    name: 'Tokyo Dragon Roll',
+    category: 'Sushi Rolls',
+    price: 18.00,
+    salesVolume: 450,
+    ingredientCosts: [
+      { name: 'Eel Fish', cost: 3.50 },
+      { name: 'Shrimp Tempura', cost: 2.00 },
+      { name: 'Fresh Avocado', cost: 0.80 },
+      { name: 'Cucumber strip', cost: 0.20 },
+      { name: 'Sweet Eel Glaze', cost: 0.30 },
+      { name: 'Nori Seaweed', cost: 0.20 }
+    ],
+    prepTime: 8,
+    allergens: ['Fish', 'Gluten', 'Sulphites'],
+    status: 'active'
+  },
+  {
+    id: 'R-2',
+    name: 'Kyoto Salmon Sashimi Platter',
+    category: 'Sashimi & Platters',
+    price: 24.00,
+    salesVolume: 180,
+    ingredientCosts: [
+      { name: 'Atlantic Salmon Fillet', cost: 9.50 },
+      { name: 'White Daikon Radish ruff', cost: 0.40 },
+      { name: 'Fresh Shiso leaves', cost: 0.60 },
+      { name: 'Artisanal Wasabi paste', cost: 0.50 },
+      { name: 'Soy Sauce', cost: 0.20 }
+    ],
+    prepTime: 12,
+    allergens: ['Fish', 'Soya', 'Gluten'],
+    status: 'active'
+  },
+  {
+    id: 'R-3',
+    name: 'Spicy Bluefin Tuna Roll',
+    category: 'Sushi Rolls',
+    price: 14.50,
+    salesVolume: 520,
+    ingredientCosts: [
+      { name: 'Spicy Minced Tuna', cost: 5.80 },
+      { name: 'Crispy Cucumber', cost: 0.20 },
+      { name: 'Kyoto Spicy Mayo', cost: 0.45 },
+      { name: 'Toasted Sesame seeds', cost: 0.10 },
+      { name: 'Sushi Grains', cost: 0.45 }
+    ],
+    prepTime: 4,
+    allergens: ['Fish', 'Eggs', 'Sesame'],
+    status: 'active'
+  },
+  {
+    id: 'R-4',
+    name: 'California Roll Classic',
+    category: 'Sushi Rolls',
+    price: 12.00,
+    salesVolume: 600,
+    ingredientCosts: [
+      { name: 'Snow Crab Stick', cost: 2.50 },
+      { name: 'Avocado slice', cost: 0.80 },
+      { name: 'Fresh Cucumber', cost: 0.20 },
+      { name: 'Premium Sushi Rice', cost: 0.50 },
+      { name: 'Nori Sheets', cost: 0.20 }
+    ],
+    prepTime: 15,
+    allergens: ['Crustaceans', 'Gluten'],
+    status: 'active'
+  },
+  {
+    id: 'R-5',
+    name: 'Volcano Baked Scallop Roll',
+    category: 'Specialty Rolls',
+    price: 16.50,
+    salesVolume: 90,
+    ingredientCosts: [
+      { name: 'Spicy Crab Mix', cost: 3.00 },
+      { name: 'Chopped Sea Scallops', cost: 5.00 },
+      { name: 'Creamy Spicy Mayo', cost: 0.40 },
+      { name: 'Sweet Soy Reduction', cost: 0.30 },
+      { name: 'Masago Fish Roe', cost: 0.80 }
+    ],
+    prepTime: 6,
+    allergens: ['Molluscs', 'Eggs', 'Fish', 'Soya'],
+    status: 'active'
+  }
+];
+
 
