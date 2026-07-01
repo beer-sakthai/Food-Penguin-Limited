@@ -1545,10 +1545,10 @@ export default function App() {
     doc.setTextColor(82, 82, 91);
 
     const bulletins = [
-      "• Capacity forecasts are computed dynamically based on the active rolling index of completed production batches versus target.",
-      '• Days highlighted with yellow "BOTTLENECK" alert badges exceed your configured threshold parameter limit.',
-      "• Moving average view reduces short-term variation spikes to reveal systemic weekly production limits for senior management reporting.",
-      "• Report intended for staff duty scheduling, shifts optimization, and oven heating resource conservation.",
+      "- Capacity forecasts are computed dynamically based on the active rolling index of completed production batches versus target.",
+      '- Days highlighted with yellow "BOTTLENECK" alert badges exceed your configured threshold parameter limit.',
+      "- Moving average view reduces short-term variation spikes to reveal systemic weekly production limits for senior management reporting.",
+      "- Report intended for staff duty scheduling, shifts optimization, and oven heating resource conservation.",
     ];
 
     bulletins.forEach((bullet) => {
@@ -2073,10 +2073,10 @@ export default function App() {
     healthLabel = "Warning";
     healthColorClass = "bg-amber-500";
     healthTextClass = "text-amber-400";
-    healthBgClass = "bg-amber-500/10 border-amber-550/20";
+    healthBgClass = "bg-amber-500/10 border-amber-500/20";
   }
 
-  const healthTooltip = `System Health Status: ${healthLabel}\n• Operations Score: ${metrics.aiHealthScore}%\n• Low Stock Ingredients: ${lowStockCount}\n• Lagging Goals: ${targetDeficitCount}`;
+  const healthTooltip = `System Health Status: ${healthLabel}\n- Operations Score: ${metrics.aiHealthScore}%\n- Low Stock Ingredients: ${lowStockCount}\n- Lagging Goals: ${targetDeficitCount}`;
 
   const isLight = theme === "light";
 
@@ -2102,7 +2102,7 @@ export default function App() {
   }
 
   return (
-    <div className={`relative w-screen h-screen overflow-hidden p-[14px] ${isLight ? "bg-zinc-100" : "bg-zinc-950"}`}>
+    <div className={`relative w-screen h-screen overflow-hidden p-1.5 ${isLight ? "bg-zinc-100" : "bg-zinc-950"}`}>
       {/* Versace Gold Frame Borders */}
       <div className="versace-frame-top" />
       <div className="versace-frame-bottom" />
@@ -2147,17 +2147,17 @@ export default function App() {
       >
         {/* Global Toolbar */}
         <header
-          className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
+          className={`h-16 px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
             isLight
-              ? "bg-white border-zinc-200 text-zinc-900 shadow-sm"
-              : "bg-zinc-950 border-zinc-900 text-white shadow-md"
+              ? "bg-white/95 border-zinc-200 text-zinc-900 shadow-sm backdrop-blur-xl"
+              : "bg-zinc-950/95 border-zinc-900 text-white shadow-sm backdrop-blur-xl"
           }`}
         >
           <div className="flex items-center gap-2.5">
             <h2
               className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? "text-zinc-900" : "text-white"}`}
             >
-              {tabMeta.find((t) => t.id === activeTab)?.label || activeTab} View
+              {tabMeta.find((t) => t.id === activeTab)?.label || activeTab}
             </h2>
             <span
               className={`hidden lg:inline-block text-xs font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
@@ -2166,14 +2166,14 @@ export default function App() {
                   : "bg-zinc-900 text-zinc-400 border-zinc-800"
               }`}
             >
-              Food chain ops portal
+              Simple ops workspace
             </span>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
               <span className="text-xs font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
-                🇮🇪 Ireland Time (Dublin)
+                Ireland Time (Dublin)
               </span>
               <span
                 className={`text-xs font-mono font-bold block mt-1 ${isLight ? "text-zinc-800" : "text-zinc-100"}`}
@@ -2188,7 +2188,7 @@ export default function App() {
               title={`Switch to ${isLight ? "Dark" : "Day"} Mode`}
               className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                 isLight
-                  ? "bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm"
+                  ? "bg-zinc-100 border border-zinc-200 text-zinc-700 active:scale-[0.98] hover:bg-zinc-200 shadow-sm"
                   : "bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
               }`}
             >
@@ -2202,7 +2202,7 @@ export default function App() {
         </header>
 
         {/* Active view port rendering */}
-        <main className="flex-1 p-6 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
+        <main className="flex-1 p-3 md:p-5 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
           <div className="mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
         </main>
       </div>
@@ -2227,7 +2227,7 @@ export default function App() {
               <div
                 className={`absolute right-0 top-0 w-24 h-24 bg-gradient-to-br rounded-full filter blur-2xl pointer-events-none ${
                   isLight
-                    ? "from-orange-550/5"
+                    ? "from-orange-500/5"
                     : "from-orange-500/5 to-transparent"
                 }`}
               />
@@ -2558,7 +2558,7 @@ export default function App() {
                     className={`font-bold ${projectedCapacityPct >= capacityPct ? "text-amber-500" : "text-emerald-500"}`}
                   >
                     {projectedCapacityPct}%{" "}
-                    {projectedCapacityPct >= capacityPct ? "↑" : "↓"}
+                    {projectedCapacityPct >= capacityPct ? "up" : "down"}
                   </span>
                 </div>
 
@@ -2757,7 +2757,7 @@ export default function App() {
                         className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
                         title="Filter daily breakdown items by impact severity"
                       >
-                        ⚡ Impact Filter:
+                        Impact Filter:
                       </span>
                       <select
                         id="capacity-impact-filter-select"
@@ -2770,7 +2770,7 @@ export default function App() {
                         className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${
                           isLight
                             ? "bg-white border-zinc-200 text-amber-600"
-                            : "bg-zinc-900 border-zinc-800/80 text-amber-450 hover:text-amber-300"
+                            : "bg-zinc-900 border-zinc-800/80 text-amber-400 hover:text-amber-300"
                         }`}
                       >
                         <option
@@ -2781,7 +2781,7 @@ export default function App() {
                               : "bg-zinc-950 text-white font-bold"
                           }
                         >
-                          🌐 All Levels
+                          All Levels
                         </option>
                         <option
                           value="critical"
@@ -2791,7 +2791,7 @@ export default function App() {
                               : "bg-zinc-950 text-white font-bold"
                           }
                         >
-                          🚨 Critical Only
+                          Critical Only
                         </option>
                         <option
                           value="low"
@@ -2801,7 +2801,7 @@ export default function App() {
                               : "bg-zinc-950 text-white font-bold"
                           }
                         >
-                          🟢 Low Impact
+                          Low Impact
                         </option>
                       </select>
                     </div>
@@ -2822,7 +2822,7 @@ export default function App() {
                         className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
                           isLight
                             ? "bg-white border-zinc-200 text-amber-600"
-                            : "bg-zinc-900 border-zinc-800/80 text-amber-450  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300"
+                            : "bg-zinc-900 border-zinc-800/80 text-amber-400  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300"
                         }`}
                       >
                         <option
@@ -2833,7 +2833,7 @@ export default function App() {
                               : "bg-zinc-950 text-white"
                           }
                         >
-                          📅 Date (Chronological)
+                          Date (Chronological)
                         </option>
                         <option
                           value="bottleneck"
@@ -2843,7 +2843,7 @@ export default function App() {
                               : "bg-zinc-950 text-white"
                           }
                         >
-                          🔥 Bottleneck Intensity
+                          Bottleneck Intensity
                         </option>
                         <option
                           value="custom"
@@ -2853,7 +2853,7 @@ export default function App() {
                               : "bg-zinc-950 text-white"
                           }
                         >
-                          🖐️ Custom Priority
+                          Custom Priority
                         </option>
                       </select>
                     </div>
@@ -3162,7 +3162,7 @@ export default function App() {
                         <div className="space-y-2 border-t pt-2 border-zinc-200/50 dark:border-zinc-800/50">
                           <div className="flex flex-col gap-0.5">
                             <span className="font-bold text-yellow-500 uppercase tracking-wide text-xs flex items-center gap-1">
-                              ⚠️ Live Alert System
+                              Live Alert System
                             </span>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               Any day with projected capacity above{" "}
@@ -3179,7 +3179,7 @@ export default function App() {
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <span className="font-bold text-yellow-500 uppercase tracking-wide text-xs flex items-center gap-1">
-                              📊 Report Generation
+                              Report Generation
                             </span>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               This threshold is baked directly into generated
@@ -3282,7 +3282,7 @@ export default function App() {
                               title={`Scroll to ${maxProjectedItem.day} inside Daily Capacity Breakdown`}
                             >
                               <span>Jump</span>
-                              <span>→</span>
+                              <span>to</span>
                             </button>
                           </div>
 
@@ -3297,7 +3297,7 @@ export default function App() {
                                     : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-zinc-950 font-extrabold shadow-[0_2px_12px_rgba(234,179,8,0.25)] hover:from-yellow-400 hover:to-amber-400"
                                 }`}
                               >
-                                <span>⚡</span>
+                                <span>AI</span>
                                 <span>Jules Quick Fix</span>
                               </button>
                             )}
@@ -3317,7 +3317,7 @@ export default function App() {
                             {/* Error State */}
                             {quickFixError && (
                               <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-500 text-xs font-medium leading-relaxed">
-                                ⚠️ {quickFixError}
+                                {quickFixError}
                                 <button
                                   onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}
                                   className="block underline font-bold mt-1 text-rose-600 dark:text-rose-400 uppercase tracking-widest text-xs"
@@ -3341,7 +3341,7 @@ export default function App() {
                                   <div className="flex flex-col">
                                     <span className="text-xs text-zinc-400 uppercase tracking-wider font-bold">Suggested Overrides:</span>
                                     <span className="text-xs font-mono font-extrabold text-orange-500">
-                                      {maxProjectedItem.projected}% → {Math.max(10, Math.min(110, Math.round(maxProjectedItem.projected + (quickFixAdjustment || 0))))}% ({quickFixAdjustment}% Adjustment)
+                                      {maxProjectedItem.projected}% to {Math.max(10, Math.min(110, Math.round(maxProjectedItem.projected + (quickFixAdjustment || 0))))}% ({quickFixAdjustment}% Adjustment)
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-1.5">
@@ -3399,7 +3399,7 @@ export default function App() {
                               : "bg-zinc-950/40 border-zinc-900/40"
                           }`}>
                             <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500 mb-2">
-                              🌱
+                              No days
                             </div>
                             <p className={`font-bold text-xs uppercase tracking-wider ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
                               No Days Found
@@ -3651,7 +3651,7 @@ export default function App() {
                                           className="text-emerald-500 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title={`Up by +${diff}% from preceding day`}
                                         >
-                                          ▲{diff}%
+                                          +{diff}%
                                         </span>
                                       );
                                     } else if (diff < 0) {
@@ -3660,7 +3660,7 @@ export default function App() {
                                           className="text-rose-500 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title={`Down by ${diff}% from preceding day`}
                                         >
-                                          ▼{Math.abs(diff)}%
+                                          -{Math.abs(diff)}%
                                         </span>
                                       );
                                     } else {
@@ -3669,7 +3669,7 @@ export default function App() {
                                           className="text-zinc-600 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title="Stable relative to preceding day"
                                         >
-                                          ■0%
+                                          00%
                                         </span>
                                       );
                                     }
@@ -3679,7 +3679,7 @@ export default function App() {
                                     className="text-zinc-600 text-xs font-bold font-mono tracking-tighter"
                                     title="First day of active week sequence"
                                   >
-                                    •
+                                    -
                                   </span>
                                 )}
                               </div>
@@ -3693,7 +3693,7 @@ export default function App() {
                                   {item.current}%
                                 </span>
                                 <span className="text-zinc-600 text-xs select-none">
-                                  →
+                                  to
                                 </span>
                                 <span
                                   className={`font-bold text-xs ${isBottleneck ? "text-amber-400 font-bold" : item.projected >= item.current ? "text-orange-400" : "text-orange-500/80"}`}
@@ -3710,14 +3710,14 @@ export default function App() {
                                       className="text-rose-500"
                                       title="Trending Up (Above avg)"
                                     >
-                                      ↑
+                                      up
                                     </span>
                                   ) : item.projected < avgWeeklyProjected ? (
                                     <span
                                       className="text-emerald-500"
                                       title="Trending Down (Below avg)"
                                     >
-                                      ↓
+                                      down
                                     </span>
                                   ) : (
                                     <span
@@ -4085,7 +4085,7 @@ export default function App() {
                     }`}
                   >
                     <span className="font-sans font-bold uppercase tracking-wider text-xs flex items-center gap-1">
-                      <span className="text-xs">💡</span> Item Impact
+                      Item Impact
                       Legend:
                     </span>
                     <div className="flex items-center gap-1">
@@ -4195,7 +4195,7 @@ export default function App() {
                         : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
                   }`}
                 >
-                  🥇 Gold
+                  Gold
                 </button>
 
                 {/* Silver Button */}
@@ -4210,7 +4210,7 @@ export default function App() {
                         : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
                   }`}
                 >
-                  🥈 Silver
+                  Silver
                 </button>
 
                 {/* Copper Button */}
@@ -4225,14 +4225,14 @@ export default function App() {
                         : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
                   }`}
                 >
-                  🥉 Copper
+                  Copper
                 </button>
               </div>
             </div>
 
             {/* Note confirming Gold Liners */}
             <div className="mt-2 text-xs leading-tight font-sans text-zinc-500 dark:text-zinc-400 flex items-start gap-1">
-              <span className="text-xs">👑</span>
+              <span className="text-xs"></span>
               <span>
                 <strong>24k Gold Liner</strong> is wrapped around all container boxes to elevate margin security.
               </span>
@@ -4307,6 +4307,74 @@ export default function App() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Everyday Focus Panel */}
+          <div
+            className={`mx-2 mt-1.5 p-2.5 gold-liner-box transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
+          >
+            <div
+              className={`flex items-center justify-between gap-2 mb-2 pb-1.5 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
+            >
+              <div className="flex items-center gap-2">
+                <Activity
+                  className={`w-3.5 h-3.5 ${isLight ? "text-orange-600" : "text-orange-400"}`}
+                />
+                <span
+                  className={`text-xs font-mono tracking-wider uppercase font-bold ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                >
+                  Today Focus
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-orange-500">
+                {lowStockCount} alerts
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              {[
+                {
+                  label: "Restock low ingredients",
+                  value: `${lowStockCount} items`,
+                  tab: "Planning",
+                  tone: "text-amber-500",
+                },
+                {
+                  label: "Check staff hours",
+                  value: `${totalHours}h planned`,
+                  tab: "Hours",
+                  tone: "text-emerald-500",
+                },
+                {
+                  label: "Review sales flow",
+                  value: selectedBranch.replace("Marks & Spencer", "M&S"),
+                  tab: "Sell",
+                  tone: "text-blue-500",
+                },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => setActiveTab(item.tab)}
+                  className={`w-full flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-left transition-all active:scale-[0.98] ${
+                    isLight
+                      ? "bg-white border-zinc-200 hover:bg-zinc-100"
+                      : "bg-zinc-950/60 border-zinc-800 hover:bg-zinc-900"
+                  }`}
+                >
+                  <span
+                    className={`text-xs font-bold ${isLight ? "text-zinc-700" : "text-zinc-200"}`}
+                  >
+                    {item.label}
+                  </span>
+                  <span
+                    className={`text-xs font-mono font-bold truncate max-w-[100px] ${item.tone}`}
+                  >
+                    {item.value}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
