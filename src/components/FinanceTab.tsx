@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  PieChart, 
-  Pie, 
-  Cell, 
+import {
+  PieChart,
+  Pie,
+  Cell,
   ResponsiveContainer,
   Tooltip,
   Legend,
@@ -85,7 +85,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
   };
 
 
-  
+
   const [mode, setMode] = useState<'plan' | 'use'>('plan');
 
   // Plan data as requested by user
@@ -127,11 +127,11 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
 
         {/* View Toggle */}
         <div className={`flex p-1 rounded-xl shadow-sm ${isLight ? 'bg-zinc-200/50' : 'bg-black/50'} w-full md:w-auto`}>
-          <button className={`btn-interactive flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'plan' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`} onClick={() => setMode('plan')}>
+          <button className={`btn-interactive flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${mode === 'plan' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`} onClick={() => setMode('plan')}>
             <Target size={16} className={mode === 'plan' ? 'text-emerald-500' : ''} />
             Plan Structure
           </button>
-          <button className={`btn-interactive flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${ mode === 'use' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50' }`} onClick={() => setMode('use')}>
+          <button className={`btn-interactive flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${mode === 'use' ? isLight ? 'bg-white text-zinc-900 shadow-sm' : 'bg-zinc-800 text-white shadow-md shadow-black/50' : isLight ? 'text-zinc-500 hover:text-zinc-700 hover:bg-white/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`} onClick={() => setMode('use')}>
             <Activity size={16} className={mode === 'use' ? 'text-orange-500' : ''} />
             Actual Use
           </button>
@@ -143,13 +143,13 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
         <div className="space-y-4">
           {currentData.map(item => (
             <div key={item.name} className={`p-5 rounded-2xl border transition-all ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
-               <div className="flex justify-between items-center mb-2">
-                 <h3 className={`text-sm font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>{item.name}</h3>
-                 <span className="text-3xl font-mono font-black" style={{ color: item.color }}>{item.value}%</span>
-               </div>
-               <div className={`w-full h-2 rounded-full overflow-hidden ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
-                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `\${item.value}%`, backgroundColor: item.color }} />
-               </div>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className={`text-sm font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>{item.name}</h3>
+                <span className="text-3xl font-mono font-black" style={{ color: item.color }}>{item.value}%</span>
+              </div>
+              <div className={`w-full h-2 rounded-full overflow-hidden ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
+                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
+              </div>
             </div>
           ))}
         </div>
@@ -224,232 +224,226 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
           </div>
         </div>
       </div>
-    
-          {/* Daily Sushi Ops & COGS Ledger Entry Form */}
-          <div
-            className={`${metallicTheme}-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
-          >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
+      {/* Daily Sushi Ops & COGS Ledger Entry Form */}
+      <div
+        className={`${metallicTheme}-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+      >
+        <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+
+        <div
+          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${isLight ? "border-zinc-200" : "border-zinc-800"
+            }`}
+        >
+          <div className="flex items-center gap-3">
             <div
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
-                isLight ? "border-zinc-200" : "border-zinc-800"
-              }`}
+              className={`p-3 border rounded-2xl transition-all duration-300 ${isLight
+                  ? "bg-zinc-100 border-zinc-200 text-orange-600"
+                  : "bg-zinc-950 border-zinc-800 text-orange-400"
+                }`}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 border rounded-2xl transition-all duration-300 ${
-                    isLight
-                      ? "bg-zinc-100 border-zinc-200 text-orange-600"
-                      : "bg-zinc-950 border-zinc-800 text-orange-400"
-                  }`}
+              <Calendar className="w-5 h-5 flex-shrink-0" />
+            </div>
+            <div className="z-10">
+              <h3
+                className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+              >
+                Operational Ledger & COGS Input
+                <span
+                  className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${isLight
+                      ? "bg-orange-50 border-orange-200 text-orange-700 font-bold"
+                      : "bg-orange-500/10 border-orange-500/30 text-orange-400"
+                    }`}
                 >
-                  <Calendar className="w-5 h-5 flex-shrink-0" />
-                </div>
-                <div className="z-10">
-                  <h3
-                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                  Ledger Direct Writer
+                </span>
+              </h3>
+              <p className="subtitle text-xs text-zinc-500">
+                Record sales, waste, hours, targets, and supplier cost
+                breakdown for any date
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form
+          onSubmit={handleSaveOperationalLog}
+          className="mt-5 space-y-6 z-10 relative"
+        >
+          <div
+            className={`grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl border transition-all duration-300 ${isLight
+                ? "bg-zinc-50 border-zinc-200"
+                : "bg-zinc-950 border-zinc-905"
+              }`}
+          >
+            <div>
+              <label
+                className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+              >
+                Target Day of Week
+              </label>
+              <select className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white"}`} value={entryDay} onChange={(e) => setEntryDay(e.target.value as any)}>
+                <option value="Mon">Monday</option>
+                <option value="Tue">Tuesday</option>
+                <option value="Wed">Wednesday</option>
+                <option value="Thu">Thursday</option>
+                <option value="Fri">Friday</option>
+                <option value="Sat">Saturday</option>
+                <option value="Sun">Sunday</option>
+              </select>
+            </div>
+            <div>
+              <label
+                className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+              >
+                Calendar Date
+              </label>
+              <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white"}`} type="date" required value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
+            </div>
+            <div>
+              <label
+                className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+              >
+                Primary Registered Supplier
+              </label>
+              <select className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white"}`} value={entrySupplierName} onChange={(e) =>
+                setEntrySupplierName(e.target.value as any)
+              }>
+                <option value="Tazaki">Tazaki</option>
+                <option value="Sysco">Sysco</option>
+                <option value="Bulza">Bulza</option>
+                <option value="Sticker">Sticker</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4 font-sans">
+            {/* Column A: Productivity Metrics */}
+            <div className="space-y-4">
+              <h4
+                className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${isLight
+                    ? "border-zinc-200 text-zinc-600 text-zinc-600"
+                    : "border-zinc-800 text-zinc-400"
+                  }`}
+              >
+                <Layers className="w-3.5 h-3.5 text-orange-400" />
+                Operational & Yield Inputs
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    Operational Ledger & COGS Input
-                    <span
-                      className={`px-2 py-0.5 rounded border text-xs font-mono uppercase tracking-widest font-bold ${
-                        isLight
-                          ? "bg-orange-50 border-orange-200 text-orange-700 font-bold"
-                          : "bg-orange-500/10 border-orange-500/30 text-orange-400"
-                      }`}
-                    >
-                      Ledger Direct Writer
-                    </span>
-                  </h3>
-                  <p className="subtitle text-xs text-zinc-500">
-                    Record sales, waste, hours, targets, and supplier cost
-                    breakdown for any date
-                  </p>
+                    Gross Revenue (€)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entrySales} onChange={(e) => setEntrySales(e.target.value)} />
+                </div>
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                  >
+                    Sushi Waste Cost (€)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entryWaste} onChange={(e) => setEntryWaste(e.target.value)} />
+                </div>
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                  >
+                    Staff Rostered (hrs)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" required value={entryHours} onChange={(e) => setEntryHours(e.target.value)} />
+                </div>
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                  >
+                    Production Target (units)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" required value={entryProdTarget} onChange={(e) => setEntryProdTarget(e.target.value)} />
+                </div>
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                  >
+                    Production Made (units)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" required value={entryProdMade} onChange={(e) => setEntryProdMade(e.target.value)} />
                 </div>
               </div>
             </div>
 
-            <form
-              onSubmit={handleSaveOperationalLog}
-              className="mt-5 space-y-6 z-10 relative"
-            >
-              <div
-                className={`grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl border transition-all duration-300 ${
-                  isLight
-                    ? "bg-zinc-50 border-zinc-200"
-                    : "bg-zinc-950 border-zinc-905"
-                }`}
+            {/* Column B: Supplier COGS breakdown */}
+            <div className="space-y-4">
+              <h4
+                className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${isLight
+                    ? "border-zinc-200 text-zinc-600 text-zinc-600"
+                    : "border-zinc-800 text-zinc-400"
+                  }`}
               >
+                <Settings className="w-3.5 h-3.5 text-emerald-400" />
+                Supplier COGS Breakdown (GOC)
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label
                     className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    Target Day of Week
+                    Tazaki Supplier (€)
                   </label>
-                  <select className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white" }`} value={entryDay} onChange={(e) => setEntryDay(e.target.value as any)}>
-                    <option value="Mon">Monday</option>
-                    <option value="Tue">Tuesday</option>
-                    <option value="Wed">Wednesday</option>
-                    <option value="Thu">Thursday</option>
-                    <option value="Fri">Friday</option>
-                    <option value="Sat">Saturday</option>
-                    <option value="Sun">Sunday</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Calendar Date
-                  </label>
-                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white" }`} type="date" required value={entryDate} onChange={(e) => setEntryDate(e.target.value)}/>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entryTazaki} onChange={(e) => setEntryTazaki(e.target.value)} />
                 </div>
                 <div>
                   <label
                     className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    Primary Registered Supplier
+                    Sysco Supplier (€)
                   </label>
-                  <select className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900 font-semibold" : "bg-zinc-900 border-zinc-800 text-white" }`} value={entrySupplierName} onChange={(e) =>
-                      setEntrySupplierName(e.target.value as any)
-                    }>
-                    <option value="Tazaki">Tazaki</option>
-                    <option value="Sysco">Sysco</option>
-                    <option value="Bulza">Bulza</option>
-                    <option value="Sticker">Sticker</option>
-                    <option value="Others">Others</option>
-                  </select>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entrySysco} onChange={(e) => setEntrySysco(e.target.value)} />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4 font-sans">
-                {/* Column A: Productivity Metrics */}
-                <div className="space-y-4">
-                  <h4
-                    className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
-                      isLight
-                        ? "border-zinc-200 text-zinc-600 text-zinc-600"
-                        : "border-zinc-800 text-zinc-400"
-                    }`}
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    <Layers className="w-3.5 h-3.5 text-orange-400" />
-                    Operational & Yield Inputs
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Gross Revenue (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entrySales} onChange={(e) => setEntrySales(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Sushi Waste Cost (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryWaste} onChange={(e) => setEntryWaste(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Staff Rostered (hrs)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" required value={entryHours} onChange={(e) => setEntryHours(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Production Target (units)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" required value={entryProdTarget} onChange={(e) => setEntryProdTarget(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Production Made (units)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" required value={entryProdMade} onChange={(e) => setEntryProdMade(e.target.value)}/>
-                    </div>
-                  </div>
+                    Bulza Supplier (€)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entryBulza} onChange={(e) => setEntryBulza(e.target.value)} />
                 </div>
-
-                {/* Column B: Supplier COGS breakdown */}
-                <div className="space-y-4">
-                  <h4
-                    className={`text-xs font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 border-b pb-1.5 ${
-                      isLight
-                        ? "border-zinc-200 text-zinc-600 text-zinc-600"
-                        : "border-zinc-800 text-zinc-400"
-                    }`}
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
-                    <Settings className="w-3.5 h-3.5 text-emerald-400" />
-                    Supplier COGS Breakdown (GOC)
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Tazaki Supplier (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryTazaki} onChange={(e) => setEntryTazaki(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Sysco Supplier (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entrySysco} onChange={(e) => setEntrySysco(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Bulza Supplier (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] focus:border-yellow-500 ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryBulza} onChange={(e) => setEntryBulza(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Sticker Supplier (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entrySticker} onChange={(e) => setEntrySticker(e.target.value)}/>
-                    </div>
-                    <div>
-                      <label
-                        className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
-                      >
-                        Others / Etc. (€)
-                      </label>
-                      <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${ isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white" }`} type="number" step="0.01" required value={entryOthers} onChange={(e) => setEntryOthers(e.target.value)}/>
-                    </div>
-                  </div>
+                    Sticker Supplier (€)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entrySticker} onChange={(e) => setEntrySticker(e.target.value)} />
+                </div>
+                <div>
+                  <label
+                    className={`text-xs font-mono uppercase font-bold tracking-widest block mb-1.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
+                  >
+                    Others / Etc. (€)
+                  </label>
+                  <input className={`input-gold-glow w-full border rounded-xl px-4 py-2.5 text-sm font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all focus:shadow-[0_0_8px_rgba(234,179,8,0.4)] ${isLight ? "bg-white border-zinc-300 text-zinc-900" : "bg-zinc-950 border-zinc-800 text-white"}`} type="number" step="0.01" required value={entryOthers} onChange={(e) => setEntryOthers(e.target.value)} />
                 </div>
               </div>
-
-              <div
-                className={`flex justify-end pt-4 border-t ${isLight ? "border-zinc-200" : "border-zinc-800"}`}
-              >
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 btn-interactive"
-                >
-                  <Save className="w-4 h-4" />
-                  Commit Active Operational Records
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
 
-</div>
+          <div
+            className={`flex justify-end pt-4 border-t ${isLight ? "border-zinc-200" : "border-zinc-800"}`}
+          >
+            <button
+              type="submit"
+              className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/15 border border-orange-500/20 hover:scale-[1.01] active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 btn-interactive"
+            >
+              <Save className="w-4 h-4" />
+              Commit Active Operational Records
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
   );
 }
