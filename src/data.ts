@@ -473,4 +473,42 @@ export const initialMenuEngineeringItems: MenuEngineeringItem[] = [
   }
 ];
 
+export interface Product {
+  name: string;
+  category: string;
+  price: number;
+  barcode?: string;
+}
+
+export const MS_PRODUCTS: Product[] = [
+  { name: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', price: 34.50, barcode: '5391548895018' },
+  { name: 'Gastropub Spicy Truffle Roll', category: 'Specialty Rolls', price: 19.95, barcode: '5391548895025' },
+  { name: 'Handcrafted Premium Dragon Roll', category: 'Sushi Rolls', price: 17.50, barcode: '5391548895049' },
+  { name: 'Premium Tuna Nigiri Duo', category: 'Nigiri Duos', price: 14.75, barcode: '5391548895056' },
+  { name: 'Black Truffle Edamame', category: 'Starters & Sides', price: 8.95, barcode: '5391548895063' },
+  { name: 'Wagyu Beef Gyoza (5pcs)', category: 'Starters & Sides', price: 12.50, barcode: '5391548895070' },
+  { name: 'Yuzu Mochi Ice Cream', category: 'Desserts & Sweets', price: 6.95, barcode: '5391548895087' },
+  { name: 'Artisan Miso Ramen', category: 'Noodles & Sides', price: 16.50, barcode: '5391548895094' },
+  { name: 'Salmon & Avocado Maki (8pcs)', category: 'Maki Rolls', price: 13.95, barcode: '5391548895100' },
+  { name: 'Crab Tempura Uramaki', category: 'Specialty Rolls', price: 18.95, barcode: '5391548895117' },
+  { name: 'Premium Edamame Sea Salt', category: 'Starters & Sides', price: 5.50, barcode: '5391548895124' },
+  { name: 'Spicy Tuna Tataki', category: 'Sashimi & Platters', price: 22.00, barcode: '5391548895131' },
+];
+
+export const TESCO_PRODUCTS: Product[] = [
+  { name: 'salmon sashimi', category: 'Sashimi Selections', price: 7.75, barcode: '5391548890068' },
+  { name: 'spicy veggie roll', category: 'Sushi Rolls', price: 5.50, barcode: '5391548890266' },
+  { name: 'veggie tofu yakisoba noodles', category: 'Noodles & Sides', price: 7.95, barcode: '5391548890679' },
+  { name: 'TokYO! party platter', category: 'Party Platters', price: 16.75, barcode: '5391548890549' },
+  { name: 'chicken katsu roll', category: 'Sushi Rolls', price: 6.25, barcode: '5391548890143' },
+  { name: 'california roll', category: 'Sushi Rolls', price: 5.25, barcode: '5391548890150' },
+  { name: 'prawn tempura maki', category: 'Maki Rolls', price: 6.75, barcode: '5391548890167' },
+  { name: 'edamame beans', category: 'Starters & Sides', price: 2.50, barcode: '5391548890174' },
+  { name: 'mochi ice cream duo', category: 'Desserts & Sweets', price: 4.00, barcode: '5391548890181' },
+  { name: 'teriyaki salmon box', category: 'Bento Boxes', price: 8.50, barcode: '5391548890198' },
+  { name: 'gyoza pork dumplings', category: 'Starters & Sides', price: 4.75, barcode: '5391548890204' },
+  { name: 'tuna & cucumber maki', category: 'Maki Rolls', price: 5.00, barcode: '5391548890211' },
+];
+
+
 

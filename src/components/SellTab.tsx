@@ -1,21 +1,75 @@
 import React, { useState, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Barcode } from './Barcode.client'; // Assuming Barcode is moved to its own file
-import { useProductData } from '../hooks/useProductData.ts'; // Custom hook for data logic
+import { MS_PRODUCTS, TESCO_PRODUCTS } from '../data';
+
+export { MS_PRODUCTS, TESCO_PRODUCTS };
 
 interface SellTabProps {
   selectedBranch: string;
   theme: string;
 }
 
+// Simple inline barcode visual component
+function BarcodeDisplay({ value, isLight }: { value: string; isLight: boolean }) {
+  const bars = value.split('').map((c, i) => {
+    const w = (parseInt(c, 10) % 3) + 1;
+    return (
+      <div
+        key={i}
+        style={{ width: w * 2, marginRight: 1 }}
+        className={`h-8 ${isLight ? 'bg-zinc-800' : 'bg-zinc-200'}`}
+      />
+    );
+  });
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="flex items-end">{bars}</div>
+      <span className={`font-mono text-[9px] tracking-widest ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
 export default function SellTab({ selectedBranch, theme }: SellTabProps) {
   const isLight = theme === 'light';
-  const {
-    products,
-    distribution,
-    distributionPercentages
-  } = useProductData(selectedBranch);
+
+  const products = useMemo(() => {
+    const isMS = selectedBranch === 'Marks & Spencer - Cork City';
+    if (selectedBranch === 'All Branches') {
+      const combined = [...MS_PRODUCTS, ...TESCO_PRODUCTS];
+      return combined.filter((v, i, a) => a.findIndex(v2 => v2.name === v.name) === i);
+    }
+    return isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
+  }, [selectedBranch]);
+
+  const distribution = useMemo(() => {
+    const seafood = products.filter(p =>
+      p.category.toLowerCase().includes('sashimi') ||
+      p.category.toLowerCase().includes('platter') ||
+      p.category.toLowerCase().includes('selection')
+    ).length;
+    const chicken = products.filter(p =>
+      p.name.toLowerCase().includes('chicken') ||
+      p.name.toLowerCase().includes('katsu')
+    ).length;
+    const veggie = products.filter(p =>
+      p.name.toLowerCase().includes('veggie') ||
+      p.name.toLowerCase().includes('tofu') ||
+      p.name.toLowerCase().includes('edamame')
+    ).length;
+    return { seafood, chicken, veggie };
+  }, [products]);
+
+  const distributionPercentages = useMemo(() => {
+    const total = products.length || 1;
+    return {
+      seafood: Math.round((distribution.seafood / total) * 100),
+      chicken: Math.round((distribution.chicken / total) * 100),
+      veggie: Math.round((distribution.veggie / total) * 100),
+    };
+  }, [distribution, products.length]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 8;
@@ -148,7 +202,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
                 <p className={`text-sm font-bold mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>€{p.price.toFixed(2)}</p>
               </div>
               <div className="shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">
-                <Barcode value={p.barcode || '0000000000000'} isLight={isLight} />
+                <BarcodeDisplay value={p.barcode || '0000000000000'} isLight={isLight} />
               </div>
             </div>
           ))}

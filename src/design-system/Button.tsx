@@ -10,6 +10,8 @@ export interface ButtonProps
   isLight?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
+  className?: string;
+  children?: React.ReactNode;
 }
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

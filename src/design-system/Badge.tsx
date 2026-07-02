@@ -15,6 +15,8 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   isLight?: boolean;
   pulse?: boolean;
   uppercase?: boolean;
+  className?: string;
+  children?: React.ReactNode;
 }
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {

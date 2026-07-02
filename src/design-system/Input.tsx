@@ -4,6 +4,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   isLight?: boolean;
   label?: string;
   icon?: React.ReactNode;
+  className?: string;
+  id?: string;
 }
 
 export function Input({

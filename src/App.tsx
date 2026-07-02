@@ -43,13 +43,12 @@ import PlanningTab from "./components/PlanningTab";
 import EnergyTab from "./components/EnergyTab";
 import SuppliersTab from "./components/SuppliersTab";
 import FinanceTab from "./components/FinanceTab";
-import RealtimeTab from "./components/RealtimeTab";
 import DataAnalystTab from "./components/DataAnalystTab";
 import ResourceAllocationTab from "./components/ResourceAllocationTab";
 import ReportsTab from "./components/ReportsTab";
 import LoginScreen from "./components/LoginScreen";
 import MenuEngineeringTab from "./components/MenuEngineeringTab";
-import { MS_PRODUCTS, TESCO_PRODUCTS } from "./components/SellTab";
+import { MS_PRODUCTS, TESCO_PRODUCTS } from "./data";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 
 // Main Icons
@@ -1619,6 +1618,7 @@ export default function App() {
     // 2. Create clean object to prevent shadow field injection
     const fullOrder: SalesOrder = {
       item: newOrder.item,
+      category: newOrder.category ?? 'Sushi Rolls',
       quantity: sanitizedQuantity,
       amount: sanitizedAmount,
       status: newOrder.status,
@@ -1913,6 +1913,30 @@ export default function App() {
     }
   };
 
+  const handleAddOrUpdateLog = (log: DailyOperationalLog) => {
+    setWeeklyLogsMap((prev) => {
+      const currentWeekLogs = prev[selectedWeekRange] || [];
+      const exists = currentWeekLogs.some((l) => l.day === log.day);
+      const updatedWeekLogs = exists
+        ? currentWeekLogs.map((l) => (l.day === log.day ? log : l))
+        : [...currentWeekLogs, log];
+      return {
+        ...prev,
+        [selectedWeekRange]: updatedWeekLogs,
+      };
+    });
+    if (log.day === "Sun") {
+      setMetrics((prev) => ({
+        ...prev,
+        salesToday: log.sales,
+        wasteCost: log.waste,
+        hoursScheduled: log.hours,
+        productionTarget: log.productionTarget,
+        productionItems: log.productionMade,
+      }));
+    }
+  };
+
   const allTabMeta = [
     {
       id: "Overview",
@@ -2118,7 +2142,7 @@ export default function App() {
       case "Suppliers":
         return <SuppliersTab theme={theme} />;
       case "Finance":
-        return <FinanceTab theme={theme} />;
+        return <FinanceTab theme={theme} weeklyLogs={weeklyLogs} onAddOrUpdateLog={handleAddOrUpdateLog} />;
       case "DataAnalyst":
         return (
           <DataAnalystTab

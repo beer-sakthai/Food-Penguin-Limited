@@ -8,6 +8,9 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   isLight?: boolean;
   padding?: CardPadding;
   hover?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
 }
 
 const PADDING_CLASSES: Record<CardPadding, string> = {

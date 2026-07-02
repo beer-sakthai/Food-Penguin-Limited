@@ -4,6 +4,9 @@ export interface SelectProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   isLight?: boolean;
   label?: string;
+  className?: string;
+  id?: string;
+  children?: React.ReactNode;
 }
 
 export function Select({

@@ -23,7 +23,7 @@ import {
  UtensilsCrossed,
  TrendingDown
 } from 'lucide-react';
-import { MS_PRODUCTS, TESCO_PRODUCTS } from './SellTab';
+import { MS_PRODUCTS, TESCO_PRODUCTS } from '../data';
 
 interface WasteTabProps {
  wasteRecords: WasteRecord[];
