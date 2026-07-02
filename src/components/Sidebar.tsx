@@ -63,14 +63,19 @@ export function Sidebar({
             />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-1">
-              <h1
-                className={`text-sm font-bold font-sans tracking-tight leading-tight truncate ${isLight ? "text-zinc-900" : "text-white"}`}
-              >
-                Food Penguin
-              </h1>
+            <h1
+              className={`text-base font-bold font-sans tracking-tight leading-tight truncate ${isLight ? "text-zinc-900" : "text-white"}`}
+            >
+              Food Penguin
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
               <span
-                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
+                className={`text-[10px] font-mono tracking-wider uppercase leading-none ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+              >
+                Personal dashboard
+              </span>
+              <span
+                className={`inline-flex items-center gap-1 px-1.5 py-[1px] rounded-full text-[9px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
                 title={healthTooltip}
               >
                 <span
@@ -79,11 +84,6 @@ export function Sidebar({
                 {healthLabel}
               </span>
             </div>
-            <span
-              className={`text-xs font-mono tracking-wider uppercase leading-none block mt-0.5 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
-            >
-              Personal dashboard
-            </span>
           </div>
         </div>
         {/* Mobile Menu Toggle Button */}
