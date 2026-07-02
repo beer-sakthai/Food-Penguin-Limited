@@ -104,11 +104,14 @@ export function Sidebar({
           {tabMeta.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
-              <button className={`btn-interactive w-full text-left py-2.5 px-3.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${ isActive ? isLight ? "bg-orange-50 text-zinc-950 font-bold shadow-sm border border-orange-200" : "bg-orange-500/12 text-white font-bold shadow-sm border border-orange-500/30" : isLight ? "text-zinc-600 active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent" : "text-zinc-400 active:scale-[0.98] hover:bg-zinc-800/70 hover:text-white border border-transparent" }`} key={tab.id} onClick={() => {
+              <button className={`relative overflow-hidden btn-interactive w-full text-left py-2.5 px-3.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${ isActive ? isLight ? "bg-orange-50 text-zinc-950 font-bold shadow-sm border border-orange-200" : "bg-orange-500/12 text-white font-bold shadow-sm border border-orange-500/30" : isLight ? "text-zinc-600 active:scale-[0.98] hover:bg-zinc-100 hover:text-zinc-900 border border-transparent" : "text-zinc-400 active:scale-[0.98] hover:bg-zinc-800/70 hover:text-white border border-transparent" }`} key={tab.id} onClick={() => {
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}>
-                <div className="flex items-center gap-3 min-w-0">
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-2/3 w-1 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] rounded-r-md transition-all duration-300 animate-in fade-in zoom-in" />
+                )}
+                <div className="flex items-center gap-3 min-w-0 z-10 relative">
                   <span
                     className={`shrink-0 transition-colors ${
                       isActive
