@@ -42,11 +42,12 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={`w-full md:w-64 flex flex-col shrink-0 shadow-lg md:border-r border-b md:border-b-0 transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
+      className={`w-full flex flex-col shrink-0 shadow-lg md:border-r border-b md:border-b-0 transition-all duration-300 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
         isLight
           ? "bg-white/95 border-zinc-200 text-zinc-800 backdrop-blur-xl"
           : "bg-zinc-950/95 border-zinc-800 text-zinc-100 backdrop-blur-xl"
       }`}
+      style={{ minWidth: 0 }}
     >
       {/* Brand Header */}
       <div

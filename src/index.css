@@ -20,7 +20,8 @@
 }
 
 html {
-  font-size: 14px;
+  /* Fluid font scale: 11px on 1024px → 14px on 1440px → 16px on 1920px+ */
+  font-size: clamp(11px, 0.9vw, 16px);
   scroll-behavior: smooth;
 }
 
@@ -276,6 +277,48 @@ html {
 
   .input-gold-glow:focus {
     box-shadow: 0 0 10px rgba(234, 179, 8, 0.2), inset 0 1px 2px rgba(234, 179, 8, 0.1);
+  }
+}
+
+/* ─── Responsive layout helpers ───────────────────────────────────────────── */
+
+/* Fluid outer padding: shrinks on small screens */
+.app-outer-pad {
+  padding: clamp(4px, 1vw, 16px);
+}
+
+/* Fluid sidebar width */
+@media (min-width: 768px) {
+  .sidebar-col {
+    width: clamp(200px, 17vw, 272px);
+    min-width: 180px;
+    max-width: 272px;
+  }
+}
+
+/* 4K / ultra-wide: cap font growth above 1920px */
+@media (min-width: 1920px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Small desktops / laptops (1024px–1280px): tighten spacing */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  html {
+    font-size: clamp(11px, 0.85vw, 13px);
+  }
+}
+
+/* Tablets & below: allow full scroll, remove fixed heights */
+@media (max-width: 767px) {
+  #app-workspace {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: auto !important;
+  }
+  .app-outer-pad {
+    padding: 0 !important;
   }
 }
 

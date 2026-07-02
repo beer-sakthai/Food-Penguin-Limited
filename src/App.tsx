@@ -2245,7 +2245,7 @@ export default function App() {
   return (
     <div
       id="app-workspace"
-      className={`h-screen w-screen overflow-hidden p-[1cm] box-border font-sans antialiased transition-colors duration-500 ${isLight
+      className={`h-screen w-screen overflow-hidden app-outer-pad box-border font-sans antialiased transition-colors duration-500 ${isLight
           ? "bg-zinc-100 text-zinc-900"
           : "bg-zinc-950 text-zinc-100"
         }`}
@@ -2256,7 +2256,7 @@ export default function App() {
             : "bg-zinc-950 border-zinc-800"
           }`}
       >
-        <div className="h-full w-full grid grid-cols-1 md:grid-cols-[252px_minmax(0,1fr)] xl:grid-cols-[252px_minmax(0,1fr)_312px]">
+        <div className="h-full w-full grid grid-cols-1 md:grid-cols-[minmax(180px,17vw)_minmax(0,1fr)] xl:grid-cols-[minmax(180px,17vw)_minmax(0,1fr)_minmax(260px,22vw)]">
           {/* SIDEBAR: NAVIGATION */}
           <Sidebar
             isLight={isLight}
@@ -2339,8 +2339,8 @@ export default function App() {
             </header>
 
             {/* Active view port rendering */}
-            <main className="flex-1 p-3 md:p-5 overflow-y-auto md:overflow-hidden bg-transparent flex flex-col">
-              <div className="mx-auto w-full h-full flex flex-col md:overflow-hidden pr-1">{renderActiveView()}</div>
+            <main className="flex-1 p-2 md:p-4 lg:p-5 overflow-y-auto bg-transparent flex flex-col">
+              <div className="mx-auto w-full h-full flex flex-col pr-1">{renderActiveView()}</div>
             </main>
           </div>
 
