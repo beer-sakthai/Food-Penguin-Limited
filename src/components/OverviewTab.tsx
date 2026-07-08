@@ -46,7 +46,7 @@ interface OverviewTabProps {
   metrics: CoreMetrics;
   onNavigateTab: (tabId: string) => void;
   targets: CompanyTarget[];
-  userRole: "Admin" | "Manager" | "Staff";
+  userRole: "Admin" | "Manager" | "Staff" | "User";
   onUpdateMetrics: (newMetrics: Partial<CoreMetrics>) => void;
   irelandTime?: string;
   weeklyLogs: DailyOperationalLog[];

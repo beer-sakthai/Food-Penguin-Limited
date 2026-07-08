@@ -31,7 +31,7 @@ interface EnergyTabProps {
 
 // Mock real-time energy usage data (kWh) vs production volume (units)
 const generateEnergyData = () => {
-  const data = [];
+  const data: { time: string; energy: number; volume: number; efficiency: number }[] = [];
   const hours = ['6AM', '8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'];
   let totalEnergy = 0;
   let totalVolume = 0;

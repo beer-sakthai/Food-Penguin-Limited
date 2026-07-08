@@ -29,7 +29,7 @@ interface WasteTabProps {
  wasteRecords: WasteRecord[];
  onAddWaste: (record: Omit<WasteRecord, 'id' | 'date'>) => void;
  totalCostToday: number;
- selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point';
+ selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point' | 'All Branches';
  weeklyLogs?: DailyOperationalLog[];
  targets?: CompanyTarget[];
  theme?: 'light' | 'dark';
@@ -237,7 +237,7 @@ export default function WasteTab({
  fontSize: '15px' 
  }}
  itemStyle={{ fontWeight: 'bold' }}
- formatter={(value: number) => `€${value.toFixed(2)}`}
+ formatter={(value) => `€${Number(value).toFixed(2)}`}
  />
  <Pie
  data={pieData}
@@ -319,7 +319,7 @@ export default function WasteTab({
  }}
  labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
  cursor={{ fill: isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.02)' }}
- formatter={(value: number) => [`€${value.toFixed(2)}`]}
+ formatter={(value) => [`€${Number(value).toFixed(2)}`]}
  />
  <Legend 
  verticalAlign="bottom" 

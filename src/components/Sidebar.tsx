@@ -14,7 +14,7 @@ export interface SidebarProps {
   setActiveTab: (tab: string) => void;
   tabMeta: Array<{ id: string; label: string; icon: React.ReactNode }>;
   lowStockCount: number;
-  currentUser: { username: string; role: string; photoURL?: string; email: string } | null;
+  currentUser: { username: string; role: string; photoURL?: string; email?: string } | null;
   userRole: string;
   setUserRole: (role: any) => void;
   isFirebaseSynced: boolean;

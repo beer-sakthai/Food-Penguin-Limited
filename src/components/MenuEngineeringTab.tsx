@@ -23,7 +23,7 @@ import { MenuEngineeringItem, IngredientCost } from "../types";
 
 interface MenuEngineeringTabProps {
   theme: "light" | "dark";
-  metallicTheme: boolean;
+  metallicTheme: "gold" | "silver" | "copper" | "crystal";
   menuItems: MenuEngineeringItem[];
   onUpdateMenuItems: (items: MenuEngineeringItem[]) => void;
 }

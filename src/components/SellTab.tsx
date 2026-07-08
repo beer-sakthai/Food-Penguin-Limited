@@ -133,7 +133,7 @@ export default function SellTab({ selectedBranch, theme }: SellTabProps) {
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: isLight ? '#71717a' : '#71717a', fontSize: 15 }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: isLight ? '#fff' : '#18181b', borderRadius: '8px', border: `1px solid ${isLight ? '#e4e4e7' : '#27272a'}`, boxShadow: 'none' }}
-                  formatter={(value: number) => [`€${value.toLocaleString()}`, 'Sales']}
+                  formatter={(value) => [`€${Number(value).toLocaleString()}`, 'Sales']}
                 />
                 <Area type="monotone" dataKey="Sales" stroke="#f59e0b" strokeWidth={2} fill="url(#sellRevenueGrad)" dot={{ r: 3, strokeWidth: 2, fill: '#18181b', stroke: '#f59e0b' }} activeDot={{ r: 5, fill: '#f59e0b' }} />
               </AreaChart>
