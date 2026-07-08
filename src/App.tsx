@@ -169,8 +169,8 @@ const rolePermissions: Record<
   User: ["Overview", "Advisor", "Realtime", "DataAnalyst"], // User can only view data
 };
 
-const getDayContributingItems = (day: string, projectedLoad: number) => {
-  const totalUnits = Math.round(projectedLoad * 12);
+const getDayContributingItems = (day: string, projected: number) => {
+  const totalUnits = Math.round(projected * 12);
   switch (day) {
     case "Mon":
       return [

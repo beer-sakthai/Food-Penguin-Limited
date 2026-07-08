@@ -188,7 +188,7 @@ export default function FinanceTab({ theme = 'dark', metallicTheme = 'gold', wee
                       fontWeight: 600
                     }}
                     itemStyle={{ color: isLight ? '#18181b' : '#f4f4f5' }}
-                    formatter={(value) => [`\${Number(value)}%`, 'Share']}
+                    formatter={(value: any) => [`\${value}%`, 'Share']}
                   />
                 </PieChart>
               </ResponsiveContainer>
