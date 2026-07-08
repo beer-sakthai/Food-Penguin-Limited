@@ -169,8 +169,8 @@ const rolePermissions: Record<
   User: ["Overview", "Advisor", "Realtime", "DataAnalyst"], // User can only view data
 };
 
-const getDayContributingItems = (day: string, projectedLoad: number) => {
-  const totalUnits = Math.round(projectedLoad * 12);
+const getDayContributingItems = (day: string, projected: number) => {
+  const totalUnits = Math.round(projected * 12);
   switch (day) {
     case "Mon":
       return [
@@ -4654,12 +4654,12 @@ export default function App() {
                     <div key={day.day} className={`rounded-lg border px-2 py-1.5 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
                       <div className="flex items-center justify-between gap-2 text-[9px] font-mono uppercase tracking-wider">
                         <span className={isLight ? "text-zinc-500" : "text-zinc-400"}>{day.day}</span>
-                        <span className={day.projectedLoad >= bottleneckThreshold ? "text-amber-500" : isLight ? "text-zinc-700" : "text-zinc-200"}>
-                          {day.projectedLoad}%
+                        <span className={day.projected >= bottleneckThreshold ? "text-amber-500" : isLight ? "text-zinc-700" : "text-zinc-200"}>
+                          {day.projected}%
                         </span>
                       </div>
                       <div className={`mt-1 h-1.5 rounded-full overflow-hidden ${isLight ? "bg-zinc-100" : "bg-zinc-900"}`}>
-                        <div className={`h-full rounded-full ${day.projectedLoad >= bottleneckThreshold ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${day.projectedLoad}%` }} />
+                        <div className={`h-full rounded-full ${day.projected >= bottleneckThreshold ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${day.projected}%` }} />
                       </div>
                     </div>
                   ))}
@@ -4704,7 +4704,7 @@ export default function App() {
                   <div className="space-y-1.5">
                     {lowStockItems.slice(0, 2).map((item) => (
                       <div key={item.id} className={`flex items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-[10px] ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-950/60"}`}>
-                        <span className={`truncate ${isLight ? "text-zinc-700" : "text-zinc-300"}`}>{item.itemName}</span>
+                        <span className={`truncate ${isLight ? "text-zinc-700" : "text-zinc-300"}`}>{item.name}</span>
                         <span className={`font-mono shrink-0 ${item.status === "Critical" ? "text-rose-500" : "text-amber-500"}`}>
                           {item.status}
                         </span>
