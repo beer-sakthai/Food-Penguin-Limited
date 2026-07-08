@@ -8,12 +8,12 @@ As of `main`, `src/App.tsx` (43 lines) and `server.ts` (5 lines) contain **only 
 
 ## Commands
 
-- `npm run dev` — starts the Express/Vite dev server (`tsx server.ts`), binds `0.0.0.0:3000`.
+- `npm run dev` — starts the Express/Vite dev server (`tsx server.ts`), binds `0.0.0.0:3050` (or `3000` via the standard container proxy port).
 - `npm run build` — builds the Vite frontend, then bundles `server.ts` to `dist/server.cjs` via esbuild.
 - `npm run start` — runs the production bundle from `dist/server.cjs`.
 - `npm run lint` — runs `tsc --noEmit`; this is the primary type-check/lint step (no ESLint configured).
 - `npm run clean` — removes `dist/` and `server.js`.
-- No test framework is configured. Validate changes with `npm run lint` and `npm run build`, and by exercising the affected tab at `http://localhost:3000/` in both light and dark mode.
+- No test framework is configured. Validate changes with `npm run lint` and `npm run build`, and by exercising the affected tab at `http://localhost:3050/` (or `http://localhost:3000/` if proxied) in both light and dark mode.
 - If `npm run build` fails due to a locked `dist/dev-server*.log`, stop the running dev server first.
 
 ## Architecture
