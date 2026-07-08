@@ -41,3 +41,14 @@ import {
   OperationType,
 } from "./firebase";
 import { Badge, Button, Card, Input, Select, StatCard } from "./design-system";
+
+function App() {
+  return (
+    <div>
+      <h1>Food Penguin Limited</h1>
+      <p>Loading dashboard...</p>
+    </div>
+  );
+}
+
+export default App;
