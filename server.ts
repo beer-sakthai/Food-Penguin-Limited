@@ -109,7 +109,7 @@ app.post(
     if (workflow === "generate-marketing-image") {
       const prompt = getStringBodyValue(body, "prompt");
       const aspectRatio = getStringBodyValue(body, "aspectRatio", "1:1");
-      const model = getStringBodyValue(body, "model", "imagen-4.0-generate-001");
+      const model = getStringBodyValue(body, "model", "imagen-3.0-generate-001");
 
       if (!prompt.trim()) {
         res.status(400).json({ error: "Missing prompt." });
