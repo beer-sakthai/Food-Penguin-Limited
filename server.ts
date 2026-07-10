@@ -36,7 +36,7 @@ function stripDataUrlPrefix(dataUrl: string) {
 async function generateText(contents: unknown, systemInstruction?: string) {
   const ai = getAiClient();
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-1.5-flash",
     contents: contents as any,
     config: systemInstruction ? { systemInstruction } : undefined,
   });
