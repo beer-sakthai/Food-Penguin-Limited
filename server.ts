@@ -24,6 +24,7 @@ function getAiClient() {
 }
 
 function getStringBodyValue(body: JsonRecord, key: string, fallback = "") {
+  if (!body) return fallback;
   const value = body[key];
   return typeof value === "string" ? value : fallback;
 }
