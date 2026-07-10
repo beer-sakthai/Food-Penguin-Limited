@@ -35,7 +35,7 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
 
 ## 🛠 Tech Stack
 
-* **Framework:** React 18 + TypeScript + Vite
+* **Framework:** React 19 + TypeScript + Vite
 * **Styling:** Tailwind CSS (responsive layouts, modern bento UI, custom semantic colors)
 * **Animations:** `motion/react` for elegant hardware-accelerated interface slide & fade effects
 * **Icons:** `lucide-react`
@@ -77,7 +77,7 @@ To start the local development server:
 npm run dev
 ```
 
-The application will bind to `0.0.0.0` at port `3050` (or the configured standard container proxy port `3000`) locally.
+The application will bind to `0.0.0.0` on `PORT` when provided, otherwise port `3000`.
 
 ### Production Build
 
@@ -87,7 +87,27 @@ To create a production-ready build:
 npm run build
 ```
 
-Then you can preview the generated `dist/` directory with `npm run preview`.
+Then you can run the generated `dist/` server bundle with:
+
+```bash
+npm run start
+```
+
+You can also build and start in one step with:
+
+```bash
+npm run preview
+```
+
+### AI API Configuration
+
+Gemini-powered features are served through the Express backend under `/api/gemini/*`, so API keys stay server-side. Copy `.env.example` to `.env` and set:
+
+```bash
+GEMINI_API_KEY="your_google_ai_studio_key"
+```
+
+Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a configuration error from the API.
 
 ## 📂 Project Structure
 
