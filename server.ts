@@ -191,7 +191,7 @@ async function startServer() {
     const distPath = path.resolve(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.use((req, res, next) => {
-      if (req.method !== "GET") {
+      if (req.method !== "GET" || req.path.startsWith("/api/")) {
         next();
         return;
       }
