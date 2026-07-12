@@ -67,7 +67,7 @@ function parseSignedBearerToken(header: string | undefined): AuthenticatedUser |
     if (headerPayload.alg !== "HS256") return null;
 
     const payload = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8")) as Partial<AuthenticatedUser> & { exp?: number };
-    if (payload.exp && Date.now() >= payload.exp * 1000) return null;
+    if (!payload.exp || Date.now() >= payload.exp * 1000) return null;
     if (!payload.sub || !payload.role || !(payload.role in roleRank)) return null;
     return { sub: String(payload.sub), email: payload.email, role: payload.role };
   } catch {
