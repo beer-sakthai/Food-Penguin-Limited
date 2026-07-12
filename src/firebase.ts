@@ -160,6 +160,9 @@ export async function getDocs(collectionRef: any) {
   };
 }
 
+const legacySafeDocIdRegex = /^[a-zA-Z0-9-_]+$/;
+const prefixedUuidDocIdRegex = /^[a-zA-Z0-9]+-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 type SnapshotCallback = (snapshot: any) => void;
 type SnapshotSubscriber = () => void;
 
@@ -234,12 +237,11 @@ function validateProposedDoc(colName: string, docId: string, proposed: any) {
     throw new Error("PERMISSION_DENIED");
   }
   
-  // 3. Id Integrity (alphanumeric and safe hyphens/underscores, length limit of 128)
+  // 3. Id Integrity (alphanumeric plus safe hyphens/underscores for prefixed UUIDs, length limit of 128)
   if (typeof docId !== "string" || docId.length === 0 || docId.length > 128) {
     throw new Error("PERMISSION_DENIED");
   }
-  const idRegex = /^[a-zA-Z0-9-_]+$/;
-  if (!idRegex.test(docId)) {
+  if (!legacySafeDocIdRegex.test(docId) && !prefixedUuidDocIdRegex.test(docId)) {
     throw new Error("PERMISSION_DENIED");
   }
 

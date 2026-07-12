@@ -50,6 +50,7 @@ import LoginScreen from "./components/LoginScreen";
 import MenuEngineeringTab from "./components/MenuEngineeringTab";
 import { MS_PRODUCTS, TESCO_PRODUCTS } from "./data";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
+import { createRecordId } from "./utils/ids";
 
 // Main Icons
 import {
@@ -1610,7 +1611,7 @@ export default function App() {
       minute: "2-digit",
       hour12: false,
     });
-    const orderId = `FP-${Math.floor(1000 + Math.random() * 9000)}`;
+    const orderId = createRecordId("FP");
 
     // 2. Create clean object to prevent shadow field injection
     const fullOrder: SalesOrder = {
@@ -1675,7 +1676,7 @@ export default function App() {
       return;
     }
 
-    const targetId = `T-${targets.length + 1}`;
+    const targetId = createRecordId("T");
     // 2. Create clean object
     const fullTarget: CompanyTarget = {
       ...newTarget, // Spreading is safe here as we validated all keys, but explicit is better
@@ -1704,7 +1705,7 @@ export default function App() {
       return;
     }
 
-    const taskId = `PT-${Math.floor(400 + Math.random() * 100)}`;
+    const taskId = createRecordId("PT");
     // 2. Create clean object
     const fullTask: ProductionTask = {
       itemName: newTask.itemName,
@@ -1794,7 +1795,7 @@ export default function App() {
       return;
     }
 
-    const wasteId = `W-${Math.floor(920 + Math.random() * 80)}`;
+    const wasteId = createRecordId("W");
     // 2. Create clean object
     const fullWaste: WasteRecord = {
       item: newWaste.item,
