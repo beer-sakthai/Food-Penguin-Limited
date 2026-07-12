@@ -122,13 +122,18 @@ The suite uses Node's built-in test runner through `tsx` for TypeScript files. I
 
 ### AI API Configuration
 
-Gemini-powered features are served through the Express backend under `/api/gemini/*`, so API keys stay server-side. Copy `.env.example` to `.env` and set:
+Gemini-powered features are served through the Express backend under `/api/gemini/*`, so provider keys stay server-side. Copy `.env.example` to `.env` and set:
 
 ```bash
 GEMINI_API_KEY="your_google_ai_studio_key"
+AUTH_TOKEN_SECRET="random-secret-used-to-verify-signed-bearer-tokens"
 ```
 
-Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a configuration error from the API.
+Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a generic provider-configuration error from the API. All `/api/gemini/*` routes require a signed HS256 bearer token verified with `AUTH_TOKEN_SECRET` (see Authentication & Authorization below).
+
+### Production AI API Controls
+
+The server applies small JSON body limits by default (64kb for prompt routes, 256kb for standard workflows) and only allows larger request bodies (12mb) for image-analysis workflows. Expensive Gemini workflows are rate-limited per authenticated user or source IP (10 requests per 15 minutes), but production deployments should still add edge/WAF rate limits, request-size caps, access logs, anomaly alerts, and provider-spend alerts to control abuse and cost spikes. API responses intentionally return sanitized errors; inspect server logs for provider-specific details when troubleshooting. Keep `GEMINI_API_KEY` and `AUTH_TOKEN_SECRET` in the hosting platform's secret manager rather than in source control.
 
 ### Authentication & Authorization
 
