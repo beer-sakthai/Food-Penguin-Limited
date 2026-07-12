@@ -3,6 +3,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 dotenv.config();
 
@@ -14,6 +15,94 @@ const app = express();
 app.use(express.json({ limit: "15mb" }));
 
 type JsonRecord = Record<string, unknown>;
+
+type AuthRole = "User" | "Staff" | "Manager" | "Admin";
+
+const roleRank: Record<AuthRole, number> = {
+  User: 0,
+  Staff: 1,
+  Manager: 2,
+  Admin: 3,
+};
+
+const workflowMinimumRoles: Record<string, AuthRole> = {
+  "low-latency-cmd": "User",
+  "strategic-advisor": "Staff",
+  "shift-summary": "Staff",
+  "search-trends": "Staff",
+  "suggest-restock": "Manager",
+  "capacity-quickfix": "Manager",
+  "menu-engineering-suggestions": "Manager",
+  "sustainability-report": "Manager",
+  "analyze-dish-photo": "Staff",
+  "generate-marketing-image": "Admin",
+};
+
+interface AuthenticatedUser {
+  sub: string;
+  email?: string;
+  role: AuthRole;
+}
+
+function verifySignature(unsignedToken: string, signature: string, secret: string) {
+  const expected = createHmac("sha256", secret).update(unsignedToken).digest("base64url");
+  const expectedBuffer = Buffer.from(expected);
+  const actualBuffer = Buffer.from(signature);
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+}
+
+function parseSignedBearerToken(header: string | undefined): AuthenticatedUser | null {
+  if (!header?.startsWith("Bearer ")) return null;
+  const token = header.slice("Bearer ".length).trim();
+  const [encodedHeader, encodedPayload, signature] = token.split(".");
+  if (!encodedHeader || !encodedPayload || !signature) return null;
+
+  const secret = process.env.AUTH_TOKEN_SECRET;
+  if (!secret) return null;
+
+  try {
+    if (!verifySignature(`${encodedHeader}.${encodedPayload}`, signature, secret)) return null;
+
+    const headerPayload = JSON.parse(Buffer.from(encodedHeader, "base64url").toString("utf8")) as { alg?: string };
+    if (headerPayload.alg !== "HS256") return null;
+
+    const payload = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8")) as Partial<AuthenticatedUser> & { exp?: number };
+    if (payload.exp && Date.now() >= payload.exp * 1000) return null;
+    if (!payload.sub || !payload.role || !(payload.role in roleRank)) return null;
+    return { sub: String(payload.sub), email: payload.email, role: payload.role };
+  } catch {
+    return null;
+  }
+}
+
+export function requireRole(minimumRole: AuthRole) {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const user = parseSignedBearerToken(req.header("authorization"));
+    if (!user) {
+      res.status(401).json({ error: "Authentication required." });
+      return;
+    }
+
+    if (roleRank[user.role] < roleRank[minimumRole]) {
+      res.status(403).json({ error: `${minimumRole} role required.` });
+      return;
+    }
+
+    res.locals.user = user;
+    next();
+  };
+}
+
+export function requireWorkflowRole(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const workflow = String(req.params.workflow || "");
+  const minimumRole = workflowMinimumRoles[workflow];
+  if (!minimumRole) {
+    next();
+    return;
+  }
+  return requireRole(minimumRole)(req, res, next);
+}
+
 
 function getAiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -72,6 +161,7 @@ app.get("/api/health", (_req, res) => {
 
 app.post(
   "/api/gemini/low-latency-cmd",
+  requireRole("User"),
   asyncRoute(async (req, res) => {
     const command = getStringBodyValue(req.body, "command");
     if (!command.trim()) {
@@ -86,6 +176,7 @@ app.post(
 
 app.post(
   "/api/gemini/strategic-advisor",
+  requireRole("Staff"),
   asyncRoute(async (req, res) => {
     const prompt = getStringBodyValue(req.body, "prompt");
     if (!prompt.trim()) {
@@ -103,6 +194,7 @@ app.post(
 
 app.post(
   "/api/gemini/:workflow",
+  requireWorkflowRole,
   asyncRoute(async (req, res) => {
     const workflow = String(req.params.workflow);
     const body = req.body as JsonRecord;
@@ -186,7 +278,7 @@ app.post(
   }),
 );
 
-async function startServer() {
+export async function startServer() {
   if (isProduction) {
     const distPath = path.resolve(process.cwd(), "dist");
     app.use(express.static(distPath));
@@ -210,7 +302,11 @@ async function startServer() {
   });
 }
 
-startServer().catch((error) => {
-  console.error("Failed to start Food Penguin dashboard.", error);
-  process.exit(1);
-});
+if (process.env.NODE_ENV !== "test") {
+  startServer().catch((error) => {
+    console.error("Failed to start Food Penguin dashboard.", error);
+    process.exit(1);
+  });
+}
+
+export { app };

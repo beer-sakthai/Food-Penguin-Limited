@@ -31,69 +31,100 @@ export interface FirestoreErrorInfo {
 }
 
 // ----------------------------------------------------------------------------
-// AUTH EMULATOR
+// AUTH PROVIDER
 // ----------------------------------------------------------------------------
-const authListeners: ((user: any) => void)[] = [];
+// Production deployments should configure the real Firebase Web SDK with the
+// VITE_FIREBASE_* environment variables below. When those values are omitted,
+// the app intentionally falls back to a demo-only local auth shim so developers
+// can run the dashboard without cloud credentials. Do not treat the fallback as
+// production authentication or authorization.
+import { initializeApp, getApps } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider as FirebaseGoogleAuthProvider,
+  onAuthStateChanged as firebaseOnAuthStateChanged,
+  signInWithPopup as firebaseSignInWithPopup,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
 
-export const auth = {
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+};
+
+const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean);
+const firebaseApp = hasFirebaseConfig
+  ? getApps()[0] || initializeApp(firebaseConfig)
+  : null;
+
+export const isDemoAuthProvider = !firebaseApp;
+
+const demoAuthListeners: ((user: any) => void)[] = [];
+
+const demoAuth = {
   get currentUser() {
-    const local = localStorage.getItem("localCurrentUser");
+    const local = localStorage.getItem("demoCurrentUser");
     if (local) {
       try {
         const parsed = JSON.parse(local);
         return {
-          uid: "local-simulation-uid",
-          displayName: parsed.username || "Corporate User",
+          uid: parsed.uid || "demo-local-user",
+          displayName: parsed.username || "Demo User",
           email: parsed.email || "demo@foodpenguin.com",
           emailVerified: true,
           isAnonymous: false,
           tenantId: null,
-          providerData: []
+          providerData: [],
+          getIdToken: async () => parsed.sessionToken || "",
         };
       } catch {
         return null;
       }
     }
     return null;
-  }
+  },
 };
 
+export const auth = firebaseApp ? getAuth(firebaseApp) : demoAuth;
+
 export function onAuthStateChanged(authObj: any, callback: (user: any) => void) {
-  // Trigger initial callback
-  callback(auth.currentUser);
-  authListeners.push(callback);
+  if (!isDemoAuthProvider) {
+    return firebaseOnAuthStateChanged(authObj, callback);
+  }
+
+  callback(demoAuth.currentUser);
+  demoAuthListeners.push(callback);
   return () => {
-    const idx = authListeners.indexOf(callback);
-    if (idx !== -1) authListeners.splice(idx, 1);
+    const idx = demoAuthListeners.indexOf(callback);
+    if (idx !== -1) demoAuthListeners.splice(idx, 1);
   };
 }
 
 export async function signOut(authObj: any) {
-  localStorage.removeItem("localCurrentUser");
-  authListeners.forEach(cb => cb(null));
+  if (!isDemoAuthProvider) {
+    return firebaseSignOut(authObj);
+  }
+
+  localStorage.removeItem("demoCurrentUser");
+  demoAuthListeners.forEach((cb) => cb(null));
 }
 
-export class GoogleAuthProvider {
-  setCustomParameters(params?: any) {}
-}
+export const GoogleAuthProvider = isDemoAuthProvider
+  ? class DemoGoogleAuthProvider {
+      setCustomParameters(_params?: any) {}
+    }
+  : FirebaseGoogleAuthProvider;
 
 export async function signInWithPopup(authObj: any, provider: any) {
-  const mockGoogleUser = {
-    uid: "google-mock-id",
-    displayName: "Corporate Auditor",
-    email: "auditor@foodpenguin.com",
-    emailVerified: true,
-    isAnonymous: false,
-    tenantId: null,
-    providerData: []
-  };
-  localStorage.setItem("localCurrentUser", JSON.stringify({
-    username: "Corporate Auditor",
-    role: "Admin",
-    email: "auditor@foodpenguin.com"
-  }));
-  authListeners.forEach(cb => cb(mockGoogleUser));
-  return { user: mockGoogleUser };
+  if (!isDemoAuthProvider) {
+    return firebaseSignInWithPopup(authObj, provider);
+  }
+
+  throw new Error(
+    "Demo auth cannot complete Google sign-in. Configure VITE_FIREBASE_* for real Firebase Authentication.",
+  );
 }
 
 // ----------------------------------------------------------------------------

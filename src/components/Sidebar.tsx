@@ -16,7 +16,6 @@ export interface SidebarProps {
   lowStockCount: number;
   currentUser: { username: string; role: string; photoURL?: string; email?: string } | null;
   userRole: string;
-  setUserRole: (role: any) => void;
   isFirebaseSynced: boolean;
   onSignOut: () => void;
 }
@@ -36,7 +35,6 @@ export function Sidebar({
   lowStockCount,
   currentUser,
   userRole,
-  setUserRole,
   isFirebaseSynced,
   onSignOut,
 }: SidebarProps) {
@@ -171,12 +169,7 @@ export function Sidebar({
                 {currentUser?.username || "Food Penguin User"}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <select className={`input-gold-glow bg-transparent font-mono text-xs uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${ isLight ? "text-zinc-500 active:scale-[0.98] hover:text-zinc-800 font-bold" : "text-zinc-500 hover:text-zinc-300" }`} value={userRole} onChange={(e) => setUserRole(e.target.value)}>
-                  <option value="Admin">Admin</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Staff">Staff</option>
-                  <option value="User">User</option>
-                </select>
+                <span className={`font-mono text-xs uppercase ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}>{userRole}</span>
                 <span className="text-zinc-500 font-mono text-xs">•</span>
                 <button
                   onClick={onSignOut}
