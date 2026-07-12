@@ -428,7 +428,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
-  >("Admin");
+  >("User");
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     role: string;
@@ -441,26 +441,23 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        const claimsRole = (user as any).reloadUserInfo?.customAttributes
+          ? JSON.parse((user as any).reloadUserInfo.customAttributes).role
+          : undefined;
+        const assignedRole = ["Admin", "Manager", "Staff", "User"].includes(claimsRole)
+          ? claimsRole
+          : "User";
+
         setCurrentUser({
           username: user.displayName || user.email || "Google User",
-          role: "Admin",
+          role: assignedRole,
           email: user.email || undefined,
           photoURL: user.photoURL || undefined,
         });
-        setUserRole("Admin");
+        setUserRole(assignedRole);
       } else {
-        const storedUser = localStorage.getItem("localCurrentUser");
-        if (storedUser) {
-          try {
-            const parsed = JSON.parse(storedUser);
-            setCurrentUser(parsed);
-            setUserRole(parsed.role);
-          } catch (_) {
-            setCurrentUser(null);
-          }
-        } else {
-          setCurrentUser(null);
-        }
+        setCurrentUser(null);
+        setUserRole("User");
       }
     });
     return () => unsubscribe();
@@ -2235,10 +2232,10 @@ export default function App() {
         <LoginScreen
           theme={theme}
           onLogin={(username, role) => {
-            const userObj = { username, role, email: "demo@foodpenguin.com" };
-            localStorage.setItem("localCurrentUser", JSON.stringify(userObj));
+            const safeRole = ["Admin", "Manager", "Staff", "User"].includes(role) ? role : "User";
+            const userObj = { username, role: safeRole, email: "demo@foodpenguin.com" };
             setCurrentUser(userObj);
-            setUserRole(role as any);
+            setUserRole(safeRole as any);
           }}
         />
       </div>
@@ -2276,10 +2273,9 @@ export default function App() {
             lowStockCount={lowStockCount}
             currentUser={currentUser}
             userRole={userRole}
-            setUserRole={setUserRole}
             isFirebaseSynced={isFirebaseSynced}
             onSignOut={async () => {
-              localStorage.removeItem("localCurrentUser");
+              localStorage.removeItem("demoCurrentUser");
               setCurrentUser(null);
               await signOut(auth).catch(() => { });
             }}
@@ -4339,15 +4335,10 @@ export default function App() {
                       {currentUser?.username || "Skipper Koala"}
                     </p>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <select className={`input-gold-glow bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${isLight ? "text-zinc-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold" : "text-zinc-500 hover:text-zinc-300"}`} value={userRole} onChange={(e) => setUserRole(e.target.value as any)}>
-                        <option value="Admin">Admin</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Staff">Staff</option>
-                        <option value="User">User</option>
-                      </select>
+                      <span className={`font-mono text-[10px] uppercase ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}>{userRole}</span>
                       <span className="text-zinc-500 font-mono text-[8px]">•</span>
                       <button className={`btn-interactive text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${isLight ? "text-zinc-500 font-bold" : "text-zinc-400"}`} onClick={async () => {
-                        localStorage.removeItem("localCurrentUser");
+                        localStorage.removeItem("demoCurrentUser");
                         setCurrentUser(null);
                         await signOut(auth).catch(() => { });
                       }} title="Sign Out">

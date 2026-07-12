@@ -1,10 +1,10 @@
 # Food Penguin Limited - Corporate Dashboard
 
-A comprehensive, unified corporate dashboard built for Food Penguin Limited. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, role-based access control, data visualizations, and embedded AI analytics for efficient restaurant management.
+A comprehensive, unified corporate dashboard built for Food Penguin Limited. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, demo role-based module visibility, server-side protected AI routes, data visualizations, and embedded AI analytics for efficient restaurant management.
 
 ## 🌟 Key Functional Modules & Features
 
-* **Role-Based Access Control (RBAC):** Distinct permission levels and module access configurations for Admin, Manager, and Staff roles.
+* **RBAC Boundary:** The UI demonstrates role-based module visibility for Admin, Manager, Staff, and User roles, but production-grade RBAC must be enforced by authenticated identity claims and server-side authorization. Protected `/api/gemini/*` routes now require signed bearer claims and role checks; do not rely on localStorage, browser state, or UI selectors for production authorization.
 * **Dynamic Day/Night Mode:** Full application-wide support for Day (Light) and Night (Dark) mode themes, completely customizing the user interface aesthetics based on preference.
 * **Intelligent Dashboarding & Visualizations:** Interactive analytics powered by `recharts` providing visual overviews seamlessly.
   * **Unified Overview (Strategic Center):** Real-time production status indicators, calendar-scoped throughput tracking, Irish standard regulatory clock indicators, and deep operational audits.
@@ -109,10 +109,16 @@ GEMINI_API_KEY="your_google_ai_studio_key"
 
 Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a configuration error from the API.
 
+### Authentication & Authorization
+
+Configure the Firebase Web SDK for production sign-in by setting the `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, and `VITE_FIREBASE_APP_ID` variables. If these are absent, the frontend clearly runs in demo-only auth mode with a non-privileged demo user; this is for local development only.
+
+Production roles should be assigned by your identity provider/custom claims and verified server-side. Set `AUTH_TOKEN_SECRET` for signed backend bearer-token verification or replace the verifier with your production identity provider SDK. The Express backend protects AI workflows with minimum roles: general commands require `User`, advisory/photo analysis workflows require `Staff`, restock/capacity/menu/sustainability workflows require `Manager`, and marketing image generation is `Admin` only.
+
 ## 📂 Project Structure
 
 * `/src/components/` - Features a modular layout with separate tabs (`OverviewTab.tsx`, `SellTab.tsx`, `TargetTab.tsx`, `ProductionTab.tsx`, `WasteTab.tsx`, `HoursTab.tsx`).
-* `/src/App.tsx` - Main orchestration entry point handling states, user roles, calendar date-range scopes, and unified navigation.
+* `/src/App.tsx` - Main orchestration entry point handling states, authenticated user role display, calendar date-range scopes, and unified navigation.
 * `/src/types.ts` - Centralized TypeScript interfaces for metrics, models, targets, etc.
 * `/src/data.ts` - Local data engines, multi-week data maps, and default state providers context.
 * `/src/index.css` - Global Tailwind CSS and specific font asset integrations.

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChefHat, Lock, User, LogIn, UserPlus } from 'lucide-react';
+import { ChefHat, Lock, User, LogIn } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider, auth } from '../firebase';
 
 interface LoginScreenProps {
@@ -9,10 +9,8 @@ interface LoginScreenProps {
 
 export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProps) {
   const isLight = theme === 'light';
-  const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'Admin' | 'User'>('User');
   const [error, setError] = useState('');
 
   const handleGoogleSignIn = async () => {
@@ -23,7 +21,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
       provider.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(auth, provider);
       if (result.user) {
-        onLogin(result.user.displayName || result.user.email || 'Google User', 'Admin');
+        onLogin(result.user.displayName || result.user.email || 'Google User', 'User');
       }
     } catch (err: any) {
       console.error('Google Auth Error:', err);
@@ -31,7 +29,8 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
     }
   };
 
-  // Very basic mock storage for users
+  // Demo-only local sign-in. Production roles must come from the configured
+  // authentication provider/custom claims, not from a browser-controlled picker.
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
@@ -39,25 +38,12 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
       return;
     }
 
-    const usersStr = localStorage.getItem('mockUsers');
-    const users = usersStr ? JSON.parse(usersStr) : [{ username: 'admin', password: 'password', role: 'Admin' }];
-
-    if (isRegistering) {
-      if (users.find((u: any) => u.username === username)) {
-        setError('Username already exists');
-        return;
-      }
-      const newUser = { username, password, role };
-      localStorage.setItem('mockUsers', JSON.stringify([...users, newUser]));
-      onLogin(username, role);
-    } else {
-      const user = users.find((u: any) => u.username === username && u.password === password);
-      if (user) {
-        onLogin(user.username, user.role);
-      } else {
-        setError('Invalid username or password');
-      }
+    if (username === 'demo' && password === 'password') {
+      onLogin('Demo User', 'User');
+      return;
     }
+
+    setError('Invalid demo credentials or configure Firebase Authentication');
   };
 
   return (
@@ -72,7 +58,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             Food Penguin Limited
           </h1>
           <p className={`text-sm mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-            {isRegistering ? 'Create a new account' : 'Sign in to your account'}
+            Sign in to your account
           </p>
         </div>
 
@@ -99,27 +85,16 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             </div>
           </div>
 
-          {isRegistering && (
-            <div>
-              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Role</label>
-              <select className={`input-gold-glow w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] appearance-none cursor-pointer ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black' }`} value={role} onChange={e => setRole(e.target.value as 'Admin' | 'User')}>
-                <option value="User">User (View Only)</option>
-                <option value="Admin">Admin (Full Access)</option>
-              </select>
-            </div>
-          )}
-
           <button
             type="submit"
             className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-md shadow-amber-500/10 btn-interactive"
           >
-            {isRegistering ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
-            {isRegistering ? 'Create Account' : 'Sign In'}
+            <LogIn className="w-5 h-5" />
+            Sign In
           </button>
         </form>
 
-        {!isRegistering && (
-          <>
+        <>
             <div className="relative my-5 flex py-1 items-center">
               <div className={`flex-grow border-t ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`}></div>
               <span className={`flex-shrink mx-4 text-xs font-mono font-bold uppercase tracking-widest ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>Or Corporate Auth</span>
@@ -156,22 +131,10 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
               Sign in with Google
             </button>
           </>
-        )}
-
-        <div className={`mt-6 pt-6 border-t text-center text-sm ${isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-400'}`}>
-          {isRegistering ? 'Already have an account? ' : 'Need an account? '}
-          <button className="btn-interactive font-bold text-amber-500 hover:text-amber-400 underline transition-colors" onClick={() => {
-              setIsRegistering(!isRegistering);
-              setError('');
-            }}>
-            {isRegistering ? 'Sign in' : 'Register now'}
-          </button>
-        </div>
-        
-        {!isRegistering && (
+        {(
           <div className="mt-4 text-center">
             <span className={`text-xs uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
-              Demo Credentials: user=admin pass=password
+              Demo Credentials: user=demo pass=password (User role only)
             </span>
           </div>
         )}
