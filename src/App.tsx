@@ -1603,8 +1603,19 @@ export default function App() {
       return;
     }
 
-    const sanitizedAmount = Math.max(0, newOrder.amount);
-    const sanitizedQuantity = Math.max(0, Math.floor(newOrder.quantity));
+    if (newOrder.quantity <= 0 || !Number.isInteger(newOrder.quantity)) {
+      const message = "Order quantity must be a whole number of at least 1.";
+      console.warn(`handleAddOrder: ${message}`, newOrder);
+      window.alert(message);
+      return;
+    }
+
+    if (newOrder.amount < 0) {
+      const message = "Order amount cannot be negative.";
+      console.warn(`handleAddOrder: ${message}`, newOrder);
+      window.alert(message);
+      return;
+    }
 
     const timestampStr = new Date().toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -1617,8 +1628,8 @@ export default function App() {
     const fullOrder: SalesOrder = {
       item: newOrder.item,
       category: newOrder.category ?? 'Sushi Rolls',
-      quantity: sanitizedQuantity,
-      amount: sanitizedAmount,
+      quantity: newOrder.quantity,
+      amount: newOrder.amount,
       status: newOrder.status as SalesOrder["status"],
       id: orderId,
       timestamp: timestampStr,
@@ -1705,13 +1716,20 @@ export default function App() {
       return;
     }
 
+    if (newTask.quantity <= 0 || !Number.isInteger(newTask.quantity)) {
+      const message = "Task quantity must be a whole number of at least 1.";
+      console.warn(`handleAddTask: ${message}`, newTask);
+      window.alert(message);
+      return;
+    }
+
     const taskId = createRecordId("PT");
     // 2. Create clean object
     const fullTask: ProductionTask = {
       itemName: newTask.itemName,
       assignedTo: newTask.assignedTo,
       status: newTask.status as ProductionTask["status"],
-      quantity: Math.max(0, Math.floor(newTask.quantity)),
+      quantity: newTask.quantity,
       priority: newTask.priority || 'low',
       id: taskId,
     };

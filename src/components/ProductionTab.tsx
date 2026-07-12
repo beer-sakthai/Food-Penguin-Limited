@@ -50,7 +50,8 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
   // New production cooker task form
   const [taskItem, setTaskItem] = useState('');
   const [assignedTo, setAssignedTo] = useState('Chef Skipper');
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState('1');
+  const [quantityError, setQuantityError] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
 
   // Auditor states
@@ -129,15 +130,23 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
   const handleSubmitTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskItem.trim()) return;
+
+    const parsedQty = Number(qty);
+    if (!Number.isInteger(parsedQty) || parsedQty < 1) {
+      setQuantityError('Quantity must be a whole number of at least 1 before a dish can be queued.');
+      return;
+    }
+
+    setQuantityError('');
     onAddTask({
       itemName: taskItem,
       assignedTo,
-      quantity: qty,
+      quantity: parsedQty,
       priority,
       status: 'In Queue'
     });
     setTaskItem('');
-    setQty(1);
+    setQty('1');
   };
 
   return (
@@ -406,7 +415,12 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Quantity</label>
-                <input className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'}`} type="number" min="1" value={qty} onChange={e => setQty(parseInt(e.target.value) || 1)} required />
+                <input className={`input-gold-glow w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${quantityError ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500' : ''} ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-white'}`} type="number" min="1" step="1" value={qty} onChange={e => { setQty(e.target.value); setQuantityError(''); }} required />
+                {quantityError && (
+                  <p className="mt-1.5 text-xs font-mono text-rose-500" role="alert">
+                    {quantityError}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-zinc-400">Priority</label>
