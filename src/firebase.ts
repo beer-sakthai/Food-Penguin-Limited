@@ -31,39 +31,14 @@ export interface FirestoreErrorInfo {
 }
 
 // ----------------------------------------------------------------------------
-// AUTH PROVIDER
+// LOCAL AUTH PROVIDER
 // ----------------------------------------------------------------------------
-// Production deployments should configure the real Firebase Web SDK with the
-// VITE_FIREBASE_* environment variables below. When those values are omitted,
-// the app intentionally falls back to a demo-only local auth shim so developers
-// can run the dashboard without cloud credentials. Do not treat the fallback as
-// production authentication or authorization.
-import { initializeApp, getApps } from "firebase/app";
-import {
-  getAuth,
-  GoogleAuthProvider as FirebaseGoogleAuthProvider,
-  onAuthStateChanged as firebaseOnAuthStateChanged,
-  signInWithPopup as firebaseSignInWithPopup,
-  signOut as firebaseSignOut,
-} from "firebase/auth";
+// The dashboard runs fully offline: authentication is a browser-local demo
+// shim persisted in localStorage. There is no cloud identity provider, so
+// nothing here is production authentication or authorization.
+const localAuthListeners: ((user: any) => void)[] = [];
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
-
-const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean);
-const firebaseApp = hasFirebaseConfig
-  ? getApps()[0] || initializeApp(firebaseConfig)
-  : null;
-
-export const isDemoAuthProvider = !firebaseApp;
-
-const demoAuthListeners: ((user: any) => void)[] = [];
-
-const demoAuth = {
+const localAuth = {
   get currentUser() {
     const local = localStorage.getItem("demoCurrentUser");
     if (local) {
@@ -77,6 +52,9 @@ const demoAuth = {
           isAnonymous: false,
           tenantId: null,
           providerData: [],
+          reloadUserInfo: parsed.role
+            ? { customAttributes: JSON.stringify({ role: parsed.role }) }
+            : undefined,
           getIdToken: async () => parsed.sessionToken || "",
         };
       } catch {
@@ -87,44 +65,20 @@ const demoAuth = {
   },
 };
 
-export const auth = firebaseApp ? getAuth(firebaseApp) : demoAuth;
+export const auth = localAuth;
 
-export function onAuthStateChanged(authObj: any, callback: (user: any) => void) {
-  if (!isDemoAuthProvider) {
-    return firebaseOnAuthStateChanged(authObj, callback);
-  }
-
-  callback(demoAuth.currentUser);
-  demoAuthListeners.push(callback);
+export function onAuthStateChanged(_authObj: any, callback: (user: any) => void) {
+  callback(localAuth.currentUser);
+  localAuthListeners.push(callback);
   return () => {
-    const idx = demoAuthListeners.indexOf(callback);
-    if (idx !== -1) demoAuthListeners.splice(idx, 1);
+    const idx = localAuthListeners.indexOf(callback);
+    if (idx !== -1) localAuthListeners.splice(idx, 1);
   };
 }
 
-export async function signOut(authObj: any) {
-  if (!isDemoAuthProvider) {
-    return firebaseSignOut(authObj);
-  }
-
+export async function signOut(_authObj: any) {
   localStorage.removeItem("demoCurrentUser");
-  demoAuthListeners.forEach((cb) => cb(null));
-}
-
-export const GoogleAuthProvider = isDemoAuthProvider
-  ? class DemoGoogleAuthProvider {
-      setCustomParameters(_params?: any) {}
-    }
-  : FirebaseGoogleAuthProvider;
-
-export async function signInWithPopup(authObj: any, provider: any) {
-  if (!isDemoAuthProvider) {
-    return firebaseSignInWithPopup(authObj, provider);
-  }
-
-  throw new Error(
-    "Demo auth cannot complete Google sign-in. Configure VITE_FIREBASE_* for real Firebase Authentication.",
-  );
+  localAuthListeners.forEach((cb) => cb(null));
 }
 
 // ----------------------------------------------------------------------------
@@ -159,6 +113,9 @@ export async function getDocs(collectionRef: any) {
     forEach: () => {}
   };
 }
+
+const legacySafeDocIdRegex = /^[a-zA-Z0-9-_]+$/;
+const prefixedUuidDocIdRegex = /^[a-zA-Z0-9]+-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type SnapshotCallback = (snapshot: any) => void;
 type SnapshotSubscriber = () => void;
@@ -234,12 +191,11 @@ function validateProposedDoc(colName: string, docId: string, proposed: any) {
     throw new Error("PERMISSION_DENIED");
   }
   
-  // 3. Id Integrity (alphanumeric and safe hyphens/underscores, length limit of 128)
+  // 3. Id Integrity (alphanumeric plus safe hyphens/underscores for prefixed UUIDs, length limit of 128)
   if (typeof docId !== "string" || docId.length === 0 || docId.length > 128) {
     throw new Error("PERMISSION_DENIED");
   }
-  const idRegex = /^[a-zA-Z0-9-_]+$/;
-  if (!idRegex.test(docId)) {
+  if (!legacySafeDocIdRegex.test(docId) && !prefixedUuidDocIdRegex.test(docId)) {
     throw new Error("PERMISSION_DENIED");
   }
 

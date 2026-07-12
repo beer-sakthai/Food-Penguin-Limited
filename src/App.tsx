@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { jsPDF } from "jspdf";
 import { Reorder, motion } from "motion/react";
 import {
   initialMetrics,
@@ -50,6 +49,7 @@ import LoginScreen from "./components/LoginScreen";
 import MenuEngineeringTab from "./components/MenuEngineeringTab";
 import { MS_PRODUCTS, TESCO_PRODUCTS } from "./data";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
+import { createRecordId } from "./utils/ids";
 
 // Main Icons
 import {
@@ -89,19 +89,17 @@ import {
 } from "lucide-react";
 
 import { RotateCcw, Info, LogOut, GitCompare, BrainCircuit } from "lucide-react";
+import { useThemeSettings } from "./hooks/useThemeSettings";
+import { useDashboardAuth } from "./hooks/useDashboardAuth";
+import { useDashboardCollections } from "./hooks/useDashboardCollections";
+import { exportCapacityPDF } from "./utils/reports";
 import {
-  auth,
   db,
+  doc,
+  setDoc,
+  updateDoc,
   handleFirestoreError,
   OperationType,
-  onAuthStateChanged,
-  signOut,
-  collection,
-  onSnapshot,
-  setDoc,
-  doc,
-  updateDoc,
-  getDocs,
 } from "./firebase";
 
 const rolePermissions: Record<
@@ -169,409 +167,45 @@ const rolePermissions: Record<
   User: ["Overview", "Advisor", "Realtime", "DataAnalyst"], // User can only view data
 };
 
-const getDayContributingItems = (day: string, projected: number) => {
-  const totalUnits = Math.round(projected * 12);
-  switch (day) {
-    case "Mon":
-      return [
-        {
-          name: "Tokyo Dragon Roll",
-          quantity: Math.round(totalUnits * 0.45),
-          category: "Sushi Rolls",
-          loadShare: 45,
-          impact: "High",
-        },
-        {
-          name: "California Roll Classic",
-          quantity: Math.round(totalUnits * 0.35),
-          category: "Sushi Rolls",
-          loadShare: 35,
-          impact: "Medium",
-        },
-        {
-          name: "Premium Sushi Rice Prep",
-          quantity: Math.round(totalUnits * 0.2),
-          category: "Grains",
-          loadShare: 20,
-          impact: "Low",
-        },
-      ];
-    case "Tue":
-      return [
-        {
-          name: "Spicy Bluefin Tuna Roll",
-          quantity: Math.round(totalUnits * 0.5),
-          category: "Sushi Rolls",
-          loadShare: 50,
-          impact: "High",
-        },
-        {
-          name: "Kyoto Salmon Sashimi Platter",
-          quantity: Math.round(totalUnits * 0.3),
-          category: "Sashimi & Platters",
-          loadShare: 30,
-          impact: "Medium",
-        },
-        {
-          name: "Nori Seaweed Processing",
-          quantity: Math.round(totalUnits * 0.2),
-          category: "Dry Goods",
-          loadShare: 20,
-          impact: "Low",
-        },
-      ];
-    case "Wed":
-      return [
-        {
-          name: "Volcano Baked Scallop Roll",
-          quantity: Math.round(totalUnits * 0.4),
-          category: "Specialty Rolls",
-          loadShare: 40,
-          impact: "High",
-        },
-        {
-          name: "Tokyo Dragon Roll",
-          quantity: Math.round(totalUnits * 0.35),
-          category: "Sushi Rolls",
-          loadShare: 35,
-          impact: "Medium",
-        },
-        {
-          name: "Fresh Avocados Slicing",
-          quantity: Math.round(totalUnits * 0.25),
-          category: "Produce",
-          loadShare: 25,
-          impact: "Low",
-        },
-      ];
-    case "Thu":
-      return [
-        {
-          name: "Kyoto Salmon Sashimi Platter",
-          quantity: Math.round(totalUnits * 0.45),
-          category: "Sashimi & Platters",
-          loadShare: 45,
-          impact: "High",
-        },
-        {
-          name: "California Roll Classic",
-          quantity: Math.round(totalUnits * 0.35),
-          category: "Sushi Rolls",
-          loadShare: 35,
-          impact: "Medium",
-        },
-        {
-          name: "Sushi Seasoning Vinegar Mix",
-          quantity: Math.round(totalUnits * 0.2),
-          category: "Condiments",
-          loadShare: 20,
-          impact: "Low",
-        },
-      ];
-    case "Fri":
-      return [
-        {
-          name: "Tokyo Dragon Roll",
-          quantity: Math.round(totalUnits * 0.55),
-          category: "Sushi Rolls",
-          loadShare: 55,
-          impact: "Critical",
-        },
-        {
-          name: "Spicy Bluefin Tuna Roll",
-          quantity: Math.round(totalUnits * 0.3),
-          category: "Sushi Rolls",
-          loadShare: 30,
-          impact: "Medium",
-        },
-        {
-          name: "Bluefin Tuna Loin Portioning",
-          quantity: Math.round(totalUnits * 0.15),
-          category: "Seafood",
-          loadShare: 15,
-          impact: "Low",
-        },
-      ];
-    case "Sat":
-      return [
-        {
-          name: "Volcano Baked Scallop Roll",
-          quantity: Math.round(totalUnits * 0.45),
-          category: "Specialty Rolls",
-          loadShare: 45,
-          impact: "High",
-        },
-        {
-          name: "Kyoto Salmon Sashimi Platter",
-          quantity: Math.round(totalUnits * 0.4),
-          category: "Sashimi & Platters",
-          loadShare: 40,
-          impact: "High",
-        },
-        {
-          name: "Atlantic Sushi Salmon Slicing",
-          quantity: Math.round(totalUnits * 0.15),
-          category: "Seafood",
-          loadShare: 15,
-          impact: "Low",
-        },
-      ];
-    case "Sun":
-      return [
-        {
-          name: "Tokyo Dragon Roll",
-          quantity: Math.round(totalUnits * 0.4),
-          category: "Sushi Rolls",
-          loadShare: 40,
-          impact: "High",
-        },
-        {
-          name: "Spicy Bluefin Tuna Roll",
-          quantity: Math.round(totalUnits * 0.35),
-          category: "Sushi Rolls",
-          loadShare: 35,
-          impact: "Medium",
-        },
-        {
-          name: "California Roll Classic",
-          quantity: Math.round(totalUnits * 0.25),
-          category: "Sushi Rolls",
-          loadShare: 25,
-          impact: "Low",
-        },
-      ];
-    default:
-      return [
-        {
-          name: "Tokyo Dragon Roll",
-          quantity: Math.round(totalUnits * 0.5),
-          category: "Sushi Rolls",
-          loadShare: 50,
-          impact: "High",
-        },
-        {
-          name: "California Roll Classic",
-          quantity: Math.round(totalUnits * 0.5),
-          category: "Sushi Rolls",
-          loadShare: 50,
-          impact: "Medium",
-        },
-      ];
-  }
-};
+import { autoFlagInventory, getDayContributingItems } from "./appUtils";
+
 
 export default function App() {
-  // App States
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    try {
-      return (localStorage.getItem("theme") as "dark" | "light") || "dark";
-    } catch {
-      return "dark";
-    }
-  });
+  const {
+    theme,
+    setTheme,
+    metallicTheme,
+    toggleTheme,
+    changeMetallicTheme,
+    isLight,
+  } = useThemeSettings();
 
-  const [metallicTheme, setMetallicTheme] = useState<
-    "gold" | "silver" | "copper" | "crystal"
-  >(() => {
-    try {
-      return (
-        (localStorage.getItem("metallicTheme") as
-          "gold" | "silver" | "copper" | "crystal") || "gold"
-      );
-    } catch {
-      return "gold";
-    }
-  });
-
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    try {
-      localStorage.setItem("theme", nextTheme);
-    } catch (_) { }
-  };
-
-  const changeMetallicTheme = (
-    metal: "gold" | "silver" | "copper" | "crystal",
-  ) => {
-    setMetallicTheme(metal);
-    try {
-      localStorage.setItem("metallicTheme", metal);
-    } catch (_) { }
-  };
-
-  // Apply Theme classes to root HTML element for complete Tailwind/custom utility integration
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("metal-gold", "metal-silver", "metal-copper");
-    root.classList.add(`metal-${metallicTheme}`);
-  }, [metallicTheme]);
-
-  const getBoxLinerClass = (forceGold: boolean = false) => {
-    if (forceGold) return "gold-liner-box";
-    if (metallicTheme === "silver") return "silver-liner-box";
-    if (metallicTheme === "copper") return "copper-liner-box";
-    if (metallicTheme === "crystal") return "crystal-liner-box";
-    return "gold-liner-box";
-  };
+  const { currentUser, userRole, setUserRole, loginLocalUser, logout } =
+    useDashboardAuth();
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [userRole, setUserRole] = useState<
-    "Admin" | "Manager" | "Staff" | "User"
-  >("User");
-  const [currentUser, setCurrentUser] = useState<{
-    username: string;
-    role: string;
-    email?: string;
-    photoURL?: string;
-  } | null>(null);
-  const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
 
-  // Auth Listener
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const claimsRole = (user as any).reloadUserInfo?.customAttributes
-          ? JSON.parse((user as any).reloadUserInfo.customAttributes).role
-          : undefined;
-        const assignedRole = ["Admin", "Manager", "Staff", "User"].includes(claimsRole)
-          ? claimsRole
-          : "User";
-
-        setCurrentUser({
-          username: user.displayName || user.email || "Google User",
-          role: assignedRole,
-          email: user.email || undefined,
-          photoURL: user.photoURL || undefined,
-        });
-        setUserRole(assignedRole);
-      } else {
-        setCurrentUser(null);
-        setUserRole("User");
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Firestore Sync Listener
-  useEffect(() => {
-    if (
-      !currentUser ||
-      !currentUser.email ||
-      currentUser.email === "demo@foodpenguin.com"
-    ) {
-      setIsFirebaseSynced(false);
-      return;
-    }
-
-    const unsubscribeList: (() => void)[] = [];
-
-    const syncCollection = async <T extends { id: string }>(
-      colName: string,
-      initialData: T[],
-      setList: React.Dispatch<React.SetStateAction<T[]>>,
-      opType: OperationType,
-    ) => {
-      try {
-        const ref = collection(db, colName);
-        const snap = await getDocs(ref).catch((err) =>
-          handleFirestoreError(err, OperationType.LIST, colName),
-        );
-
-        if (snap.empty) {
-          // Seed initial data
-          for (const item of initialData) {
-            await setDoc(doc(db, colName, item.id), item).catch((err) =>
-              handleFirestoreError(
-                err,
-                OperationType.WRITE,
-                `${colName}/${item.id}`,
-              ),
-            );
-          }
-        }
-
-        const unsub = onSnapshot(
-          ref,
-          (snapshot) => {
-            const list: T[] = [];
-            snapshot.forEach((doc: any) => {
-              list.push(doc.data() as T);
-            });
-            setList(list);
-          },
-          (err) => handleFirestoreError(err, OperationType.GET, colName),
-        );
-
-        unsubscribeList.push(unsub);
-      } catch (e) {
-        console.error(`Error syncing ${colName} with Firestore:`, e);
-      }
-    };
-
-    const initSync = async () => {
-      await syncCollection(
-        "orders",
-        initialOrders,
-        setOrders,
-        OperationType.WRITE,
-      );
-      await syncCollection(
-        "tasks",
-        initialTasks,
-        setTasks,
-        OperationType.WRITE,
-      );
-      await syncCollection(
-        "waste",
-        initialWaste,
-        setWasteRecords,
-        OperationType.WRITE,
-      );
-      await syncCollection(
-        "targets",
-        initialTargets,
-        setTargets,
-        OperationType.WRITE,
-      );
-      await syncCollection(
-        "hours",
-        initialHours,
-        setHoursData,
-        OperationType.WRITE,
-      );
-      await syncCollection(
-        "inventory",
-        initialInventory,
-        setInventory,
-        OperationType.WRITE,
-      );
-      setIsFirebaseSynced(true);
-    };
-
-    initSync();
-
-    return () => {
-      unsubscribeList.forEach((unsub) => unsub());
-    };
-  }, [currentUser]);
 
   const [selectedBranch, setSelectedBranch] = useState<
     "Marks & Spencer - Cork City" | "Tesco - Cork City" | "Tesco - Mahon Point" | "All Branches"
   >("All Branches");
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
-  const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
-  const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
+  const {
+    isFirebaseSynced,
+    orders,
+    setOrders,
+    targets,
+    setTargets,
+    tasks,
+    setTasks,
+    wasteRecords,
+    setWasteRecords,
+    hoursData,
+    setHoursData,
+    inventory,
+    setInventory,
+  } = useDashboardCollections(currentUser);
 
   const recipes = useMemo<Recipe[]>(() => {
     const isMS = selectedBranch === "Marks & Spencer - Cork City";
@@ -684,8 +318,6 @@ export default function App() {
     }));
   }, [selectedBranch]);
 
-  const [tasks, setTasks] = useState<ProductionTask[]>(initialTasks);
-
   // Sync tasks list with active branch products on branch switch
   useEffect(() => {
     if (isFirebaseSynced) return;
@@ -732,25 +364,10 @@ export default function App() {
     }
   }, [selectedBranch, isFirebaseSynced]);
 
-  const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>(initialWaste);
   const [alerts, setAlerts] = useState<RealtimeAlert[]>(initialAlerts);
-  const [hoursData, setHoursData] = useState<EmployeeHour[]>(initialHours);
-  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [menuItems, setMenuItems] = useState<MenuEngineeringItem[]>(initialMenuEngineeringItems);
 
   // Automatically flags inventory items based on stock level and reorder thresholds
-  const autoFlagInventory = (items: InventoryItem[]): InventoryItem[] => {
-    return items.map((item) => {
-      let status: "Healthy" | "Low" | "Critical" = "Healthy";
-      if (item.stockLevel <= 20) {
-        status = "Critical";
-      } else if (item.stockLevel <= 50 || item.currentQty <= item.reorderLevel) {
-        status = "Low";
-      }
-      return { ...item, status };
-    });
-  };
-
   const processedInventory = useMemo(() => {
     return autoFlagInventory(inventory);
   }, [inventory]);
@@ -1329,259 +946,15 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  // Export Daily projected capacity as a stunning, styled PDF summary document for reporting purposes
   const handleExportCapacityPDF = () => {
-    if (!dailyCapacityBreakdown || dailyCapacityBreakdown.length === 0) return;
-
-    // Initialize portrait PDF (A4 size page dimensions: 210mm x 297mm)
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+    exportCapacityPDF({
+      dailyCapacityBreakdown,
+      sortedDailyCapacityBreakdown,
+      selectedWeekRange,
+      bottleneckThreshold,
+      capacitySmoothing,
+      capacitySortBy,
     });
-
-    // Helper color palette following the elegant Slate & Amber UI dashboard theme
-    const primaryColor = [24, 24, 27]; // Dark Slate (Zinc 900)
-    const accentColor = [249, 115, 22]; // Orange 500
-    const lightBg = [244, 244, 245]; // Light Gray (Zinc 100)
-    const alertColor = [239, 68, 68]; // Red 500
-    const amberAlert = [217, 119, 6]; // Amber 600
-    const textGray = [113, 113, 122]; // Zinc 500
-
-    // --- Page Header Background Accent Banner ---
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.rect(0, 0, 210, 42, "F");
-
-    // Header Metadata & Typography branding
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(15);
-    doc.text("BAKERY OPERATIONAL CORE SUITE", 15, 14);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9.5);
-    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
-    doc.text("PREDICTIVE WEEKLY CAPACITY PROJECTION REPORT", 15, 20);
-
-    doc.setTextColor(161, 161, 170); // Zinc 400
-    doc.setFontSize(8);
-    doc.text(`Active Calendar Frame: ${selectedWeekRange}`, 15, 26);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date().toLocaleTimeString("en-US")}`,
-      15,
-      30,
-    );
-
-    // Dynamic watermarked badge
-    doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
-    doc.rect(168, 10, 27, 5, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "bold");
-    doc.text("ANALYTICS ENGINE", 170, 13.5);
-
-    // --- KPIs / Summary Metric Cards Banner ---
-    let yPos = 52;
-
-    const totalDays = dailyCapacityBreakdown.length;
-    const avgProjected = Math.round(
-      dailyCapacityBreakdown.reduce((sum, item) => sum + item.projected, 0) /
-      totalDays,
-    );
-    const maxProjectedItem = [...dailyCapacityBreakdown].sort(
-      (a, b) => b.projected - a.projected,
-    )[0];
-    const bottlenecksCount = dailyCapacityBreakdown.filter(
-      (item) => item.projected > bottleneckThreshold,
-    ).length;
-
-    // Background container sheet for key summaries
-    doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]);
-    doc.roundedRect(15, yPos, 180, 25, 2.5, 2.5, "F");
-
-    // KPI Box 1: Average Load
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.text("AVERAGE LOAD FACTOR", 22, yPos + 7);
-    doc.setFontSize(14);
-    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
-    doc.text(`${avgProjected}%`, 22, yPos + 17);
-
-    // KPI Box 2: Peak Loaded Day
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.text("PEAK CAPACITY LIMIT", 80, yPos + 7);
-    doc.setFontSize(12.5);
-    doc.setTextColor(39, 39, 42); // Zinc 800
-    doc.text(`${maxProjectedItem.projected}% Load`, 80, yPos + 14.5);
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    doc.text(`On ${maxProjectedItem.day}`, 80, yPos + 19);
-
-    // KPI Box 3: Bottleneck Threshold Alarms
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text("THRESHOLD BOTTLENECKS", 138, yPos + 7);
-    doc.setFontSize(13.5);
-    if (bottlenecksCount > 0) {
-      doc.setTextColor(alertColor[0], alertColor[1], alertColor[2]);
-      doc.text(`${bottlenecksCount} Hot Days`, 138, yPos + 17);
-    } else {
-      doc.setTextColor(16, 185, 129); // Green 500
-      doc.text("Stable Output (0)", 138, yPos + 17);
-    }
-
-    // --- Subtitle parameter summary line ---
-    yPos += 35;
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10.5);
-    doc.text("7-DAY DAILY PREDICTED TIMELINE BREAKDOWN", 15, yPos);
-
-    // Thin grey spacer boundary line
-    doc.setDrawColor(228, 228, 231); // Zinc 200
-    doc.setLineWidth(0.35);
-    doc.line(15, yPos + 2, 195, yPos + 2);
-
-    // Print metadata variables
-    yPos += 7;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    doc.text(`Bottleneck Limit Trigger: ${bottleneckThreshold}%`, 15, yPos);
-    doc.text(
-      `Smoothing Mode: ${capacitySmoothing === "smoothed" ? "3-Day Rolling Moving Average" : "Raw Metrics (None)"}`,
-      72,
-      yPos,
-    );
-    doc.text(
-      `Sequence Filter Order: ${capacitySortBy === "bottleneck" ? "Bottleneck Intensity" : capacitySortBy === "custom" ? "Custom Priority" : "Calendar Sequence"}`,
-      142,
-      yPos,
-    );
-
-    // --- Main Capacity Breakdown Table ---
-    yPos += 6;
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.rect(15, yPos, 180, 8, "F");
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.text("WEEKDAY", 20, yPos + 5.5);
-    doc.text("DATE", 50, yPos + 5.5);
-    doc.text("BASE CURRENT (%)", 85, yPos + 5.5);
-    doc.text("PROJECTED LOAD (%)", 125, yPos + 5.5);
-    doc.text("BOTTLENECK STATE", 165, yPos + 5.5);
-
-    const rowHeight = 9.5;
-    yPos += 8;
-
-    sortedDailyCapacityBreakdown.forEach((item, idx) => {
-      const isBottleneck = item.projected > bottleneckThreshold;
-
-      // Alternating row highlighting background
-      if (idx % 2 === 1) {
-        doc.setFillColor(250, 250, 250);
-        doc.rect(15, yPos, 180, rowHeight, "F");
-      }
-
-      // Draw light wire separators
-      doc.setDrawColor(244, 244, 245);
-      doc.setLineWidth(0.2);
-      doc.line(15, yPos + rowHeight, 195, yPos + rowHeight);
-
-      // Value rendering block
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
-      doc.text(item.day, 20, yPos + 6);
-
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(82, 82, 91);
-      doc.text(item.date, 50, yPos + 6);
-
-      doc.text(`${item.current}%`, 85, yPos + 6);
-
-      // Project highlighting styling
-      doc.setFont("helvetica", "bold");
-      if (isBottleneck) {
-        doc.setTextColor(amberAlert[0], amberAlert[1], amberAlert[2]);
-        doc.text(`${item.projected}%`, 125, yPos + 6);
-      } else {
-        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.text(`${item.projected}%`, 125, yPos + 6);
-      }
-
-      // Alert cell tag
-      if (isBottleneck) {
-        doc.setFillColor(254, 243, 199); // Amber 100
-        doc.roundedRect(162, yPos + 1.8, 28, 5.5, 0.8, 0.8, "F");
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(7.5);
-        doc.setTextColor(180, 83, 9); // Amber 700
-        doc.text("BOTTLENECK", 165.5, yPos + 5.6);
-      } else {
-        doc.setTextColor(113, 113, 122);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(7.5);
-        doc.text("NORMAL LOAD", 165, yPos + 5.6);
-      }
-
-      yPos += rowHeight;
-    });
-
-    // --- Footer Explanatory Bullet Points & Notes ---
-    yPos += 10;
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
-    doc.text("EXECUTIVE INTERPRETATION GUIDELINE", 15, yPos);
-
-    doc.setDrawColor(228, 228, 231);
-    doc.setLineWidth(0.35);
-    doc.line(15, yPos + 2, 195, yPos + 2);
-
-    yPos += 7;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
-    doc.setTextColor(82, 82, 91);
-
-    const bulletins = [
-      "- Capacity forecasts are computed dynamically based on the active rolling index of completed production batches versus target.",
-      '- Days highlighted with yellow "BOTTLENECK" alert badges exceed your configured threshold parameter limit.',
-      "- Moving average view reduces short-term variation spikes to reveal systemic weekly production limits for senior management reporting.",
-      "- Report intended for staff duty scheduling, shifts optimization, and oven heating resource conservation.",
-    ];
-
-    bulletins.forEach((bullet) => {
-      doc.text(bullet, 15, yPos);
-      yPos += 4.5;
-    });
-
-    // Ground footer copyright boundary lines
-    yPos = 282;
-    doc.setDrawColor(228, 228, 231);
-    doc.setLineWidth(0.3);
-    doc.line(15, yPos - 3, 195, yPos - 3);
-
-    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    doc.setFontSize(7);
-    doc.text(
-      "Automated forecast projection report. Confidential & intended for Bakery Internal Operations.",
-      15,
-      yPos,
-    );
-    doc.text("Page 1 of 1", 182, yPos);
-
-    // Trigger PDF browser-side download
-    doc.save(
-      `Capacity_Projection_Report_${selectedWeekRange.replace(/\s+/g, "_")}.pdf`,
-    );
   };
 
   const handleUpdateMetrics = (newMetrics: Partial<CoreMetrics>) => {
@@ -1602,22 +975,33 @@ export default function App() {
       return;
     }
 
-    const sanitizedAmount = Math.max(0, newOrder.amount);
-    const sanitizedQuantity = Math.max(0, Math.floor(newOrder.quantity));
+    if (newOrder.quantity <= 0 || !Number.isInteger(newOrder.quantity)) {
+      const message = "Order quantity must be a whole number of at least 1.";
+      console.warn(`handleAddOrder: ${message}`, newOrder);
+      window.alert(message);
+      return;
+    }
+
+    if (newOrder.amount < 0) {
+      const message = "Order amount cannot be negative.";
+      console.warn(`handleAddOrder: ${message}`, newOrder);
+      window.alert(message);
+      return;
+    }
 
     const timestampStr = new Date().toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
     });
-    const orderId = `FP-${Math.floor(1000 + Math.random() * 9000)}`;
+    const orderId = createRecordId("FP");
 
     // 2. Create clean object to prevent shadow field injection
     const fullOrder: SalesOrder = {
       item: newOrder.item,
       category: newOrder.category ?? 'Sushi Rolls',
-      quantity: sanitizedQuantity,
-      amount: sanitizedAmount,
+      quantity: newOrder.quantity,
+      amount: newOrder.amount,
       status: newOrder.status as SalesOrder["status"],
       id: orderId,
       timestamp: timestampStr,
@@ -1675,7 +1059,7 @@ export default function App() {
       return;
     }
 
-    const targetId = `T-${targets.length + 1}`;
+    const targetId = createRecordId("T");
     // 2. Create clean object
     const fullTarget: CompanyTarget = {
       ...newTarget, // Spreading is safe here as we validated all keys, but explicit is better
@@ -1704,13 +1088,20 @@ export default function App() {
       return;
     }
 
-    const taskId = `PT-${Math.floor(400 + Math.random() * 100)}`;
+    if (newTask.quantity <= 0 || !Number.isInteger(newTask.quantity)) {
+      const message = "Task quantity must be a whole number of at least 1.";
+      console.warn(`handleAddTask: ${message}`, newTask);
+      window.alert(message);
+      return;
+    }
+
+    const taskId = createRecordId("PT");
     // 2. Create clean object
     const fullTask: ProductionTask = {
       itemName: newTask.itemName,
       assignedTo: newTask.assignedTo,
       status: newTask.status as ProductionTask["status"],
-      quantity: Math.max(0, Math.floor(newTask.quantity)),
+      quantity: newTask.quantity,
       priority: newTask.priority || 'low',
       id: taskId,
     };
@@ -1794,7 +1185,7 @@ export default function App() {
       return;
     }
 
-    const wasteId = `W-${Math.floor(920 + Math.random() * 80)}`;
+    const wasteId = createRecordId("W");
     // 2. Create clean object
     const fullWaste: WasteRecord = {
       item: newWaste.item,
@@ -2219,8 +1610,6 @@ export default function App() {
 
   const healthTooltip = `System Health Status: ${healthLabel}\n- Operations Score: ${metrics.aiHealthScore}%\n- Low Stock Ingredients: ${lowStockCount}\n- Lagging Goals: ${targetDeficitCount}`;
 
-  const isLight = theme === "light";
-
   if (!currentUser) {
     return (
       <div className={`relative w-screen h-screen overflow-hidden p-[14px] ${isLight ? "bg-zinc-100" : "bg-black"}`}>
@@ -2231,12 +1620,7 @@ export default function App() {
         <div className="versace-frame-right" />
         <LoginScreen
           theme={theme}
-          onLogin={(username, role) => {
-            const safeRole = ["Admin", "Manager", "Staff", "User"].includes(role) ? role : "User";
-            const userObj = { username, role: safeRole, email: "demo@foodpenguin.com" };
-            setCurrentUser(userObj);
-            setUserRole(safeRole as any);
-          }}
+          onLogin={(username, role) => loginLocalUser(username, role as any)}
         />
       </div>
     );
@@ -2274,11 +1658,7 @@ export default function App() {
             currentUser={currentUser}
             userRole={userRole}
             isFirebaseSynced={isFirebaseSynced}
-            onSignOut={async () => {
-              localStorage.removeItem("demoCurrentUser");
-              setCurrentUser(null);
-              await signOut(auth).catch(() => { });
-            }}
+            onSignOut={logout}
           />
 
           <div
@@ -4337,11 +3717,7 @@ export default function App() {
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className={`font-mono text-[10px] uppercase ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}>{userRole}</span>
                       <span className="text-zinc-500 font-mono text-[8px]">•</span>
-                      <button className={`btn-interactive text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${isLight ? "text-zinc-500 font-bold" : "text-zinc-400"}`} onClick={async () => {
-                        localStorage.removeItem("demoCurrentUser");
-                        setCurrentUser(null);
-                        await signOut(auth).catch(() => { });
-                      }} title="Sign Out">
+                      <button className={`btn-interactive text-[9px] font-mono hover:text-rose-500 flex items-center gap-0.5 transition-colors cursor-pointer ${isLight ? "text-zinc-500 font-bold" : "text-zinc-400"}`} onClick={logout} title="Sign Out">
                         <LogOut className="w-2.5 h-2.5" />
                         OUT
                       </button>
