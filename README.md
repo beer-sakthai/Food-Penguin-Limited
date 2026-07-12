@@ -99,6 +99,16 @@ You can also build and start in one step with:
 npm run preview
 ```
 
+### Testing and Checks
+
+Run the non-visual behavior test suite with:
+
+```bash
+npm test
+```
+
+The suite uses Node's built-in test runner through `tsx` for TypeScript files. It covers extracted dashboard calculation helpers, local Firebase emulator validation and snapshot behavior, and Express API route behavior with mocked AI responses.
+
 ### AI API Configuration
 
 Gemini-powered features are served through the Express backend under `/api/gemini/*`, so API keys stay server-side. Copy `.env.example` to `.env` and set:
