@@ -28,7 +28,7 @@ const listeners = new Map<string, Set<(event: any) => void>>();
 const firebase = await import("../src/firebase");
 
 function signIn() {
-  localStorage.setItem("localCurrentUser", JSON.stringify({ username: "Tester", role: "Admin", email: "tester@example.com" }));
+  localStorage.setItem("demoCurrentUser", JSON.stringify({ username: "Tester", role: "Admin", email: "tester@example.com" }));
 }
 
 function validOrder(overrides: Record<string, unknown> = {}) {

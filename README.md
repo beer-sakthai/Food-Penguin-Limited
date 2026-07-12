@@ -118,7 +118,7 @@ Run the non-visual behavior test suite with:
 npm test
 ```
 
-The suite uses Node's built-in test runner through `tsx` for TypeScript files. It covers extracted dashboard calculation helpers, local Firebase emulator validation and snapshot behavior, and Express API route behavior with mocked AI responses.
+The suite uses Node's built-in test runner through `tsx` for TypeScript files. It covers extracted dashboard calculation helpers and local storage emulator validation and snapshot behavior. Run `npm run test:authz` for the Express API authorization suite.
 
 ### AI API Configuration
 
@@ -132,7 +132,7 @@ Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions r
 
 ### Authentication & Authorization
 
-Configure the Firebase Web SDK for production sign-in by setting the `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, and `VITE_FIREBASE_APP_ID` variables. If these are absent, the frontend clearly runs in demo-only auth mode with a non-privileged demo user; this is for local development only.
+The frontend uses a browser-local demo auth shim persisted in `localStorage` — there is no cloud identity provider and no Firebase dependency. The demo user is non-privileged and intended for local development only.
 
 Production roles should be assigned by your identity provider/custom claims and verified server-side. Set `AUTH_TOKEN_SECRET` for signed backend bearer-token verification or replace the verifier with your production identity provider SDK. The Express backend protects AI workflows with minimum roles: general commands require `User`, advisory/photo analysis workflows require `Staff`, restock/capacity/menu/sustainability workflows require `Manager`, and marketing image generation is `Admin` only.
 
