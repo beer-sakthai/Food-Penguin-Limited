@@ -1,6 +1,6 @@
 import React from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant = "primary" | "amber" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md";
 
 export interface ButtonProps
@@ -23,6 +23,8 @@ function variantClasses(variant: ButtonVariant, isLight: boolean): string {
   switch (variant) {
     case "primary":
       return "bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/10 focus:ring-orange-500";
+    case "amber":
+      return "bg-amber-500 hover:bg-amber-600 text-zinc-950 shadow-md shadow-amber-500/20 focus:ring-amber-500";
     case "danger":
       return "bg-rose-500 hover:bg-rose-600 text-white shadow-md shadow-rose-500/10 focus:ring-rose-500";
     case "secondary":
