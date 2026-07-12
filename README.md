@@ -101,13 +101,26 @@ npm run preview
 
 ### AI API Configuration
 
-Gemini-powered features are served through the Express backend under `/api/gemini/*`, so API keys stay server-side. Copy `.env.example` to `.env` and set:
+Gemini-powered features are served through the Express backend under `/api/gemini/*`, so provider keys stay server-side. Copy `.env.example` to `.env` and set:
 
 ```bash
 GEMINI_API_KEY="your_google_ai_studio_key"
+AI_API_KEYS="shared-secret-for-your-auth-proxy-or-client"
 ```
 
-Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a configuration error from the API.
+`AI_API_KEYS` may contain a comma-separated list during key rotation. In production, every `/api/gemini/*` request must present one of these values as either `Authorization: Bearer <token>` or `X-API-Key: <token>`. The API also expects the authenticated identity layer to forward `X-FPL-User-ID` and either `X-FPL-User-Roles` or `X-FPL-Permissions` so the server can enforce workflow-level authorization. For example:
+
+* `strategic-advisor` requires an `admin` or `manager` role, or the `ai:strategic` permission.
+* `generate-marketing-image` requires an `admin`, `manager`, or `marketing` role, or the `ai:image:generate` permission.
+* `analyze-dish-photo` requires an `admin`, `manager`, `chef`, or `quality` role, or the `ai:image:analyze` permission.
+
+Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a generic provider-configuration error from the API. Without `AI_API_KEYS` in production, `/api/gemini/*` returns a service-unavailable response until authentication is configured.
+
+### Production AI API Controls
+
+Deploy the Express server behind a production identity-aware reverse proxy or application gateway. The gateway should terminate TLS, authenticate users, strip any incoming client-supplied `X-FPL-*` authorization headers, and re-inject trusted `X-FPL-User-ID`, `X-FPL-User-Roles`, and/or `X-FPL-Permissions` headers before traffic reaches Node. Keep `GEMINI_API_KEY` and `AI_API_KEYS` in the hosting platform's secret manager rather than in source control.
+
+The server applies smaller JSON body limits by default and only allows larger request bodies for image-analysis workflows. Expensive Gemini workflows are rate-limited per authenticated user or source IP, but production deployments should still add edge/WAF rate limits, request-size caps, access logs, anomaly alerts, and provider-spend alerts to control abuse and cost spikes. API responses intentionally return sanitized errors; inspect server logs for provider-specific details when troubleshooting.
 
 ## 📂 Project Structure
 
