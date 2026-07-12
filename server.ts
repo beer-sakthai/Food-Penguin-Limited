@@ -97,7 +97,7 @@ export function requireWorkflowRole(req: express.Request, res: express.Response,
   const workflow = String(req.params.workflow || "");
   const minimumRole = workflowMinimumRoles[workflow];
   if (!minimumRole) {
-    next();
+    res.status(404).json({ error: `Unknown workflow: ${workflow}` });
     return;
   }
   return requireRole(minimumRole)(req, res, next);
