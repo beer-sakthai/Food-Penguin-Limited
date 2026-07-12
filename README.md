@@ -79,6 +79,17 @@ npm run dev
 
 The application will bind to `0.0.0.0` on `PORT` when provided, otherwise port `3000`.
 
+
+### Manual local Firestore emulator verification
+
+Use this path after changing the local Firestore emulator or order syncing:
+
+1. Start the app with `npm run dev` and open `http://localhost:3000/`.
+2. Sign in with a non-demo local user so Firestore sync is enabled.
+3. Create or update an order from the sales/order entry flow.
+4. Confirm the subscribed order consumers update immediately without refreshing, including the Sell tab order list, Overview metrics/charts, Data Analyst views, and Reports filters.
+5. Optionally repeat the order change from a second browser tab to confirm cross-tab `storage` event updates still flow.
+
 ### Production Build
 
 To create a production-ready build:

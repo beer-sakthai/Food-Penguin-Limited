@@ -160,23 +160,50 @@ export async function getDocs(collectionRef: any) {
   };
 }
 
-export function onSnapshot(collectionRef: any, onNext: (snapshot: any) => void, onError?: (err: any) => void) {
+type SnapshotCallback = (snapshot: any) => void;
+type SnapshotSubscriber = () => void;
+
+const snapshotSubscribers = new Map<string, Set<SnapshotSubscriber>>();
+
+function getLocalCollectionSnapshot(colName: string) {
+  const localData = localStorage.getItem(`fs_${colName}`);
+  const items = localData ? JSON.parse(localData) : [];
+
+  return {
+    empty: items.length === 0,
+    forEach: (cb: (doc: any) => void) => {
+      items.forEach((item: any) => {
+        cb({ data: () => item });
+      });
+    }
+  };
+}
+
+function notifySnapshotSubscribers(colName: string) {
+  snapshotSubscribers.get(colName)?.forEach((subscriber) => subscriber());
+}
+
+export function onSnapshot(collectionRef: any, onNext: SnapshotCallback, onError?: (err: any) => void) {
   const colName = collectionRef.path;
   const update = () => {
-    const localData = localStorage.getItem(`fs_${colName}`);
-    const items = localData ? JSON.parse(localData) : [];
-    onNext({
-      empty: items.length === 0,
-      forEach: (cb: (doc: any) => void) => {
-        items.forEach((item: any) => {
-          cb({ data: () => item });
-        });
+    try {
+      onNext(getLocalCollectionSnapshot(colName));
+    } catch (err) {
+      if (onError) {
+        onError(err);
+        return;
       }
-    });
+      throw err;
+    }
   };
 
   // Run initially
   update();
+
+  if (!snapshotSubscribers.has(colName)) {
+    snapshotSubscribers.set(colName, new Set());
+  }
+  snapshotSubscribers.get(colName)?.add(update);
 
   const handler = (e: StorageEvent) => {
     if (e.key === `fs_${colName}`) {
@@ -187,6 +214,11 @@ export function onSnapshot(collectionRef: any, onNext: (snapshot: any) => void, 
 
   return () => {
     window.removeEventListener('storage', handler);
+    const collectionSubscribers = snapshotSubscribers.get(colName);
+    collectionSubscribers?.delete(update);
+    if (collectionSubscribers?.size === 0) {
+      snapshotSubscribers.delete(colName);
+    }
   };
 }
 
@@ -443,7 +475,7 @@ export async function setDoc(docRef: any, data: any) {
     }
     
     localStorage.setItem(`fs_${colName}`, JSON.stringify(items));
-    window.dispatchEvent(new StorageEvent('storage', { key: `fs_${colName}` }));
+    notifySnapshotSubscribers(colName);
   } catch (err: any) {
     handleFirestoreError(err, OperationType.WRITE, `${colName}/${docId}`);
   }
