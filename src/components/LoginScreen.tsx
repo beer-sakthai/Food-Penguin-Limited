@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChefHat, Lock, User, LogIn } from 'lucide-react';
+import { ChefHat, Lock, User, LogIn, UserPlus } from 'lucide-react';
 
 interface LoginScreenProps {
   onLogin: (username: string, role: string) => void;
@@ -8,12 +8,13 @@ interface LoginScreenProps {
 
 export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProps) {
   const isLight = theme === 'light';
+  const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<'Admin' | 'User'>('User');
   const [error, setError] = useState('');
 
-  // Demo-only local sign-in. Production roles must come from a real
-  // authentication provider, not from a browser-controlled picker.
+  // Very basic mock storage for users
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
@@ -21,16 +22,29 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
       return;
     }
 
-    if (username === 'demo' && password === 'password') {
-      onLogin('Demo User', 'User');
-      return;
-    }
+    const usersStr = localStorage.getItem('mockUsers');
+    const users = usersStr ? JSON.parse(usersStr) : [{ username: 'admin', password: 'password', role: 'Admin' }];
 
-    setError('Invalid demo credentials');
+    if (isRegistering) {
+      if (users.find((u: any) => u.username === username)) {
+        setError('Username already exists');
+        return;
+      }
+      const newUser = { username, password, role };
+      localStorage.setItem('mockUsers', JSON.stringify([...users, newUser]));
+      onLogin(username, role);
+    } else {
+      const user = users.find((u: any) => u.username === username && u.password === password);
+      if (user) {
+        onLogin(user.username, user.role);
+      } else {
+        setError('Invalid username or password');
+      }
+    }
   };
 
   return (
-    <div className={`h-full w-full flex items-center justify-center font-sans ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
+    <div className={`min-h-screen flex items-center justify-center font-sans ${isLight ? 'bg-zinc-100' : 'bg-black'}`}>
       <div className={`w-full max-w-md p-8 gold-liner-box ${isLight ? 'bg-white shadow-zinc-200/50' : 'bg-zinc-950 shadow-amber-500/5'}`}>
         
         <div className="flex flex-col items-center justify-center mb-8">
@@ -41,7 +55,7 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             Food Penguin Limited
           </h1>
           <p className={`text-sm mt-1 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-            Sign in to your account
+            {isRegistering ? 'Create a new account' : 'Sign in to your account'}
           </p>
         </div>
 
@@ -56,7 +70,15 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Username</label>
             <div className="relative">
               <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-              <input className={`input-gold-glow w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black' }`} type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"/>
+              <input
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
+                }`}
+                placeholder="Enter username"
+              />
             </div>
           </div>
 
@@ -64,23 +86,62 @@ export default function LoginScreen({ onLogin, theme = 'dark' }: LoginScreenProp
             <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Password</label>
             <div className="relative">
               <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-              <input className={`input-gold-glow w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_15px_rgba(234,179,8,0.3)] ${ isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black' }`} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"/>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
+                }`}
+                placeholder="Enter password"
+              />
             </div>
           </div>
 
+          {isRegistering && (
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Role</label>
+              <select
+                value={role}
+                onChange={e => setRole(e.target.value as 'Admin' | 'User')}
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none cursor-pointer ${
+                  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white' : 'bg-zinc-900 border-zinc-800 text-white focus:bg-black'
+                }`}
+              >
+                <option value="User">User (View Only)</option>
+                <option value="Admin">Admin (Full Access)</option>
+              </select>
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-md shadow-amber-500/10 btn-interactive"
+            className="w-full mt-6 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-md shadow-amber-500/10"
           >
-            <LogIn className="w-5 h-5" />
-            Sign In
+            {isRegistering ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+            {isRegistering ? 'Create Account' : 'Sign In'}
           </button>
         </form>
 
-        {(
+
+
+        <div className={`mt-6 pt-6 border-t text-center text-sm ${isLight ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-400'}`}>
+          {isRegistering ? 'Already have an account? ' : 'Need an account? '}
+          <button 
+            onClick={() => {
+              setIsRegistering(!isRegistering);
+              setError('');
+            }}
+            className="font-bold text-amber-500 hover:text-amber-400 underline transition-colors"
+          >
+            {isRegistering ? 'Sign in' : 'Register now'}
+          </button>
+        </div>
+        
+        {!isRegistering && (
           <div className="mt-4 text-center">
-            <span className={`text-xs uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
-              Demo Credentials: user=demo pass=password (User role only)
+            <span className={`text-[10px] uppercase font-mono ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+              Demo Credentials: user=admin pass=password
             </span>
           </div>
         )}

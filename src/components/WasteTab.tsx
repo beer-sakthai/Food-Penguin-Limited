@@ -16,18 +16,20 @@ import {
 import { 
  Trash2, 
  Sparkles, 
+ Scale, 
  Euro, 
+ AlertCircle, 
  Plus, 
+ UtensilsCrossed,
  TrendingDown
 } from 'lucide-react';
-import { MS_PRODUCTS, TESCO_PRODUCTS } from '../data';
-import { Badge, Button, Card, Input, Select } from '../design-system';
+import { MS_PRODUCTS, TESCO_PRODUCTS } from './SellTab';
 
 interface WasteTabProps {
  wasteRecords: WasteRecord[];
  onAddWaste: (record: Omit<WasteRecord, 'id' | 'date'>) => void;
  totalCostToday: number;
- selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point' | 'All Branches';
+ selectedBranch: 'Marks & Spencer - Cork City' | 'Tesco - Cork City' | 'Tesco - Mahon Point';
  weeklyLogs?: DailyOperationalLog[];
  targets?: CompanyTarget[];
  theme?: 'light' | 'dark';
@@ -158,25 +160,27 @@ export default function WasteTab({
  }
  };
 
- const reasonTone = (reasonStr: string) => {
+ const reasonColors = (reasonStr: string) => {
  switch (reasonStr) {
- case 'Expired': return 'danger' as const;
- case 'Overproduced': return 'warning' as const;
- case 'Quality Issue': return 'warning' as const;
- case 'Spill/Accident': return 'neutral' as const;
- default: return 'neutral' as const;
+ case 'Expired': return isLight ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-rose-950/40 text-rose-400 border border-rose-900/40';
+ case 'Overproduced': return isLight ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-amber-950/40 text-amber-450 border border-amber-900/40';
+ case 'Quality Issue': return isLight ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-yellow-950/40 text-yellow-400 border border-yellow-900/40';
+ case 'Spill/Accident': return isLight ? 'bg-zinc-100 text-zinc-700 border border-zinc-300' : 'bg-zinc-950 text-zinc-400 border border-zinc-800';
+ default: return isLight ? 'bg-zinc-100 text-zinc-700' : 'bg-zinc-950 text-zinc-400';
  }
  };
 
  return (
- <div className="w-full h-full grid grid-cols-1 xl:grid-cols-2 gap-6 md:overflow-hidden">
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       {/* LEFT ASPECT: FOOD WASTE LEDGER & METRICS */}
-      <div className="lg:col-span-2 space-y-6 md:h-full md:overflow-y-auto md:pr-1">
+      <div className="lg:col-span-2 space-y-6">
 
  {/* Dynamic Allowance Index and Chart Split */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- <Card isLight={isLight} className="flex flex-col justify-between">
+ <div className={`rounded-xl border p-5 shadow-sm flex flex-col justify-between transition-all duration-300 ${
+ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white'
+ }`}>
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
  <div>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Food Waste Cost Summary</h2>
@@ -190,8 +194,8 @@ export default function WasteTab({
  <Euro className="w-5 h-5" />
  </div>
  <div>
- <span className={`text-xs uppercase font-mono font-bold tracking-wide ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>Leakage Today</span>
- <span className={`text-3xl font-sans font-bold block -mt-1 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+ <span className={`text-[10px] uppercase font-mono font-bold tracking-wide ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>Leakage Today</span>
+ <span className={`text-lg font-sans font-bold block -mt-1 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  €{totalCostToday.toFixed(2)}
  </span>
  </div>
@@ -207,16 +211,18 @@ export default function WasteTab({
  style={{ width: `${Math.min((totalCostToday / 500) * 100, 100)}%` }}
  />
  </div>
- <div className="flex justify-between items-center text-xs text-zinc-500 font-mono mt-2">
+ <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono mt-2">
  <span>Safety Limit Target: €500.00 Max</span>
  <span className="font-bold text-rose-400">
  {((totalCostToday / 500) * 100).toFixed(1)}% of allowance consumed
  </span>
  </div>
  </div>
- </Card>
+ </div>
 
- <Card isLight={isLight} className="flex-1 min-h-[220px] flex flex-col">
+ <div className={`rounded-xl border p-5 shadow-sm h-48 md:h-auto min-h-[220px] flex flex-col transition-all duration-300 ${
+ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-800 text-white'
+ }`}>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Leakage Proportions</h2>
  <p className="text-xs text-zinc-500">Cost value breakdown by incident reason</p>
  <div className="flex-1 mt-2">
@@ -228,10 +234,10 @@ export default function WasteTab({
  borderRadius: '12px', 
  border: isLight ? '1px solid #e4e4e7' : '1px solid #27272a', 
  color: isLight ? '#18181b' : '#fff', 
- fontSize: '15px' 
+ fontSize: '12px' 
  }}
  itemStyle={{ fontWeight: 'bold' }}
- formatter={(value: any) => `€${value.toFixed(2)}`}
+ formatter={(value: number) => `€${value.toFixed(2)}`}
  />
  <Pie
  data={pieData}
@@ -252,16 +258,18 @@ export default function WasteTab({
  height={36} 
  iconType="circle" 
  iconSize={8} 
- wrapperStyle={{ fontSize: '15px', color: isLight ? '#52525b' : '#a1a1aa' }} 
+ wrapperStyle={{ fontSize: '10px', color: isLight ? '#52525b' : '#a1a1aa' }} 
  />
  </PieChart>
  </ResponsiveContainer>
  </div>
- </Card>
+ </div>
  </div>
 
  {/* Create a beautiful bar chart to compare daily waste costs against the target waste budget */}
- <Card isLight={isLight}>
+ <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${
+ isLight ? 'bg-white border-zinc-200 text-zinc-900' : 'bg-zinc-900 border-zinc-800 text-white'
+ }`}>
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-dashed border-zinc-700/20">
  <div className="flex items-center gap-3">
  <div className={`p-3 border rounded-2xl transition-all duration-300 ${
@@ -272,16 +280,20 @@ export default function WasteTab({
  <div>
  <h3 className={`text-base font-sans font-bold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
  Daily Waste Benchmark vs Target
- <Badge tone="danger" size="sm" isLight={isLight} uppercase>
+ <span className={`px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest font-bold ${
+ isLight 
+ ? 'bg-rose-50 border-rose-200 text-rose-700' 
+ : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+ }`}>
  Weekly Target
- </Badge>
+ </span>
  </h3>
  <p className="subtitle text-xs text-zinc-500">Chronological analysis of actual food waste costs compared to the preset daily target budget</p>
  </div>
  </div>
  </div>
 
- <div className="flex-1 min-h-[180px] w-full mt-6">
+ <div className="h-64 w-full mt-6">
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={barChartData} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? '#e4e4e7' : '#1f2937'} />
@@ -289,12 +301,12 @@ export default function WasteTab({
  dataKey="day" 
  tickLine={false} 
  axisLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 15 }} 
+ tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
  />
  <YAxis 
  tickLine={false} 
  axisLine={false} 
- tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 15 }} 
+ tick={{ fill: isLight ? '#71717a' : '#9ca3af', fontSize: 11 }} 
  unit="€"
  />
  <Tooltip 
@@ -307,20 +319,20 @@ export default function WasteTab({
  }}
  labelStyle={{ color: isLight ? '#71717a' : '#a1a1aa', fontWeight: 'bold' }}
  cursor={{ fill: isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.02)' }}
- formatter={(value: any) => [`€${value.toFixed(2)}`]}
+ formatter={(value: number) => [`€${value.toFixed(2)}`]}
  />
  <Legend 
  verticalAlign="bottom" 
  height={36} 
  content={({ payload }) => (
- <div className="flex justify-center gap-6 mt-4 text-xs font-sans">
+ <div className="flex justify-center gap-6 mt-4 text-[11px] font-sans">
  {payload?.map((entry: any, index: number) => (
  <div key={`item-${index}`} className="flex items-center gap-2">
  <span 
  className="w-3 h-3 rounded-full" 
  style={{ backgroundColor: entry.color }} 
  />
- <span className={`font-semibold uppercase tracking-wider text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
+ <span className={`font-semibold uppercase tracking-wider text-[10px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
  {entry.value === 'actual' ? 'Actual Waste Cost' : 'Budget Allowance'}
  </span>
  </div>
@@ -345,10 +357,12 @@ export default function WasteTab({
  </BarChart>
  </ResponsiveContainer>
  </div>
- </Card>
+ </div>
 
  {/* Active Waste Ledger */}
- <Card isLight={isLight}>
+ <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${
+ isLight ? 'bg-white border-zinc-200 text-zinc-800' : 'bg-zinc-900 border-zinc-805 text-white'
+ }`}>
  <div className="pb-4">
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Daily Spoilage & Scrap Ledger</h2>
  <p className="text-xs text-zinc-500">Documented items removed from active inventory</p>
@@ -356,7 +370,7 @@ export default function WasteTab({
 
  <div className="overflow-x-auto">
  <table className="w-full text-left text-xs">
- <thead className={`font-mono text-xs uppercase tracking-wider border-b ${
+ <thead className={`font-mono text-[10px] uppercase tracking-wider border-b ${
  isLight ? 'bg-zinc-50 text-zinc-600 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800'
  }`}>
  <tr>
@@ -374,9 +388,9 @@ export default function WasteTab({
  <td className={`py-3 px-4 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{rec.category}</td>
  <td className="py-3 px-4 text-center font-mono font-medium">{rec.weight.toFixed(1)} kg</td>
  <td className="py-3 px-4 text-center">
- <Badge tone={reasonTone(rec.reason)} size="sm" isLight={isLight}>
+ <span className={`inline-block px-2 py-0.5 rounded font-mono text-[9px] font-semibold ${reasonColors(rec.reason)}`}>
  {rec.reason}
- </Badge>
+ </span>
  </td>
  <td className="py-3 px-4 text-right font-mono font-bold text-rose-500">-€{rec.cost.toFixed(2)}</td>
  </tr>
@@ -384,15 +398,15 @@ export default function WasteTab({
  </tbody>
  </table>
  </div>
- </Card>
+ </div>
 
       </div>
 
       {/* RIGHT ASPECT: LOGGING & AI STRATEGY */}
-      <div className="space-y-6 md:h-full md:overflow-y-auto md:pr-1">
+      <div className="space-y-6">
         
         {/* Input Form */}
-        <Card isLight={isLight}>
+        <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
           <div className="flex items-center gap-2 mb-4">
             <Trash2 className={`w-5 h-5 ${isLight ? 'text-zinc-700' : 'text-zinc-400'}`} />
             <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-900' : 'text-white'}`}>Log Waste Event</h2>
@@ -400,35 +414,66 @@ export default function WasteTab({
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Select isLight={isLight} label="Item" value={newItem} onChange={e => handleProductChange(e.target.value)}>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Item</label>
+              <select 
+                value={newItem}
+                onChange={e => handleProductChange(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+              >
                 {products.map(p => (
                   <option key={p.name} value={p.name}>{p.name}</option>
                 ))}
-              </Select>
+              </select>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <Input isLight={isLight} label="Weight (kg)" type="number" step="0.1" min="0.1" value={weight} onChange={e => handleWeightChange(parseFloat(e.target.value))} required />
-              <Input isLight={isLight} label="Value (€)" type="number" step="0.01" value={cost} readOnly className="opacity-80 cursor-not-allowed" />
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Weight (kg)</label>
+                <input 
+                  type="number" 
+                  step="0.1"
+                  min="0.1"
+                  value={weight}
+                  onChange={e => handleWeightChange(parseFloat(e.target.value))}
+                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-950 border-zinc-800 text-white'}`}
+                  required
+                />
+              </div>
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Value (€)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  value={cost}
+                  readOnly
+                  className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none opacity-80 cursor-not-allowed ${isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-500'}`}
+                />
+              </div>
             </div>
 
             <div>
-              <Select isLight={isLight} label="Reason" value={reason} onChange={e => setReason(e.target.value as any)}>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Reason</label>
+              <select 
+                value={reason}
+                onChange={e => setReason(e.target.value as any)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+              >
                 <option value="Expired">Expired</option>
                 <option value="Overproduced">Overproduced</option>
                 <option value="Quality Issue">Quality Issue</option>
                 <option value="Spill/Accident">Spill/Accident</option>
-              </Select>
+              </select>
             </div>
 
-            <Button type="submit" variant="amber" fullWidth icon={<Plus className="w-4 h-4" />} className="mt-6 btn-interactive">
+            <button type="submit" className="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
+              <Plus className="w-4 h-4" />
               Log Waste Record
-            </Button>
+            </button>
           </form>
-        </Card>
+        </div>
 
         {/* AI Action Strategy */}
-        <Card isLight={isLight}>
+        <div className={`rounded-xl border p-5 shadow-sm transition-all duration-300 ${isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
           <div className="flex items-center justify-between mb-4">
              <h2 className={`text-base font-sans font-semibold flex items-center gap-2 ${isLight ? 'text-zinc-900' : 'text-white'}`}>
               <Sparkles className="w-4 h-4 text-amber-500" />
@@ -438,25 +483,29 @@ export default function WasteTab({
           <p className="text-xs text-zinc-500 mb-4">Select a high-loss category to generate predictive preservation tactics and repurposing hacks.</p>
           
           <div className="space-y-3">
-             <Select isLight={isLight} value={helpCat} onChange={e => setHelpCat(e.target.value)}>
+             <select 
+                value={helpCat}
+                onChange={e => setHelpCat(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}
+              >
                 <option value="Seafood">Seafood</option>
                 <option value="Produce">Produce</option>
                 <option value="Dairy">Dairy</option>
                 <option value="Baked Goods">Baked Goods</option>
                 <option value="Prepared Foods">Prepared Foods</option>
-              </Select>
+              </select>
 
-              <Button
+              <button 
                 onClick={handleFetchRepurposeStrategy}
                 disabled={strategyLoading}
-                variant="secondary"
-                size="sm"
-                isLight={isLight}
-                fullWidth
-                className="py-2.5 font-mono tracking-wider"
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold font-mono tracking-wider transition-all ${
+                  strategyLoading 
+                    ? (isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed')
+                    : 'bg-zinc-800 hover:bg-zinc-700 text-white dark:bg-zinc-800 dark:hover:bg-zinc-700'
+                }`}
               >
                 {strategyLoading ? 'ANALYZING...' : 'GENERATE ADVICE'}
-              </Button>
+              </button>
 
               {repurposeStrategy && (
                  <div className={`p-4 rounded-xl mt-4 text-xs leading-relaxed border ${isLight ? 'bg-amber-50/50 border-amber-200 text-zinc-800' : 'bg-amber-950/20 border-amber-900/40 text-amber-50'}`}>
@@ -464,7 +513,7 @@ export default function WasteTab({
                  </div>
               )}
           </div>
-        </Card>
+        </div>
 
       </div>
     </div>

@@ -115,21 +115,3 @@ export interface DailyOperationalLog {
     others: number;
   };
 }
-
-export interface IngredientCost {
-  name: string;
-  cost: number;
-}
-
-export interface MenuEngineeringItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  salesVolume: number;
-  ingredientCosts: IngredientCost[];
-  prepTime: number;
-  allergens: string[];
-  status: 'active' | 'archived';
-}
-

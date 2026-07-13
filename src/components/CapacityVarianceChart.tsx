@@ -142,7 +142,7 @@ export default function CapacityVarianceChart({ weeklyLogs, isLight }: CapacityV
  return (
  <div ref={containerRef} className="w-full flex flex-col gap-2 relative">
  {/* Dynamic Summary HUD */}
- <div className="flex items-center justify-between font-mono text-xs select-none leading-none border-b border-dashed pb-1.5 border-zinc-800/10 dark:border-zinc-800/40">
+ <div className="flex items-center justify-between font-mono text-[9px] select-none leading-none border-b border-dashed pb-1.5 border-zinc-800/10 dark:border-zinc-800/40">
  {activeStats ? (
  <>
  <span className="flex items-center gap-1 font-bold text-orange-500">
@@ -234,7 +234,7 @@ export default function CapacityVarianceChart({ weeklyLogs, isLight }: CapacityV
  />
 
  {/* Y Axis Guide ticks */}
- <g className="text-xs font-mono" fill={isLight ? '#71717a' : '#71717a'}>
+ <g className="text-[7.5px] font-mono" fill={isLight ? '#71717a' : '#71717a'}>
  {yTicks.map((tick, i) => (
  <text
  key={i}
@@ -249,7 +249,7 @@ export default function CapacityVarianceChart({ weeklyLogs, isLight }: CapacityV
  </g>
 
  {/* X Axis (Days of Week) */}
- <g className="text-xs font-mono" fill={isLight ? '#71717a' : '#71717a'}>
+ <g className="text-[8px] font-mono" fill={isLight ? '#71717a' : '#71717a'}>
  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
  const xPos = xScale(day) || 0;
  const isActive = hoveredIndex !== null && data[hoveredIndex]?.day === day;
@@ -330,7 +330,7 @@ export default function CapacityVarianceChart({ weeklyLogs, isLight }: CapacityV
  </div>
 
  {/* Mini Legend labels */}
- <div className="flex items-center justify-center gap-3 text-xs font-mono text-zinc-400 dark:text-zinc-500 select-none pb-0.5">
+ <div className="flex items-center justify-center gap-3 text-[7.5px] font-mono text-zinc-400 dark:text-zinc-500 select-none pb-0.5">
  <span className="flex items-center gap-1">
  <span className="w-1.5 h-0.5 bg-orange-500 rounded" /> Production Actual
  </span>

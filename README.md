@@ -1,10 +1,10 @@
 # Food Penguin Limited - Corporate Dashboard
 
-A comprehensive, unified corporate dashboard built for Food Penguin Limited. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, demo role-based module visibility, server-side protected AI routes, data visualizations, and embedded AI analytics for efficient restaurant management.
+A comprehensive, unified corporate dashboard built for Food Penguin Limited. This project is a modern React single-page application using Tailwind CSS, providing deep operational insights, role-based access control, data visualizations, and embedded AI analytics for efficient restaurant management.
 
 ## 🌟 Key Functional Modules & Features
 
-* **RBAC Boundary:** The UI demonstrates role-based module visibility for Admin, Manager, Staff, and User roles, but production-grade RBAC must be enforced by authenticated identity claims and server-side authorization. Protected `/api/gemini/*` routes now require signed bearer claims and role checks; do not rely on localStorage, browser state, or UI selectors for production authorization.
+* **Role-Based Access Control (RBAC):** Distinct permission levels and module access configurations for Admin, Manager, and Staff roles.
 * **Dynamic Day/Night Mode:** Full application-wide support for Day (Light) and Night (Dark) mode themes, completely customizing the user interface aesthetics based on preference.
 * **Intelligent Dashboarding & Visualizations:** Interactive analytics powered by `recharts` providing visual overviews seamlessly.
   * **Unified Overview (Strategic Center):** Real-time production status indicators, calendar-scoped throughput tracking, Irish standard regulatory clock indicators, and deep operational audits.
@@ -15,7 +15,6 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
   * **Branch Product Module:** Track active POS sales, transaction ledgers, margins, barcodes, and revenue bar charts. Includes multi-select checkboxes and bulk actions like 'Print Labels' and 'Hide from POS' for enhanced workflow.
   * **Resource Allocation Module [NEW]:** Manage and track inter-branch inventory transfers. Features multi-branch distribution tracking, bulk status updates, and visual transfer histories.
   * **Production Module [UPDATED]:** Kitchen throughput monitoring, task queuing, recipe formulation, and chef workflows. Now includes hourly efficiency volume vs target tracking and an embedded AI Culinary Auditor for dish quality compliance.
-  * **Menu Engineering Module [NEW]:** An advanced analytics tab for optimizing menu profitability. Features an interactive 2x2 scatter plot that classifies menu items into Stars, Plowhorses, Puzzles, and Dogs based on sales volume and profit margin. Includes an on-demand AI suggestion engine ("Jules") that analyzes the data and provides actionable recommendations for price adjustments to maximize revenue and recover costs.
   * **Waste Module [UPDATED]:** Financial leakage tracking with interactive pie chart distributions. Allows staff to log waste events by weight/value with specific reasons (Expired, Overproduced) and includes an AI Action Strategy generator to propose preservation and repurposing techniques.
   * **Hours Module:** Workforce scheduling, clocked-in time tracking, planned hour comparison vs logged times and variance tracking analysis.
   * **Target Module:** Corporate-wide milestone tracking, completion bar charts, progress validations, and AI-optimized targets.
@@ -35,7 +34,7 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
 
 ## 🛠 Tech Stack
 
-* **Framework:** React 19 + TypeScript + Vite
+* **Framework:** React 18 + TypeScript + Vite
 * **Styling:** Tailwind CSS (responsive layouts, modern bento UI, custom semantic colors)
 * **Animations:** `motion/react` for elegant hardware-accelerated interface slide & fade effects
 * **Icons:** `lucide-react`
@@ -52,19 +51,14 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
 ### Installation
 
 1. Clone the repository:
-
    ```bash
    git clone <repository-url>
    ```
-
 2. Navigate to the project directory:
-
    ```bash
    cd food-penguin
    ```
-
 3. Install dependencies:
-
    ```bash
    npm install
    ```
@@ -77,18 +71,7 @@ To start the local development server:
 npm run dev
 ```
 
-The application will bind to `0.0.0.0` on `PORT` when provided, otherwise port `3000`.
-
-
-### Manual local Firestore emulator verification
-
-Use this path after changing the local Firestore emulator or order syncing:
-
-1. Start the app with `npm run dev` and open `http://localhost:3000/`.
-2. Sign in with a non-demo local user so Firestore sync is enabled.
-3. Create or update an order from the sales/order entry flow.
-4. Confirm the subscribed order consumers update immediately without refreshing, including the Sell tab order list, Overview metrics/charts, Data Analyst views, and Reports filters.
-5. Optionally repeat the order change from a second browser tab to confirm cross-tab `storage` event updates still flow.
+The application will bind to `0.0.0.0` at port `3050` (or the configured standard container proxy port `3000`) locally.
 
 ### Production Build
 
@@ -98,53 +81,12 @@ To create a production-ready build:
 npm run build
 ```
 
-Then you can run the generated `dist/` server bundle with:
-
-```bash
-npm run start
-```
-
-You can also build and start in one step with:
-
-```bash
-npm run preview
-```
-
-### Testing and Checks
-
-Run the non-visual behavior test suite with:
-
-```bash
-npm test
-```
-
-The suite uses Node's built-in test runner through `tsx` for TypeScript files. It covers extracted dashboard calculation helpers and local storage emulator validation and snapshot behavior. Run `npm run test:authz` for the Express API authorization suite.
-
-### AI API Configuration
-
-Gemini-powered features are served through the Express backend under `/api/gemini/*`, so provider keys stay server-side. Copy `.env.example` to `.env` and set:
-
-```bash
-GEMINI_API_KEY="your_google_ai_studio_key"
-AUTH_TOKEN_SECRET="random-secret-used-to-verify-signed-bearer-tokens"
-```
-
-Without `GEMINI_API_KEY`, the dashboard still builds and loads, but AI actions return a generic provider-configuration error from the API. All `/api/gemini/*` routes require a signed HS256 bearer token verified with `AUTH_TOKEN_SECRET` (see Authentication & Authorization below).
-
-### Production AI API Controls
-
-The server applies small JSON body limits by default (64kb for prompt routes, 256kb for standard workflows) and only allows larger request bodies (12mb) for image-analysis workflows. Expensive Gemini workflows are rate-limited per authenticated user or source IP (10 requests per 15 minutes), but production deployments should still add edge/WAF rate limits, request-size caps, access logs, anomaly alerts, and provider-spend alerts to control abuse and cost spikes. API responses intentionally return sanitized errors; inspect server logs for provider-specific details when troubleshooting. Keep `GEMINI_API_KEY` and `AUTH_TOKEN_SECRET` in the hosting platform's secret manager rather than in source control.
-
-### Authentication & Authorization
-
-The frontend uses a browser-local demo auth shim persisted in `localStorage` — there is no cloud identity provider and no Firebase dependency. The demo user is non-privileged and intended for local development only.
-
-Production roles should be assigned by your identity provider/custom claims and verified server-side. Set `AUTH_TOKEN_SECRET` for signed backend bearer-token verification or replace the verifier with your production identity provider SDK. The Express backend protects AI workflows with minimum roles: general commands require `User`, advisory/photo analysis workflows require `Staff`, restock/capacity/menu/sustainability workflows require `Manager`, and marketing image generation is `Admin` only.
+Then you can preview the generated `dist/` directory with `npm run preview`.
 
 ## 📂 Project Structure
 
 * `/src/components/` - Features a modular layout with separate tabs (`OverviewTab.tsx`, `SellTab.tsx`, `TargetTab.tsx`, `ProductionTab.tsx`, `WasteTab.tsx`, `HoursTab.tsx`).
-* `/src/App.tsx` - Main orchestration entry point handling states, authenticated user role display, calendar date-range scopes, and unified navigation.
+* `/src/App.tsx` - Main orchestration entry point handling states, user roles, calendar date-range scopes, and unified navigation.
 * `/src/types.ts` - Centralized TypeScript interfaces for metrics, models, targets, etc.
 * `/src/data.ts` - Local data engines, multi-week data maps, and default state providers context.
 * `/src/index.css` - Global Tailwind CSS and specific font asset integrations.

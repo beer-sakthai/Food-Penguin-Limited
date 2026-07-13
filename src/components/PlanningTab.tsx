@@ -104,10 +104,10 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  };
 
  return (
- <div className="w-full h-full grid grid-cols-1 xl:grid-cols-2 gap-6 items-start md:overflow-hidden">
+ <div className="grid grid-cols-1 gap-6">
 
   {/* LEFT ASPECT: REAL RAW MATERIALS STOCK PLAN */}
- <div className="space-y-6 h-full flex flex-col md:overflow-hidden min-h-0">
+ <div className="space-y-6">
 
  {lowStockItems.length > 0 && (
   <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all duration-300 ${
@@ -119,20 +119,20 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
     </div>
     <div>
      <p className="text-xs font-black">Restock Warning: {lowStockItems.length} Raw Materials Low</p>
-     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Automated safety threshold triggers active. Please initialize the supply chain order restock procedure below.</p>
+     <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Automated safety threshold triggers active. Please initialize the supply chain order restock procedure below.</p>
     </div>
    </div>
-   <span className="px-2.5 py-1 rounded bg-amber-500 text-zinc-950 text-xs font-mono font-black uppercase tracking-wider animate-pulse shrink-0">
+   <span className="px-2.5 py-1 rounded bg-amber-500 text-zinc-950 text-[10px] font-mono font-black uppercase tracking-wider animate-pulse shrink-0">
     Action Needed
    </span>
   </div>
  )}
 
  {/* Stock Level Matrix */}
- <div className={`rounded-xl border p-5 shadow-sm transition-all flex-1 min-h-0 flex flex-col md:overflow-hidden ${
+ <div className={`rounded-xl border p-5 shadow-sm transition-all ${
  isLight ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800 text-white'
  }`}>
- <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+ <div className="pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
  <h2 className={`text-base font-sans font-semibold ${isLight ? 'text-zinc-800' : 'text-white'}`}>Cold Chain Inventory Planning</h2>
  <p className={`text-xs ${isLight ? 'text-zinc-500' : 'text-zinc-500'}`}>Documented levels of fresh ingredients & freezer raw materials for {selectedBranch}</p>
@@ -157,14 +157,14 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  </div>
  
  {suggestionLog && (
- <div className={`mb-4 p-3 rounded-lg border text-xs font-mono whitespace-pre-wrap max-h-32 overflow-y-auto shrink-0 ${
+ <div className={`mb-4 p-3 rounded-lg border text-[10px] font-mono whitespace-pre-wrap max-h-32 overflow-y-auto ${
  isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-950 border-zinc-800 text-zinc-400'
  }`}>
  {suggestionLog}
  </div>
  )}
 
- <div className="space-y-4 flex-1 min-h-0 overflow-y-auto pr-1">
+ <div className="space-y-4">
  {inventory.map((item) => {
  const suggestedValue = aiSuggestions ? aiSuggestions[item.id] : null;
  
@@ -175,7 +175,7 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  <div className="space-y-1 md:w-1/3">
  <div className="flex items-center gap-2">
  <span className={`font-sans font-bold text-sm ${isLight ? 'text-zinc-800' : 'text-white'}`}>{item.name}</span>
- <span className={`px-2 py-0.2 rounded font-mono text-xs font-bold ${statusColors(item.status)}`}>
+ <span className={`px-2 py-0.2 rounded font-mono text-[9px] font-bold ${statusColors(item.status)}`}>
  {item.status}
  </span>
  </div>
@@ -199,11 +199,23 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
 
  <div className="md:w-40 text-right flex flex-col items-end gap-2">
  {suggestedValue != null && (
- <span className={`text-xs font-bold font-mono px-2 py-0.5 rounded ${isLight ? 'bg-yellow-100 text-yellow-700' : 'bg-yellow-950/80 text-yellow-400'}`}>
+ <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${isLight ? 'bg-yellow-100 text-yellow-700' : 'bg-yellow-950/80 text-yellow-400'}`}>
  Suggest: +{suggestedValue}{item.unit}
  </span>
  )}
- <button className={`btn-interactive px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${ item.status === 'Healthy' ? isLight ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50' : isLight ? 'bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 shadow' : 'bg-zinc-950 border border-zinc-800 text-white hover:bg-zinc-900 shadow' }`} onClick={() => onOrderRestock(item.id)} disabled={item.status === 'Healthy'}>
+ <button
+ onClick={() => onOrderRestock(item.id)}
+ disabled={item.status === 'Healthy'}
+ className={`px-3 py-1.5 text-xs rounded transition-colors inline-flex items-center gap-1 w-full justify-center ${
+ item.status === 'Healthy'
+ ? isLight 
+ ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100' 
+ : 'bg-zinc-900/50 text-zinc-600 cursor-not-allowed border border-zinc-800/40 hover:bg-zinc-900/50'
+ : isLight
+ ? 'bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 shadow'
+ : 'bg-zinc-950 border border-zinc-800 text-white hover:bg-zinc-900 shadow'
+ }`}
+ >
  <ArrowDownToLine className="w-3.5 h-3.5" />
  Restock
  </button>
@@ -212,12 +224,11 @@ export default function PlanningTab({ inventory, onOrderRestock, selectedBranch,
  )})}
  </div>
  </div>
-  </div>
 
-  {/* RIGHT ASPECT: Capacity Analytics */}
-  <div className="h-full flex flex-col md:overflow-hidden min-h-0">
-   <CapacityAnalytics weeklyLogs={weeklyLogs} isLight={isLight} />
-  </div>
+ {/* Capacity Analytics visual component */}
+ <CapacityAnalytics weeklyLogs={weeklyLogs} isLight={isLight} />
+
+ </div>
 
  </div>
  );

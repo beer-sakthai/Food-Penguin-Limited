@@ -149,8 +149,8 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
   }).filter(supplier => supplier.items.length > 0 || supplier.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden gap-6">
-      <div className="shrink-0 flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between transition-all gap-4">
         <div>
           <h1 className={`text-2xl font-bold font-sans tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} flex items-center gap-2`}>
             <Package className={`${isLight ? 'text-indigo-600' : 'text-indigo-400'}`} size={28} />
@@ -163,11 +163,21 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
         
         <div className="relative">
           <Search size={18} className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`} />
-          <input className={`input-gold-glow pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-sm ${ isLight ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800' }`} type="text" placeholder="Search items or suppliers..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+          <input
+            type="text"
+            placeholder="Search items or suppliers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={`pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 shadow-sm ${
+              isLight 
+                ? 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400' 
+                : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:bg-zinc-800'
+            }`}
+          />
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 gap-4 content-start pr-1">
+      <div className="grid grid-cols-1 gap-4">
         {filteredSuppliers.length === 0 ? (
           <div className={`p-8 text-center rounded-2xl border ${isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-500' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
             No items found matching "{searchQuery}".
@@ -184,7 +194,12 @@ export default function SuppliersTab({ theme = 'dark' }: SuppliersTabProps) {
                   isLight ? 'bg-white border-zinc-200' : 'bg-black border-zinc-800'
                 }`}
               >
-                <button className={`btn-interactive w-full px-5 py-4 flex items-center justify-between transition-colors ${ isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50' }`} onClick={() => toggleSupplier(supplier.id)}>
+                <button
+                  onClick={() => toggleSupplier(supplier.id)}
+                  className={`w-full px-5 py-4 flex items-center justify-between transition-colors ${
+                    isLight ? 'hover:bg-zinc-50' : 'hover:bg-zinc-900/50'
+                  }`}
+                >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${isLight ? 'bg-indigo-50 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400'}`}>
                       <Icon size={20} />
