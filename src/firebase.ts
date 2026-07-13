@@ -17,68 +17,6 @@ export interface FirestoreErrorInfo {
   error: string;
   operationType: OperationType;
   path: string | null;
-  authInfo: {
-    userId?: string | null;
-    email?: string | null;
-    emailVerified?: boolean | null;
-    isAnonymous?: boolean | null;
-    tenantId?: string | null;
-    providerInfo?: {
-      providerId?: string | null;
-      email?: string | null;
-    }[];
-  };
-}
-
-// ----------------------------------------------------------------------------
-// LOCAL AUTH PROVIDER
-// ----------------------------------------------------------------------------
-// The dashboard runs fully offline: authentication is a browser-local demo
-// shim persisted in localStorage. There is no cloud identity provider, so
-// nothing here is production authentication or authorization.
-const localAuthListeners: ((user: any) => void)[] = [];
-
-const localAuth = {
-  get currentUser() {
-    const local = localStorage.getItem("demoCurrentUser");
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        return {
-          uid: parsed.uid || "demo-local-user",
-          displayName: parsed.username || "Demo User",
-          email: parsed.email || "demo@foodpenguin.com",
-          emailVerified: true,
-          isAnonymous: false,
-          tenantId: null,
-          providerData: [],
-          reloadUserInfo: parsed.role
-            ? { customAttributes: JSON.stringify({ role: parsed.role }) }
-            : undefined,
-          getIdToken: async () => parsed.sessionToken || "",
-        };
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  },
-};
-
-export const auth = localAuth;
-
-export function onAuthStateChanged(_authObj: any, callback: (user: any) => void) {
-  callback(localAuth.currentUser);
-  localAuthListeners.push(callback);
-  return () => {
-    const idx = localAuthListeners.indexOf(callback);
-    if (idx !== -1) localAuthListeners.splice(idx, 1);
-  };
-}
-
-export async function signOut(_authObj: any) {
-  localStorage.removeItem("demoCurrentUser");
-  localAuthListeners.forEach((cb) => cb(null));
 }
 
 // ----------------------------------------------------------------------------
@@ -180,18 +118,7 @@ export function onSnapshot(collectionRef: any, onNext: SnapshotCallback, onError
 }
 
 function validateProposedDoc(colName: string, docId: string, proposed: any) {
-  // 1. Authentication & Identity
-  const user = auth.currentUser;
-  if (!user || !user.uid) {
-    throw new Error("PERMISSION_DENIED");
-  }
-  
-  // 2. Strict Verification (requires email to be verified)
-  if (user.emailVerified !== true) {
-    throw new Error("PERMISSION_DENIED");
-  }
-  
-  // 3. Id Integrity (alphanumeric plus safe hyphens/underscores for prefixed UUIDs, length limit of 128)
+  // 1. Id Integrity (alphanumeric plus safe hyphens/underscores for prefixed UUIDs, length limit of 128)
   if (typeof docId !== "string" || docId.length === 0 || docId.length > 128) {
     throw new Error("PERMISSION_DENIED");
   }
@@ -199,12 +126,12 @@ function validateProposedDoc(colName: string, docId: string, proposed: any) {
     throw new Error("PERMISSION_DENIED");
   }
 
-  // 4. Proposed document ID consistency check
+  // 2. Proposed document ID consistency check
   if (proposed.id !== undefined && proposed.id !== docId) {
     throw new Error("PERMISSION_DENIED");
   }
 
-  // 5. Unmapped Collection Spoofing (only specific collections allowed)
+  // 3. Unmapped Collection Spoofing (only specific collections allowed)
   const allowedCols = ["orders", "tasks", "waste", "targets", "hours", "inventory"];
   if (!allowedCols.includes(colName)) {
     throw new Error("PERMISSION_DENIED");
@@ -445,18 +372,12 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   const errStr = error instanceof Error ? error.message : String(error);
   
   // Guard to prevent double-serializing an already JSON-stringified error object
-  if (errStr.trim().startsWith('{') && errStr.includes('"error"') && errStr.includes('"authInfo"')) {
+  if (errStr.trim().startsWith('{') && errStr.includes('"error"') && errStr.includes('"operationType"')) {
     throw error;
   }
 
   const errInfo: FirestoreErrorInfo = {
     error: errStr,
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-    },
     operationType,
     path
   };

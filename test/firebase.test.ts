@@ -27,10 +27,6 @@ const listeners = new Map<string, Set<(event: any) => void>>();
 
 const firebase = await import("../src/firebase");
 
-function signIn() {
-  localStorage.setItem("demoCurrentUser", JSON.stringify({ username: "Tester", role: "Admin", email: "tester@example.com" }));
-}
-
 function validOrder(overrides: Record<string, unknown> = {}) {
   return {
     id: "ORD-1",
@@ -46,15 +42,7 @@ function validOrder(overrides: Record<string, unknown> = {}) {
 
 test.beforeEach(() => localStorage.clear());
 
-test("setDoc rejects writes without a signed-in verified local user", async () => {
-  await assert.rejects(
-    firebase.setDoc(firebase.doc(firebase.db, "orders", "ORD-1"), validOrder()),
-    /PERMISSION_DENIED/,
-  );
-});
-
 test("setDoc enforces document id consistency and safe collection schemas", async () => {
-  signIn();
   await assert.rejects(
     firebase.setDoc(firebase.doc(firebase.db, "orders", "bad id"), validOrder({ id: "bad id" })),
     /PERMISSION_DENIED/,
@@ -70,7 +58,6 @@ test("setDoc enforces document id consistency and safe collection schemas", asyn
 });
 
 test("setDoc stores local snapshots and onSnapshot receives updates", async () => {
-  signIn();
   const snapshots: unknown[][] = [];
   const unsubscribe = firebase.onSnapshot(firebase.collection(firebase.db, "orders"), (snapshot: any) => {
     const rows: unknown[] = [];
