@@ -307,19 +307,6 @@ export default function App() {
     }
   });
 
-  const [metallicTheme, setMetallicTheme] = useState<
-    "gold" | "silver" | "copper"
-  >(() => {
-    try {
-      return (
-        (localStorage.getItem("metallicTheme") as
-          "gold" | "silver" | "copper") || "gold"
-      );
-    } catch {
-      return "gold";
-    }
-  });
-
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
@@ -328,35 +315,10 @@ export default function App() {
     } catch (_) {}
   };
 
-  const changeMetallicTheme = (metal: "gold" | "silver" | "copper") => {
-    setMetallicTheme(metal);
-    try {
-      localStorage.setItem("metallicTheme", metal);
-    } catch (_) {}
-  };
-
-  // Apply Theme classes to root HTML element for complete Tailwind/custom utility integration
+  // Keep the color-scheme token set aligned with the selected display mode.
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("metal-gold", "metal-silver", "metal-copper");
-    root.classList.add(`metal-${metallicTheme}`);
-  }, [metallicTheme]);
-
-  const getBoxLinerClass = (forceGold: boolean = false) => {
-    if (forceGold) return "gold-liner-box";
-    if (metallicTheme === "silver") return "silver-liner-box";
-    if (metallicTheme === "copper") return "copper-liner-box";
-    return "gold-liner-box";
-  };
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -1823,7 +1785,6 @@ export default function App() {
             orders={orders}
             selectedBranch={selectedBranch}
             theme={theme}
-            metallicTheme={metallicTheme}
             lowStockItems={lowStockItems}
           />
         );
@@ -1924,7 +1885,6 @@ export default function App() {
             orders={orders}
             selectedBranch={selectedBranch}
             theme={theme}
-            metallicTheme={metallicTheme}
           />
         );
     }
@@ -1936,8 +1896,8 @@ export default function App() {
   ).length;
 
   let healthLabel = "Healthy";
-  let healthColorClass = "bg-emerald-500";
-  let healthTextClass = "text-emerald-400";
+  let healthColorClass = "status-healthy";
+  let healthTextClass = "status-healthy";
   let healthBgClass = "bg-emerald-500/10 border-emerald-550/20";
 
   if (
@@ -1946,8 +1906,8 @@ export default function App() {
     targetDeficitCount >= 3
   ) {
     healthLabel = "Critical";
-    healthColorClass = "bg-rose-500";
-    healthTextClass = "text-rose-400";
+    healthColorClass = "status-critical";
+    healthTextClass = "status-critical";
     healthBgClass = "bg-rose-500/10 border-rose-550/20";
   } else if (
     metrics.aiHealthScore < 90 ||
@@ -1955,8 +1915,8 @@ export default function App() {
     targetDeficitCount > 0
   ) {
     healthLabel = "Warning";
-    healthColorClass = "bg-amber-500";
-    healthTextClass = "text-amber-400";
+    healthColorClass = "status-warning";
+    healthTextClass = "status-warning";
     healthBgClass = "bg-amber-500/10 border-amber-550/20";
   }
 
@@ -2032,7 +1992,7 @@ export default function App() {
                 FP
               </span>
               <div
-                className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${healthColorClass} rounded-full border border-black animate-pulse`}
+                className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${healthColorClass} status-dot border border-black`}
                 title={healthTooltip}
               />
             </div>
@@ -2044,11 +2004,11 @@ export default function App() {
                   Food Penguin
                 </h1>
                 <span
-                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-mono font-bold border shrink-0 cursor-help ${healthBgClass} ${healthTextClass}`}
                   title={healthTooltip}
                 >
                   <span
-                    className={`w-1 h-1 rounded-full ${healthColorClass} animate-pulse`}
+                    className={`w-1 h-1 rounded-full ${healthColorClass} status-dot`}
                   />
                   {healthLabel}
                 </span>
@@ -2064,6 +2024,9 @@ export default function App() {
           <button
             className={`md:hidden p-2 rounded-lg transition-colors shrink-0 ${isLight ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="primary-navigation"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -2073,6 +2036,57 @@ export default function App() {
         <div
           className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
+          {/* Aesthetic & Theme Panel */}
+          <div className={`mx-4 mt-4 p-3 surface-card transition-all ${
+            isLight ? "bg-amber-50/20" : "bg-zinc-950/40"
+          }`}>
+            <div className="flex items-center gap-1.5 mb-2.5 pb-1.5 border-b border-yellow-500/20">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-500 motion-safe:animate-pulse shrink-0" />
+              <span className="text-[10px] font-sans font-black uppercase tracking-wider text-yellow-500">
+                Display settings
+              </span>
+            </div>
+            
+            {/* Dark & Day Mode Select */}
+            <div className="flex flex-col gap-1 mb-2.5">
+              <span className={`text-xs uppercase font-mono font-bold ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
+                Color mode
+              </span>
+              <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
+                <button
+                  type="button"
+                  onClick={() => setTheme("light")}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
+                    isLight 
+                      ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" 
+                      : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <Sun className="w-3 h-3 text-amber-500" /> Day
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTheme("dark")}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-bold uppercase transition-all cursor-pointer ${
+                    !isLight 
+                      ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" 
+                      : "text-zinc-500 hover:text-zinc-700"
+                  }`}
+                >
+                  <Moon className="w-3 h-3 text-zinc-400" /> Night
+                </button>
+              </div>
+            </div>
+
+            <p className="mt-2 text-xs leading-snug text-zinc-500 dark:text-zinc-400">
+              Choose a display mode. Surfaces and status indicators use consistent, accessible tokens.
+            </p>
+          </div>
+
+          {/* Global Branches Overview */}
+
+          <div
+            className={`mx-4 mt-4 p-3 surface-card transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
           <div
             className={`mx-4 mt-4 p-3 rounded-xl border transition-all ${isLight ? "bg-zinc-50 border-zinc-200 shadow-sm" : "bg-zinc-900 border-zinc-800"}`}
           >
@@ -2102,10 +2116,13 @@ export default function App() {
                   .replace(" - Mahon Point", " Mahon");
                 const isSelected = selectedBranch === branch;
                 return (
-                  <div
+                  <button
                     key={branch}
+                    type="button"
                     onClick={() => setSelectedBranch(branch)}
-                    className={`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors ${
+                    aria-pressed={isSelected}
+                    aria-label={`Select ${branch} branch`}
+                    className={`w-full flex justify-between items-center text-xs p-2 rounded-lg border text-left transition-colors ${
                       isSelected
                         ? isLight
                           ? "bg-sky-50 border-sky-200"
@@ -2129,19 +2146,21 @@ export default function App() {
                       {shortName}
                     </span>
                     <span
-                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1.5 ${isLight ? "text-emerald-500 font-bold" : "text-[9px] px-2 py-0.5 rounded-full uppercase bg-3d-silver-dark metallic-base drop-shadow-md animate-pulse font-black"}`}
+                      className={`font-mono tracking-tight shrink-0 flex items-center gap-1.5 ${isLight ? "text-emerald-500 font-bold" : "text-xs px-2 py-0.5 rounded-full uppercase surface-subtle status-healthy font-bold"}`}
                     >
                       {isLight && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 motion-safe:animate-pulse"></span>
                       )}{" "}
                       Live
                     </span>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           </div>
 
+          {/* Navigation Actions */}
+          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
           <button
             type="button"
             onClick={() => {
@@ -2207,6 +2226,8 @@ export default function App() {
                     className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
                       isActive
                         ? tab.id === "Real-time"
+                          ? "bg-rose-500 motion-safe:animate-pulse"
+                          : "bg-orange-500 scale-125"
                           ? "bg-rose-500 animate-pulse"
                           : "bg-sky-500 scale-125"
                         : isLight
@@ -2219,6 +2240,7 @@ export default function App() {
                       <span
                         className={
                           isActive
+                            ? "text-orange-500"
                             ? "text-sky-500"
                             : isLight
                               ? "text-zinc-400"
@@ -2230,6 +2252,7 @@ export default function App() {
                       {tab.label}
                     </span>
                     {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
+                      <span className="bg-red-500 text-white font-mono text-xs px-1.5 py-0.5 rounded-full font-black motion-safe:animate-pulse shrink-0">
                       <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
                         {lowStockCount}
                       </span>
@@ -2289,11 +2312,11 @@ export default function App() {
                   )}
                 </button>
                 <div className="flex items-center gap-1.5">
-                  <span className="flex items-center gap-1 text-[8px] text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
+                  <span className="flex items-center gap-1 text-xs text-orange-400 font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
                     Forecast AI
                   </span>
                   <span
-                    className={`flex items-center gap-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${
+                    className={`flex items-center gap-1 text-xs font-mono font-bold px-1.5 py-0.5 rounded border select-none transition-all ${
                       aiAccuracyConfidence >= 90
                         ? isLight
                           ? "text-emerald-600 bg-emerald-50 border-emerald-200"
@@ -2311,7 +2334,7 @@ export default function App() {
                     <span
                       className={`w-1 h-1 rounded-full ${
                         aiAccuracyConfidence >= 90
-                          ? "bg-emerald-500 animate-pulse"
+                          ? "bg-emerald-500 motion-safe:animate-pulse"
                           : aiAccuracyConfidence >= 80
                             ? "bg-amber-500"
                             : "bg-rose-500"
@@ -2324,7 +2347,7 @@ export default function App() {
 
               {/* Branch Overlay Selector (Gold Liner style) */}
               <div
-                className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-[8.5px] select-none border transition-all ${
+                className={`flex flex-col gap-2 mt-1 mb-2.5 p-2 rounded-lg font-mono text-xs select-none border transition-all ${
                   isLight
                     ? "bg-zinc-100/65 border-zinc-200 shadow-sm"
                     : "bg-zinc-950/30 border-zinc-800/45"
@@ -2335,7 +2358,7 @@ export default function App() {
                     className={`flex items-center gap-1.5 font-bold ${isLight ? "text-zinc-500" : "text-zinc-400"}`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${overlayBranches.length > 0 ? "bg-yellow-500 animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]" : "bg-zinc-400"}`}
+                      className={`w-1.5 h-1.5 rounded-full ${overlayBranches.length > 0 ? "bg-yellow-500 motion-safe:animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]" : "bg-zinc-400"}`}
                     />
                     Overlay Branch Trends
                   </span>
@@ -2405,9 +2428,9 @@ export default function App() {
                       return (
                         <div
                           key={branch}
-                          className={`px-2 py-1 rounded-md border text-[7.5px] font-bold flex items-center gap-1 cursor-default opacity-95 ${style.activeBg}`}
+                          className={`px-2 py-1 rounded-md border text-xs font-bold flex items-center gap-1 cursor-default opacity-95 ${style.activeBg}`}
                         >
-                          <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                          <span className="w-1 h-1 rounded-full bg-white motion-safe:animate-pulse" />
                           {shortName} (Active)
                         </div>
                       );
@@ -2423,7 +2446,7 @@ export default function App() {
                               : [...prev, branch],
                           );
                         }}
-                        className={`px-2 py-1 rounded-md border text-[7.5px] font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
+                        className={`px-2 py-1 rounded-md border text-xs font-bold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 hover:-translate-y-0.5 active:scale-[0.98] ${
                           isSelected
                             ? style.activeBg
                             : `${isLight ? "bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-100" : "bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:bg-zinc-800"} opacity-75`
@@ -2472,7 +2495,7 @@ export default function App() {
                   />
                 ) : (
                   <motion.div
-                    className={`absolute top-0 h-full animate-pulse ${isLight ? "bg-rose-500/40" : "bg-rose-500/50"}`}
+                    className={`absolute top-0 h-full motion-safe:animate-pulse ${isLight ? "bg-rose-500/40" : "bg-rose-500/50"}`}
                     animate={{
                       left: `${bottleneckThreshold}%`,
                       width: `${projectedCapacityPct - bottleneckThreshold}%`,
@@ -2609,7 +2632,7 @@ export default function App() {
                     }`}
                   >
                     <p
-                      className={`text-[8px] uppercase tracking-wider font-bold mb-1 select-none ${
+                      className={`text-xs uppercase tracking-wider font-bold mb-1 select-none ${
                         isLight ? "text-zinc-400" : "text-zinc-500"
                       }`}
                     >
@@ -2639,7 +2662,7 @@ export default function App() {
                             } ${isCurrentBranch ? "font-bold" : ""}`}
                           >
                             <span
-                              className="w-1.5 h-1.5 rounded-full animate-pulse"
+                              className="w-1.5 h-1.5 rounded-full motion-safe:animate-pulse"
                               style={{ backgroundColor: bData.color }}
                             />
                             {shortName}:
@@ -2650,7 +2673,7 @@ export default function App() {
                           >
                             {bData.projected}%{" "}
                             {isCurrentBranch && (
-                              <span className="text-[7.5px] uppercase tracking-wide font-black pl-1">
+                              <span className="text-xs uppercase tracking-wide font-black pl-1">
                                 (Active)
                               </span>
                             )}
@@ -2662,7 +2685,7 @@ export default function App() {
                 )}
 
                 <p
-                  className={`text-[9px] leading-normal mt-1 pt-1 italic font-sans border-t ${
+                  className={`text-xs leading-normal mt-1 pt-1 italic font-sans border-t ${
                     isLight
                       ? "border-zinc-200 text-zinc-400"
                       : "border-zinc-800/20 text-zinc-500"
@@ -2675,11 +2698,11 @@ export default function App() {
               {/* Expandable daily capacity breakdown block */}
               {isCapacityExpanded && (
                 <div
-                  className={`mt-4 pt-3.5 border-t font-mono text-[9px] space-y-3 animate-fadeIn duration-300 ${isLight ? "border-zinc-205" : "border-zinc-800/80"}`}
+                  className={`mt-4 pt-3.5 border-t font-mono text-xs space-y-3 animate-fadeIn duration-300 ${isLight ? "border-zinc-205" : "border-zinc-800/80"}`}
                 >
                   <div className="flex items-center justify-between">
                     <p
-                      className={`font-bold uppercase tracking-wider text-[8px] ${isLight ? "text-zinc-500" : "text-zinc-555"}`}
+                      className={`font-bold uppercase tracking-wider text-xs ${isLight ? "text-zinc-500" : "text-zinc-555"}`}
                     >
                       Daily Capacity Breakdown
                     </p>
@@ -2698,7 +2721,7 @@ export default function App() {
                           capacityImpactFilter === "all" &&
                           bulkSelectedDays.length === 0
                         }
-                        className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-[7.5px] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
+                        className={`p-1 px-1.5 rounded hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 border font-bold text-xs uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
                           capacitySortBy !== "date" ||
                           capacitySmoothing !== "raw" ||
                           capacityImpactFilter !== "all" ||
@@ -2726,10 +2749,11 @@ export default function App() {
                             : "bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700"
                         }`}
                         title="Download daily capacity report as CSV"
+                        aria-label="Download daily capacity report as CSV"
                       >
                         <Download className="w-2.5 h-2.5 text-orange-400" />
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
                         >
                           CSV
                         </span>
@@ -2742,10 +2766,11 @@ export default function App() {
                             : "bg-zinc-800 border-zinc-700/40 text-zinc-400 hover:text-white hover:bg-zinc-700"
                         }`}
                         title="Download styled PDF projection summary report"
+                        aria-label="Download styled PDF projection summary report"
                       >
                         <Download className="w-2.5 h-2.5 text-amber-500" />
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
                         >
                           PDF
                         </span>
@@ -2761,12 +2786,12 @@ export default function App() {
                       >
                         <Mail className="w-2.5 h-2.5 text-rose-400" />
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
+                          className={`text-xs font-bold uppercase tracking-wide ${isLight ? "text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-900" : "text-zinc-300"}`}
                         >
                           Schedule
                         </span>
                       </button>
-                      <span className="text-[8px] text-zinc-400 font-semibold ml-1">
+                      <span className="text-xs text-zinc-400 font-semibold ml-1">
                         [Current vs Proj]
                       </span>
                     </div>
@@ -2783,7 +2808,7 @@ export default function App() {
                     {/* Impact Filter Dropdown */}
                     <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-zinc-200 dark:border-zinc-800/50">
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
                         title="Filter daily breakdown items by impact severity"
                       >
                         ⚡ Impact Filter:
@@ -2796,7 +2821,7 @@ export default function App() {
                             e.target.value as "all" | "critical" | "low"
                           )
                         }
-                        className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${
+                        className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 font-bold border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 focus:shadow-[0_0_12px_rgba(234,179,8,0.4)] ${
                           isLight
                             ? "bg-white border-zinc-200 text-amber-600"
                             : "bg-zinc-900 border-zinc-800/80 text-amber-450 hover:text-amber-300"
@@ -2837,7 +2862,7 @@ export default function App() {
 
                     <div className="flex items-center justify-between gap-1.5">
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
                       >
                         Order by:
                       </span>
@@ -2848,7 +2873,7 @@ export default function App() {
                             e.target.value as "date" | "bottleneck" | "custom",
                           )
                         }
-                        className={`text-[8.5px] rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
+                        className={`text-xs rounded px-2 py-0.5 font-mono focus:outline-none cursor-pointer transition-all font-bold border ${
                           isLight
                             ? "bg-white border-zinc-200 text-amber-600"
                             : "bg-zinc-900 border-zinc-800/80 text-amber-450  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-amber-300"
@@ -2892,7 +2917,7 @@ export default function App() {
                       className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? "border-zinc-200" : "border-zinc-900/60"}`}
                     >
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest ${isLight ? "text-zinc-500 font-bold" : "text-zinc-500"}`}
                         title="3-Day moving average smoothing vs raw data"
                       >
                         Data View:
@@ -2902,7 +2927,7 @@ export default function App() {
                       >
                         <button
                           onClick={() => setCapacitySmoothing("raw")}
-                          className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
+                          className={`text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase ${
                             capacitySmoothing === "raw"
                               ? "bg-orange-500 text-white shadow-sm"
                               : isLight
@@ -2914,7 +2939,7 @@ export default function App() {
                         </button>
                         <button
                           onClick={() => setCapacitySmoothing("smoothed")}
-                          className={`text-[8px] px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
+                          className={`text-xs px-2 py-0.5 rounded font-mono font-bold transition-all uppercase flex items-center gap-0.5 ${
                             capacitySmoothing === "smoothed"
                               ? "bg-orange-500 text-white shadow-sm"
                               : isLight
@@ -2933,7 +2958,7 @@ export default function App() {
                       className={`flex items-center justify-between gap-1.5 pt-1.5 border-t ${isLight ? "border-zinc-200" : "border-zinc-900/60"}`}
                     >
                       <span
-                        className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${compareModeEnabled ? "text-yellow-600 dark:text-yellow-500 font-extrabold" : isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                        className={`text-xs font-bold uppercase tracking-widest flex items-center gap-1 ${compareModeEnabled ? "text-yellow-600 dark:text-yellow-500 font-extrabold" : isLight ? "text-zinc-500" : "text-zinc-500"}`}
                         title="Compare initial AI forecast with manual simulation value"
                       >
                         <GitCompare
@@ -2946,7 +2971,7 @@ export default function App() {
                           setCompareModeEnabled(!compareModeEnabled)
                         }
                         type="button"
-                        className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
+                        className={`text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] ${
                           compareModeEnabled
                             ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-zinc-950 border-transparent shadow-[0_0_8px_rgba(234,179,8,0.25)]"
                             : isLight
@@ -2964,7 +2989,7 @@ export default function App() {
                     >
                       <div className="flex items-center justify-between gap-1">
                         <span
-                          className={`text-[7.5px] font-bold uppercase tracking-widest flex items-center gap-1 ${
+                          className={`text-xs font-bold uppercase tracking-widest flex items-center gap-1 ${
                             quickAdjustEnabled
                               ? "text-orange-500 font-extrabold"
                               : isLight
@@ -2974,7 +2999,7 @@ export default function App() {
                           title="Toggle manual vs AI capacity adjustments"
                         >
                           <Wand2
-                            className={`w-3 h-3 ${quickAdjustEnabled ? "animate-pulse text-orange-500" : ""}`}
+                            className={`w-3 h-3 ${quickAdjustEnabled ? "motion-safe:animate-pulse text-orange-500" : ""}`}
                           />
                           Quick Adjust:
                         </span>
@@ -2986,7 +3011,7 @@ export default function App() {
                             }
                           }}
                           type="button"
-                          className={`text-[8px] font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
+                          className={`text-xs font-bold px-2 py-0.5 rounded transition-all uppercase tracking-wider border cursor-pointer ${
                             quickAdjustEnabled
                               ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-sm"
                               : isLight
@@ -3002,7 +3027,7 @@ export default function App() {
                         <div
                           className={`p-2 mt-1.5 rounded-xl border flex flex-col gap-1.5 ${isLight ? "bg-amber-50/50 border-amber-200" : "bg-amber-950/20 border-amber-900/50"}`}
                         >
-                          <div className="flex justify-between items-center text-[9px] uppercase font-bold text-amber-600 dark:text-amber-500">
+                          <div className="flex justify-between items-center text-xs uppercase font-bold text-amber-600 dark:text-amber-500">
                             <span>
                               {bulkSelectedDays.length > 0
                                 ? `Bulk Adjust (${bulkSelectedDays.length} days)`
@@ -3012,7 +3037,7 @@ export default function App() {
                               {bulkSelectedDays.length > 0 && (
                                 <button
                                   onClick={() => setBulkSelectedDays([])}
-                                  className="hover:underline text-[8px] tracking-wider"
+                                  className="hover:underline text-xs tracking-wider"
                                 >
                                   Clear Selection
                                 </button>
@@ -3020,7 +3045,7 @@ export default function App() {
                               {Object.keys(capacityOverrides).length > 0 && (
                                 <button
                                   onClick={handleResetOverrides}
-                                  className="hover:underline text-[8px] tracking-wider"
+                                  className="hover:underline text-xs tracking-wider"
                                 >
                                   Reset All
                                 </button>
@@ -3099,7 +3124,7 @@ export default function App() {
                                         handleGlobalOverride();
                                       }
                                     }}
-                                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-[9px] font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+                                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 rounded px-2 py-1 text-xs font-bold uppercase transition-colors active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
                                   >
                                     Apply{" "}
                                     {isBulk
@@ -3123,7 +3148,7 @@ export default function App() {
                         : "bg-zinc-950/80 border-zinc-900/60"
                     }`}
                   >
-                    <div className="flex justify-between items-center text-[7.5px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+                    <div className="flex justify-between items-center text-xs text-zinc-500 font-bold uppercase tracking-widest leading-none">
                       <div className="flex items-center gap-1">
                         <span>Bottleneck Threshold</span>
                         <button
@@ -3155,7 +3180,7 @@ export default function App() {
                           stiffness: 450,
                           damping: 25,
                         }}
-                        className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${
+                        className={`font-mono text-xs font-bold px-1.5 py-0.5 rounded border transition-colors duration-200 ${
                           isLight
                             ? "bg-white border-zinc-200 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.2)]"
                             : "bg-zinc-900 border-zinc-800/55 text-yellow-450 shadow-[0_0_10px_rgba(234,179,8,0.3)]"
@@ -3168,7 +3193,7 @@ export default function App() {
                     {/* Tooltip Popup box aligned directly on top of the container */}
                     {showThresholdTooltip && (
                       <div
-                        className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-[9px] font-normal normal-case tracking-normal leading-relaxed ${
+                        className={`absolute bottom-full left-0 right-0 mb-2 p-3.5 rounded-xl border shadow-2xl z-50 transition-all font-sans text-xs font-normal normal-case tracking-normal leading-relaxed ${
                           isLight
                             ? "bg-white border-zinc-200/90 text-zinc-700 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)]"
                             : "bg-zinc-900/95 border-zinc-800 text-zinc-300 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5),0_8px_10px_-6px_rgba(0,0,0,0.5)]"
@@ -3181,7 +3206,7 @@ export default function App() {
                           <Info className="w-3 h-3 text-yellow-500" />
                           Calibration Parameters
                         </h4>
-                        <p className="mb-2.5 text-[8.5px] leading-normal">
+                        <p className="mb-2.5 text-xs leading-normal">
                           The <strong>Bottleneck Threshold</strong> defines your
                           operational peak capacity tolerance. Adjusting it
                           triggers real-time visual alerts and modifies report
@@ -3190,10 +3215,10 @@ export default function App() {
 
                         <div className="space-y-2 border-t pt-2 border-zinc-200/50 dark:border-zinc-800/50">
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-[7.5px] flex items-center gap-1">
+                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-xs flex items-center gap-1">
                               ⚠️ Live Alert System
                             </span>
-                            <p className="text-[8px] text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               Any day with projected capacity above{" "}
                               <span className="font-bold">
                                 {bottleneckThreshold}%
@@ -3207,10 +3232,10 @@ export default function App() {
                             </p>
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-[7.5px] flex items-center gap-1">
+                            <span className="font-bold text-yellow-500 uppercase tracking-wide text-xs flex items-center gap-1">
                               📊 Report Generation
                             </span>
-                            <p className="text-[8px] text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               This threshold is baked directly into generated
                               PDF summaries and CSV sheets. The system uses it
                               to compile bottleneck statistics, mark overflow
@@ -3281,7 +3306,7 @@ export default function App() {
                           <div className="flex items-start justify-between gap-1.5 pl-1.5">
                             <div className="flex flex-col">
                               <span className="font-sans font-bold text-[10.5px] text-yellow-600 dark:text-yellow-500 flex items-center gap-1.5 uppercase tracking-wide">
-                                <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 animate-bounce" />
+                                <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 motion-safe:animate-bounce" />
                                 Threshold Exceeded ({maxProjectedItem.projected}%)
                               </span>
                               <span className="text-[9.5px] text-zinc-500 font-medium mt-0.5">
@@ -3303,7 +3328,7 @@ export default function App() {
                                   setFocusedDay(null);
                                 }, 2500);
                               }}
-                              className={`p-1 rounded text-[9px] font-mono font-bold tracking-wider hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer ${
+                              className={`p-1 rounded text-xs font-mono font-bold tracking-wider hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center gap-1 cursor-pointer ${
                                 isLight
                                   ? "text-amber-800 bg-amber-100/70 hover:bg-amber-200/80 border border-amber-200"
                                   : "text-amber-400 bg-amber-950/50 hover:bg-amber-900/50 border border-amber-900/50 hover:border-amber-500/50"
@@ -3337,7 +3362,7 @@ export default function App() {
                                 isLight ? "bg-amber-100/30 border-amber-200" : "bg-amber-950/20 border-amber-900/30"
                               }`}>
                                 <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-                                <span className="text-[8.5px] font-mono text-amber-600 dark:text-amber-500 font-bold uppercase tracking-wider text-center animate-pulse">
+                                <span className="text-xs font-mono text-amber-600 dark:text-amber-500 font-bold uppercase tracking-wider text-center motion-safe:animate-pulse">
                                   Jules is formulating recalibrations...
                                 </span>
                               </div>
@@ -3345,7 +3370,7 @@ export default function App() {
 
                             {/* Error State */}
                             {quickFixError && (
-                              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-500 text-[8.5px] font-medium leading-relaxed">
+                              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-500 text-xs font-medium leading-relaxed">
                                 ⚠️ {quickFixError}
                                 <button
                                   onClick={() => handleTriggerQuickFix(maxProjectedItem.day, maxProjectedItem.projected, bottleneckThreshold)}
@@ -3363,12 +3388,12 @@ export default function App() {
                                   ? "bg-white/80 border-amber-200/80 shadow-[0_1px_5px_rgba(0,0,0,0.02)]"
                                   : "bg-zinc-950/60 border-zinc-800/80 shadow-inner"
                               }`}>
-                                <div className="text-[9px] text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed text-justify pl-1 border-l-2 border-yellow-500/60">
+                                <div className="text-xs text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed text-justify pl-1 border-l-2 border-yellow-500/60">
                                   {quickFixRecommendation}
                                 </div>
                                 <div className="flex items-center justify-between gap-1 border-t pt-2 border-zinc-200/50 dark:border-zinc-850/50">
                                   <div className="flex flex-col">
-                                    <span className="text-[7.5px] text-zinc-400 uppercase tracking-wider font-bold">Suggested Overrides:</span>
+                                    <span className="text-xs text-zinc-400 uppercase tracking-wider font-bold">Suggested Overrides:</span>
                                     <span className="text-[10px] font-mono font-extrabold text-orange-500">
                                       {maxProjectedItem.projected}% → {Math.max(10, Math.min(110, Math.round(maxProjectedItem.projected + (quickFixAdjustment || 0))))}% ({quickFixAdjustment}% Adjustment)
                                     </span>
@@ -3380,13 +3405,13 @@ export default function App() {
                                         setQuickFixAdjustment(null);
                                         setQuickFixDay(null);
                                       }}
-                                      className="px-1.5 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-[8px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                                      className="px-1.5 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                                     >
                                       Dismiss
                                     </button>
                                     <button
                                       onClick={handleApplyQuickFix}
-                                      className={`px-2 py-1 rounded text-[8px] font-extrabold uppercase tracking-wider transition-all hover:-translate-y-0.5 active:scale-[0.98] shadow-sm flex items-center gap-1 border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
+                                      className={`px-2 py-1 rounded text-xs font-extrabold uppercase tracking-wider transition-all hover:-translate-y-0.5 active:scale-[0.98] shadow-sm flex items-center gap-1 border focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer ${
                                         isLight
                                           ? "bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 shadow-[0_0_8px_rgba(234,179,8,0.25)]"
                                           : "bg-amber-950/50 border-amber-900/60 text-amber-400 hover:bg-amber-900/40 hover:text-amber-300 hover:border-amber-500/50 shadow-[0_0_12px_rgba(234,179,8,0.2)]"
@@ -3430,10 +3455,10 @@ export default function App() {
                             <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500 mb-2">
                               🌱
                             </div>
-                            <p className={`font-bold text-[9px] uppercase tracking-wider ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
+                            <p className={`font-bold text-xs uppercase tracking-wider ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
                               No Days Found
                             </p>
-                            <p className="text-[8px] text-zinc-500 max-w-[180px] mt-1 leading-normal">
+                            <p className="text-xs text-zinc-500 max-w-[180px] mt-1 leading-normal">
                               All operational loads are clear of this impact level.
                             </p>
                           </div>
@@ -3538,7 +3563,7 @@ export default function App() {
                                 >
                                   {item.day.substring(0, 3)}
                                   <span
-                                    className={`text-[8px] font-normal font-mono ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                                    className={`text-xs font-normal font-mono ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
                                   >
                                     ({item.date})
                                   </span>
@@ -3569,9 +3594,9 @@ export default function App() {
 
                                     return (
                                       <span
-                                        className={`text-[7.5px] font-mono leading-none py-0.5 px-1.5 rounded-md border font-extrabold uppercase inline-flex items-center gap-1 shrink-0 ${badgeClass}`}
+                                        className={`text-xs font-mono leading-none py-0.5 px-1.5 rounded-md border font-extrabold uppercase inline-flex items-center gap-1 shrink-0 ${badgeClass}`}
                                       >
-                                        <span className={`w-1 h-1 rounded-full ${dotClass} animate-pulse`} />
+                                        <span className={`w-1 h-1 rounded-full ${dotClass} motion-safe:animate-pulse`} />
                                         {badgeText}
                                       </span>
                                     );
@@ -3677,7 +3702,7 @@ export default function App() {
                                     if (diff > 0) {
                                       return (
                                         <span
-                                          className="text-emerald-500 text-[8px] font-bold font-mono tracking-tighter flex items-center"
+                                          className="text-emerald-500 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title={`Up by +${diff}% from preceding day`}
                                         >
                                           ▲{diff}%
@@ -3686,7 +3711,7 @@ export default function App() {
                                     } else if (diff < 0) {
                                       return (
                                         <span
-                                          className="text-rose-500 text-[8px] font-bold font-mono tracking-tighter flex items-center"
+                                          className="text-rose-500 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title={`Down by ${diff}% from preceding day`}
                                         >
                                           ▼{Math.abs(diff)}%
@@ -3695,7 +3720,7 @@ export default function App() {
                                     } else {
                                       return (
                                         <span
-                                          className="text-zinc-600 text-[8px] font-bold font-mono tracking-tighter flex items-center"
+                                          className="text-zinc-600 text-xs font-bold font-mono tracking-tighter flex items-center"
                                           title="Stable relative to preceding day"
                                         >
                                           ■0%
@@ -3705,7 +3730,7 @@ export default function App() {
                                   })()
                                 ) : (
                                   <span
-                                    className="text-zinc-600 text-[8px] font-bold font-mono tracking-tighter"
+                                    className="text-zinc-600 text-xs font-bold font-mono tracking-tighter"
                                     title="First day of active week sequence"
                                   >
                                     •
@@ -3716,12 +3741,12 @@ export default function App() {
                               {/* Right side: capacity percentages */}
                               <div className="flex items-center gap-1 shrink-0 text-right min-w-[55px] justify-end">
                                 <span
-                                  className="text-zinc-500 text-[8px]"
+                                  className="text-zinc-500 text-xs"
                                   title="Current"
                                 >
                                   {item.current}%
                                 </span>
-                                <span className="text-zinc-600 text-[8px] select-none">
+                                <span className="text-zinc-600 text-xs select-none">
                                   →
                                 </span>
                                 <span
@@ -3800,7 +3825,7 @@ export default function App() {
                                     : "bg-yellow-950/5 border-yellow-900/10"
                                 }`}
                               >
-                                <div className="flex justify-between items-center text-[7.5px] font-mono leading-none">
+                                <div className="flex justify-between items-center text-xs font-mono leading-none">
                                   <div className="flex items-center gap-0.5 text-zinc-500">
                                     <span>AI:</span>
                                     <span
@@ -3964,7 +3989,7 @@ export default function App() {
                                       style={{ accentColor: "#f97316" }}
                                     />
                                     <div className="flex flex-col items-end shrink-0 w-8">
-                                      <span className="font-mono text-[8px] font-bold text-orange-500 text-right">
+                                      <span className="font-mono text-xs font-bold text-orange-500 text-right">
                                         {capacityOverrides[item.day]?.value}%
                                       </span>
                                       {(() => {
@@ -4019,7 +4044,7 @@ export default function App() {
                                   }`}
                                 >
                                   <span>Top Contributing Production Items</span>
-                                  <span className="font-mono text-[8px] uppercase tracking-wider">
+                                  <span className="font-mono text-xs uppercase tracking-wider">
                                     Qty / Impact
                                   </span>
                                 </div>
@@ -4060,7 +4085,7 @@ export default function App() {
                                         }`}
                                       >
                                         <div className="flex items-center gap-1.5 min-w-0">
-                                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor} animate-pulse`} />
+                                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor} motion-safe:animate-pulse`} />
                                           <div className="flex flex-col min-w-0">
                                             <span
                                               className={`font-semibold truncate ${isLight ? "text-zinc-800 font-bold" : "text-zinc-200"}`}
@@ -4068,7 +4093,7 @@ export default function App() {
                                               {prodItem.name}
                                             </span>
                                             <span
-                                              className={`text-[8px] font-normal truncate ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                                              className={`text-xs font-normal truncate ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                                             >
                                               {prodItem.category}
                                             </span>
@@ -4077,18 +4102,18 @@ export default function App() {
                                         <div className="flex items-center gap-2 shrink-0">
                                           <div className="text-right flex flex-col">
                                             <span
-                                              className={`font-bold font-mono text-[9px] ${isLight ? "text-zinc-800" : "text-zinc-300"}`}
+                                              className={`font-bold font-mono text-xs ${isLight ? "text-zinc-800" : "text-zinc-300"}`}
                                             >
                                               {prodItem.quantity} units
                                             </span>
                                             <span
-                                              className={`text-[8px] font-mono font-medium ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
+                                              className={`text-xs font-mono font-medium ${isLight ? "text-zinc-400" : "text-zinc-500"}`}
                                             >
                                               {prodItem.loadShare}% Share
                                             </span>
                                           </div>
                                           <span
-                                            className={`text-[7.5px] font-mono uppercase px-1.5 py-0.5 rounded-md border font-extrabold ${badgeColor}`}
+                                            className={`text-xs font-mono uppercase px-1.5 py-0.5 rounded-md border font-extrabold ${badgeColor}`}
                                           >
                                             {prodItem.impact}
                                           </span>
@@ -4107,13 +4132,13 @@ export default function App() {
 
                   {/* Summary Legend explaining Impact levels */}
                   <div
-                    className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[8.5px] ${
+                    className={`mt-3 pt-2.5 border-t flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs ${
                       isLight
                         ? "border-zinc-200 text-zinc-500"
                         : "border-zinc-800/60 text-zinc-400"
                     }`}
                   >
-                    <span className="font-sans font-bold uppercase tracking-wider text-[7.5px] flex items-center gap-1">
+                    <span className="font-sans font-bold uppercase tracking-wider text-xs flex items-center gap-1">
                       <span className="text-[10px]">💡</span> Item Impact
                       Legend:
                     </span>
@@ -4188,7 +4213,7 @@ export default function App() {
                   <User className="w-4 h-4" />
                 )}
                 <span
-                  className={`w-2 h-2 rounded-full ${isFirebaseSynced ? "bg-emerald-500 animate-pulse" : "bg-orange-500"} absolute -bottom-0.5 -right-0.5 border ${isLight ? "border-zinc-100" : "border-zinc-950"}`}
+                  className={`w-2 h-2 rounded-full ${isFirebaseSynced ? "bg-emerald-500 motion-safe:animate-pulse" : "bg-orange-500"} absolute -bottom-0.5 -right-0.5 border ${isLight ? "border-zinc-100" : "border-zinc-950"}`}
                 />
               </div>
               <div className="text-[11px] leading-tight flex-1 min-w-0">
@@ -4238,7 +4263,7 @@ export default function App() {
               {tabMeta.find((t) => t.id === activeTab)?.label || activeTab} View
             </h2>
             <span
-              className={`hidden lg:inline-block text-[9px] font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
+              className={`hidden lg:inline-block text-xs font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
                 isLight
                   ? "bg-zinc-100 text-zinc-600 border-zinc-200"
                   : "bg-zinc-900 text-zinc-400 border-zinc-800"
@@ -4256,7 +4281,7 @@ export default function App() {
               }`}
             >
               <span
-                className={`text-[8px] font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
+                className={`text-xs font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
               >
                 Store:
               </span>
@@ -4400,14 +4425,14 @@ export default function App() {
             <div className="mt-5 space-y-4">
               <div className="flex flex-col gap-1.5">
                 <label
-                  className={`text-[9px] font-bold uppercase tracking-wider font-mono ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                  className={`text-xs font-bold uppercase tracking-wider font-mono ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
                 >
                   Delivery Frequency
                 </label>
                 <div className="flex bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-1">
                   <button
                     onClick={() => setReportFrequency("daily")}
-                    className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
+                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
                       reportFrequency === "daily"
                         ? "bg-rose-500 text-white shadow"
                         : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
@@ -4417,7 +4442,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setReportFrequency("weekly")}
-                    className={`flex-1 py-1.5 text-[9px] font-bold font-mono tracking-widest uppercase transition-all rounded ${
+                    className={`flex-1 py-1.5 text-xs font-bold font-mono tracking-widest uppercase transition-all rounded ${
                       reportFrequency === "weekly"
                         ? "bg-rose-500 text-white shadow"
                         : "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
@@ -4429,7 +4454,7 @@ export default function App() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label
-                  className={`text-[9px] font-bold uppercase tracking-wider font-mono flex gap-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
+                  className={`text-xs font-bold uppercase tracking-wider font-mono flex gap-1 ${isLight ? "text-zinc-600" : "text-zinc-400"}`}
                 >
                   Target Email Address
                   <span className="text-rose-500">*</span>

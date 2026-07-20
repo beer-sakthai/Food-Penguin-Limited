@@ -21,7 +21,6 @@ interface OverviewTabProps {
   orders: SalesOrder[];
   selectedBranch: string;
   theme?: "dark" | "light";
-  metallicTheme?: "gold" | "silver" | "copper";
   lowStockItems?: InventoryItem[];
 }
 
@@ -41,7 +40,6 @@ export default function OverviewTab({
   orders,
   selectedBranch,
   theme = "dark",
-  metallicTheme = "gold",
   lowStockItems = [],
 }: OverviewTabProps) {
   const isLight = theme === "light";
@@ -334,8 +332,6 @@ export default function OverviewTab({
             : "bg-zinc-900 border-zinc-800 text-white"
         }`}
       >
-        <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full filter blur-3xl pointer-events-none" />
-        <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-gradient-to-tr from-orange-400/10 to-transparent rounded-full filter blur-2xl pointer-events-none" />
 
         <div className="relative z-10 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2.5 mb-4">
@@ -346,7 +342,7 @@ export default function OverviewTab({
                   : "bg-zinc-800 border-zinc-700/60 text-orange-400"
               }`}
             >
-              <Sparkles className="w-3 h-3 animate-pulse" />
+              <Sparkles className="w-3 h-3 motion-safe:animate-pulse" />
               Sushi Intelligence Portal Active
             </div>
             {irelandTime && (
@@ -363,7 +359,7 @@ export default function OverviewTab({
           </div>
           <h1
             className={`text-3xl md:text-4xl font-sans font-extrabold tracking-tight mb-2 ${
-              isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"
+              isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"
             }`}
           >
             Sushi Ops Strategy Center
@@ -480,7 +476,7 @@ export default function OverviewTab({
                     : "bg-amber-950/60 text-amber-400 border border-amber-900/30"
                 } flex shrink-0`}
               >
-                <AlertTriangle className="w-5 h-5 animate-bounce text-amber-500" />
+                <AlertTriangle className="w-5 h-5 motion-safe:animate-bounce text-amber-500" />
               </div>
               <div>
                 <h4 className="text-sm font-black tracking-tight">
@@ -501,7 +497,7 @@ export default function OverviewTab({
             </div>
             <button
               onClick={() => onNavigateTab("Planning")}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs rounded-xl shadow-md transition-all hover:-translate-y-0.5 active:scale-[0.98] shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-zinc-950 font-black text-xs rounded-xl shadow-md transition-all hover:-translate-y-0.5 active:scale-[0.98] shrink-0 cursor-pointer"
             >
               Review & Restock Planning
             </button>
@@ -541,6 +537,7 @@ export default function OverviewTab({
                     key={day}
                     onClick={() => setSelectedDayTab(day)}
                     type="button"
+                    aria-pressed={isActive}
                     className={`px-3.5 py-1.5 text-xs rounded-xl font-mono font-bold transition-all ${
                       isActive
                         ? "bg-orange-500 text-white shadow-md"
@@ -603,7 +600,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.05 }}
             onClick={() => onNavigateTab("Sell")}
-            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 surface-card cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-amber-50/70 hover:bg-amber-100/60 text-zinc-900 shadow-md"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -618,7 +615,7 @@ export default function OverviewTab({
                     Gross Revenue
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     €{activeLog.sales.toLocaleString()}
                   </h3>
@@ -695,7 +692,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
             onClick={() => onNavigateTab("Production")}
-            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 surface-card cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 shadow-sm"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -710,7 +707,7 @@ export default function OverviewTab({
                     Throughput
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     {activeLog.productionMade.toLocaleString()}{" "}
                     <span className="text-[10px] text-zinc-500 font-normal">
@@ -793,7 +790,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
             onClick={() => onNavigateTab("Waste")}
-            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 surface-card cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-orange-50/50 hover:bg-orange-100/40 text-zinc-900 shadow-sm"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -808,7 +805,7 @@ export default function OverviewTab({
                     Seafood Waste
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     €{activeLog.waste.toFixed(2)}
                   </h3>
@@ -889,7 +886,7 @@ export default function OverviewTab({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
             onClick={() => onNavigateTab("Hours")}
-            className={`p-5 gold-liner-box cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 surface-card cursor-pointer group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 shadow-sm"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -904,7 +901,7 @@ export default function OverviewTab({
                     Worked Hours
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     {activeLog.hours} hrs
                   </h3>
@@ -983,7 +980,7 @@ export default function OverviewTab({
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.25 }}
-            className={`p-5 gold-liner-box group relative overflow-hidden flex flex-col justify-between ${
+            className={`p-5 surface-card group relative overflow-hidden flex flex-col justify-between ${
               isLight
                 ? "bg-amber-50/70 hover:bg-amber-100/60 text-zinc-900 shadow-md"
                 : "bg-zinc-950/80 hover:bg-black text-white"
@@ -998,7 +995,7 @@ export default function OverviewTab({
                     Total COGS (GOC)
                   </p>
                   <h3
-                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-2xl font-sans font-black mt-1.5 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     €{totalCogsActiveDay.toLocaleString()}
                   </h3>
@@ -1120,13 +1117,12 @@ export default function OverviewTab({
           {/* Real-time AI Operations Shift Summary */}
           <div
             id="ai-shift-summary"
-            className={`gold-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${
+            className={`surface-card p-6 overflow-hidden relative font-sans transition-all duration-300 ${
               isLight
                 ? "bg-orange-50/50 border border-orange-200"
-                : "bg-3d-copper-dark metallic-base drop-shadow-xl"
+                : "bg-slate-900 border-slate-700"
             }`}
           >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
             <div
               className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
@@ -1141,11 +1137,11 @@ export default function OverviewTab({
                       : "bg-orange-950/30 border-orange-900/40 text-orange-400"
                   }`}
                 >
-                  <Sparkles className="w-5 h-5 flex-shrink-0 animate-pulse" />
+                  <Sparkles className="w-5 h-5 flex-shrink-0 motion-safe:animate-pulse" />
                 </div>
                 <div>
                   <h3
-                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     AI Live Shift Summary Report
                     <span
@@ -1177,7 +1173,7 @@ export default function OverviewTab({
               >
                 {summaryLoading ? (
                   <>
-                    <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full motion-safe:animate-spin" />
                     Analyzing...
                   </>
                 ) : (
@@ -1191,7 +1187,7 @@ export default function OverviewTab({
 
             <div className="mt-6">
               {summaryLoading ? (
-                <div className="space-y-3 py-2 animate-pulse">
+                <div className="space-y-3 py-2 motion-safe:animate-pulse">
                   <div
                     className={`h-4 rounded-full w-3/4 ${isLight ? "bg-zinc-100" : "bg-zinc-800"}`}
                   />
@@ -1280,13 +1276,13 @@ export default function OverviewTab({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
             {/* Interactive Production & Revenue Chart */}
             <div
-              className={`lg:col-span-2 gold-liner-box p-6 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+              className={`lg:col-span-2 surface-card p-6 transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <h3
-                      className={`text-lg font-sans font-bold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                      className={`text-lg font-sans font-bold ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                     >
                       Performance Index
                     </h3>
@@ -1312,6 +1308,7 @@ export default function OverviewTab({
                   <button
                     type="button"
                     onClick={() => setChartView("hourly")}
+                    aria-pressed={chartView === "hourly"}
                     className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
                       chartView === "hourly"
                         ? "bg-amber-500 text-zinc-950 shadow-md"
@@ -1325,6 +1322,7 @@ export default function OverviewTab({
                   <button
                     type="button"
                     onClick={() => setChartView("weekly")}
+                    aria-pressed={chartView === "weekly"}
                     className={`px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-lg font-mono font-bold transition-all ${
                       chartView === "weekly"
                         ? "bg-amber-500 text-zinc-950 shadow-md"
@@ -1697,7 +1695,7 @@ export default function OverviewTab({
                                     {data.type}
                                   </p>
                                   <p
-                                    className={`text-sm font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                                    className={`text-sm font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                                   >
                                     {data.fullName}
                                   </p>
@@ -1857,7 +1855,7 @@ export default function OverviewTab({
 
                     <div className="mt-4">
                       <h4
-                        className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                        className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                       >
                         {championBranch.fullName}
                       </h4>
@@ -1877,7 +1875,7 @@ export default function OverviewTab({
                         </strong>{" "}
                         holds the highest corporate return ratio at{" "}
                         <strong
-                          className={`font-mono ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                          className={`font-mono ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                         >
                           €{championBranch.laborProd}/hr
                         </strong>{" "}
@@ -1952,7 +1950,7 @@ export default function OverviewTab({
                   </div>
                   <div>
                     <h3
-                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                     >
                       Monthly Sales Trend
                     </h3>
@@ -2055,7 +2053,7 @@ export default function OverviewTab({
                   </div>
                   <div>
                     <h3
-                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                     >
                       Daily Output vs. Target
                     </h3>
@@ -2150,7 +2148,7 @@ export default function OverviewTab({
                   </div>
                   <div>
                     <h3
-                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                      className={`text-sm font-extrabold ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                     >
                       Waste by Category
                     </h3>
@@ -2217,9 +2215,8 @@ export default function OverviewTab({
 
           {/* Daily Sushi Ops & COGS Ledger Entry Form */}
           <div
-            className={`gold-liner-box p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
+            className={`surface-card p-6 overflow-hidden relative font-sans transition-all duration-300 ${isLight ? "bg-amber-50/20" : "bg-zinc-950/80"}`}
           >
-            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none" />
 
             <div
               className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
@@ -2238,7 +2235,7 @@ export default function OverviewTab({
                 </div>
                 <div className="z-10">
                   <h3
-                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-3d-gold drop-shadow-md"}`}
+                    className={`text-lg font-sans font-bold flex items-center gap-2 ${isLight ? "text-zinc-900" : "text-orange-700 dark:text-orange-300"}`}
                   >
                     Operational Ledger & COGS Input
                     <span
