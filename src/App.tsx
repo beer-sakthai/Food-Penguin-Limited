@@ -100,9 +100,9 @@ const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",
   string[]
 > = {
-  Admin: ["Overview", "Production", "Planning", "Finance"],
-  Manager: ["Overview", "Production", "Planning", "Finance"],
-  Staff: ["Overview", "Production", "Planning"],
+  Admin: ["Overview", "Advisor", "Sell", "Target", "Studio", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports"],
+  Manager: ["Overview", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports"],
+  Staff: ["Overview", "Production", "Waste", "Hours", "Planning", "Suppliers", "Realtime"],
   User: ["Overview"],
 };
 
@@ -360,6 +360,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreToolsOpen, setIsMoreToolsOpen] = useState(false);
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
@@ -1756,28 +1757,44 @@ export default function App() {
     }
   };
 
-  const allTabMeta = [
-    {
-      id: "Overview",
-      label: "Dashboard",
-      icon: <LayoutDashboard className="w-4 h-4" />,
-    },
-    {
-      id: "Production",
-      label: "Production",
-      icon: <ChefHat className="w-4 h-4" />,
-    },
-    { id: "Planning", label: "Inventory & Planning", icon: <Boxes className="w-4 h-4" /> },
-    {
-      id: "Finance",
-      label: "Finance",
-      icon: <DollarSign className="w-4 h-4" />,
-    },
+  type TabMeta = { id: string; label: string; icon: React.ReactNode };
+
+  const primaryTabMeta: TabMeta[] = [
+    { id: "Overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: "Planning", label: "Planning", icon: <Boxes className="w-4 h-4" /> },
+    { id: "Finance", label: "Finance", icon: <DollarSign className="w-4 h-4" /> },
+    { id: "Reports", label: "Reports", icon: <FileSpreadsheet className="w-4 h-4" /> },
   ];
 
-  const tabMeta = allTabMeta.filter((tab) =>
-    rolePermissions[userRole].includes(tab.id),
-  );
+  const operationsTabMeta: TabMeta[] = [
+    { id: "Production", label: "Production", icon: <ChefHat className="w-4 h-4" /> },
+    { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
+    { id: "Hours", label: "Hours", icon: <Clock className="w-4 h-4" /> },
+    { id: "Suppliers", label: "Suppliers", icon: <Package className="w-4 h-4" /> },
+    { id: "Allocation", label: "Resource Allocation", icon: <SlidersHorizontal className="w-4 h-4" /> },
+    { id: "Energy", label: "Energy", icon: <Zap className="w-4 h-4" /> },
+    { id: "Realtime", label: "Real-time", icon: <Activity className="w-4 h-4" /> },
+  ];
+
+  const moreToolsTabMeta: TabMeta[] = [
+    { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
+    { id: "Target", label: "Targets", icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
+    { id: "Studio", label: "Studio", icon: <Wand2 className="w-4 h-4" /> },
+  ];
+
+  const permittedTabIds = rolePermissions[userRole];
+  const primaryTabs = primaryTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
+  const operationsTabs = operationsTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
+  const moreToolsTabs = moreToolsTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
+  const tabMeta = [...primaryTabs, ...operationsTabs, ...moreToolsTabs];
+
+  const navigateToTab = (tabId: string) => {
+    if (permittedTabIds.includes(tabId)) {
+      setActiveTab(tabId);
+      setIsMobileMenuOpen(false);
+    }
+  };
 
   // Switch to allowed tab if role changes and active tab is hidden
   useEffect(() => {
@@ -1792,9 +1809,10 @@ export default function App() {
         return (
           <OverviewTab
             metrics={metrics}
-            onNavigateTab={setActiveTab}
+            onNavigateTab={navigateToTab}
             targets={targets}
             userRole={userRole}
+            availableTabIds={permittedTabIds}
             onUpdateMetrics={handleUpdateMetrics}
             irelandTime={irelandTime}
             weeklyLogs={weeklyLogs}
@@ -1892,9 +1910,10 @@ export default function App() {
         return (
           <OverviewTab
             metrics={metrics}
-            onNavigateTab={setActiveTab}
+            onNavigateTab={navigateToTab}
             targets={targets}
             userRole={userRole}
+            availableTabIds={permittedTabIds}
             onUpdateMetrics={handleUpdateMetrics}
             irelandTime={irelandTime}
             weeklyLogs={weeklyLogs}
@@ -1944,6 +1963,28 @@ export default function App() {
 
   const isLight = theme === "light";
 
+  const renderNavigationButton = (tab: TabMeta) => {
+    const isActive = activeTab === tab.id;
+    return (
+      <button
+        key={tab.id}
+        type="button"
+        onClick={() => navigateToTab(tab.id)}
+        className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
+          isActive
+            ? isLight ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm" : "bg-zinc-900 text-white font-bold shadow-inner"
+            : isLight ? "text-zinc-600 hover:bg-white hover:text-zinc-900" : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
+        }`}
+      >
+        <span className={`w-2 h-2 rounded-full shrink-0 ${isActive ? tab.id === "Realtime" ? "bg-rose-500 animate-pulse" : "bg-orange-500" : isLight ? "border border-zinc-300" : "border border-zinc-800"}`} />
+        <span className="flex-1 flex items-center gap-2 justify-between">
+          <span className="flex items-center gap-2"><span className={isActive ? "text-orange-500" : isLight ? "text-zinc-400" : "text-zinc-500"}>{tab.icon}</span>{tab.label}</span>
+          {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">{lowStockCount}</span>}
+        </span>
+      </button>
+    );
+  };
+
   if (!currentUser) {
     return (
       <LoginScreen
@@ -1969,7 +2010,7 @@ export default function App() {
     >
       {/* SIDEBAR: NAVIGATION */}
       <aside
-        className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? "fixed inset-0 z-50 h-[100dvh] overflow-hidden" : "sticky md:relative top-0 z-40"} ${
+        className={`w-full md:w-64 flex flex-col shrink-0 shadow-xl md:border-r border-b md:border-b-0 transition-all duration-200 ${isMobileMenuOpen ? "fixed inset-x-0 top-0 z-50 max-h-[85dvh] overflow-hidden rounded-b-2xl" : "sticky md:relative top-0 z-40"} ${
           isLight
             ? "bg-white border-zinc-200 text-zinc-800"
             : "bg-zinc-950 border-zinc-900 text-zinc-100"
@@ -2201,62 +2242,35 @@ export default function App() {
             </div>
           </div>
 
-          {/* Navigation Actions */}
-          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
-            {tabMeta.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
+          {/* Grouped, role-aware navigation */}
+          <nav aria-label="Workspace navigation" className="flex-1 p-4 mt-2 space-y-3 overflow-y-auto">
+            <p className={`px-2 text-[9px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>Primary</p>
+            <div className="space-y-1">
+              {primaryTabs.map((tab) => renderNavigationButton(tab))}
+            </div>
+
+            {operationsTabs.length > 0 && (
+              <section aria-labelledby="operations-nav-heading" className="space-y-1">
+                <p id="operations-nav-heading" className={`px-2 pt-2 text-[9px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>Operations</p>
+                {operationsTabs.map((tab) => renderNavigationButton(tab))}
+              </section>
+            )}
+
+            {moreToolsTabs.length > 0 && (
+              <section className={`rounded-xl border ${isLight ? "border-zinc-200 bg-zinc-50" : "border-zinc-800 bg-zinc-900/40"}`}>
                 <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
-                    isActive
-                      ? isLight
-                        ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm"
-                        : "bg-zinc-900 text-white font-bold shadow-inner"
-                      : isLight
-                        ? "text-zinc-600 text-zinc-600  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-50 hover:text-zinc-900"
-                        : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
-                  }`}
+                  type="button"
+                  aria-expanded={isMoreToolsOpen}
+                  onClick={() => setIsMoreToolsOpen((open) => !open)}
+                  className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors ${isLight ? "text-zinc-700 hover:bg-white" : "text-zinc-300 hover:bg-zinc-900"}`}
                 >
-                  <span
-                    className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
-                      isActive
-                        ? tab.id === "Real-time"
-                          ? "bg-rose-500 animate-pulse"
-                          : "bg-orange-500 scale-125"
-                        : isLight
-                          ? "bg-transparent border border-zinc-300"
-                          : "bg-transparent border border-zinc-800"
-                    }`}
-                  />
-                  <span className="flex-1 flex items-center gap-2 justify-between">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={
-                          isActive
-                            ? "text-orange-500"
-                            : isLight
-                              ? "text-zinc-400"
-                              : "text-zinc-500"
-                        }
-                      >
-                        {tab.icon}
-                      </span>
-                      {tab.label}
-                    </span>
-                    {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
-                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
-                        {lowStockCount}
-                      </span>
-                    )}
-                  </span>
+                  <Boxes className="w-4 h-4 text-orange-500" />
+                  <span className="flex-1 text-left">More tools</span>
+                  {isMoreToolsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
-              );
-            })}
+                {isMoreToolsOpen && <div className="px-1 pb-1 space-y-1">{moreToolsTabs.map((tab) => renderNavigationButton(tab))}</div>}
+              </section>
+            )}
           </nav>
 
           {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}

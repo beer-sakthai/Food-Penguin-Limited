@@ -46,7 +46,8 @@ interface OverviewTabProps {
   metrics: CoreMetrics;
   onNavigateTab: (tabId: string) => void;
   targets: CompanyTarget[];
-  userRole: "Admin" | "Manager" | "Staff";
+  userRole: "Admin" | "Manager" | "Staff" | "User";
+  availableTabIds: string[];
   onUpdateMetrics: (newMetrics: Partial<CoreMetrics>) => void;
   irelandTime?: string;
   weeklyLogs: DailyOperationalLog[];
@@ -65,6 +66,7 @@ export default function OverviewTab({
   onNavigateTab,
   targets,
   userRole,
+  availableTabIds,
   onUpdateMetrics,
   irelandTime,
   weeklyLogs,
@@ -750,6 +752,43 @@ export default function OverviewTab({
             )}
           </div>
         </div>
+
+        {/* Role-aware quick actions mirror every workflow available in navigation. */}
+        {availableTabIds.filter((tabId) => tabId !== "Overview").length > 0 && (
+          <section aria-labelledby="quick-actions-heading" className={`p-4 rounded-3xl border ${isLight ? "bg-white border-zinc-200" : "bg-zinc-950 border-zinc-900"}`}>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h2 id="quick-actions-heading" className={`text-xs font-black uppercase tracking-wider ${isLight ? "text-zinc-800" : "text-zinc-100"}`}>Quick actions</h2>
+              <span className={`text-[9px] font-mono uppercase tracking-wider ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>Your permitted workflows</span>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+              {availableTabIds.filter((tabId) => tabId !== "Overview").map((tabId) => (
+                <button
+                  key={tabId}
+                  type="button"
+                  onClick={() => onNavigateTab(tabId)}
+                  className={`shrink-0 rounded-xl border px-3 py-2 text-[11px] font-bold transition-colors ${isLight ? "border-zinc-200 bg-zinc-50 text-zinc-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700" : "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-orange-500/50 hover:text-orange-300"}`}
+                >
+                  {({
+                    Advisor: "Advisor",
+                    Sell: "Sales",
+                    Target: "Targets",
+                    Studio: "Studio",
+                    Production: "Production",
+                    Waste: "Waste",
+                    Hours: "Hours",
+                    Planning: "Planning",
+                    Energy: "Energy",
+                    Suppliers: "Suppliers",
+                    Finance: "Finance",
+                    Realtime: "Real-time",
+                    Allocation: "Resource Allocation",
+                    Reports: "Reports",
+                  } as Record<string, string>)[tabId] || tabId}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* KPI Bento Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
