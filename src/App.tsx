@@ -322,6 +322,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [isMoreToolsOpen, setIsMoreToolsOpen] = useState(false);
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
@@ -1921,6 +1922,11 @@ export default function App() {
 
   const healthTooltip = `System Health Status: ${healthLabel}\n• Operations Score: ${metrics.aiHealthScore}%\n• Low Stock Ingredients: ${lowStockCount}\n• Lagging Goals: ${targetDeficitCount}`;
 
+  const activeAlerts = alerts.filter((alert) => alert.status !== "normal");
+  const criticalAlertCount = activeAlerts.filter(
+    (alert) => alert.status === "critical",
+  ).length;
+
   const isLight = theme === "light";
 
   const renderNavigationButton = (tab: TabMeta) => {
@@ -1981,7 +1987,7 @@ export default function App() {
           className={`p-4 md:p-6 border-b flex items-center justify-between gap-3 transition-colors ${isLight ? "border-zinc-150" : "border-zinc-900"}`}
         >
           <div className="flex items-center gap-3 w-full">
-            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 relative group shrink-0">
+            <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20 relative group shrink-0">
               <span className="font-bold text-white font-sans text-lg tracking-tighter select-none">
                 FP
               </span>
@@ -2081,6 +2087,8 @@ export default function App() {
 
           <div
             className={`mx-4 mt-4 p-3 surface-card transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
+          <div
+            className={`mx-4 mt-4 p-3 rounded-xl border transition-all ${isLight ? "bg-zinc-50 border-zinc-200 shadow-sm" : "bg-zinc-900 border-zinc-800"}`}
           >
             <div
               className={`flex items-center gap-2 mb-3 pb-2 border-b ${isLight ? "border-zinc-200" : "border-zinc-800/80"}`}
@@ -2117,8 +2125,8 @@ export default function App() {
                     className={`w-full flex justify-between items-center text-xs p-2 rounded-lg border text-left transition-colors ${
                       isSelected
                         ? isLight
-                          ? "bg-orange-50 border-orange-200"
-                          : "bg-orange-500/10 border-orange-500/30"
+                          ? "bg-sky-50 border-sky-200"
+                          : "bg-sky-500/10 border-sky-500/30"
                         : isLight
                           ? "bg-white border-zinc-200  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-100"
                           : "bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900"
@@ -2128,8 +2136,8 @@ export default function App() {
                       className={`truncate mr-2 ${
                         isSelected
                           ? isLight
-                            ? "text-orange-700 font-bold"
-                            : "text-orange-400 font-bold"
+                            ? "text-sky-700 font-bold"
+                            : "text-sky-400 font-bold"
                           : isLight
                             ? "text-zinc-700 font-medium"
                             : "text-zinc-300 font-medium"
@@ -2153,6 +2161,42 @@ export default function App() {
 
           {/* Navigation Actions */}
           <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("Planning");
+              setIsMobileMenuOpen(false);
+            }}
+            className={`mx-4 mt-3 p-3 rounded-xl border text-left transition-colors ${
+              criticalAlertCount > 0
+                ? isLight
+                  ? "bg-rose-50 border-rose-200"
+                  : "bg-rose-500/10 border-rose-500/30"
+                : activeAlerts.length > 0
+                  ? isLight
+                    ? "bg-amber-50 border-amber-200"
+                    : "bg-amber-500/10 border-amber-500/30"
+                  : isLight
+                    ? "bg-zinc-50 border-zinc-200 hover:bg-zinc-100"
+                    : "bg-zinc-900 border-zinc-800 hover:bg-zinc-800"
+            }`}
+          >
+            <span className="flex items-center justify-between gap-3">
+              <span className={`flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-wider ${isLight ? "text-zinc-700" : "text-zinc-200"}`}>
+                <AlertTriangle className={`w-3.5 h-3.5 ${criticalAlertCount > 0 ? "text-rose-500" : activeAlerts.length > 0 ? "text-amber-500" : "text-sky-500"}`} />
+                Operational alerts
+              </span>
+              <span className={`text-[10px] font-bold ${criticalAlertCount > 0 ? "text-rose-600 dark:text-rose-400" : activeAlerts.length > 0 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                {activeAlerts.length || "Clear"}
+              </span>
+            </span>
+            <span className={`block mt-1 text-[10px] ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
+              {activeAlerts[0]?.message || "No active operational issues."}
+            </span>
+          </button>
+
+          {/* Navigation Actions */}
+          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
             {tabMeta.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -2184,6 +2228,8 @@ export default function App() {
                         ? tab.id === "Real-time"
                           ? "bg-rose-500 motion-safe:animate-pulse"
                           : "bg-orange-500 scale-125"
+                          ? "bg-rose-500 animate-pulse"
+                          : "bg-sky-500 scale-125"
                         : isLight
                           ? "bg-transparent border border-zinc-300"
                           : "bg-transparent border border-zinc-800"
@@ -2195,6 +2241,7 @@ export default function App() {
                         className={
                           isActive
                             ? "text-orange-500"
+                            ? "text-sky-500"
                             : isLight
                               ? "text-zinc-400"
                               : "text-zinc-500"
@@ -2206,6 +2253,7 @@ export default function App() {
                     </span>
                     {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
                       <span className="bg-red-500 text-white font-mono text-xs px-1.5 py-0.5 rounded-full font-black motion-safe:animate-pulse shrink-0">
+                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
                         {lowStockCount}
                       </span>
                     )}
@@ -4240,7 +4288,7 @@ export default function App() {
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value as any)}
-                className="bg-transparent text-amber-500 hover:text-amber-400 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f59e0b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
+                className="bg-transparent text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%230ea5e9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
                 style={{ outline: "none" }}
               >
                 <option
@@ -4265,7 +4313,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
                 🇮🇪 Ireland Time (Dublin)
@@ -4277,22 +4325,72 @@ export default function App() {
               </span>
             </div>
 
-            {/* Dynamic Day/Night Mode Switcher button */}
-            <button
-              onClick={toggleTheme}
-              title={`Switch to ${isLight ? "Dark" : "Day"} Mode`}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                isLight
-                  ? "bg-zinc-100 border border-zinc-200 text-zinc-700  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:bg-zinc-200 shadow-sm"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-              }`}
-            >
-              {isLight ? (
-                <Moon className="w-4.5 h-4.5 text-zinc-600" />
-              ) : (
-                <Sun className="w-4.5 h-4.5 text-amber-400" />
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsSettingsMenuOpen((open) => !open)}
+                aria-expanded={isSettingsMenuOpen}
+                aria-haspopup="menu"
+                title="Open display settings"
+                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                  isLight
+                    ? "bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                    : "bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                }`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+              </button>
+
+              {isSettingsMenuOpen && (
+                <div
+                  role="menu"
+                  className={`absolute right-0 top-11 z-50 w-56 rounded-xl border p-3 shadow-xl ${
+                    isLight
+                      ? "bg-white border-zinc-200 text-zinc-900"
+                      : "bg-zinc-950 border-zinc-800 text-zinc-100"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500">
+                      Display settings
+                    </span>
+                    <button
+                      type="button"
+                      onClick={toggleTheme}
+                      className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-semibold ${isLight ? "bg-zinc-100 text-zinc-700 hover:bg-zinc-200" : "bg-zinc-900 text-zinc-200 hover:bg-zinc-800"}`}
+                    >
+                      {isLight ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
+                      {isLight ? "Dark" : "Light"}
+                    </button>
+                  </div>
+                  <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
+                    <span className="block mb-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-zinc-500">
+                      Accent
+                    </span>
+                    <div className="grid grid-cols-3 gap-1">
+                      {(["gold", "silver", "copper"] as const).map((metal) => (
+                        <button
+                          key={metal}
+                          type="button"
+                          onClick={() => changeMetallicTheme(metal)}
+                          className={`rounded-md border px-1 py-1.5 text-[9px] font-semibold capitalize transition-colors ${
+                            metallicTheme === metal
+                              ? isLight
+                                ? "bg-sky-50 border-sky-300 text-sky-800"
+                                : "bg-sky-500/15 border-sky-500/50 text-sky-300"
+                              : isLight
+                                ? "border-zinc-200 text-zinc-600 hover:bg-zinc-100"
+                                : "border-zinc-800 text-zinc-400 hover:bg-zinc-900"
+                          }`}
+                        >
+                          {metal}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
           </div>
         </header>
 
