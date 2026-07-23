@@ -63,11 +63,25 @@ export default function OverviewTab({
     { label: "Worked hours", value: `${activeLog.hours} hrs`, detail: "Staffing is on plan", icon: Clock, tone: "amber", tab: "Hours" },
     { label: "COGS", value: `€${totalCogs.toLocaleString()}`, detail: `Primary: ${activeLog.supplierName}`, icon: WalletCards, tone: "violet" },
   ];
-  return <div id="overview-viewport" className="space-y-6">
-    <section className={`relative overflow-hidden rounded-3xl border p-6 md:p-8 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-900"}`} aria-labelledby="today-heading">
-      <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-orange-500/10 blur-3xl" />
-      <div className="relative flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between"><div><div className="flex flex-wrap items-center gap-2 text-xs font-mono"><span className="rounded-full bg-orange-500/10 px-3 py-1 font-bold text-orange-500">TODAY</span>{irelandTime && <span className="text-zinc-500">Dublin {irelandTime}</span>}</div><h1 id="today-heading" className={`mt-3 text-3xl font-black tracking-tight ${isLight ? "text-zinc-900" : "text-white"}`}>Today at {selectedBranch}</h1><p className="mt-2 max-w-2xl text-sm text-zinc-500">Command view for the selected operating day. Prioritise exceptions, then log the day’s figures.</p></div><div className={`min-w-72 rounded-2xl border p-4 ${isLight ? "border-zinc-200 bg-zinc-50" : "border-zinc-800 bg-zinc-950/60"}`}><label className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500"><Calendar className="h-3.5 w-3.5 text-orange-500" />Date range</label><select value={selectedWeekRange} onChange={event => onSelectedWeekRangeChange(event.target.value)} className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-bold text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"><option value="2026-06-15 to 2026-06-21">Week 25 · Jun 15–21, 2026</option><option value="2026-06-22 to 2026-06-28">Week 26 · Jun 22–28, 2026</option><option value="2026-06-08 to 2026-06-14">Week 24 · Jun 8–14, 2026</option></select></div></div>
-      <div className="relative mt-6 flex flex-col gap-4 lg:flex-row"><div className="flex flex-wrap gap-2 lg:w-2/3">{(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).map(day => <button key={day} type="button" onClick={() => setSelectedDay(day)} className={`rounded-xl px-3 py-2 text-xs font-bold ${selectedDay === day ? "bg-orange-500 text-white" : isLight ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200" : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"}`}>{day}</button>)}</div><button type="button" onClick={() => setIsEntryOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2 text-sm font-black text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600"><Activity className="h-4 w-4" />Log daily figures</button></div>
+  return <div id="overview-viewport" className="space-y-5">
+    <section className={`rounded-2xl border p-4 ${isLight ? "border-zinc-200 bg-white" : "border-zinc-800 bg-zinc-900"}`} aria-labelledby="today-heading">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+            Today · {irelandTime || "Dublin time"}
+          </div>
+          <h1 id="today-heading" className={`mt-1 text-xl font-black tracking-tight ${isLight ? "text-zinc-900" : "text-white"}`}>{selectedBranch.replace("Marks & Spencer", "M&S")}</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <select value={selectedWeekRange} onChange={e => onSelectedWeekRangeChange(e.target.value)} className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-xs font-bold text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
+            <option value="2026-06-15 to 2026-06-21">Jun 15–21</option>
+            <option value="2026-06-22 to 2026-06-28">Jun 22–28</option>
+            <option value="2026-06-08 to 2026-06-14">Jun 8–14</option>
+          </select>
+          <button type="button" onClick={() => setIsEntryOpen(true)} className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-orange-600"><Activity className="h-3.5 w-3.5" />Log</button>
+        </div>
+      </div>
     </section>
     <section aria-label="Today key performance indicators"><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">{kpis.map(({ tab, ...kpi }) => <KpiCard key={kpi.label} label={kpi.label} value={kpi.value} detail={kpi.detail} icon={kpi.icon} tone={kpi.tone} isLight={isLight} onClick={tab ? () => onNavigateTab(tab) : undefined} />)}</div></section>
     <ActionQueue lowStockItems={lowStockItems} isLight={isLight} onReviewAlerts={() => onNavigateTab("Planning")} />
