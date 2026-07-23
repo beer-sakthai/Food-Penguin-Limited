@@ -306,12 +306,26 @@ export default function App() {
       return "dark";
     }
   });
+  const [metallicTheme, setMetallicTheme] = useState<"gold" | "silver" | "copper">(() => {
+    try {
+      return (localStorage.getItem("metallicTheme") as "gold" | "silver" | "copper") || "gold";
+    } catch {
+      return "gold";
+    }
+  });
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     try {
       localStorage.setItem("theme", nextTheme);
+    } catch (_) {}
+  };
+
+  const changeMetallicTheme = (metal: "gold" | "silver" | "copper") => {
+    setMetallicTheme(metal);
+    try {
+      localStorage.setItem("metallicTheme", metal);
     } catch (_) {}
   };
 
@@ -2084,9 +2098,7 @@ export default function App() {
           </div>
 
           {/* Global Branches Overview */}
-
-          <div
-            className={`mx-4 mt-4 p-3 surface-card transition-all ${isLight ? "bg-zinc-50 shadow-sm" : "bg-zinc-900 shadow"}`}
+          
           <div
             className={`mx-4 mt-4 p-3 rounded-xl border transition-all ${isLight ? "bg-zinc-50 border-zinc-200 shadow-sm" : "bg-zinc-900 border-zinc-800"}`}
           >
@@ -2160,7 +2172,6 @@ export default function App() {
           </div>
 
           {/* Navigation Actions */}
-          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
           <button
             type="button"
             onClick={() => {
@@ -2195,13 +2206,8 @@ export default function App() {
             </span>
           </button>
 
-          {/* Navigation Actions */}
-          <nav className="flex-1 p-4 mt-2 space-y-1 overflow-y-auto">
-            {tabMeta.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
           {/* Grouped, role-aware navigation */}
-          <nav aria-label="Workspace navigation" className="flex-1 p-4 mt-2 space-y-3 overflow-y-auto">
+          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-2 space-y-3 overflow-y-auto">
             <p className={`px-2 text-[9px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>Primary</p>
             <div className="space-y-1">
               {primaryTabs.map((tab) => renderNavigationButton(tab))}
@@ -2222,42 +2228,6 @@ export default function App() {
                   onClick={() => setIsMoreToolsOpen((open) => !open)}
                   className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors ${isLight ? "text-zinc-700 hover:bg-white" : "text-zinc-300 hover:bg-zinc-900"}`}
                 >
-                  <span
-                    className={`w-2 h-2 rounded-full transition-all duration-300 shrink-0 ${
-                      isActive
-                        ? tab.id === "Real-time"
-                          ? "bg-rose-500 motion-safe:animate-pulse"
-                          : "bg-orange-500 scale-125"
-                          ? "bg-rose-500 animate-pulse"
-                          : "bg-sky-500 scale-125"
-                        : isLight
-                          ? "bg-transparent border border-zinc-300"
-                          : "bg-transparent border border-zinc-800"
-                    }`}
-                  />
-                  <span className="flex-1 flex items-center gap-2 justify-between">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={
-                          isActive
-                            ? "text-orange-500"
-                            ? "text-sky-500"
-                            : isLight
-                              ? "text-zinc-400"
-                              : "text-zinc-500"
-                        }
-                      >
-                        {tab.icon}
-                      </span>
-                      {tab.label}
-                    </span>
-                    {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && (
-                      <span className="bg-red-500 text-white font-mono text-xs px-1.5 py-0.5 rounded-full font-black motion-safe:animate-pulse shrink-0">
-                      <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">
-                        {lowStockCount}
-                      </span>
-                    )}
-                  </span>
                   <Boxes className="w-4 h-4 text-orange-500" />
                   <span className="flex-1 text-left">More tools</span>
                   {isMoreToolsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
