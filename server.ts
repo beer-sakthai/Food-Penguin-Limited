@@ -3,6 +3,11 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import dotenv from "dotenv";
+import {
+  getMetrics, getOrders, getTargets, getRecipes, getProductionTasks,
+  getWasteRecords, getEmployeeHours, getInventory, getDailyLogs, getAlerts,
+  updateMetrics, addOrder, addWasteRecord, addDailyLog
+} from "./db";
 
 dotenv.config();
 
@@ -464,6 +469,102 @@ Respond ONLY with the JSON object, do not wrap in markdown or backticks.`;
     console.error("Capacity Quickfix error: ", err);
     res.status(500).json({ error: err.message || "Failed to calculate capacity quickfix." });
   }
+});
+
+// ==========================================
+// REST DATA API — real SQLite backend
+// ==========================================
+
+app.get("/api/metrics", (_req, res) => {
+  try {
+    const data = getMetrics();
+    res.json(data || {});
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/metrics", (req, res) => {
+  try {
+    updateMetrics(req.body);
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/orders", (req, res) => {
+  try {
+    const branch = req.query.branch as string | undefined;
+    res.json(getOrders(branch));
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/orders", (req, res) => {
+  try {
+    addOrder(req.body);
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/targets", (_req, res) => {
+  try { res.json(getTargets()); } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/recipes", (_req, res) => {
+  try { res.json(getRecipes()); } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/tasks", (_req, res) => {
+  try { res.json(getProductionTasks()); } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/waste", (_req, res) => {
+  try { res.json(getWasteRecords()); } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+app.post("/api/waste", (req, res) => {
+  try {
+    addWasteRecord(req.body);
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/hours", (_req, res) => {
+  try { res.json(getEmployeeHours()); } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/inventory", (_req, res) => {
+  try { res.json(getInventory()); } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/logs", (req, res) => {
+  try {
+    const week = req.query.week as string;
+    if (!week) return res.status(400).json({ error: "week query param required" });
+    res.json(getDailyLogs(week));
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/logs", (req, res) => {
+  try {
+    addDailyLog(req.body);
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/alerts", (_req, res) => {
+  try { res.json(getAlerts()); } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 // Serve static compiled UI or route to Vite dev-server (SPA mode)

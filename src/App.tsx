@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Reorder, motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
-import { Reorder, motion } from "motion/react";
 import {
   initialMetrics,
   initialOrders,
@@ -14,6 +14,10 @@ import {
   alternativeWeeklyLogsMap,
   initialAlerts,
 } from "./data";
+import {
+  fetchMetrics, fetchOrders, fetchTargets, fetchTasks,
+  fetchWaste, fetchHours, fetchInventory, fetchLogs, fetchAlerts,
+} from "./api";
 import {
   CoreMetrics,
   SalesOrder,
@@ -329,10 +333,15 @@ export default function App() {
     } catch (_) {}
   };
 
-  // Keep the color-scheme token set aligned with the selected display mode.
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
+
+  // Sync metallic theme CSS class
+  useEffect(() => {
+    document.documentElement.classList.remove("metal-gold", "metal-silver", "metal-copper");
+    document.documentElement.classList.add(`metal-${metallicTheme}`);
+  }, [metallicTheme]);
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -365,6 +374,43 @@ export default function App() {
         // Keep the default state
       }
     }
+  }, []);
+
+  // Load data from SQLite API (falls back to hardcoded data on failure)
+  const [dataLoaded, setDataLoaded] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const [m, o, t, tk, w, h, inv, l, a] = await Promise.all([
+          fetchMetrics(),
+          fetchOrders(),
+          fetchTargets(),
+          fetchTasks(),
+          fetchWaste(),
+          fetchHours(),
+          fetchInventory(),
+          fetchLogs("2026-06-15 to 2026-06-21"),
+          fetchAlerts(),
+        ]);
+        if (cancelled) return;
+        setMetrics(m);
+        setOrders(o);
+        setTargets(t);
+        setTasks(tk);
+        setWasteRecords(w);
+        setHoursData(h);
+        setInventory(inv);
+        setWeeklyLogsMap({ "2026-06-15 to 2026-06-21": l });
+        setAlerts(a);
+      } catch (err) {
+        console.warn("API load failed, using hardcoded data:", err);
+      } finally {
+        if (!cancelled) setDataLoaded(true);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   // Firestore Sync Listener
@@ -1949,16 +1995,19 @@ export default function App() {
       <button
         key={tab.id}
         type="button"
+        role="tab"
+        aria-selected={isActive}
+        aria-current={isActive ? "page" : undefined}
         onClick={() => navigateToTab(tab.id)}
-        className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 ${
+        className={`w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors duration-200 focus-ring ${
           isActive
-            ? isLight ? "bg-zinc-100 text-zinc-950 font-extrabold shadow-sm" : "bg-zinc-900 text-white font-bold shadow-inner"
+            ? isLight ? "nav-active bg-zinc-100 text-zinc-950 font-extrabold shadow-sm" : "nav-active bg-zinc-900 text-white font-bold shadow-inner"
             : isLight ? "text-zinc-600 hover:bg-white hover:text-zinc-900" : "text-zinc-500 hover:bg-zinc-905 hover:text-white"
         }`}
       >
-        <span className={`w-2 h-2 rounded-full shrink-0 ${isActive ? tab.id === "Realtime" ? "bg-rose-500 animate-pulse" : "bg-orange-500" : isLight ? "border border-zinc-300" : "border border-zinc-800"}`} />
+        <span className={`w-2 h-2 rounded-full shrink-0 ${isActive ? tab.id === "Realtime" ? "bg-rose-500 animate-pulse" : "bg-[var(--metal-primary)]" : isLight ? "border border-zinc-300" : "border border-zinc-800"}`} />
         <span className="flex-1 flex items-center gap-2 justify-between">
-          <span className="flex items-center gap-2"><span className={isActive ? "text-orange-500" : isLight ? "text-zinc-400" : "text-zinc-500"}>{tab.icon}</span>{tab.label}</span>
+          <span className="flex items-center gap-2"><span className={isActive ? "text-[var(--metal-primary)]" : isLight ? "text-zinc-400" : "text-zinc-500"}>{tab.icon}</span>{tab.label}</span>
           {(tab.id === "Overview" || tab.id === "Planning") && lowStockCount > 0 && <span className="bg-red-500 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse shrink-0">{lowStockCount}</span>}
         </span>
       </button>
@@ -2048,7 +2097,7 @@ export default function App() {
 
         {/* Mobile Menu Wrapper */}
         <div
-          className={`flex-col flex-1 overflow-y-auto ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
+          className={`flex-col flex-1 overflow-y-auto md:overflow-visible ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
           {/* Aesthetic & Theme Panel */}
           <div className={`mx-4 mt-4 p-3 surface-card transition-all ${
@@ -2207,7 +2256,7 @@ export default function App() {
           </button>
 
           {/* Grouped, role-aware navigation */}
-          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-2 space-y-3 overflow-y-auto">
+          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-2 space-y-3 overflow-y-auto md:overflow-visible min-h-0">
             <p className={`px-2 text-[9px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>Primary</p>
             <div className="space-y-1">
               {primaryTabs.map((tab) => renderNavigationButton(tab))}
@@ -2238,7 +2287,7 @@ export default function App() {
           </nav>
 
           {/* Sidebar Capacity Card (matches Bento Grid illustration specs) */}
-          <div className="px-4 py-3 mt-auto mb-2 hidden md:block">
+          <div className="px-4 py-3 mt-auto mb-2 hidden md:block md:sticky md:bottom-0 bg-inherit z-10">
             <div
               className={`p-4 rounded-2xl border relative overflow-hidden group transition-all duration-200 ${
                 isLight
@@ -2249,8 +2298,8 @@ export default function App() {
               <div
                 className={`absolute right-0 top-0 w-24 h-24 bg-gradient-to-br rounded-full filter blur-2xl pointer-events-none ${
                   isLight
-                    ? "from-orange-550/5"
-                    : "from-orange-500/5 to-transparent"
+                    ? "from-[var(--metal-primary)]/10"
+                    : "from-[var(--metal-primary)]/10 to-transparent"
                 }`}
               />
 
@@ -4366,7 +4415,19 @@ export default function App() {
 
         {/* Active view port rendering */}
         <main className="flex-1 p-6 overflow-y-auto bg-transparent">
-          <div className="max-w-7xl mx-auto">{renderActiveView()}</div>
+          <div className="max-w-7xl mx-auto">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+              >
+                {renderActiveView()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </main>
       </div>
 

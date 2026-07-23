@@ -23,6 +23,29 @@
   --status-critical: #b91c1c;
   --status-info: #1d4ed8;
   --status-neutral: #475569;
+
+  /* Metallic accent tokens (default = gold) */
+  --metal-primary: #f59e0b;
+  --metal-glow: rgba(245, 158, 11, 0.10);
+  --metal-border: rgba(245, 158, 11, 0.30);
+  --metal-soft: rgba(245, 158, 11, 0.06);
+  --metal-text: #b45309;
+}
+
+.metal-silver {
+  --metal-primary: #cbd5e1;
+  --metal-glow: rgba(203, 213, 225, 0.10);
+  --metal-border: rgba(203, 213, 225, 0.30);
+  --metal-soft: rgba(203, 213, 225, 0.06);
+  --metal-text: #475569;
+}
+
+.metal-copper {
+  --metal-primary: #c67c38;
+  --metal-glow: rgba(198, 124, 56, 0.10);
+  --metal-border: rgba(198, 124, 56, 0.35);
+  --metal-soft: rgba(198, 124, 56, 0.06);
+  --metal-text: #92400e;
 }
 
 .dark {
@@ -58,12 +81,71 @@
   }
   .surface-card--raised { box-shadow: var(--elevation-2); }
   .surface-subtle { background: var(--surface-subtle); }
+
+  /* Metallic-aware card accents */
+  .metal-accent {
+    border-color: var(--metal-border);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--metal-primary) 4%, var(--surface-raised)) 0%, var(--surface-raised) 100%);
+  }
+  .metal-liner {
+    position: relative;
+  }
+  .metal-liner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--metal-primary), transparent 50%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.75;
+  }
+
+  /* KPI card hover micro-interactions */
+  .kpi-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.12), 0 0 0 1px var(--metal-border);
+    border-color: var(--metal-primary);
+  }
+  .kpi-card .kpi-icon {
+    transition: transform 0.3s ease, background-color 0.2s ease;
+  }
+  .kpi-card:hover .kpi-icon {
+    transform: scale(1.08);
+    background-color: var(--metal-soft);
+  }
+  .kpi-card .kpi-value {
+    transition: color 0.2s ease;
+  }
+  .kpi-card:hover .kpi-value {
+    color: var(--metal-primary);
+  }
+
   .status-healthy { color: var(--status-healthy); }
   .status-warning { color: var(--status-warning); }
   .status-critical { color: var(--status-critical); }
   .status-info { color: var(--status-info); }
   .status-neutral { color: var(--status-neutral); }
   .status-dot { width: .5rem; height: .5rem; border-radius: 9999px; background: currentColor; display: inline-block; flex: none; }
+
+  /* Focus ring consistency */
+  .focus-ring:focus-visible {
+    outline: 3px solid var(--metal-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--metal-glow);
+  }
+
+  /* Navigation active indicator */
+  .nav-active {
+    background: linear-gradient(90deg, var(--metal-soft) 0%, transparent 100%);
+    border-left: 3px solid var(--metal-primary);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
