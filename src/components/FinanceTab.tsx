@@ -11,12 +11,12 @@ import {
 
 export default function FinanceTab({ theme }: { theme: string }) {
   const monthly = [
-    { m: "Jan", revenue: 280000 },
-    { m: "Feb", revenue: 295000 },
-    { m: "Mar", revenue: 312000 },
-    { m: "Apr", revenue: 298000 },
-    { m: "May", revenue: 325000 },
-    { m: "Jun", revenue: 340000 },
+    { m: "Jan", revenue: 205000 },
+    { m: "Feb", revenue: 212000 },
+    { m: "Mar", revenue: 220000 },
+    { m: "Apr", revenue: 215000 },
+    { m: "May", revenue: 228000 },
+    { m: "Jun", revenue: 235000 },
   ].map((m) => ({
     ...m,
     net: Math.round(m.revenue * NET_SALES_FACTOR),
