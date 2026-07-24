@@ -50,6 +50,7 @@ import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
 import { MS_PRODUCTS, TESCO_PRODUCTS } from "./components/SellTab";
+import { BUSINESS_LOCATIONS, BusinessLocation } from "./business";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 import { OperationalLogForm } from "./components/overview/OperationalLogForm";
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -498,9 +499,7 @@ export default function App() {
     };
   }, [currentUser]);
 
-  const [selectedBranch, setSelectedBranch] = useState<
-    "Marks & Spencer - Cork City" | "Tesco - Cork City" | "Tesco - Mahon Point"
-  >("Marks & Spencer - Cork City");
+  const [selectedBranch, setSelectedBranch] = useState<BusinessLocation>(BUSINESS_LOCATIONS[0].name);
   // Self-hosted analytics tracker (sends batches every 2s)
   useAnalytics({ userRole, selectedBranch, activeTab });
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
@@ -1878,6 +1877,7 @@ export default function App() {
             totalCostToday={totalWasteCost}
             selectedBranch={selectedBranch}
             theme={theme}
+            productionValueToday={metrics.productionItems}
           />
         );
       case "Hours":
@@ -2027,12 +2027,14 @@ export default function App() {
           <div className="flex items-center gap-2 lg:gap-3 shrink-0">
             <select
               value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value as any)}
+              onChange={(e) => setSelectedBranch(e.target.value as BusinessLocation)}
               className="bg-[var(--panel)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
             >
-              <option value="Marks & Spencer - Cork City">M&S Cork</option>
-              <option value="Tesco - Cork City">Tesco Cork</option>
-              <option value="Tesco - Mahon Point">Tesco Mahon</option>
+              {BUSINESS_LOCATIONS.map((loc) => (
+                <option key={loc.id} value={loc.name}>
+                  {loc.type === "Tesco" ? "Tesco" : "M&S"} {loc.name.split(" - ")[1]}
+                </option>
+              ))}
             </select>
 
             <select

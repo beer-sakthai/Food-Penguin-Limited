@@ -1,6 +1,7 @@
 // Saksee · 2026-07-24 · feat/new-design-system
 import React, { useState } from "react";
 import { ShieldCheck, Plus, Target } from "lucide-react";
+import { COGS_TARGET_PCT, COMMISSION_TARGET_PCT, WASTE_TARGET_PCT } from "../business";
 import type { CompanyTarget } from "../types";
 
 export default function TargetTab({
@@ -51,7 +52,9 @@ export default function TargetTab({
         </div>
         <div>
           <h1 className="text-lg font-semibold text-[var(--text)]">Targets</h1>
-          <p className="text-xs text-[var(--muted)]">{targets.length} active · {onTrack} on track</p>
+          <p className="text-xs text-[var(--muted)]">
+        {targets.length} active · {onTrack} on track · COGS {COGS_TARGET_PCT}% · Commission {COMMISSION_TARGET_PCT}% · Waste {WASTE_TARGET_PCT}%
+      </p>
         </div>
       </div>
 

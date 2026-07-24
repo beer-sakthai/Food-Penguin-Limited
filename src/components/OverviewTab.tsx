@@ -1,10 +1,18 @@
 // Saksee · 2026-07-24 · feat/new-design-system
 import React, { useMemo } from "react";
-import { LayoutDashboard, TrendingUp, TrendingDown, Package, Trash2, Clock, ArrowRight, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, AlertTriangle, DollarSign, Wallet } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area } from "recharts";
 import { KpiCard } from "./overview/KpiCard";
 import { ActionQueue } from "./overview/ActionQueue";
 import { TrendPanel } from "./overview/TrendPanel";
+import {
+  WASTE_TARGET_PCT,
+  COGS_TARGET_PCT,
+  COMMISSION_TARGET_PCT,
+  NET_SALES_FACTOR,
+  cogsTargetFromSales,
+  wasteTargetFromProduction,
+} from "../business";
 import type { InventoryItem, DailyOperationalLog } from "../types";
 
 interface OverviewProps {
@@ -28,31 +36,60 @@ export default function OverviewTab(props: OverviewProps) {
   }));
   const lowStockItems = useMemo(() => (inventory || []).filter(i => i.status === "Low"), [inventory]);
 
+  const salesToday = Number(metrics?.sales_today || metrics?.salesToday || 0);
+  const productionToday = Number(metrics?.production_items || metrics?.productionItems || 0);
+  const wasteCostToday = Number(metrics?.waste_cost || metrics?.wasteCost || 0);
+  const wastePct = productionToday ? (wasteCostToday / productionToday) * 100 : 0;
+  const wasteTargetPct = WASTE_TARGET_PCT;
+  const wasteVsTarget = wastePct - wasteTargetPct;
+
+  const netSales = salesToday * NET_SALES_FACTOR;
+  const commission = salesToday - netSales;
+  const cogsTarget = cogsTargetFromSales(salesToday);
+  const cogsActual = trend.length
+    ? trend.reduce((a, r) => a + Number(r.cogs || 0), 0) / (trend.length || 1)
+    : 0;
+  const cogsPct = netSales ? (cogsActual / netSales) * 100 : 0;
+
   const cards = [
     {
       label: "Sales today",
-      value: `€${(metrics?.sales_today || 0).toLocaleString()}`,
-      detail: `+${metrics?.sales_growth || 0}% vs yesterday`,
+      value: `€${salesToday.toLocaleString()}`,
+      detail: `+${metrics?.sales_growth || metrics?.salesGrowth || 0}% vs yesterday`,
       icon: TrendingUp,
       tone: "ok" as const,
     },
     {
       label: "Production",
-      value: `${(metrics?.production_items || 0).toLocaleString()} / ${(metrics?.production_target || 0).toLocaleString()}`,
+      value: `${productionToday.toLocaleString()} / ${(metrics?.production_target || metrics?.productionTarget || 0).toLocaleString()}`,
       detail: "items / target",
       icon: Package,
       tone: "accent" as const,
     },
     {
       label: "Waste",
-      value: `€${(metrics?.waste_cost || 0).toFixed(0)}`,
-      detail: `-${metrics?.waste_reduction || 0}% reduction`,
+      value: `€${wasteCostToday.toFixed(0)}`,
+      detail: `${wastePct.toFixed(1)}% of prod · target ${wasteTargetPct}%`,
       icon: Trash2,
-      tone: "bad" as const,
+      tone: wasteVsTarget > 0 ? ("bad" as const) : ("ok" as const),
+    },
+    {
+      label: "COGS",
+      value: `${cogsPct.toFixed(1)}%`,
+      detail: `target ${COGS_TARGET_PCT}% · commission ${COMMISSION_TARGET_PCT}%`,
+      icon: DollarSign,
+      tone: cogsPct > COGS_TARGET_PCT ? ("warn" as const) : ("ok" as const),
+    },
+    {
+      label: "Net after commission",
+      value: `€${netSales.toLocaleString()}`,
+      detail: `commission €${commission.toLocaleString()}`,
+      icon: Wallet,
+      tone: "accent" as const,
     },
     {
       label: "Hours",
-      value: `${metrics?.hours_scheduled || 0}h`,
+      value: `${metrics?.hours_scheduled || metrics?.hoursScheduled || 0}h`,
       detail: "scheduled",
       icon: Clock,
       tone: "warn" as const,
@@ -76,7 +113,7 @@ export default function OverviewTab(props: OverviewProps) {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {cards.map((k, i) => (
           <KpiCard
             label={k.label}

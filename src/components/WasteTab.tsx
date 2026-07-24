@@ -1,7 +1,8 @@
 // Saksee · 2026-07-24 · feat/new-design-system
 import React, { useState } from "react";
 import { Trash2, Plus, Search, AlertTriangle } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
+import { WASTE_TARGET_PCT, wasteTargetFromProduction } from "../business";
 
 interface Waste { id: string; item: string; category: string; weight: number; cost: number; reason: string; date: string; }
 
@@ -14,8 +15,9 @@ export default function WasteTab(props: {
   totalCostToday: number;
   selectedBranch: string;
   theme: "dark" | "light";
+  productionValueToday?: number;
 }) {
-  const { wasteRecords, onAddWaste, totalCostToday, selectedBranch } = props;
+  const { wasteRecords, onAddWaste, totalCostToday, selectedBranch, productionValueToday = 11240 } = props;
   const [item, setItem] = useState("");
   const [cat, setCat] = useState(CATS[0]);
   const [w, setW] = useState(1);
@@ -37,9 +39,15 @@ export default function WasteTab(props: {
   const totalWeight = wasteRecords.reduce((a, w) => a + (w.weight || 0), 0);
   const topReason = byReason.length ? byReason.sort((a, b) => b.cost - a.cost)[0].reason : "—";
 
+  const wasteTarget = wasteTargetFromProduction(productionValueToday);
+  const wastePct = productionValueToday ? (totalCostToday / productionValueToday) * 100 : 0;
+  const overTarget = wastePct > WASTE_TARGET_PCT;
+
   const cards = [
-    { label: "Total cost", value: `€${totalCostToday.toFixed(0)}`, sub: "all branches", warn: totalCostToday > 200 },
+    { label: "Total cost", value: `€${totalCostToday.toFixed(0)}`, sub: "all branches", warn: overTarget },
+    { label: "Waste %", value: `${wastePct.toFixed(1)}%`, sub: `target ${WASTE_TARGET_PCT}%`, warn: overTarget },
     { label: "Total weight", value: `${totalWeight.toFixed(1)} kg`, sub: `${wasteRecords.length} records` },
+    { label: "Target budget", value: `€${wasteTarget.toFixed(0)}`, sub: `${WASTE_TARGET_PCT}% of prod` },
     { label: "Top reason", value: topReason, sub: "by cost" },
   ];
 
@@ -54,12 +62,12 @@ export default function WasteTab(props: {
           </div>
           <div>
             <h1 className="text-lg font-semibold text-[var(--text)]">Waste</h1>
-            <p className="text-xs text-[var(--muted)]">{selectedBranch} · {wasteRecords.length} records · {totalWeight.toFixed(1)}kg</p>
+            <p className="text-xs text-[var(--muted)]">{selectedBranch} · {wasteRecords.length} records · {totalWeight.toFixed(1)}kg · target {WASTE_TARGET_PCT}%</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {cards.map((k, i) => (
           <div key={i} className="card card-hover">
             <div className="flex items-center gap-2">
@@ -82,6 +90,7 @@ export default function WasteTab(props: {
                 <XAxis dataKey="reason" tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} formatter={(v: any) => `€${v}`} />
+                <ReferenceLine y={wasteTarget / byReason.length} stroke="var(--warn)" strokeDasharray="4 4" label={{ value: `${WASTE_TARGET_PCT}%`, fill: "var(--warn)", fontSize: 10 }} />
                 <Bar dataKey="cost" radius={[6, 6, 0, 0]} fontSize={12}>
                   {byReason.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Bar>

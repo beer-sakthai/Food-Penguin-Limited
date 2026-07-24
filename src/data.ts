@@ -10,6 +10,14 @@ import {
   RealtimeAlert,
   DailyOperationalLog
 } from './types';
+import {
+  COGS_TARGET_PCT,
+  COMMISSION_TARGET_PCT,
+  WASTE_TARGET_PCT,
+  NET_SALES_FACTOR,
+  cogsTargetFromSales,
+  wasteTargetFromProduction,
+} from './business';
 
 export const initialMetrics: CoreMetrics = {
   salesToday: 14820,
@@ -44,9 +52,9 @@ export const initialOrders: SalesOrder[] = [
 export const initialTargets: CompanyTarget[] = [
   { id: 'T-1', name: 'Sushi Revenue Target', metric: 'Total Sales (€)', targetValue: 15000, currentValue: 14820, unit: '€', category: 'Sell', deadline: 'Today, 22:00', date: '2026-06-28' },
   { id: 'T-2', name: 'Sushi Rolls Made', metric: 'Items Rolled', targetValue: 11500, currentValue: 11240, unit: 'units', category: 'Production', deadline: 'Today, 21:05', date: '2026-06-28' },
-  { id: 'T-3', name: 'Daily Waste Minimizer', metric: 'Food Waste Cost', targetValue: 500, currentValue: 412.50, unit: '€', category: 'Waste', deadline: 'Today, 22:00', date: '2026-06-28' },
-  { id: 'T-4', name: 'Hourly Roster Precision', metric: 'Overtime Margin', targetValue: 2, currentValue: 0, unit: 'hrs', category: 'Hours', deadline: 'End of Shift', date: '2026-06-28' },
-  { id: 'T-5', name: 'Weekly Organic Reach', metric: 'Social Promos Run', targetValue: 10, currentValue: 8, unit: 'times', category: 'Sell', deadline: 'Sunday, 18:00', date: '2026-06-21' }
+  { id: 'T-3', name: 'Waste Budget', metric: 'Waste vs Production', targetValue: WASTE_TARGET_PCT, currentValue: 3.7, unit: '%', category: 'Waste', deadline: 'Today, 22:00', date: '2026-06-28' },
+  { id: 'T-4', name: 'COGS Target', metric: 'COGS vs Net Sales', targetValue: COGS_TARGET_PCT, currentValue: 33.0, unit: '%', category: 'Finance', deadline: 'End of Month', date: '2026-06-28' },
+  { id: 'T-5', name: 'Retailer Commission', metric: 'Commission vs Gross', targetValue: COMMISSION_TARGET_PCT, currentValue: COMMISSION_TARGET_PCT, unit: '%', category: 'Finance', deadline: 'Every Sale', date: '2026-06-28' }
 ];
 
 export const initialRecipes: Recipe[] = [
@@ -102,282 +110,317 @@ export const initialWeeklyLogs: DailyOperationalLog[] = [
     day: 'Mon',
     date: '2026-06-15',
     sales: 10450,
-    waste: 520,
+    waste: 980.0,
     hours: 110,
     productionTarget: 11500,
     productionMade: 9800,
     supplierName: 'Tazaki',
-    cogs: {
-      tazaki: 3500,
-      sysco: 1200,
-      bulza: 600,
-      sticker: 120,
-      others: 200
-    }
+    cogs: { tazaki: 442, sysco: 438, bulza: 438, sticker: 438, others: 438 }
   },
   {
     day: 'Tue',
     date: '2026-06-16',
     sales: 11200,
-    waste: 480,
+    waste: 1020.0,
     hours: 115,
     productionTarget: 11500,
     productionMade: 10200,
     supplierName: 'Sysco',
-    cogs: {
-      tazaki: 3600,
-      sysco: 1100,
-      bulza: 550,
-      sticker: 100,
-      others: 250
-    }
+    cogs: { tazaki: 470, sysco: 472, bulza: 470, sticker: 470, others: 470 }
   },
   {
     day: 'Wed',
     date: '2026-06-17',
     sales: 10800,
-    waste: 460,
+    waste: 1010.0,
     hours: 118,
     productionTarget: 11500,
     productionMade: 10100,
     supplierName: 'Bulza',
-    cogs: {
-      tazaki: 3450,
-      sysco: 1300,
-      bulza: 620,
-      sticker: 150,
-      others: 180
-    }
+    cogs: { tazaki: 453, sysco: 453, bulza: 456, sticker: 453, others: 453 }
   },
   {
     day: 'Thu',
     date: '2026-06-18',
     sales: 12500,
-    waste: 410,
+    waste: 1110.0,
     hours: 120,
     productionTarget: 11500,
     productionMade: 11100,
     supplierName: 'Sticker',
-    cogs: {
-      tazaki: 4100,
-      sysco: 1250,
-      bulza: 700,
-      sticker: 180,
-      others: 210
-    }
+    cogs: { tazaki: 525, sysco: 525, bulza: 525, sticker: 525, others: 525 }
   },
   {
     day: 'Fri',
     date: '2026-06-19',
     sales: 13800,
-    waste: 390,
+    waste: 1130.0,
     hours: 122,
     productionTarget: 11500,
     productionMade: 11300,
     supplierName: 'Others',
-    cogs: {
-      tazaki: 4500,
-      sysco: 1150,
-      bulza: 750,
-      sticker: 200,
-      others: 330
-    }
+    cogs: { tazaki: 579, sysco: 579, bulza: 579, sticker: 579, others: 582 }
   },
   {
     day: 'Sat',
     date: '2026-06-20',
     sales: 14200,
-    waste: 405,
+    waste: 1140.0,
     hours: 125,
     productionTarget: 11500,
     productionMade: 11400,
     supplierName: 'Tazaki',
-    cogs: {
-      tazaki: 4700,
-      sysco: 1100,
-      bulza: 800,
-      sticker: 220,
-      others: 350
-    }
+    cogs: { tazaki: 598, sysco: 596, bulza: 596, sticker: 596, others: 596 }
   },
   {
     day: 'Sun',
     date: '2026-06-21',
     sales: 14820,
-    waste: 412.50,
+    waste: 1124.0,
     hours: 124,
     productionTarget: 11500,
     productionMade: 11240,
     supplierName: 'Others',
-    cogs: {
-      tazaki: 4890,
-      sysco: 1100,
-      bulza: 820,
-      sticker: 240,
-      others: 380
-    }
+    cogs: { tazaki: 622, sysco: 622, bulza: 622, sticker: 622, others: 624 }
   }
 ];
 
 export const alternativeWeeklyLogsMap: Record<string, DailyOperationalLog[]> = {
-  '2026-06-15 to 2026-06-21': initialWeeklyLogs,
+  '2026-06-15 to 2026-06-21': [
+  {
+    day: 'Mon',
+    date: '2026-06-15',
+    sales: 10450,
+    waste: 980.0,
+    hours: 110,
+    productionTarget: 11500,
+    productionMade: 9800,
+    supplierName: 'Tazaki',
+    cogs: { tazaki: 442, sysco: 438, bulza: 438, sticker: 438, others: 438 }
+  },
+  {
+    day: 'Tue',
+    date: '2026-06-16',
+    sales: 11200,
+    waste: 1020.0,
+    hours: 115,
+    productionTarget: 11500,
+    productionMade: 10200,
+    supplierName: 'Sysco',
+    cogs: { tazaki: 470, sysco: 472, bulza: 470, sticker: 470, others: 470 }
+  },
+  {
+    day: 'Wed',
+    date: '2026-06-17',
+    sales: 10800,
+    waste: 1010.0,
+    hours: 118,
+    productionTarget: 11500,
+    productionMade: 10100,
+    supplierName: 'Bulza',
+    cogs: { tazaki: 453, sysco: 453, bulza: 456, sticker: 453, others: 453 }
+  },
+  {
+    day: 'Thu',
+    date: '2026-06-18',
+    sales: 12500,
+    waste: 1110.0,
+    hours: 120,
+    productionTarget: 11500,
+    productionMade: 11100,
+    supplierName: 'Sticker',
+    cogs: { tazaki: 525, sysco: 525, bulza: 525, sticker: 525, others: 525 }
+  },
+  {
+    day: 'Fri',
+    date: '2026-06-19',
+    sales: 13800,
+    waste: 1130.0,
+    hours: 122,
+    productionTarget: 11500,
+    productionMade: 11300,
+    supplierName: 'Others',
+    cogs: { tazaki: 579, sysco: 579, bulza: 579, sticker: 579, others: 582 }
+  },
+  {
+    day: 'Sat',
+    date: '2026-06-20',
+    sales: 14200,
+    waste: 1140.0,
+    hours: 125,
+    productionTarget: 11500,
+    productionMade: 11400,
+    supplierName: 'Tazaki',
+    cogs: { tazaki: 598, sysco: 596, bulza: 596, sticker: 596, others: 596 }
+  },
+  {
+    day: 'Sun',
+    date: '2026-06-21',
+    sales: 14820,
+    waste: 1124.0,
+    hours: 124,
+    productionTarget: 11500,
+    productionMade: 11240,
+    supplierName: 'Others',
+    cogs: { tazaki: 622, sysco: 622, bulza: 622, sticker: 622, others: 624 }
+  }
+  ],
   '2026-06-22 to 2026-06-28': [
-    {
-      day: 'Mon',
-      date: '2026-06-22',
-      sales: 11000,
-      waste: 500,
-      hours: 108,
-      productionTarget: 11500,
-      productionMade: 9900,
-      supplierName: 'Tazaki',
-      cogs: { tazaki: 3600, sysco: 1150, bulza: 580, sticker: 110, others: 190 }
-    },
-    {
-      day: 'Tue',
-      date: '2026-06-23',
-      sales: 11500,
-      waste: 470,
-      hours: 114,
-      productionTarget: 11500,
-      productionMade: 10400,
-      supplierName: 'Sysco',
-      cogs: { tazaki: 3700, sysco: 1200, bulza: 530, sticker: 110, others: 240 }
-    },
-    {
-      day: 'Wed',
-      date: '2026-06-24',
-      sales: 11200,
-      waste: 450,
-      hours: 116,
-      productionTarget: 11500,
-      productionMade: 10300,
-      supplierName: 'Bulza',
-      cogs: { tazaki: 3500, sysco: 1250, bulza: 610, sticker: 140, others: 200 }
-    },
-    {
-      day: 'Thu',
-      date: '2026-06-25',
-      sales: 12100,
-      waste: 430,
-      hours: 118,
-      productionTarget: 11500,
-      productionMade: 10900,
-      supplierName: 'Sticker',
-      cogs: { tazaki: 4000, sysco: 1200, bulza: 680, sticker: 170, others: 220 }
-    },
-    {
-      day: 'Fri',
-      date: '2026-06-26',
-      sales: 14000,
-      waste: 380,
-      hours: 120,
-      productionTarget: 11500,
-      productionMade: 11500,
-      supplierName: 'Others',
-      cogs: { tazaki: 4600, sysco: 1100, bulza: 720, sticker: 190, others: 310 }
-    },
-    {
-      day: 'Sat',
-      date: '2026-06-27',
-      sales: 14500,
-      waste: 395,
-      hours: 122,
-      productionTarget: 11500,
-      productionMade: 11600,
-      supplierName: 'Tazaki',
-      cogs: { tazaki: 4800, sysco: 1150, bulza: 780, sticker: 210, others: 340 }
-    },
-    {
-      day: 'Sun',
-      date: '2026-06-28',
-      sales: 15200,
-      waste: 400,
-      hours: 126,
-      productionTarget: 11500,
-      productionMade: 11800,
-      supplierName: 'Others',
-      cogs: { tazaki: 5000, sysco: 1050, bulza: 800, sticker: 230, others: 360 }
-    }
+  {
+    day: 'Mon',
+    date: '2026-06-22',
+    sales: 11000,
+    waste: 990.0,
+    hours: 108,
+    productionTarget: 11500,
+    productionMade: 9900,
+    supplierName: 'Tazaki',
+    cogs: { tazaki: 462, sysco: 462, bulza: 462, sticker: 462, others: 462 }
+  },
+  {
+    day: 'Tue',
+    date: '2026-06-23',
+    sales: 11500,
+    waste: 1040.0,
+    hours: 114,
+    productionTarget: 11500,
+    productionMade: 10400,
+    supplierName: 'Sysco',
+    cogs: { tazaki: 483, sysco: 483, bulza: 483, sticker: 483, others: 483 }
+  },
+  {
+    day: 'Wed',
+    date: '2026-06-24',
+    sales: 11200,
+    waste: 1030.0,
+    hours: 116,
+    productionTarget: 11500,
+    productionMade: 10300,
+    supplierName: 'Bulza',
+    cogs: { tazaki: 470, sysco: 470, bulza: 472, sticker: 470, others: 470 }
+  },
+  {
+    day: 'Thu',
+    date: '2026-06-25',
+    sales: 12100,
+    waste: 1090.0,
+    hours: 118,
+    productionTarget: 11500,
+    productionMade: 10900,
+    supplierName: 'Sticker',
+    cogs: { tazaki: 508, sysco: 508, bulza: 508, sticker: 509, others: 508 }
+  },
+  {
+    day: 'Fri',
+    date: '2026-06-26',
+    sales: 14000,
+    waste: 1150.0,
+    hours: 120,
+    productionTarget: 11500,
+    productionMade: 11500,
+    supplierName: 'Others',
+    cogs: { tazaki: 588, sysco: 588, bulza: 588, sticker: 588, others: 588 }
+  },
+  {
+    day: 'Sat',
+    date: '2026-06-27',
+    sales: 14500,
+    waste: 1160.0,
+    hours: 122,
+    productionTarget: 11500,
+    productionMade: 11600,
+    supplierName: 'Tazaki',
+    cogs: { tazaki: 609, sysco: 609, bulza: 609, sticker: 609, others: 609 }
+  },
+  {
+    day: 'Sun',
+    date: '2026-06-28',
+    sales: 15200,
+    waste: 1180.0,
+    hours: 126,
+    productionTarget: 11500,
+    productionMade: 11800,
+    supplierName: 'Others',
+    cogs: { tazaki: 638, sysco: 638, bulza: 638, sticker: 638, others: 640 }
+  }
   ],
   '2026-06-08 to 2026-06-14': [
-    {
-      day: 'Mon',
-      date: '2026-06-08',
-      sales: 9800,
-      waste: 550,
-      hours: 112,
-      productionTarget: 11000,
-      productionMade: 9400,
-      supplierName: 'Tazaki',
-      cogs: { tazaki: 3300, sysco: 1250, bulza: 620, sticker: 130, others: 210 }
-    },
-    {
-      day: 'Tue',
-      date: '2026-06-09',
-      sales: 10500,
-      waste: 510,
-      hours: 116,
-      productionTarget: 11000,
-      productionMade: 9800,
-      supplierName: 'Sysco',
-      cogs: { tazaki: 3400, sysco: 1150, bulza: 570, sticker: 120, others: 260 }
-    },
-    {
-      day: 'Wed',
-      date: '2026-06-10',
-      sales: 10100,
-      waste: 490,
-      hours: 119,
-      productionTarget: 11000,
-      productionMade: 9700,
-      supplierName: 'Bulza',
-      cogs: { tazaki: 3350, sysco: 1350, bulza: 640, sticker: 160, others: 190 }
-    },
-    {
-      day: 'Thu',
-      date: '2026-06-11',
-      sales: 11800,
-      waste: 440,
-      hours: 121,
-      productionTarget: 11000,
-      productionMade: 10500,
-      supplierName: 'Sticker',
-      cogs: { tazaki: 3900, sysco: 1300, bulza: 720, sticker: 190, others: 230 }
-    },
-    {
-      day: 'Fri',
-      date: '2026-06-12',
-      sales: 13000,
-      waste: 410,
-      hours: 124,
-      productionTarget: 11000,
-      productionMade: 10800,
-      supplierName: 'Others',
-      cogs: { tazaki: 4300, sysco: 1200, bulza: 770, sticker: 210, others: 350 }
-    },
-    {
-      day: 'Sat',
-      date: '2026-06-13',
-      sales: 13505,
-      waste: 420,
-      hours: 127,
-      productionTarget: 11000,
-      productionMade: 10900,
-      supplierName: 'Tazaki',
-      cogs: { tazaki: 4500, sysco: 1150, bulza: 820, sticker: 230, others: 370 }
-    },
-    {
-      day: 'Sun',
-      date: '2026-06-14',
-      sales: 14100,
-      waste: 425,
-      hours: 125,
-      productionTarget: 11000,
-      productionMade: 10750,
-      supplierName: 'Others',
-      cogs: { tazaki: 4650, sysco: 1150, bulza: 840, sticker: 250, others: 390 }
-    }
-  ]
+  {
+    day: 'Mon',
+    date: '2026-06-08',
+    sales: 9800,
+    waste: 940.0,
+    hours: 112,
+    productionTarget: 11000,
+    productionMade: 9400,
+    supplierName: 'Tazaki',
+    cogs: { tazaki: 414, sysco: 411, bulza: 411, sticker: 411, others: 411 }
+  },
+  {
+    day: 'Tue',
+    date: '2026-06-09',
+    sales: 10500,
+    waste: 980.0,
+    hours: 116,
+    productionTarget: 11000,
+    productionMade: 9800,
+    supplierName: 'Sysco',
+    cogs: { tazaki: 441, sysco: 441, bulza: 441, sticker: 441, others: 441 }
+  },
+  {
+    day: 'Wed',
+    date: '2026-06-10',
+    sales: 10100,
+    waste: 970.0,
+    hours: 119,
+    productionTarget: 11000,
+    productionMade: 9700,
+    supplierName: 'Bulza',
+    cogs: { tazaki: 424, sysco: 424, bulza: 425, sticker: 424, others: 424 }
+  },
+  {
+    day: 'Thu',
+    date: '2026-06-11',
+    sales: 11800,
+    waste: 1050.0,
+    hours: 121,
+    productionTarget: 11000,
+    productionMade: 10500,
+    supplierName: 'Sticker',
+    cogs: { tazaki: 495, sysco: 495, bulza: 495, sticker: 498, others: 495 }
+  },
+  {
+    day: 'Fri',
+    date: '2026-06-12',
+    sales: 13000,
+    waste: 1080.0,
+    hours: 124,
+    productionTarget: 11000,
+    productionMade: 10800,
+    supplierName: 'Others',
+    cogs: { tazaki: 546, sysco: 546, bulza: 546, sticker: 546, others: 546 }
+  },
+  {
+    day: 'Sat',
+    date: '2026-06-13',
+    sales: 13505,
+    waste: 1090.0,
+    hours: 127,
+    productionTarget: 11000,
+    productionMade: 10900,
+    supplierName: 'Tazaki',
+    cogs: { tazaki: 568, sysco: 567, bulza: 567, sticker: 567, others: 567 }
+  },
+  {
+    day: 'Sun',
+    date: '2026-06-14',
+    sales: 14100,
+    waste: 1075.0,
+    hours: 125,
+    productionTarget: 11000,
+    productionMade: 10750,
+    supplierName: 'Others',
+    cogs: { tazaki: 592, sysco: 592, bulza: 592, sticker: 592, others: 593 }
+  }
+  ],
 };
-

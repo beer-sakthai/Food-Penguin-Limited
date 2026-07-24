@@ -30,7 +30,7 @@ export interface CompanyTarget {
   targetValue: number;
   currentValue: number;
   unit: string;
-  category: 'Sell' | 'Production' | 'Waste' | 'Hours';
+  category: 'Sell' | 'Production' | 'Waste' | 'Hours' | 'Finance' | 'Energy' | 'Suppliers';
   deadline: string;
   date?: string;
 }
