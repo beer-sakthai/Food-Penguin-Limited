@@ -313,14 +313,6 @@ export default function App() {
       return "dark";
     }
   });
-  const [metallicTheme, setMetallicTheme] = useState<"gold" | "silver" | "copper">(() => {
-    try {
-      return (localStorage.getItem("metallicTheme") as "gold" | "silver" | "copper") || "gold";
-    } catch {
-      return "gold";
-    }
-  });
-
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
@@ -329,27 +321,12 @@ export default function App() {
     } catch (_) {}
   };
 
-  const changeMetallicTheme = (metal: "gold" | "silver" | "copper") => {
-    setMetallicTheme(metal);
-    try {
-      localStorage.setItem("metallicTheme", metal);
-    } catch (_) {}
-  };
-
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
-  // Sync metallic theme CSS class
-  useEffect(() => {
-    document.documentElement.classList.remove("metal-gold", "metal-silver", "metal-copper");
-    document.documentElement.classList.add(`metal-${metallicTheme}`);
-  }, [metallicTheme]);
-
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
-  const [isMoreToolsOpen, setIsMoreToolsOpen] = useState(false);
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
@@ -2007,13 +1984,13 @@ export default function App() {
         aria-selected={isActive}
         aria-current={isActive ? "page" : undefined}
         onClick={() => navigateToTab(tab.id)}
-        className={`w-full text-left py-2 px-3 rounded-lg text-xs font-medium flex items-center gap-2.5 transition-colors ${
+        className={`w-full text-left py-1.5 px-2.5 rounded-md text-xs flex items-center gap-2 transition-colors ${
           isActive
-            ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+            ? "bg-[var(--accent-soft)] text-[var(--accent)] font-semibold"
             : "text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)]"
         }`}
       >
-        <span className="w-4 h-4">{tab.icon}</span>
+        <span className="w-4 h-4 shrink-0">{tab.icon}</span>
         <span className="truncate">{tab.label}</span>
       </button>
     );
@@ -2032,4 +2009,85 @@ export default function App() {
       />
     );
   }
-  return (    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)]">      <aside className="w-50 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)]">        <div className="p-4">          <div className="flex items-center gap-2.5">            <div className="w-8 h-8 rounded-lg bg-[var(--accent)] text-white flex items-center justify-center text-sm font-bold shadow-sm">FP</div>            <div className="min-w-0">              <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>              <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>            </div>          </div>        </div>        <nav className="flex-1 px-2 pb-4 space-y-0.5 overflow-y-auto">          {primaryTabs.map((tab) => renderNavigationButton(tab))}          {operationsTabs.length > 0 && (            <div className="pt-4 mt-3 space-y-0.5 border-t border-[var(--border)]">              {operationsTabs.map((tab) => renderNavigationButton(tab))}            </div>          )}          {moreToolsTabs.length > 0 && (            <div className="pt-4 mt-3 space-y-0.5 border-t border-[var(--border)]">              <div className="px-3 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">More tools</div>              {moreToolsTabs.map((tab) => renderNavigationButton(tab))}            </div>          )}        </nav>        <div className="p-3 border-t border-[var(--border)]">          <div className="flex items-center justify-between text-xs">            <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>            <select value={userRole} onChange={(e) => setUserRole(e.target.value as any)} className="bg-transparent text-[var(--muted)] text-[10px] font-medium uppercase cursor-pointer focus:outline-none appearance-none">              <option value="Admin">Admin</option>              <option value="Manager">Manager</option>              <option value="Staff">Staff</option>              <option value="User">User</option>            </select>          </div>        </div>      </aside>      <div className="flex-1 flex flex-col min-w-0">        <header className="h-14 px-5 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--border)]">          <div className="flex items-center gap-4">            <h1 className="text-sm font-bold">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>            <select value={selectedBranch} onChange={(e) => setSelectedBranch(e.target.value as any)} className="bg-transparent text-[var(--muted)] text-xs font-medium focus:outline-none cursor-pointer">              <option value="Marks & Spencer - Cork City">M&S Cork</option>              <option value="Tesco - Cork City">Tesco Cork</option>              <option value="Tesco - Mahon Point">Tesco Mahon</option>            </select>          </div>          <div className="flex items-center gap-3">            <span className="text-xs font-mono text-[var(--muted)]">{irelandTime || "—"}</span>            <button type="button" onClick={toggleTheme} className="p-1.5 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] transition-colors">{isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}</button>          </div>        </header>        <main className="flex-1 p-8 overflow-y-auto">          <div className="max-w-6xl mx-auto">            <AnimatePresence mode="wait" initial={false}>              <motion.div key={activeTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>                {renderActiveView()}              </motion.div>            </AnimatePresence>          </div>        </main>      </div>    </div>  );}
+  return (
+    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)]">
+      <aside className="w-44 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)]">
+        <div className="px-3 py-3 border-b border-[var(--border)]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-md bg-[var(--accent)] text-white flex items-center justify-center text-xs font-bold">FP</div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>
+              <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+          {tabMeta.map((tab) => renderNavigationButton(tab))}
+        </nav>
+
+        <div className="px-3 py-3 border-t border-[var(--border)]">
+          <div className="flex items-center gap-2 text-xs min-w-0">
+            <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>
+            <span className="text-[10px] text-[var(--muted)] uppercase">{userRole}</span>
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-12 px-4 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--border)]">
+          <div className="flex items-center gap-4 min-w-0">
+            <h1 className="text-sm font-bold truncate">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value as any)}
+              className="bg-[var(--panel)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+            >
+              <option value="Marks & Spencer - Cork City">M&S Cork</option>
+              <option value="Tesco - Cork City">Tesco Cork</option>
+              <option value="Tesco - Mahon Point">Tesco Mahon</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <select
+              value={userRole}
+              onChange={(e) => setUserRole(e.target.value as any)}
+              className="bg-[var(--panel)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+            >
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Staff">Staff</option>
+              <option value="User">User</option>
+            </select>
+            <span className="text-xs font-mono text-[var(--muted)] hidden sm:inline">{irelandTime || "—"}</span>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] transition-colors"
+              aria-label="Toggle theme"
+            >
+              {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
+          </div>
+        </header>
+
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-6xl mx-auto">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+              >
+                {renderActiveView()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
