@@ -103,3 +103,52 @@ export async function fetchAlerts() {
   const rows = await r.json();
   return rows.map(mapRow);
 }
+
+// ==========================================
+// Analytics API (self-hosted)
+// ==========================================
+export async function fetchAnalyticsSummary(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/summary?days=${days}`);
+  if (!r.ok) throw new Error(`analytics summary: ${r.status}`);
+  return r.json();
+}
+export async function fetchAnalyticsTimeseries(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/timeseries?days=${days}`);
+  if (!r.ok) throw new Error(`analytics timeseries: ${r.status}`);
+  return r.json();
+}
+export async function fetchTopTabs(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/top-labels?days=${days}&event_type=tab_switch&limit=10`);
+  if (!r.ok) throw new Error(`analytics top tabs: ${r.status}`);
+  return r.json();
+}
+export async function fetchTopActions(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/top-actions?days=${days}&limit=8`);
+  if (!r.ok) throw new Error(`analytics top actions: ${r.status}`);
+  return r.json();
+}
+export async function fetchTopErrors(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/top-errors?days=${days}`);
+  if (!r.ok) throw new Error(`analytics top errors: ${r.status}`);
+  return r.json();
+}
+export async function fetchTopBranches(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/top-branches?days=${days}`);
+  if (!r.ok) throw new Error(`analytics top branches: ${r.status}`);
+  return r.json();
+}
+export async function fetchRoleBreakdown(days = 30) {
+  const r = await fetch(`${BASE}/api/analytics/roles?days=${days}`);
+  if (!r.ok) throw new Error(`analytics roles: ${r.status}`);
+  return r.json();
+}
+export async function fetchFunnel(days = 30, steps = "Overview,Production,Sell,Waste,Hours,Reports") {
+  const r = await fetch(`${BASE}/api/analytics/funnel?days=${days}&steps=${encodeURIComponent(steps)}`);
+  if (!r.ok) throw new Error(`analytics funnel: ${r.status}`);
+  return r.json();
+}
+export async function fetchRecentEvents(limit = 15) {
+  const r = await fetch(`${BASE}/api/analytics/recent?limit=${limit}`);
+  if (!r.ok) throw new Error(`analytics recent: ${r.status}`);
+  return r.json();
+}

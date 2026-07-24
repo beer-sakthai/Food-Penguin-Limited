@@ -137,6 +137,42 @@ function initSchema() {
       status TEXT NOT NULL DEFAULT 'normal',
       message TEXT NOT NULL
     );
+
+    -- ==========================================
+    -- Product Analytics layer (self-hosted, no-cost)
+    -- ==========================================
+    CREATE TABLE IF NOT EXISTS analytics_sessions (
+      session_id TEXT PRIMARY KEY,
+      user_role TEXT NOT NULL,
+      branch TEXT,
+      first_seen_at TEXT NOT NULL,
+      last_seen_at TEXT NOT NULL,
+      event_count INTEGER NOT NULL DEFAULT 0,
+      pageview_count INTEGER NOT NULL DEFAULT 0,
+      duration_seconds INTEGER NOT NULL DEFAULT 0,
+      is_active INTEGER NOT NULL DEFAULT 1
+    );
+    CREATE INDEX IF NOT EXISTS idx_sessions_last_seen ON analytics_sessions(last_seen_at);
+
+    CREATE TABLE IF NOT EXISTS analytics_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id TEXT NOT NULL,
+      event_type TEXT NOT NULL,           -- pageview | tab_switch | click | form_submit | action | error
+      category TEXT,                       -- e.g. "Tab", "Button", "Form", "Api"
+      label TEXT,                          -- e.g. "Production", "Save Order"
+      value REAL,                          -- optional numeric value
+      props TEXT,                          -- JSON string of extra props
+      page TEXT NOT NULL,                  -- logical page/route
+      user_role TEXT NOT NULL,
+      branch TEXT,
+      occurred_at TEXT NOT NULL,
+      day TEXT NOT NULL                     -- YYYY-MM-DD for fast daily aggregation
+    );
+    CREATE INDEX IF NOT EXISTS idx_events_day ON analytics_events(day);
+    CREATE INDEX IF NOT EXISTS idx_events_type ON analytics_events(event_type);
+    CREATE INDEX IF NOT EXISTS idx_events_label ON analytics_events(label);
+    CREATE INDEX IF NOT EXISTS idx_events_session ON analytics_events(session_id);
+    CREATE INDEX IF NOT EXISTS idx_events_page ON analytics_events(page);
   `);
 }
 
@@ -345,4 +381,224 @@ export function addDailyLog(log: Record<string, any>) {
   return getDb().prepare(
     "INSERT OR REPLACE INTO daily_logs (day, date, sales, waste, hours, production_target, production_made, supplier_name, cogs_tazaki, cogs_sysco, cogs_bulza, cogs_sticker, cogs_others, week_range) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   ).run(log.day, log.date, log.sales, log.waste, log.hours, log.production_target, log.production_made, log.supplier_name, log.cogs_tazaki, log.cogs_sysco, log.cogs_bulza, log.cogs_sticker, log.cogs_others, log.week_range);
+}
+
+// ==========================================
+// Analytics write/read helpers
+// ==========================================
+
+export type AnalyticsEventInput = {
+  session_id: string;
+  event_type: string;
+  category?: string;
+  label?: string;
+  value?: number;
+  props?: Record<string, any>;
+  page: string;
+  user_role: string;
+  branch?: string;
+  occurred_at: string; // ISO
+  day: string;         // YYYY-MM-DD
+};
+
+export function upsertAnalyticsSession(s: {
+  session_id: string;
+  user_role: string;
+  branch?: string;
+  first_seen_at: string;
+  last_seen_at: string;
+  is_active: number;
+}) {
+  return getDb().prepare(`
+    INSERT INTO analytics_sessions (session_id, user_role, branch, first_seen_at, last_seen_at, is_active)
+    VALUES (@session_id, @user_role, @branch, @first_seen_at, @last_seen_at, @is_active)
+    ON CONFLICT(session_id) DO UPDATE SET
+      last_seen_at = excluded.last_seen_at,
+      is_active = excluded.is_active
+  `).run({
+    session_id: s.session_id,
+    user_role: s.user_role,
+    branch: s.branch ?? null,
+    first_seen_at: s.first_seen_at,
+    last_seen_at: s.last_seen_at,
+    is_active: s.is_active,
+  });
+}
+
+export function recordAnalyticsEvent(e: AnalyticsEventInput) {
+  const tx = getDb().transaction((row: AnalyticsEventInput) => {
+    getDb().prepare(`
+      INSERT INTO analytics_events (session_id, event_type, category, label, value, props, page, user_role, branch, occurred_at, day)
+      VALUES (@session_id, @event_type, @category, @label, @value, @props, @page, @user_role, @branch, @occurred_at, @day)
+    `).run({
+      session_id: row.session_id,
+      event_type: row.event_type,
+      category: row.category ?? null,
+      label: row.label ?? null,
+      value: row.value ?? null,
+      props: row.props ? JSON.stringify(row.props) : null,
+      page: row.page,
+      user_role: row.user_role,
+      branch: row.branch ?? null,
+      occurred_at: row.occurred_at,
+      day: row.day,
+    });
+    // Bump session counters
+    const isPageview = row.event_type === "pageview" ? 1 : 0;
+    getDb().prepare(`
+      UPDATE analytics_sessions
+      SET event_count = event_count + 1,
+          pageview_count = pageview_count + ?,
+          last_seen_at = ?
+      WHERE session_id = ?
+    `).run(isPageview, row.occurred_at, row.session_id);
+  });
+  tx(e);
+}
+
+export function endAnalyticsSession(session_id: string, last_seen_at: string) {
+  // Compute duration from first_seen_at
+  const s = getDb().prepare("SELECT first_seen_at FROM analytics_sessions WHERE session_id = ?").get(session_id) as { first_seen_at: string } | undefined;
+  if (!s) return;
+  const start = new Date(s.first_seen_at).getTime();
+  const end = new Date(last_seen_at).getTime();
+  const dur = Math.max(0, Math.round((end - start) / 1000));
+  getDb().prepare("UPDATE analytics_sessions SET is_active = 0, duration_seconds = ? WHERE session_id = ?").run(dur, session_id);
+}
+
+export function getAnalyticsSummary(days = 30) {
+  const db = getDb();
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  const totals = db.prepare(`
+    SELECT
+      (SELECT COUNT(*) FROM analytics_sessions WHERE substr(first_seen_at,1,10) >= ?) AS sessions,
+      (SELECT COUNT(*) FROM analytics_events WHERE day >= ?) AS events,
+      (SELECT COUNT(*) FROM analytics_events WHERE day >= ? AND event_type = 'pageview') AS pageviews,
+      (SELECT COUNT(DISTINCT session_id) FROM analytics_events WHERE day >= ?) AS active_users
+  `).get(since, since, since, since) as { sessions: number; events: number; pageviews: number; active_users: number };
+  const avgSession = db.prepare(`
+    SELECT
+      ROUND(AVG(duration_seconds), 1) AS avg_duration_seconds,
+      ROUND(AVG(event_count), 1) AS avg_events_per_session,
+      ROUND(AVG(pageview_count), 1) AS avg_pageviews_per_session
+    FROM analytics_sessions
+    WHERE substr(first_seen_at,1,10) >= ? AND duration_seconds > 0
+  `).get(since) as { avg_duration_seconds: number | null; avg_events_per_session: number | null; avg_pageviews_per_session: number | null };
+  return { ...totals, ...avgSession, window_days: days };
+}
+
+export function getAnalyticsTimeseries(days = 30) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT day,
+      COUNT(*) AS events,
+      SUM(CASE WHEN event_type='pageview' THEN 1 ELSE 0 END) AS pageviews,
+      COUNT(DISTINCT session_id) AS sessions
+    FROM analytics_events
+    WHERE day >= ?
+    GROUP BY day
+    ORDER BY day
+  `).all(since);
+}
+
+export function getTopLabels(days = 30, event_type = "tab_switch", limit = 10) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT label, COUNT(*) AS hits, COUNT(DISTINCT session_id) AS unique_sessions
+    FROM analytics_events
+    WHERE day >= ? AND event_type = ? AND label IS NOT NULL
+    GROUP BY label
+    ORDER BY hits DESC
+    LIMIT ?
+  `).all(since, event_type, limit);
+}
+
+export function getTopActions(days = 30, limit = 10) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT label, category, COUNT(*) AS hits, COUNT(DISTINCT session_id) AS unique_sessions
+    FROM analytics_events
+    WHERE day >= ? AND event_type IN ('click','form_submit','action') AND label IS NOT NULL
+    GROUP BY label
+    ORDER BY hits DESC
+    LIMIT ?
+  `).all(since, limit);
+}
+
+export function getTopErrors(days = 30, limit = 10) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT label, COUNT(*) AS hits
+    FROM analytics_events
+    WHERE day >= ? AND event_type = 'error' AND label IS NOT NULL
+    GROUP BY label
+    ORDER BY hits DESC
+    LIMIT ?
+  `).all(since, limit);
+}
+
+export function getTopPages(days = 30, limit = 10) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT page, COUNT(*) AS views, COUNT(DISTINCT session_id) AS unique_sessions
+    FROM analytics_events
+    WHERE day >= ? AND event_type = 'pageview' AND page IS NOT NULL
+    GROUP BY page
+    ORDER BY views DESC
+    LIMIT ?
+  `).all(since, limit);
+}
+
+export function getTopBranches(days = 30, limit = 10) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT branch, COUNT(DISTINCT session_id) AS sessions, COUNT(*) AS events
+    FROM analytics_events
+    WHERE day >= ? AND branch IS NOT NULL
+    GROUP BY branch
+    ORDER BY sessions DESC
+    LIMIT ?
+  `).all(since, limit);
+}
+
+export function getRoleBreakdown(days = 30) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  return getDb().prepare(`
+    SELECT user_role, COUNT(DISTINCT session_id) AS sessions, COUNT(*) AS events
+    FROM analytics_events
+    WHERE day >= ?
+    GROUP BY user_role
+    ORDER BY sessions DESC
+  `).all(since);
+}
+
+export function getFunnel(steps: string[], days = 30) {
+  const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  const out: Array<{ step: string; users: number; conversion_pct: number | null }> = [];
+  let prev: number | null = null;
+  for (const step of steps) {
+    const row = getDb().prepare(`
+      SELECT COUNT(DISTINCT session_id) AS users
+      FROM analytics_events
+      WHERE day >= ? AND event_type = 'pageview' AND page = ?
+    `).get(since, step) as { users: number };
+    const conv = prev === null || prev === 0 ? null : Math.round((row.users / prev) * 1000) / 10;
+    out.push({ step, users: row.users, conversion_pct: conv });
+    prev = row.users;
+  }
+  return out;
+}
+
+export function getRecentEvents(limit = 50) {
+  return getDb().prepare(`
+    SELECT id, session_id, event_type, category, label, value, page, user_role, branch, occurred_at
+    FROM analytics_events
+    ORDER BY id DESC
+    LIMIT ?
+  `).all(limit);
+}
+
+export function getAnalyticsSeeded(): boolean {
+  const row = getDb().prepare("SELECT COUNT(*) AS c FROM analytics_events").get() as { c: number };
+  return row.c > 0;
 }

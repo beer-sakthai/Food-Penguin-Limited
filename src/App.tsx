@@ -47,9 +47,11 @@ import FinanceTab from "./components/FinanceTab";
 import RealtimeTab from "./components/RealtimeTab";
 import ResourceAllocationTab from "./components/ResourceAllocationTab";
 import ReportsTab from "./components/ReportsTab";
+import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
 import { MS_PRODUCTS, TESCO_PRODUCTS } from "./components/SellTab";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
+import { useAnalytics } from "./hooks/useAnalytics";
 
 // Main Icons
 import {
@@ -85,6 +87,7 @@ import {
   Store,
   FileSpreadsheet,
   GripVertical,
+  BarChart3,
 } from "lucide-react";
 
 import { RotateCcw, Info, LogOut, GitCompare, BrainCircuit } from "lucide-react";
@@ -104,7 +107,7 @@ const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",
   string[]
 > = {
-  Admin: ["Overview", "Advisor", "Sell", "Target", "Studio", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports"],
+  Admin: ["Overview", "Advisor", "Sell", "Target", "Studio", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports", "Analytics"],
   Manager: ["Overview", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports"],
   Staff: ["Overview", "Production", "Waste", "Hours", "Planning", "Suppliers", "Realtime"],
   User: ["Overview"],
@@ -519,6 +522,8 @@ export default function App() {
   const [selectedBranch, setSelectedBranch] = useState<
     "Marks & Spencer - Cork City" | "Tesco - Cork City" | "Tesco - Mahon Point"
   >("Marks & Spencer - Cork City");
+  // Self-hosted analytics tracker (sends batches every 2s)
+  useAnalytics({ userRole, selectedBranch, activeTab });
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
   const [orders, setOrders] = useState<SalesOrder[]>(initialOrders);
   const [targets, setTargets] = useState<CompanyTarget[]>(initialTargets);
@@ -1804,6 +1809,7 @@ export default function App() {
     { id: "Target", label: "Targets", icon: <ShieldCheck className="w-4 h-4" /> },
     { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
     { id: "Studio", label: "Studio", icon: <Wand2 className="w-4 h-4" /> },
+    { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
   const permittedTabIds = rolePermissions[userRole];
@@ -1874,6 +1880,8 @@ export default function App() {
             alerts={alerts}
           />
         );
+      case "Analytics":
+        return <AnalyticsTab theme={theme} />;
       case "Allocation":
         return (
           <ResourceAllocationTab
@@ -2024,4 +2032,4 @@ export default function App() {
       />
     );
   }
-  return (    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)]">      <aside className="w-56 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)]">        <div className="p-4">          <div className="flex items-center gap-2.5">            <div className="w-8 h-8 rounded-lg bg-[var(--accent)] text-white flex items-center justify-center text-sm font-bold shadow-sm">FP</div>            <div className="min-w-0">              <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>              <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>            </div>          </div>        </div>        <nav className="flex-1 px-2 pb-4 space-y-0.5 overflow-y-auto">          {primaryTabs.map((tab) => renderNavigationButton(tab))}          {operationsTabs.length > 0 && (            <div className="pt-4 mt-3 space-y-0.5 border-t border-[var(--border)]">              {operationsTabs.map((tab) => renderNavigationButton(tab))}            </div>          )}        </nav>        <div className="p-3 border-t border-[var(--border)]">          <div className="flex items-center justify-between text-xs">            <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>            <select value={userRole} onChange={(e) => setUserRole(e.target.value as any)} className="bg-transparent text-[var(--muted)] text-[10px] font-medium uppercase cursor-pointer focus:outline-none appearance-none">              <option value="Admin">Admin</option>              <option value="Manager">Manager</option>              <option value="Staff">Staff</option>              <option value="User">User</option>            </select>          </div>        </div>      </aside>      <div className="flex-1 flex flex-col min-w-0">        <header className="h-14 px-5 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--border)]">          <div className="flex items-center gap-4">            <h1 className="text-sm font-bold">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>            <select value={selectedBranch} onChange={(e) => setSelectedBranch(e.target.value as any)} className="bg-transparent text-[var(--muted)] text-xs font-medium focus:outline-none cursor-pointer">              <option value="Marks & Spencer - Cork City">M&S Cork</option>              <option value="Tesco - Cork City">Tesco Cork</option>              <option value="Tesco - Mahon Point">Tesco Mahon</option>            </select>          </div>          <div className="flex items-center gap-3">            <span className="text-xs font-mono text-[var(--muted)]">{irelandTime || "—"}</span>            <button type="button" onClick={toggleTheme} className="p-1.5 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] transition-colors">{isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}</button>          </div>        </header>        <main className="flex-1 p-6 overflow-y-auto">          <div className="max-w-6xl mx-auto">            <AnimatePresence mode="wait" initial={false}>              <motion.div key={activeTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>                {renderActiveView()}              </motion.div>            </AnimatePresence>          </div>        </main>      </div>    </div>  );}
+  return (    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)]">      <aside className="w-56 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)]">        <div className="p-4">          <div className="flex items-center gap-2.5">            <div className="w-8 h-8 rounded-lg bg-[var(--accent)] text-white flex items-center justify-center text-sm font-bold shadow-sm">FP</div>            <div className="min-w-0">              <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>              <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>            </div>          </div>        </div>        <nav className="flex-1 px-2 pb-4 space-y-0.5 overflow-y-auto">          {primaryTabs.map((tab) => renderNavigationButton(tab))}          {operationsTabs.length > 0 && (            <div className="pt-4 mt-3 space-y-0.5 border-t border-[var(--border)]">              {operationsTabs.map((tab) => renderNavigationButton(tab))}            </div>          )}          {moreToolsTabs.length > 0 && (            <div className="pt-4 mt-3 space-y-0.5 border-t border-[var(--border)]">              <div className="px-3 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">More tools</div>              {moreToolsTabs.map((tab) => renderNavigationButton(tab))}            </div>          )}        </nav>        <div className="p-3 border-t border-[var(--border)]">          <div className="flex items-center justify-between text-xs">            <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>            <select value={userRole} onChange={(e) => setUserRole(e.target.value as any)} className="bg-transparent text-[var(--muted)] text-[10px] font-medium uppercase cursor-pointer focus:outline-none appearance-none">              <option value="Admin">Admin</option>              <option value="Manager">Manager</option>              <option value="Staff">Staff</option>              <option value="User">User</option>            </select>          </div>        </div>      </aside>      <div className="flex-1 flex flex-col min-w-0">        <header className="h-14 px-5 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--border)]">          <div className="flex items-center gap-4">            <h1 className="text-sm font-bold">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>            <select value={selectedBranch} onChange={(e) => setSelectedBranch(e.target.value as any)} className="bg-transparent text-[var(--muted)] text-xs font-medium focus:outline-none cursor-pointer">              <option value="Marks & Spencer - Cork City">M&S Cork</option>              <option value="Tesco - Cork City">Tesco Cork</option>              <option value="Tesco - Mahon Point">Tesco Mahon</option>            </select>          </div>          <div className="flex items-center gap-3">            <span className="text-xs font-mono text-[var(--muted)]">{irelandTime || "—"}</span>            <button type="button" onClick={toggleTheme} className="p-1.5 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] transition-colors">{isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}</button>          </div>        </header>        <main className="flex-1 p-6 overflow-y-auto">          <div className="max-w-6xl mx-auto">            <AnimatePresence mode="wait" initial={false}>              <motion.div key={activeTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>                {renderActiveView()}              </motion.div>            </AnimatePresence>          </div>        </main>      </div>    </div>  );}
