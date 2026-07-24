@@ -314,7 +314,7 @@ export default function App() {
     }
   });
   const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
+    const nextTheme = theme === "light" ? "dark" : "light";
     setTheme(nextTheme);
     try {
       localStorage.setItem("theme", nextTheme);
@@ -322,7 +322,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("light", theme === "light");
   }, [theme]);
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
@@ -1984,14 +1984,14 @@ export default function App() {
         aria-selected={isActive}
         aria-current={isActive ? "page" : undefined}
         onClick={() => navigateToTab(tab.id)}
-        className={`w-full text-left py-1.5 px-2.5 rounded-md text-xs flex items-center gap-2 transition-colors ${
+        className={`w-full text-left rounded-lg text-xs flex items-center gap-3 transition-all ${
           isActive
             ? "bg-[var(--accent-soft)] text-[var(--accent)] font-semibold"
             : "text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)]"
-        }`}
+        } py-2 px-2 lg:px-3`}
       >
-        <span className="w-4 h-4 shrink-0">{tab.icon}</span>
-        <span className="truncate">{tab.label}</span>
+        <span className="w-5 h-5 shrink-0">{tab.icon}</span>
+        <span className="hidden lg:block truncate">{tab.label}</span>
       </button>
     );
   };
@@ -2010,61 +2010,63 @@ export default function App() {
     );
   }
   return (
-    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)]">
-      <aside className="w-44 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)]">
-        <div className="px-3 py-3 border-b border-[var(--border)]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md bg-[var(--accent)] text-white flex items-center justify-center text-xs font-bold">FP</div>
-            <div className="min-w-0">
-              <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>
-              <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>
-            </div>
+    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)] font-sans antialiased">
+      <aside className="w-16 lg:w-56 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)] transition-all duration-200">
+        <div className="h-14 px-4 flex items-center gap-3 border-b border-[var(--border)]">
+          <div className="w-8 h-8 rounded-lg bg-[var(--accent)] text-[var(--bg)] flex items-center justify-center text-sm font-bold shrink-0">FP</div>
+          <div className="hidden lg:block min-w-0">
+            <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>
+            <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>
           </div>
         </div>
 
-        <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
           {tabMeta.map((tab) => renderNavigationButton(tab))}
         </nav>
 
-        <div className="px-3 py-3 border-t border-[var(--border)]">
-          <div className="flex items-center gap-2 text-xs min-w-0">
+        <div className="p-3 border-t border-[var(--border)]">
+          <div className="hidden lg:flex items-center gap-2 text-xs min-w-0">
             <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>
             <span className="text-[10px] text-[var(--muted)] uppercase">{userRole}</span>
           </div>
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-12 px-4 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--border)]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[var(--bg)]">
+        <header className="h-14 px-4 lg:px-6 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur">
           <div className="flex items-center gap-4 min-w-0">
-            <h1 className="text-sm font-bold truncate">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>
+            <h1 className="text-base font-semibold tracking-tight truncate">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>
+            <div className="hidden sm:flex items-center gap-3 text-xs text-[var(--muted)]">
+              <span>{irelandTime || "—"}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 lg:gap-3 shrink-0">
             <select
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value as any)}
-              className="bg-[var(--panel)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+              className="bg-[var(--panel)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
             >
               <option value="Marks & Spencer - Cork City">M&S Cork</option>
               <option value="Tesco - Cork City">Tesco Cork</option>
               <option value="Tesco - Mahon Point">Tesco Mahon</option>
             </select>
-          </div>
 
-          <div className="flex items-center gap-3 shrink-0">
             <select
               value={userRole}
               onChange={(e) => setUserRole(e.target.value as any)}
-              className="bg-[var(--panel)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+              className="hidden sm:block bg-[var(--panel)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
             >
               <option value="Admin">Admin</option>
               <option value="Manager">Manager</option>
               <option value="Staff">Staff</option>
               <option value="User">User</option>
             </select>
-            <span className="text-xs font-mono text-[var(--muted)] hidden sm:inline">{irelandTime || "—"}</span>
+
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] transition-colors"
+              className="p-2 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)] transition-colors"
               aria-label="Toggle theme"
             >
               {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -2072,15 +2074,15 @@ export default function App() {
           </div>
         </header>
 
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-6xl mx-auto">
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 6 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.15 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18 }}
               >
                 {renderActiveView()}
               </motion.div>
