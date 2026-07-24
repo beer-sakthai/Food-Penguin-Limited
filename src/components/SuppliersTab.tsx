@@ -1,13 +1,13 @@
-// Saksee · 2026-07-24 · feat/new-design-system
+// Saksee · 2026-07-24 · supplier directory
 import React from "react";
 import { Package, Mail, Phone, ShoppingBag } from "lucide-react";
 
 export default function SuppliersTab({ theme }: { theme: string }) {
   const suppliers = [
-    { name: "Tazaki", category: "Seafood", contact: "tazaki@example.com", phone: "+353 21 555 0100", orders: 28 },
-    { name: "Sysco", category: "Produce", contact: "sysco@example.com", phone: "+353 21 555 0200", orders: 35 },
-    { name: "Bulza", category: "Grains", contact: "bulza@example.com", phone: "+353 21 555 0300", orders: 22 },
-    { name: "Sticker", category: "Packaging", contact: "sticker@example.com", phone: "+353 21 555 0400", orders: 18 },
+    { name: "Tazaki", category: "Seafood", contact: "orders@tazaki.ie", phone: "+353 21 480 0000", orders: 28 },
+    { name: "Sysco", category: "Produce", contact: "cork@sysco.ie", phone: "+353 21 480 0001", orders: 35 },
+    { name: "Bulza", category: "Grains", contact: "sales@bulza.ie", phone: "+353 21 480 0002", orders: 22 },
+    { name: "Sticker", category: "Packaging", contact: "info@sticker.ie", phone: "+353 21 480 0003", orders: 18 },
     { name: "Others", category: "Mixed", contact: "—", phone: "—", orders: 12 },
   ];
 
@@ -38,34 +38,30 @@ export default function SuppliersTab({ theme }: { theme: string }) {
               <k.icon className="w-4 h-4 text-[var(--subtle)]" />
             </div>
             <div className="mt-2 metric-value">{k.value}</div>
-            <div className="mt-1 text-[11px] text-[var(--muted)]">{k.sub}</div>
+            <div className="text-xs text-[var(--muted)]">{k.sub}</div>
           </div>
         ))}
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-x-auto">
         <table className="data-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Supplier</th>
               <th>Category</th>
-              <th>Email</th>
+              <th>Contact</th>
               <th>Phone</th>
               <th className="text-right">Orders</th>
             </tr>
           </thead>
           <tbody>
-            {suppliers.map(s => (
+            {suppliers.map((s) => (
               <tr key={s.name}>
                 <td className="font-medium">{s.name}</td>
-                <td className="text-[var(--muted)]">{s.category}</td>
-                <td className="font-mono text-[var(--muted)] flex items-center gap-1.5">
-                  <Mail className="w-3 h-3" /> {s.contact}
-                </td>
-                <td className="font-mono text-[var(--muted)] flex items-center gap-1.5">
-                  <Phone className="w-3 h-3" /> {s.phone}
-                </td>
-                <td className="text-right font-mono">{s.orders}</td>
+                <td>{s.category}</td>
+                <td>{s.contact === "—" ? s.contact : <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {s.contact}</span>}</td>
+                <td>{s.phone === "—" ? s.phone : <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {s.phone}</span>}</td>
+                <td className="text-right">{s.orders}</td>
               </tr>
             ))}
           </tbody>

@@ -76,7 +76,7 @@ export default function LoginScreen({ onLogin }: Props) {
         </form>
 
         <p className="text-center text-[10px] text-[var(--muted)] mt-6">
-          Food Penguin Limited · Commissioned by Beer
+          Food Penguin Limited · Operations Dashboard
         </p>
       </div>
     </div>

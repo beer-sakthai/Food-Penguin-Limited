@@ -36,21 +36,17 @@ import OverviewTab from "./components/OverviewTab";
 import AdvisorTab from "./components/AdvisorTab";
 import SellTab from "./components/SellTab";
 import TargetTab from "./components/TargetTab";
-import StudioTab from "./components/StudioTab";
 import ProductionTab from "./components/ProductionTab";
 import WasteTab from "./components/WasteTab";
 import HoursTab from "./components/HoursTab";
 import PlanningTab from "./components/PlanningTab";
-import EnergyTab from "./components/EnergyTab";
 import SuppliersTab from "./components/SuppliersTab";
 import FinanceTab from "./components/FinanceTab";
 import RealtimeTab from "./components/RealtimeTab";
-import ResourceAllocationTab from "./components/ResourceAllocationTab";
 import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
-import { MS_PRODUCTS, TESCO_PRODUCTS } from "./components/SellTab";
-import { BUSINESS_LOCATIONS, BusinessLocation } from "./business";
+import { TESCO_PRODUCTS, MS_PRODUCTS, BUSINESS_LOCATIONS, BusinessLocation } from "./business";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 import { OperationalLogForm } from "./components/overview/OperationalLogForm";
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -63,7 +59,6 @@ import {
   Menu,
   X,
   Coins,
-  Zap,
   Package,
   DollarSign,
   ShieldCheck,
@@ -81,18 +76,22 @@ import {
   Download,
   Sun,
   Moon,
-  Wand2,
   Sparkles,
-  SlidersHorizontal,
   Mail,
   Clock,
-  Store,
+  TrendingUp,
+  TrendingDown,
+  MoreHorizontal,
+  Receipt,
+  DollarSign as DollarIcon,
+  Package as PackageIcon,
+  InfoIcon,
+  Settings,
   FileSpreadsheet,
-  GripVertical,
   BarChart3,
+  BrainCircuit,
 } from "lucide-react";
-
-import { RotateCcw, Info, LogOut, GitCompare, BrainCircuit } from "lucide-react";
+import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
 import {
   db,
   handleFirestoreError,
@@ -109,8 +108,8 @@ const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",
   string[]
 > = {
-  Admin: ["Overview", "Advisor", "Sell", "Target", "Studio", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports", "Analytics"],
-  Manager: ["Overview", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Energy", "Suppliers", "Finance", "Realtime", "Allocation", "Reports"],
+  Admin: ["Overview", "Advisor", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports", "Analytics"],
+  Manager: ["Overview", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports"],
   Staff: ["Overview", "Production", "Waste", "Hours", "Planning", "Suppliers", "Realtime"],
   User: ["Overview"],
 };
@@ -1777,8 +1776,6 @@ export default function App() {
     { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
     { id: "Hours", label: "Hours", icon: <Clock className="w-4 h-4" /> },
     { id: "Suppliers", label: "Suppliers", icon: <Package className="w-4 h-4" /> },
-    { id: "Allocation", label: "Resource Allocation", icon: <SlidersHorizontal className="w-4 h-4" /> },
-    { id: "Energy", label: "Energy", icon: <Zap className="w-4 h-4" /> },
     { id: "Realtime", label: "Real-time", icon: <Activity className="w-4 h-4" /> },
   ];
 
@@ -1786,7 +1783,6 @@ export default function App() {
     { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
     { id: "Target", label: "Targets", icon: <ShieldCheck className="w-4 h-4" /> },
     { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
-    { id: "Studio", label: "Studio", icon: <Wand2 className="w-4 h-4" /> },
     { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
@@ -1824,14 +1820,20 @@ export default function App() {
           />
         );
       case "Advisor":
-        return <AdvisorTab theme={theme} />;
+        return <AdvisorTab />;
       case "Realtime":
         return <RealtimeTab theme={theme} />;
       case "Sell": {
         const filteredOrders = orders.filter(
           (o) => !o.branch || o.branch === selectedBranch,
         );
-        return <SellTab selectedBranch={selectedBranch} theme={theme} />;
+        return (
+          <SellTab
+            selectedBranch={selectedBranch}
+            orders={filteredOrders}
+            onAddOrder={handleAddOrder}
+          />
+        );
       }
       case "Target":
         return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
@@ -1851,15 +1853,6 @@ export default function App() {
         );
       case "Analytics":
         return <AnalyticsTab theme={theme} />;
-      case "Allocation":
-        return (
-          <ResourceAllocationTab
-            theme={theme}
-            branches={["M&S Cork", "Tesco Cork", "Tesco Mahon"]}
-          />
-        );
-      case "Studio":
-        return <StudioTab theme={theme} />;
       case "Production":
         return (
           <ProductionTab
@@ -1898,8 +1891,6 @@ export default function App() {
             weeklyLogs={weeklyLogs}
           />
         );
-      case "Energy":
-        return <EnergyTab theme={theme} weeklyLogs={weeklyLogs} />;
       case "Suppliers":
         return <SuppliersTab theme={theme} />;
       case "Finance":

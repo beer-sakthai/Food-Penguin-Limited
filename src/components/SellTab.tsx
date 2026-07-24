@@ -1,102 +1,99 @@
-// Saksee · 2026-07-24 · feat/new-design-system
+// Saksee · 2026-07-24 · real Tesco + Bento (M&S) product catalog
 import React, { useState } from "react";
-import { Coins, Search, ShoppingCart, Minus, Plus, ArrowRight } from "lucide-react";
+import { Search, ShoppingCart, Package, QrCode } from "lucide-react";
+import { TESCO_PRODUCTS, MS_PRODUCTS } from "../business";
+import type { SalesOrder } from "../types";
 
-export const MS_PRODUCTS = [
-  { barcode: "5391548895018", name: "Luxury Salmon & Caviar Platter", category: "Sashimi & Platters", price: 34.50 },
-  { barcode: "5391548895025", name: "Gastropub Spicy Truffle Roll", category: "Specialty Rolls", price: 19.95 },
-  { barcode: "5391548895049", name: "Handcrafted Premium Dragon Roll", category: "Sushi Rolls", price: 17.50 },
-];
-export const TESCO_PRODUCTS = [
-  { barcode: "5391548890068", name: "Salmon Sashimi", category: "Sashimi Selections", price: 7.75 },
-  { barcode: "5391548890266", name: "Spicy Veggie Roll", category: "Sushi Rolls", price: 5.50 },
-  { barcode: "5391548890679", name: "Veggie Tofu Yakisoba Noodles", category: "Noodles & Sides", price: 7.95 },
-  { barcode: "5391548890549", name: "TokYO! Party Platter", category: "Party Platters", price: 16.75 },
-];
+export { TESCO_PRODUCTS, MS_PRODUCTS };
 
-export default function SellTab({ selectedBranch }: { selectedBranch: string; theme: string }) {
-  const isMS = selectedBranch.startsWith("Marks");
-  const products = isMS ? MS_PRODUCTS : TESCO_PRODUCTS;
-  const [cart, setCart] = useState<Record<string, number>>({});
-  const [filter, setFilter] = useState("");
-  const filtered = products.filter(p => !filter || p.name.toLowerCase().includes(filter.toLowerCase()) || p.category.toLowerCase().includes(filter.toLowerCase()));
-  const add = (b: string) => setCart(c => ({ ...c, [b]: (c[b] || 0) + 1 }));
-  const sub = (b: string) => setCart(c => ({ ...c, [b]: Math.max(0, (c[b] || 0) - 1) }));
-  const total = Object.entries(cart).reduce((sum, [b, q]) => { const p = products.find(x => x.barcode === b); return sum + (p ? p.price * (Number(q) || 0) : 0); }, 0);
-  const items = Object.values(cart).reduce((a, b) => Number(a) + Number(b), 0);
+interface SellTabProps {
+  orders: SalesOrder[];
+  onAddOrder: (order: Omit<SalesOrder, "id" | "timestamp" | "status">) => void;
+  selectedBranch: string;
+}
+
+export default function SellTab({ orders, onAddOrder, selectedBranch }: SellTabProps) {
+  const [search, setSearch] = useState("");
+  const isTesco = selectedBranch.includes("Tesco");
+  const products = isTesco ? TESCO_PRODUCTS : MS_PRODUCTS;
+  const filtered = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.barcode.includes(search));
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
-            <Coins className="w-5 h-5 text-[var(--accent)]" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-[var(--text)]">Sales</h1>
-            <p className="text-xs text-[var(--muted)]">{selectedBranch}</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+          <ShoppingCart className="w-5 h-5 text-[var(--accent)]" />
         </div>
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
-          <input
-            type="text"
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            placeholder="Filter products…"
-            className="input pl-9 w-64"
-          />
+        <div>
+          <h1 className="text-lg font-semibold text-[var(--text)]">Sell</h1>
+          <p className="text-xs text-[var(--muted)]">{products.length} products · {selectedBranch}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {filtered.map(p => {
-          const qty = cart[p.barcode] || 0;
-          return (
-            <div key={p.barcode} className="card card-hover">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">{p.category}</div>
-              <div className="text-sm font-medium text-[var(--text)] mt-1.5 leading-snug">{p.name}</div>
-              <div className="metric-value text-[var(--accent)] mt-3">€{p.price.toFixed(2)}</div>
-              <div className="flex items-center gap-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => sub(p.barcode)}
-                  disabled={qty === 0}
-                  className="btn btn-ghost w-8 h-8 p-0 justify-center disabled:opacity-30"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="flex-1 text-center font-mono text-sm text-[var(--text)]">{qty}</span>
-                <button
-                  type="button"
-                  onClick={() => add(p.barcode)}
-                  className="btn btn-ghost w-8 h-8 p-0 justify-center"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search product or barcode..."
+          className="input w-full pl-10"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {filtered.map((p) => (
+          <div key={p.barcode} className="card card-hover flex items-center justify-between">
+            <div className="min-w-0">
+              <div className="font-medium text-sm text-[var(--text)] truncate">{p.name}</div>
+              <div className="flex items-center gap-2 text-xs text-[var(--muted)] mt-1">
+                <QrCode className="w-3 h-3" /> {p.barcode}
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="card">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <ShoppingCart className="w-5 h-5 text-[var(--accent)]" />
-            <div>
-              <div className="metric-value">€{total.toFixed(2)}</div>
-              <div className="metric-label">{items} items in cart</div>
+            <div className="text-right">
+              <div className="font-semibold text-[var(--accent)]">€{p.price.toFixed(2)}</div>
+              <button
+                onClick={() => onAddOrder({ item: p.name, category: "Sushi", quantity: 1, amount: p.price, barcode: p.barcode, branch: selectedBranch, date: new Date().toISOString().slice(0,10) })}
+                className="btn btn-sm mt-1"
+              >
+                Add
+              </button>
             </div>
           </div>
-          <button
-            type="button"
-            disabled={items === 0}
-            onClick={() => setCart({})}
-            className="btn btn-primary disabled:opacity-30"
-          >
-            Save order <ArrowRight className="w-4 h-4" />
-          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center text-[var(--muted)] text-sm py-12">No products match “{search}”</div>
+      )}
+
+      <div className="card">
+        <h2 className="section-title mb-3 flex items-center gap-2">
+          <Package className="w-4 h-4" /> Recent orders ({orders.length})
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Amount</th>
+                <th>Branch</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.slice(0, 10).map((o) => (
+                <tr key={o.id}>
+                  <td>{o.timestamp}</td>
+                  <td>{o.item}</td>
+                  <td>{o.quantity}</td>
+                  <td>€{o.amount.toFixed(2)}</td>
+                  <td>{o.branch}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

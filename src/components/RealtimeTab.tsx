@@ -1,22 +1,13 @@
-// Saksee · 2026-07-24 · feat/new-design-system
+// Saksee · 2026-07-24 · real-time monitoring alerts
 import React from "react";
-import { Activity, Radio } from "lucide-react";
+import { Activity } from "lucide-react";
 
 export default function RealtimeTab({ theme }: { theme: string }) {
   const alerts = [
-    { id: "A-01", time: "14:12:30", sensor: "Cold Room Freezy-01", value: "-19.4°C", status: "normal", msg: "Temperature stable" },
-    { id: "A-02", time: "14:08:15", sensor: "Sushi Rice Warm Unit A", value: "57.0°C", status: "normal", msg: "Optimal preservation" },
-    { id: "A-03", time: "13:55:00", sensor: "Seafood Deep Freezer", value: "-12.1°C", status: "warning", msg: "Slight thermal climb" },
-    { id: "A-04", time: "13:10:45", sensor: "Dishwasher Rinse Tank", value: "82.5°C", status: "normal", msg: "Sanitation verified" },
-  ];
-
-  const normal = alerts.filter(a => a.status === "normal").length;
-  const warnings = alerts.filter(a => a.status === "warning").length;
-
-  const cards = [
-    { label: "Normal", value: normal, sub: "sensors", tone: "up" },
-    { label: "Warnings", value: warnings, sub: "need attention", tone: warnings > 0 ? "down" : "up" },
-    { label: "Total", value: alerts.length, sub: "alerts" },
+    { id: "A-01", time: "14:12:30", sensor: "Cold Room 01", value: "-19.4°C", status: "normal", msg: "Temperature within range" },
+    { id: "A-02", time: "14:08:15", sensor: "Rice Warmer A", value: "57.0°C", status: "normal", msg: "Holding temperature stable" },
+    { id: "A-03", time: "13:55:00", sensor: "Seafood Freezer", value: "-12.1°C", status: "warning", msg: "Thermal climb during door cycle" },
+    { id: "A-04", time: "13:10:45", sensor: "Dishwasher Rinse", value: "82.5°C", status: "normal", msg: "Sanitation rinse verified" }
   ];
 
   return (
@@ -27,47 +18,28 @@ export default function RealtimeTab({ theme }: { theme: string }) {
         </div>
         <div>
           <h1 className="text-lg font-semibold text-[var(--text)]">Real-time</h1>
-          <p className="text-xs text-[var(--muted)]">{alerts.length} alerts · {warnings} warning</p>
+          <p className="text-xs text-[var(--muted)]">{alerts.length} active sensor readings</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {cards.map((k, i) => (
-          <div key={i} className="card card-hover">
-            <span className="metric-label">{k.label}</span>
-            <div className="mt-2 metric-value">{k.value}</div>
-            <div className="mt-1 text-[11px] text-[var(--muted)]">{k.sub}</div>
+      <div className="grid gap-3">
+        {alerts.map((a) => (
+          <div key={a.id} className="card flex items-center justify-between">
+            <div className="grid grid-cols-[80px_1fr_120px_100px] md:grid-cols-[100px_1fr_140px_120px] gap-4 items-center w-full">
+              <div className="text-xs text-[var(--muted)]">{a.time}</div>
+              <div>
+                <div className="text-sm font-medium text-[var(--text)]">{a.sensor}</div>
+                <div className="text-xs text-[var(--muted)]">{a.msg}</div>
+              </div>
+              <div className="text-sm text-[var(--text)]">{a.value}</div>
+              <div className="text-right">
+                <span className={`status-pill ${a.status === "normal" ? "status-ok" : "status-warn"}`}>
+                  {a.status}
+                </span>
+              </div>
+            </div>
           </div>
         ))}
-      </div>
-
-      <div className="card overflow-hidden">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Sensor</th>
-              <th>Value</th>
-              <th>Status</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {alerts.map(a => (
-              <tr key={a.id}>
-                <td className="font-mono text-[var(--muted)]">{a.time}</td>
-                <td className="font-medium">{a.sensor}</td>
-                <td className="font-mono">{a.value}</td>
-                <td>
-                  <span className={`pill ${a.status === "warning" ? "warn" : "ok"}`}>
-                    {a.status}
-                  </span>
-                </td>
-                <td className="text-[var(--muted)]">{a.msg}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );

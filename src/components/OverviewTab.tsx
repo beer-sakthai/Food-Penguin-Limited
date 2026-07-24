@@ -105,7 +105,7 @@ export default function OverviewTab(props: OverviewProps) {
           </div>
           <div>
             <h1 className="text-lg font-semibold text-[var(--text)]">Overview</h1>
-            <p className="text-xs text-[var(--muted)]">AI Health: {metrics?.aiHealthScore || 0}%</p>
+            <p className="text-xs text-[var(--muted)]">Operational health: {metrics?.aiHealthScore || 0}%</p>
           </div>
         </div>
         <button type="button" onClick={onOpenLogForm} className="btn btn-primary text-xs">

@@ -19,90 +19,265 @@ import {
   wasteTargetFromProduction,
 } from './business';
 
+export const TESCO_PRODUCTS = [
+  { name: 'YO! highlights', price: 11.25, barcode: '5391548890457' },
+  { name: 'Veggie tofu yakisoba noodles', price: 7.95, barcode: '5391548890679' },
+  { name: 'Veggie gyoza', price: 5.95, barcode: '5391548890150' },
+  { name: 'TokYO! party platter', price: 16.75, barcode: '5391548890549' },
+  { name: 'Teriyaki chicken udon noodles', price: 8.25, barcode: '5391548890730' },
+  { name: 'Tokyo top 5', price: 11.25, barcode: '5391548890495' },
+  { name: 'Teriyaki chicken rice bowl', price: 7.95, barcode: '5391548890648' },
+  { name: 'Teriyaki chicken karaage', price: 7.75, barcode: '5391548890129' },
+  { name: 'Sweet chilli chicken yakitori', price: 5.50, barcode: '5391548890136' },
+  { name: 'Sriracha salmon poké bowl', price: 8.25, barcode: '5391548890600' },
+  { name: 'St Patrick\'s Irish stout karaage', price: 7.75, barcode: '5391548892611' },
+  { name: 'Strawberry cheesecake mochi', price: 3.95, barcode: '5391548890754' },
+  { name: 'Spicy veggie roll', price: 5.50, barcode: '5391548890266' },
+  { name: 'Spicy salmon avocado sushi sando', price: 4.95, barcode: '5391548892512' },
+  { name: 'Spicy salmon & avocado roll', price: 7.25, barcode: '5391548890372' },
+  { name: 'Spicy california roll', price: 5.95, barcode: '5391548890303' },
+  { name: 'Spicy chicken katsu crunch roll', price: 6.50, barcode: '5391548890358' },
+  { name: 'Spicy prawn katsu roll', price: 7.95, barcode: '5391548890419' },
+  { name: 'Spice up YO! life', price: 11.25, barcode: '5391548890464' },
+  { name: 'Shinjuku Collection', price: 27.95, barcode: '5391548892376' },
+  { name: 'Shibuya Collection', price: 23.50, barcode: '5391548892499' },
+  { name: 'Salmon maki', price: 4.50, barcode: '5391548890020' },
+  { name: 'Salmon nigiri', price: 6.95, barcode: '5391548890051' },
+  { name: 'Seaweed salad', price: 3.95, barcode: '5391548890174' },
+  { name: 'Salmon dragon roll', price: 8.75, barcode: '5391548890181' },
+  { name: 'Salmon sashimi', price: 7.75, barcode: '5391548890068' },
+  { name: 'Salmon Poke', price: 8.25, barcode: '5391548892642' },
+  { name: 'Saikou! selects', price: 9.75, barcode: '5391548890518' },
+  { name: 'Sakana selects', price: 9.75, barcode: '5391548890501' },
+  { name: 'Salmon classics', price: 9.75, barcode: '5391548890440' },
+  { name: 'Pumpkin katsu rice bowl', price: 7.25, barcode: '5391548890655' },
+  { name: 'Pumpkin katsu curry', price: 7.75, barcode: '5391548890624' },
+  { name: 'Pumpkin katsu bao', price: 4.50, barcode: '5391548890099' },
+  { name: 'Nigiri selection', price: 6.95, barcode: '5391548890044' },
+  { name: 'Osaka veggie platter', price: 14.95, barcode: '5391548890556' },
+  { name: 'Plant power', price: 8.50, barcode: '5391548890471' },
+  { name: 'Mixed maki box', price: 6.75, barcode: '5391548890525' },
+  { name: 'Mexican Mango Salmon Sharer', price: 19.75, barcode: '5391548892789' },
+  { name: 'Mexican Mango Salmon Roll', price: 7.95, barcode: '5391548892741' },
+  { name: 'Mexican Mango Salmon Bento', price: 11.25, barcode: '5391548892765' },
+  { name: 'Mexican Crunch Chicken Roll', price: 6.95, barcode: '5391548892734' },
+  { name: 'Korean chicken udon noodles', price: 8.25, barcode: '5391548890723' },
+  { name: 'Lucky dip', price: 12.95, barcode: '5391548890488' },
+  { name: 'Mexican Crunch Chicken Bento', price: 10.75, barcode: '5391548892758' },
+  { name: 'Inari nigiri', price: 4.75, barcode: '5391548890037' },
+  { name: 'Harajuku Collection', price: 33.50, barcode: '5391548892406' },
+  { name: 'Ginza Collection', price: 36.95, barcode: '5391548892437' },
+  { name: 'Crunchy prawn katsu roll', price: 8.25, barcode: '5391548890426' },
+  { name: 'Crunchy salmon & avocado roll', price: 7.50, barcode: '5391548890389' },
+  { name: 'Crunchy veggie roll', price: 5.75, barcode: '5391548890273' },
+  { name: 'Chocolate mochi', price: 3.95, barcode: '5391548890747' },
+  { name: 'Crunchy california roll', price: 6.25, barcode: '5391548890310' },
+  { name: 'Crunchy chicken katsu roll', price: 6.25, barcode: '5391548890341' },
+  { name: 'Chicken teriyaki sushi sando', price: 4.75, barcode: '5391548892505' },
+  { name: 'Chicken teriyaki roll', price: 6.50, barcode: '5391548890204' },
+  { name: 'Chicken yakisoba noodles', price: 7.95, barcode: '5391548890662' },
+  { name: 'Chicken katsu curry udon noodles', price: 7.75, barcode: '5391548890716' },
+  { name: 'Chicken teriyaki bao', price: 4.50, barcode: '5391548890075' },
+  { name: 'Chicken teriyaki Poke', price: 8.25, barcode: '5391548892635' },
+  { name: 'Avocado maki', price: 3.50, barcode: '5391548890006' },
+  { name: 'Chicken gyoza', price: 6.25, barcode: '5391548890143' },
+  { name: 'California sushi sando', price: 4.75, barcode: '5391548892529' },
+  { name: 'California mango roll', price: 6.50, barcode: '5391548890198' },
+  { name: 'Chicken gyoza udon noodles', price: 7.75, barcode: '5391548890709' },
+  { name: 'Chicken katsu bao', price: 4.50, barcode: '5391548890082' },
+  { name: 'Chicken katsu curry', price: 7.95, barcode: '5391548890617' }
+];
+
+export const MS_PRODUCTS = [
+  { name: 'Avocado Maki', price: 3.50, barcode: '5055372900774' },
+  { name: 'California Catch', price: 10.25, barcode: '5055378900729' },
+  { name: 'California Mango Roll', price: 6.75, barcode: '5055372900635' },
+  { name: 'California Mango Volcano Roll', price: 6.25, barcode: '5055372901726' },
+  { name: 'Chicken Karaage', price: 8.50, barcode: '5055372901108' },
+  { name: 'Chicken Gyoza Udon Noodles', price: 8.25, barcode: '5055372901634' },
+  { name: 'Chicken Katsu Bao Bun', price: 4.75, barcode: '5055372901214' },
+  { name: 'Chicken Katsu Curry', price: 8.25, barcode: '5055372901139' },
+  { name: 'Chicken Katsu Curry Udon Noodles', price: 8.25, barcode: '5055372901641' },
+  { name: 'Chicken Teriyaki Poke', price: 8.25, barcode: '5391548892598' },
+  { name: 'Chicken Teriyaki Roll', price: 6.75, barcode: '5055372900842' },
+  { name: 'Chicken Yakisoba Noodles', price: 8.50, barcode: '5055372901160' },
+  { name: 'Chicken Yakitori', price: 5.75, barcode: '5055372901221' },
+  { name: 'Chocolate Truffle Mochi', price: 4.25, barcode: '5055372901054' },
+  { name: 'Crunchy California Roll', price: 6.50, barcode: '5055372900628' },
+  { name: 'Crunchy Fiesta Chicken Feast', price: 19.95, barcode: '5391548892918' },
+  { name: 'Crunchy Fiesta Chicken Roll', price: 7.95, barcode: '5391548892671' },
+  { name: 'Crunchy Fiesta Chicken Trio', price: 11.25, barcode: '5391548892695' },
+  { name: 'Cucumber Maki', price: 3.50, barcode: '5055372900781' },
+  { name: 'Duck Gyoza', price: 6.75, barcode: '5055372901481' },
+  { name: 'Dynamite Crunch Roll', price: 8.75, barcode: '5055372900611' },
+  { name: 'Fiesta Mango Chicken Poke', price: 8.25, barcode: '5391548892664' },
+  { name: 'Fiesta Mango Salmon Feast', price: 21.95, barcode: '5391548892925' },
+  { name: 'Fiesta Mango Salmon Roll', price: 8.50, barcode: '5391548892588' },
+  { name: 'Fiesta Mango Salmon Poke', price: 8.95, barcode: '5391548892657' },
+  { name: 'Fiesta Mango Salmon Trio', price: 11.75, barcode: '5391548892901' },
+  { name: 'Fiji Collection', price: 11.25, barcode: '5055372900682' },
+  { name: 'Ginza Group', price: 8.25, barcode: '5391548892177' },
+  { name: 'Green Scene', price: 8.95, barcode: '5055372900699' },
+  { name: 'Inari Pocket', price: 4.95, barcode: '5055372901450' },
+  { name: 'Kaiso Seaweed Salad', price: 4.25, barcode: '5055372901030' },
+  { name: 'Kiso Selection', price: 24.95, barcode: '5391548892352' },
+  { name: 'Korean Chicken Karaage', price: 8.50, barcode: '5055372901115' },
+  { name: 'Korean Chicken Rice Bowl', price: 8.25, barcode: '5055372901146' },
+  { name: 'Korean Chicken Udon Noodles', price: 8.50, barcode: '5055372901658' },
+  { name: 'Kyoto Sharer', price: 15.95, barcode: '5055372900767' },
+  { name: 'Lucky No.7', price: 11.75, barcode: '5055372900712' },
+  { name: 'Nagoya Selection', price: 29.95, barcode: '5391548892583' },
+  { name: 'Nigiri Allsorts', price: 7.25, barcode: '5055372900910' },
+  { name: 'Osaka Selects', price: 11.75, barcode: '5055372900675' },
+  { name: 'Otaki Selection', price: 39.95, barcode: '5391548892451' },
+  { name: 'Prawn Firecracker Yakisoba Noodles', price: 8.75, barcode: '5055372901191' },
+  { name: 'Pumpkin Katsu Bao', price: 4.75, barcode: '5055372901092' },
+  { name: 'Pumpkin Katsu Curry', price: 7.95, barcode: '5055372901078' },
+  { name: 'Pumpkin Katsu with rice', price: 7.75, barcode: '5055372901085' },
+  { name: 'Sakura Spring Selection', price: 23.95, barcode: '5391548892703' },
+  { name: 'Salmon Avocado Roll', price: 7.50, barcode: '5055372900873' },
+  { name: 'Salmon and Avocado Crystal Roll', price: 7.95, barcode: '5391548892888' },
+  { name: 'Salmon and Cream cheese Poke', price: 8.75, barcode: '5391548892581' },
+  { name: 'Salmon and Tuna Poke', price: 9.95, barcode: '5391548892567' },
+  { name: 'Salmon Blossom Box', price: 15.95, barcode: '5391548892697' },
+  { name: 'Salmon Cream Cheese Roll', price: 7.95, barcode: '5391548892191' },
+  { name: 'Salmon Cream Cheese Trio', price: 10.95, barcode: '5391548892710' },
+  { name: 'Salmon Dragon Roll', price: 9.25, barcode: '5055372900804' },
+  { name: 'Salmon Lovers', price: 10.25, barcode: '5055372900668' },
+  { name: 'Salmon Maki', price: 4.75, barcode: '5055372900798' },
+  { name: 'Salmon Nigiri', price: 7.50, barcode: '5055372901474' },
+  { name: 'Salmon Non-stop', price: 13.75, barcode: '5055372900705' },
+  { name: 'Salmon Poke', price: 8.75, barcode: '5391548892574' },
+  { name: 'Salmon Sashimi', price: 7.95, barcode: '5055372900927' },
+  { name: 'Salmon Volcano Roll', price: 7.75, barcode: '5055372901702' },
+  { name: 'Seikai Salmon Collection', price: 12.25, barcode: '5391548892314' },
+  { name: 'Sesame Prawn Katsu Roll', price: 8.25, barcode: '5055372900659' },
+  { name: 'Shibuya Sharer', price: 17.75, barcode: '5055372900750' },
+  { name: 'Sláinte Roll', price: 7.75, barcode: '5055372900903' },
+  { name: 'Spicy California Roll', price: 6.25, barcode: '5055372901869' },
+  { name: 'Spicy Chicken Katsu Roll', price: 7.25, barcode: '5055372900866' },
+  { name: 'Spicy Crunchy Salmon Avocado Roll', price: 8.25, barcode: '5055372901405' },
+  { name: 'Spicy Salmon Avocado Roll', price: 7.75, barcode: '5055372901389' },
+  { name: 'Spicy Salmon Gunkan', price: 5.25, barcode: '5391548892321' },
+  { name: 'Sriracha Salmon Poké', price: 8.75, barcode: '5055372900958' },
+  { name: 'Strawberry Cheesecake Mochi', price: 4.25, barcode: '5055372901061' },
+  { name: 'Teriyaki Chicken Karaage', price: 8.50, barcode: '5055372901122' },
+  { name: 'Teriyaki Chicken Rice Bowl', price: 8.25, barcode: '5055372901153' },
+  { name: 'Teriyaki Chicken Udon Noodles', price: 8.50, barcode: '5055372901665' },
+  { name: 'Tofu and Veggie Yakisoba Noodles', price: 8.50, barcode: '5055372901177' },
+  { name: 'Tofu Firecracker Yakisoba Noodles', price: 8.50, barcode: '5055372901184' },
+  { name: 'Tokyo Market Specials', price: 13.95, barcode: '5391548892558' },
+  { name: 'Toyosu Duo', price: 10.25, barcode: '5055372900736' },
+  { name: 'Veggie Gyoza', price: 6.25, barcode: '5055372901145' },
+  { name: 'Yasai Roll', price: 5.75, barcode: '5055372900897' }
+];
+
 export const initialMetrics: CoreMetrics = {
   salesToday: 7500,
-  salesGrowth: 12.4,
+  salesGrowth: 8.2,
   productionItems: 2200,
   productionTarget: 2500,
   wasteCost: 196.50,
-  wasteReduction: 8.2,
+  wasteReduction: 4.5,
   hoursScheduled: 84,
   overtimeHours: 0,
-  aiHealthScore: 94
+  aiHealthScore: 92
 };
 
 export const initialOrders: SalesOrder[] = [
-  // Marks & Spencer - Cork City (Luxury Gourmet Sushi Specialties)
-  { id: 'FP-1084', timestamp: '14:10', date: '2026-06-28', item: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', quantity: 2, amount: 69.00, barcode: '5391548895018', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
-  { id: 'FP-1083', timestamp: '13:58', date: '2026-06-28', item: 'Gastropub Spicy Truffle Roll', category: 'Specialty Rolls', quantity: 1, amount: 19.95, barcode: '5391548895025', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
-  { id: 'FP-1081', timestamp: '13:45', date: '2026-06-26', item: 'Handcrafted Premium Dragon Roll', category: 'Sushi Rolls', quantity: 3, amount: 52.50, barcode: '5391548895049', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
-  { id: 'FP-1079', timestamp: '13:12', item: 'Luxury Salmon & Caviar Platter', category: 'Sashimi & Platters', quantity: 1, date: '2026-06-19', amount: 34.50, barcode: '5391548895018', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
-
-  // Tesco - Cork City (Everyday Value & Finest Selection)
-  { id: 'FP-2081', timestamp: '13:51', date: '2026-06-19', item: 'salmon sashimi', category: 'Sashimi Selections', quantity: 1, amount: 7.75, barcode: '5391548890068', status: 'Completed', branch: 'Tesco - Cork City' },
-  { id: 'FP-2080', timestamp: '13:30', date: '2026-06-18', item: 'spicy veggie roll', category: 'Sushi Rolls', quantity: 2, amount: 11.00, barcode: '5391548890266', status: 'Completed', branch: 'Tesco - Cork City' },
-  { id: 'FP-2078', timestamp: '12:45', date: '2026-06-25', item: 'veggie tofu yakisoba noodles', category: 'Noodles & Sides', quantity: 2, amount: 15.90, barcode: '5391548890679', status: 'Completed', branch: 'Tesco - Cork City' },
-
-  // Tesco - Mahon Point (Everyday Value, Meals, & Local Mahon Special)
-  { id: 'FP-3081', timestamp: '13:55', date: '2026-06-20', item: 'spicy veggie roll', category: 'Sushi Rolls', quantity: 1, amount: 5.50, barcode: '5391548890266', status: 'Completed', branch: 'Tesco - Mahon Point' },
-  { id: 'FP-3080', timestamp: '13:20', date: '2026-06-15', item: 'TokYO! party platter', category: 'Party Platters', quantity: 1, amount: 16.75, barcode: '5391548890549', status: 'Completed', branch: 'Tesco - Mahon Point' },
-  { id: 'FP-3078', timestamp: '12:30', date: '2026-06-28', item: 'veggie tofu yakisoba noodles', category: 'Noodles & Sides', quantity: 3, amount: 23.85, barcode: '5391548890679', status: 'Completed', branch: 'Tesco - Mahon Point' }
+  { id: 'FP-1000', timestamp: '12:10', date: '2026-06-08', item: 'Spicy salmon & avocado roll', category: 'Sushi Specials', quantity: 1, amount: 7.25, barcode: '5391548890372', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1021', timestamp: '15:31', date: '2026-06-08', item: 'Nigiri selection', category: 'Sushi Specials', quantity: 1, amount: 6.95, barcode: '5391548890044', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1001', timestamp: '13:11', date: '2026-06-09', item: 'Plant power', category: 'Sushi Specials', quantity: 1, amount: 8.50, barcode: '5391548890471', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1022', timestamp: '16:32', date: '2026-06-09', item: 'Chicken teriyaki Poke', category: 'Noodles & Sides', quantity: 2, amount: 16.50, barcode: '5391548892635', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1002', timestamp: '14:12', date: '2026-06-10', item: 'Green Scene', category: 'Sushi Specials', quantity: 1, amount: 8.95, barcode: '5055372900699', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1023', timestamp: '17:33', date: '2026-06-10', item: 'Crunchy Fiesta Chicken Feast', category: 'Sashimi & Platters', quantity: 2, amount: 39.90, barcode: '5391548892918', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1003', timestamp: '15:13', date: '2026-06-11', item: 'Spicy salmon avocado sushi sando', category: 'Sushi Specials', quantity: 3, amount: 14.85, barcode: '5391548892512', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1024', timestamp: '12:34', date: '2026-06-11', item: 'St Patrick\'s Irish stout karaage', category: 'Sushi Specials', quantity: 2, amount: 15.50, barcode: '5391548892611', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1004', timestamp: '16:14', date: '2026-06-12', item: 'Strawberry cheesecake mochi', category: 'Sushi Specials', quantity: 2, amount: 7.90, barcode: '5391548890754', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1025', timestamp: '13:35', date: '2026-06-12', item: 'Mexican Mango Salmon Sharer', category: 'Sashimi & Platters', quantity: 3, amount: 59.25, barcode: '5391548892789', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1005', timestamp: '17:15', date: '2026-06-13', item: 'Salmon Lovers', category: 'Sushi Specials', quantity: 1, amount: 10.25, barcode: '5055372900668', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1026', timestamp: '14:36', date: '2026-06-13', item: 'Veggie Gyoza', category: 'Noodles & Sides', quantity: 1, amount: 6.25, barcode: '5055372901145', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1006', timestamp: '12:16', date: '2026-06-14', item: 'TokYO! party platter', category: 'Sushi Specials', quantity: 1, amount: 16.75, barcode: '5391548890549', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1027', timestamp: '15:37', date: '2026-06-14', item: 'Salmon dragon roll', category: 'Sushi Specials', quantity: 3, amount: 26.25, barcode: '5391548890181', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1007', timestamp: '13:17', date: '2026-06-15', item: 'Saikou! selects', category: 'Sushi Specials', quantity: 1, amount: 9.75, barcode: '5391548890518', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1028', timestamp: '16:38', date: '2026-06-15', item: 'Sweet chilli chicken yakitori', category: 'Sushi Specials', quantity: 1, amount: 5.50, barcode: '5391548890136', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1008', timestamp: '14:18', date: '2026-06-16', item: 'Sláinte Roll', category: 'Sushi Rolls', quantity: 2, amount: 15.50, barcode: '5055372900903', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1029', timestamp: '17:39', date: '2026-06-16', item: 'Inari Pocket', category: 'Sushi Specials', quantity: 1, amount: 4.95, barcode: '5055372901450', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1009', timestamp: '15:19', date: '2026-06-17', item: 'TokYO! party platter', category: 'Sushi Specials', quantity: 2, amount: 33.50, barcode: '5391548890549', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1010', timestamp: '16:20', date: '2026-06-18', item: 'Salmon sashimi', category: 'Sushi Specials', quantity: 3, amount: 23.25, barcode: '5391548890068', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1011', timestamp: '17:21', date: '2026-06-19', item: 'Spicy Salmon Gunkan', category: 'Sushi Specials', quantity: 2, amount: 10.50, barcode: '5391548892321', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1012', timestamp: '12:22', date: '2026-06-20', item: 'Sakana selects', category: 'Sushi Specials', quantity: 2, amount: 19.50, barcode: '5391548890501', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1013', timestamp: '13:23', date: '2026-06-21', item: 'Plant power', category: 'Sushi Specials', quantity: 1, amount: 8.50, barcode: '5391548890471', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1014', timestamp: '14:24', date: '2026-06-22', item: 'Dynamite Crunch Roll', category: 'Sushi Rolls', quantity: 3, amount: 26.25, barcode: '5055372900611', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1015', timestamp: '15:25', date: '2026-06-23', item: 'Chicken teriyaki roll', category: 'Sushi Specials', quantity: 1, amount: 6.50, barcode: '5391548890204', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1016', timestamp: '16:26', date: '2026-06-24', item: 'Plant power', category: 'Sushi Specials', quantity: 1, amount: 8.50, barcode: '5391548890471', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1017', timestamp: '17:27', date: '2026-06-25', item: 'Ginza Group', category: 'Sashimi & Platters', quantity: 1, amount: 8.25, barcode: '5391548892177', status: 'Completed', branch: 'Marks & Spencer - Cork City' },
+  { id: 'FP-1018', timestamp: '12:28', date: '2026-06-26', item: 'Spicy salmon avocado sushi sando', category: 'Sushi Specials', quantity: 1, amount: 4.95, barcode: '5391548892512', status: 'Completed', branch: 'Tesco - Cork City' },
+  { id: 'FP-1019', timestamp: '13:29', date: '2026-06-27', item: 'Crunchy salmon & avocado roll', category: 'Sushi Specials', quantity: 1, amount: 7.50, barcode: '5391548890389', status: 'Completed', branch: 'Tesco - Mahon Point' },
+  { id: 'FP-1020', timestamp: '14:30', date: '2026-06-28', item: 'Sakura Spring Selection', category: 'Sashimi & Platters', quantity: 1, amount: 23.95, barcode: '5391548892703', status: 'Completed', branch: 'Marks & Spencer - Cork City' }
 ];
 
 export const initialTargets: CompanyTarget[] = [
-  { id: 'T-1', name: 'Sushi Revenue Target', metric: 'Total Sales (€)', targetValue: 8000, currentValue: 7500, unit: '€', category: 'Sell', deadline: 'Today, 22:00', date: '2026-06-28' },
-  { id: 'T-2', name: 'Sushi Rolls Made', metric: 'Items Rolled', targetValue: 2500, currentValue: 2200, unit: 'units', category: 'Production', deadline: 'Today, 21:05', date: '2026-06-28' },
-  { id: 'T-3', name: 'Waste Budget', metric: 'Waste vs Production', targetValue: WASTE_TARGET_PCT, currentValue: 8.9, unit: '%', category: 'Waste', deadline: 'Today, 22:00', date: '2026-06-28' },
+  { id: 'T-1', name: 'Daily Revenue Target', metric: 'Total Sales (€)', targetValue: 8000, currentValue: 7500, unit: '€', category: 'Sell', deadline: 'Today, 22:00', date: '2026-06-28' },
+  { id: 'T-2', name: 'Daily Production Target', metric: 'Items Made', targetValue: 2500, currentValue: 2200, unit: 'units', category: 'Production', deadline: 'Today, 21:05', date: '2026-06-28' },
+  { id: 'T-3', name: 'Waste vs Production', metric: 'Waste Cost', targetValue: WASTE_TARGET_PCT, currentValue: 8.9, unit: '%', category: 'Waste', deadline: 'Today, 22:00', date: '2026-06-28' },
   { id: 'T-4', name: 'COGS Target', metric: 'COGS vs Net Sales', targetValue: COGS_TARGET_PCT, currentValue: 31.0, unit: '%', category: 'Finance', deadline: 'End of Month', date: '2026-06-28' },
   { id: 'T-5', name: 'Retailer Commission', metric: 'Commission vs Gross', targetValue: COMMISSION_TARGET_PCT, currentValue: COMMISSION_TARGET_PCT, unit: '%', category: 'Finance', deadline: 'Every Sale', date: '2026-06-28' }
 ];
 
 export const initialRecipes: Recipe[] = [
-  { id: 'R-1', name: 'Tokyo Dragon Roll', category: 'Sushi Rolls', status: 'active', prepTime: 8, ingredients: ['Eel Fish', 'Shrimp Tempura', 'Fresh Avocado', 'Cucumber strip', 'Sweet Eel Glaze', 'Nori Seaweed'], allergens: ['Fish', 'Gluten', 'Sulphites'] },
-  { id: 'R-2', name: 'Kyoto Salmon Sashimi Platter', category: 'Sashimi & Platters', status: 'active', prepTime: 12, ingredients: ['Atlantic Salmon Fillet', 'White Daikon Radish ruff', 'Fresh Shiso leaves', 'Artisanal Wasabi paste', 'Soy Sauce'], allergens: ['Fish', 'Soya', 'Gluten'] },
-  { id: 'R-3', name: 'Spicy Bluefin Tuna Roll', category: 'Sushi Rolls', status: 'active', prepTime: 4, ingredients: ['Spicy Minced Tuna', 'Crispy Cucumber', 'Kyoto Spicy Mayo', 'Toasted Sesame seeds', 'Sushi Grains'], allergens: ['Fish', 'Eggs', 'Sesame'] },
-  { id: 'R-4', name: 'California Roll Classic', category: 'Sushi Rolls', status: 'active', prepTime: 15, ingredients: ['Snow Crab Stick', 'Avocado slice', 'Fresh Cucumber', 'Premium Sushi Rice', 'Nori Sheets'], allergens: ['Crustaceans', 'Gluten'] },
-  { id: 'R-5', name: 'Volcano Baked Scallop Roll', category: 'Specialty Rolls', status: 'active', prepTime: 6, ingredients: ['Spicy Crab Mix', 'Chopped Sea Scallops', 'Creamy Spicy Mayo', 'Sweet Soy Reduction', 'Masago Fish Roe'], allergens: ['Molluscs', 'Eggs', 'Fish', 'Soya'] }
+  { id: 'R-1', name: 'Salmon Dragon Roll', category: 'Sushi Rolls', status: 'active', prepTime: 5, ingredients: ['Salmon', 'Avocado', 'Sushi rice', 'Nori', 'Sesame seeds'], allergens: ['Fish', 'Sesame'] },
+  { id: 'R-2', name: 'California Roll', category: 'Sushi Rolls', status: 'active', prepTime: 7, ingredients: ['Surimi sticks', 'Avocado', 'Cucumber', 'Sushi rice', 'Nori'], allergens: ['Crustaceans'] },
+  { id: 'R-3', name: 'Spicy Salmon Avocado Roll', category: 'Sushi Rolls', status: 'active', prepTime: 5, ingredients: ['Salmon', 'Spicy mayo', 'Avocado', 'Sushi rice', 'Nori'], allergens: ['Fish', 'Eggs', 'Sesame'] },
+  { id: 'R-4', name: 'Chicken Katsu Curry', category: 'Hot Meals', status: 'active', prepTime: 10, ingredients: ['Chicken katsu', 'Curry sauce', 'Steamed rice'], allergens: ['Gluten'] },
+  { id: 'R-5', name: 'Chicken Teriyaki Udon Noodles', category: 'Noodles', status: 'active', prepTime: 8, ingredients: ['Udon noodles', 'Teriyaki chicken', 'Soy sauce', 'Sesame oil'], allergens: ['Gluten', 'Soya', 'Sesame'] },
+  { id: 'R-6', name: 'Salmon Poke', category: 'Poke Bowls', status: 'active', prepTime: 11, ingredients: ['Salmon', 'Sushi rice', 'Edamame', 'Seaweed salad', 'Sriracha mayo'], allergens: ['Fish', 'Soya', 'Sesame'] },
+  { id: 'R-7', name: 'Pumpkin Katsu Curry', category: 'Hot Meals', status: 'active', prepTime: 14, ingredients: ['Pumpkin katsu', 'Curry sauce', 'Steamed rice'], allergens: ['Gluten'] },
+  { id: 'R-8', name: 'Salmon Sashimi', category: 'Sashimi', status: 'active', prepTime: 9, ingredients: ['Salmon', 'Soy sauce sachet', 'Wasabi sachet', 'Ginger sachet'], allergens: ['Fish', 'Soya'] },
+  { id: 'R-9', name: 'Veggie Gyoza', category: 'Sides', status: 'active', prepTime: 6, ingredients: ['Veggie gyoza', 'Soy sauce sachet'], allergens: ['Gluten', 'Soya'] },
+  { id: 'R-10', name: 'Chocolate Ganache Mochi', category: 'Dessert', status: 'active', prepTime: 9, ingredients: ['Mochi'], allergens: ['None declared'] }
 ];
 
 export const initialTasks: ProductionTask[] = [
-  { id: 'PT-301', itemName: 'Tokyo Dragon Roll', assignedTo: 'Chef Skipper', status: 'Cooking', quantity: 2, priority: 'high', date: '2026-06-28' },
-  { id: 'PT-302', itemName: 'Kyoto Salmon Sashimi Platter', assignedTo: 'Chef Private', status: 'Cooking', quantity: 1, priority: 'medium', date: '2026-06-27' },
-  { id: 'PT-303', itemName: 'Spicy Bluefin Tuna Roll', assignedTo: 'Kitchen Aide Rico', status: 'In Queue', quantity: 1, priority: 'low', date: '2026-06-20' },
-  { id: 'PT-304', itemName: 'California Roll Classic', assignedTo: 'Chef Kowalski', status: 'Prepared', quantity: 3, priority: 'high', date: '2026-06-19' }
+  { id: 'PT-301', itemName: 'Salmon Dragon Roll', assignedTo: 'A. Chen', status: 'Cooking', quantity: 24, priority: 'high', date: '2026-06-28' },
+  { id: 'PT-302', itemName: 'California Roll', assignedTo: 'M. OBrien', status: 'Cooking', quantity: 18, priority: 'medium', date: '2026-06-27' },
+  { id: 'PT-303', itemName: 'Chicken Teriyaki Udon Noodles', assignedTo: 'L. Nguyen', status: 'In Queue', quantity: 12, priority: 'low', date: '2026-06-28' },
+  { id: 'PT-304', itemName: 'Spicy Salmon Avocado Roll', assignedTo: 'A. Chen', status: 'Prepared', quantity: 20, priority: 'high', date: '2026-06-27' }
 ];
 
 export const initialWaste: WasteRecord[] = [
-  { id: 'W-901', item: 'Spilled Sushi Rice Vinegar', category: 'Condiments', weight: 4.5, cost: 35.00, reason: 'Spill/Accident', date: '2026-06-19' },
-  { id: 'W-902', item: 'Overproduced California Rolls', category: 'Sushi Rolls', weight: 12.0, cost: 48.00, reason: 'Overproduced', date: '2026-06-19' },
-  { id: 'W-903', item: 'Expired Tuna Loin Trimmings', category: 'Seafood', weight: 3.2, cost: 74.50, reason: 'Expired', date: '2026-06-19' },
-  { id: 'W-904', item: 'Damaged Nori Seaweed Sheets', category: 'Wrapping', weight: 6.0, cost: 24.00, reason: 'Quality Issue', date: '2026-06-19' },
-  { id: 'W-905', item: 'Soggy Cucumber Strips', category: 'Produce', weight: 5.0, cost: 15.00, reason: 'Expired', date: '2026-06-18' }
+  { id: 'W-901', item: 'Spilled sushi rice vinegar', category: 'Condiments', weight: 1.2, cost: 8.50, reason: 'Spill/Accident', date: '2026-06-27' },
+  { id: 'W-902', item: 'Overproduced California rolls', category: 'Sushi Rolls', weight: 4.5, cost: 22.00, reason: 'Overproduced', date: '2026-06-27' },
+  { id: 'W-903', item: 'Expired tuna loin trimmings', category: 'Seafood', weight: 1.1, cost: 31.20, reason: 'Expired', date: '2026-06-26' },
+  { id: 'W-904', item: 'Damaged nori seaweed sheets', category: 'Wrapping', weight: 1.0, cost: 12.00, reason: 'Quality Issue', date: '2026-06-25' },
+  { id: 'W-905', item: 'Soggy cucumber strips', category: 'Produce', weight: 1.5, cost: 4.50, reason: 'Expired', date: '2026-06-24' }
 ];
 
 export const initialHours: EmployeeHour[] = [
-  { id: 'E-01', name: 'Chef Skipper (Lead)', role: 'Head Sushi Chef', status: 'Clocked In', scheduledHours: 40, actualHours: 36.5, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' },
-  { id: 'E-02', name: 'Chef Kowalski', role: 'Sushi Master / Kitchen Analyst', status: 'Clocked In', scheduledHours: 40, actualHours: 35.0, shiftStart: '09:00', shiftEnd: '18:00', date: '2026-06-28' },
-  { id: 'E-03', name: 'Chef Private', role: 'Sushi Roll Prep', status: 'Clocked In', scheduledHours: 35, actualHours: 31.0, shiftStart: '10:00', shiftEnd: '18:00', date: '2026-06-27' },
-  { id: 'E-04', name: 'Kitchen Aide Rico', role: 'Prep & Rice Cooker', status: 'Clocked In', scheduledHours: 30, actualHours: 28.5, shiftStart: '11:00', shiftEnd: '19:00', date: '2026-06-20' },
-  { id: 'E-05', name: 'Alice Smith', role: 'Sushi Counter Manager', status: 'Clocked Out', scheduledHours: 32, actualHours: 32.0, shiftStart: '08:00', shiftEnd: '16:00', date: '2026-06-19' },
-  { id: 'E-06', name: 'Bob Johnson', role: 'Cold Logistics Lead', status: 'Clocked Out', scheduledHours: 30, actualHours: 24.0, shiftStart: '12:00', shiftEnd: '20:00', date: '2026-06-18' }
+  { id: 'E-01', name: 'A. Chen', role: 'Head Sushi Chef', status: 'Clocked In', scheduledHours: 40, actualHours: 36.5, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' },
+  { id: 'E-02', name: 'M. O\'Brien', role: 'Sushi Chef', status: 'Clocked In', scheduledHours: 40, actualHours: 35.0, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' },
+  { id: 'E-03', name: 'L. Nguyen', role: 'Prep Cook', status: 'Clocked In', scheduledHours: 35, actualHours: 31.0, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' },
+  { id: 'E-04', name: 'S. Kelly', role: 'Kitchen Assistant', status: 'Clocked In', scheduledHours: 30, actualHours: 28.5, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' },
+  { id: 'E-05', name: 'R. Murphy', role: 'Counter Manager', status: 'Clocked In', scheduledHours: 32, actualHours: 32.0, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' },
+  { id: 'E-06', name: 'T. Walsh', role: 'Cold Chain Lead', status: 'Clocked In', scheduledHours: 30, actualHours: 24.0, shiftStart: '08:00', shiftEnd: '17:00', date: '2026-06-28' }
 ];
 
 export const initialInventory: InventoryItem[] = [
-  { id: 'I-101', name: 'Bluefin Tuna Loin', category: 'Seafood', stockLevel: 35, currentQty: 70, unit: 'kg', reorderLevel: 100, status: 'Low' },
-  { id: 'I-102', name: 'Atlantic Sushi Salmon', category: 'Seafood', stockLevel: 80, currentQty: 120, unit: 'kg', reorderLevel: 80, status: 'Healthy' },
+  { id: 'I-101', name: 'Atlantic Sushi Salmon', category: 'Seafood', stockLevel: 80, currentQty: 120, unit: 'kg', reorderLevel: 80, status: 'Healthy' },
+  { id: 'I-102', name: 'Bluefin Tuna Saku', category: 'Seafood', stockLevel: 35, currentQty: 70, unit: 'kg', reorderLevel: 100, status: 'Low' },
   { id: 'I-103', name: 'Premium Sushi Rice', category: 'Grains', stockLevel: 55, currentQty: 180, unit: 'kg', reorderLevel: 250, status: 'Low' },
   { id: 'I-104', name: 'Nori Seaweed Sheets', category: 'Dry Goods', stockLevel: 65, currentQty: 1300, unit: 'units', reorderLevel: 1000, status: 'Healthy' },
   { id: 'I-105', name: 'Fresh Avocados', category: 'Produce', stockLevel: 45, currentQty: 90, unit: 'units', reorderLevel: 120, status: 'Low' },
-  { id: 'I-106', name: 'Sushi Seasoning Vinegar', category: 'Condiments', stockLevel: 95, currentQty: 475, unit: 'L', reorderLevel: 150, status: 'Healthy' }
+  { id: 'I-106', name: 'Sushi Seasoning Vinegar', category: 'Condiments', stockLevel: 95, currentQty: 475, unit: 'L', reorderLevel: 150, status: 'Healthy' },
+  { id: 'I-107', name: 'Frozen Cooked Breaded Prawn', category: 'Seafood', stockLevel: 40, currentQty: 200, unit: 'units', reorderLevel: 120, status: 'Healthy' },
+  { id: 'I-108', name: 'Chicken Katsu', category: 'Poultry', stockLevel: 30, currentQty: 60, unit: 'kg', reorderLevel: 80, status: 'Low' }
 ];
 
 export const initialAlerts: RealtimeAlert[] = [
-  { id: 'A-01', timestamp: '14:12:30', date: '2026-06-28', sensor: 'Cold Room Freezy-01', value: '-19.4°C', status: 'normal', message: 'Temperature remains stable at threshold.' },
-  { id: 'A-02', timestamp: '14:08:15', date: '2026-06-28', sensor: 'Sushi Rice Warm Unit A', value: '57.0°C', status: 'normal', message: 'Optimal preservation raw rice temperature verified.' },
-  { id: 'A-03', timestamp: '13:55:00', date: '2026-06-27', sensor: 'Seafood Deep Freezer', value: '-12.1°C', status: 'warning', message: 'Slight thermal climb detected during door cycle.' },
-  { id: 'A-04', timestamp: '13:10:45', date: '2026-06-19', sensor: 'Dishwasher Rinse Tank', value: '82.5°C', status: 'normal', message: 'Sanitation high-temp rinse verified.' }
+  { id: 'A-01', timestamp: '14:12:30', date: '2026-06-28', sensor: 'Cold Room 01', value: '-19.4°C', status: 'normal', message: 'Temperature remains stable at threshold.' },
+  { id: 'A-02', timestamp: '14:08:15', date: '2026-06-28', sensor: 'Rice Warmer A', value: '57.0°C', status: 'normal', message: 'Optimal holding temperature verified.' },
+  { id: 'A-03', timestamp: '13:55:00', date: '2026-06-27', sensor: 'Seafood Freezer', value: '-12.1°C', status: 'warning', message: 'Slight thermal climb detected during door cycle.' },
+  { id: 'A-04', timestamp: '13:10:45', date: '2026-06-26', sensor: 'Dishwasher Rinse', value: '82.5°C', status: 'normal', message: 'Sanitation high-temp rinse verified.' }
 ];
 
 export const initialWeeklyLogs: DailyOperationalLog[] = [
@@ -142,35 +317,35 @@ export const initialWeeklyLogs: DailyOperationalLog[] = [
   {
     day: 'Thu',
     date: '2026-06-18',
-    sales: 7100,
+    sales: 7500,
     waste: 232.0,
     hours: 86,
     productionTarget: 2500,
     productionMade: 2320,
     supplierName: 'Sticker',
-    cogs: { tazaki: 298, sysco: 298, bulza: 298, sticker: 299, others: 298 }
+    cogs: { tazaki: 315, sysco: 315, bulza: 315, sticker: 315, others: 315 }
   },
   {
     day: 'Fri',
     date: '2026-06-19',
-    sales: 7600,
+    sales: 7800,
     waste: 240.0,
     hours: 88,
     productionTarget: 2500,
     productionMade: 2400,
     supplierName: 'Others',
-    cogs: { tazaki: 319, sysco: 319, bulza: 319, sticker: 319, others: 320 }
+    cogs: { tazaki: 327, sysco: 327, bulza: 327, sticker: 327, others: 330 }
   },
   {
     day: 'Sat',
     date: '2026-06-20',
-    sales: 7800,
+    sales: 8100,
     waste: 245.0,
     hours: 90,
     productionTarget: 2500,
     productionMade: 2450,
     supplierName: 'Tazaki',
-    cogs: { tazaki: 330, sysco: 327, bulza: 327, sticker: 327, others: 327 }
+    cogs: { tazaki: 341, sysco: 340, bulza: 340, sticker: 340, others: 340 }
   },
   {
     day: 'Sun',
@@ -223,35 +398,35 @@ export const alternativeWeeklyLogsMap: Record<string, DailyOperationalLog[]> = {
   {
     day: 'Thu',
     date: '2026-06-18',
-    sales: 7100,
+    sales: 7500,
     waste: 232.0,
     hours: 86,
     productionTarget: 2500,
     productionMade: 2320,
     supplierName: 'Sticker',
-    cogs: { tazaki: 298, sysco: 298, bulza: 298, sticker: 299, others: 298 }
+    cogs: { tazaki: 315, sysco: 315, bulza: 315, sticker: 315, others: 315 }
   },
   {
     day: 'Fri',
     date: '2026-06-19',
-    sales: 7600,
+    sales: 7800,
     waste: 240.0,
     hours: 88,
     productionTarget: 2500,
     productionMade: 2400,
     supplierName: 'Others',
-    cogs: { tazaki: 319, sysco: 319, bulza: 319, sticker: 319, others: 320 }
+    cogs: { tazaki: 327, sysco: 327, bulza: 327, sticker: 327, others: 330 }
   },
   {
     day: 'Sat',
     date: '2026-06-20',
-    sales: 7800,
+    sales: 8100,
     waste: 245.0,
     hours: 90,
     productionTarget: 2500,
     productionMade: 2450,
     supplierName: 'Tazaki',
-    cogs: { tazaki: 330, sysco: 327, bulza: 327, sticker: 327, others: 327 }
+    cogs: { tazaki: 341, sysco: 340, bulza: 340, sticker: 340, others: 340 }
   },
   {
     day: 'Sun',
@@ -324,13 +499,13 @@ export const alternativeWeeklyLogsMap: Record<string, DailyOperationalLog[]> = {
   {
     day: 'Sat',
     date: '2026-06-27',
-    sales: 8100,
+    sales: 8200,
     waste: 250.0,
     hours: 92,
     productionTarget: 2500,
     productionMade: 2500,
     supplierName: 'Tazaki',
-    cogs: { tazaki: 341, sysco: 340, bulza: 340, sticker: 340, others: 340 }
+    cogs: { tazaki: 346, sysco: 344, bulza: 344, sticker: 344, others: 344 }
   },
   {
     day: 'Sun',

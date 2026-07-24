@@ -1,10 +1,8 @@
-// Saksee · 2026-07-24 · feat/new-design-system
+// Saksee · 2026-07-24 · operational Q&A panel
 import React, { useState } from "react";
-import { BrainCircuit, Send, Loader2, Sparkles } from "lucide-react";
+import { MessageSquare, Send, Loader2 } from "lucide-react";
 
-interface Props { theme: "dark" | "light" }
-
-export default function AdvisorTab({ theme }: Props) {
+export default function AdvisorTab() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [resp, setResp] = useState<string | null>(null);
@@ -19,51 +17,49 @@ export default function AdvisorTab({ theme }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: input })
       });
+      if (!r.ok) throw new Error(`Server returned ${r.status}`);
       const d = await r.json();
       setResp(d.text || d.response || JSON.stringify(d));
-    } catch { setErr("Network error. Try again."); } finally { setLoading(false); }
+    } catch { setErr("Unable to reach the advisor. Check your connection and try again."); } finally { setLoading(false); }
   };
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
-          <BrainCircuit className="w-5 h-5 text-[var(--accent)]" />
+          <MessageSquare className="w-5 h-5 text-[var(--accent)]" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-[var(--text)]">Strategic Advisor</h1>
-          <p className="text-xs text-[var(--muted)]">Ask a question about your operations</p>
+          <h1 className="text-lg font-semibold text-[var(--text)]">Operational Advisor</h1>
+          <p className="text-xs text-[var(--muted)]">Ask a question about daily operations</p>
         </div>
       </div>
 
       <div className="card">
         <textarea
           value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="e.g. How can I reduce waste on Fridays?"
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Example: How did waste compare to target this week?"
           rows={3}
-          className="input w-full resize-none"
+          className="input w-full mb-3"
         />
-        <button
-          type="button"
-          onClick={ask}
-          disabled={loading || !input.trim()}
-          className="btn btn-primary mt-3 disabled:opacity-50"
-        >
-          {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Thinking…</> : <><Send className="w-4 h-4" /> Ask</>}
-        </button>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={ask}
+            disabled={loading || !input.trim()}
+            className="btn btn-primary"
+          >
+            {loading && <Loader2 className="w-4 h-4 animate-spin mr-1 inline" />}
+            <Send className="w-4 h-4 inline mr-1" />
+            Ask
+          </button>
+        </div>
       </div>
 
-      {err && <div className="card border-[var(--bad)] text-[var(--bad)] text-xs">{err}</div>}
+      {err && <div className="card border border-red-400/30 text-red-300 text-sm">{err}</div>}
 
-      {resp && (
-        <div className="card">
-          <div className="section-title mb-2 flex items-center gap-2">
-            <Sparkles className="w-4 h-4" /> Response
-          </div>
-          <div className="text-sm text-[var(--text)] whitespace-pre-wrap leading-relaxed">{resp}</div>
-        </div>
-      )}
+      {resp && <div className="card text-sm text-[var(--text)] leading-relaxed">{resp}</div>}
     </div>
   );
 }
