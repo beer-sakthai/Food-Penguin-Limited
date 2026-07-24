@@ -20,8 +20,8 @@ export default function EnergyTab({ theme, weeklyLogs }: { theme: string; weekly
               <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
               <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="wh" name="kWh (est)" stroke="#c2410c" strokeWidth={2} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="sales" name="Sales (€)" stroke="#78716c" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+              <Line type="monotone" dataKey="wh" name="kWh (est)" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="sales" name="Sales (€)" stroke="var(--muted)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

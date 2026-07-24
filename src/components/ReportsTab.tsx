@@ -12,7 +12,7 @@ type Target = { name: string; currentValue: number; targetValue: number; unit: s
 type Waste = { date: string; cost: number; reason: string };
 type Alert = { status: string; message: string };
 
-const BRANCH_COLORS = ["#c2410c", "#ea580c", "#f59e0b", "#65a30d", "#0891b2", "#7c3aed"];
+const BRANCH_COLORS = ["var(--accent)", "var(--accent-hover)", "var(--warn)", "var(--ok)", "var(--accent)", "#6366f1"];
 
 export default function ReportsTab(props: {
   orders: Order[]; targets: Target[]; tasks: any[]; wasteRecords: Waste[];

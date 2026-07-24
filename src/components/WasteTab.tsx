@@ -23,7 +23,7 @@ export default function WasteTab(props: {
   };
   const byReason = REASONS.map(rn => ({ reason: rn, cost: wasteRecords.filter(w => w.reason === rn).reduce((a, w) => a + w.cost, 0) })).filter(x => x.cost > 0);
   const totalWeight = wasteRecords.reduce((a, w) => a + (w.weight || 0), 0);
-  const COLORS = ["#c2410c", "#ea580c", "#f59e0b", "#65a30d", "#0891b2"];
+  const COLORS = ["var(--accent)", "var(--accent-hover)", "var(--warn)", "var(--ok)", "var(--accent)"];
   return (
     <div className="space-y-6 max-w-6xl">
       <div>

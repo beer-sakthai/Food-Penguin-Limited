@@ -16,7 +16,7 @@ interface ProductionTabProps {
 
 const STATUS_COLORS: Record<string, string> = {
   "In Queue": "#94a3b8",
-  "Cooking": "#f59e0b",
+  "Cooking": "var(--warn)",
   "Prepared": "#15803d",
 };
 
@@ -102,8 +102,8 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
                 <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
                 <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line type="monotone" dataKey="volume" name="Made" stroke="#c2410c" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="target" name="Target" stroke="#78716c" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+                <Line type="monotone" dataKey="volume" name="Made" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="target" name="Target" stroke="var(--muted)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>

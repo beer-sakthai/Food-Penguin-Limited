@@ -25,8 +25,8 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
 
 * **Framework:** React 19 + TypeScript + Vite
 * **Backend:** Node + better-sqlite3 (local SQLite database)
-* **Styling:** Tailwind CSS (warm cream + terracotta palette, flat bordered cards)
-* **Animations:** `motion/react` for hardware-accelerated transitions
+* **Styling:** Tailwind CSS (deep charcoal + muted teal palette, flat cards, icon-only sidebar)
+* **Animations:** `motion/react` for subtle transitions
 * **Icons:** `lucide-react`
 * **Charts:** `recharts`
 * **Date Handling:** Native JS utilities
@@ -78,9 +78,10 @@ npm run start
 
 ## 📝 Changelog
 
+- **2026-07-24** — New design: deep charcoal + teal palette, icon-only expanding sidebar, matching login screen.
 - **2026-07-24** — Rebuilt app shell: flat sidebar, compact nav, header controls, removed dead metallic theme state.
 - **2026-07-24** — Added self-hosted analytics layer (SQLite + REST + React tracker + Analytics tab).
-- **2026-07-24** — Density cut pass: ~70% UI element reduction across all tabs with warm cream/terracotta palette.
+- **2026-07-24** — Density cut pass: ~70% UI element reduction across all tabs.
 
 ## 📄 License
 

@@ -34,7 +34,7 @@ export default function OverviewTab(props: any) {
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--muted)" }} />
               <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
               <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} formatter={(v: any) => `€${Number(v).toLocaleString()}`} />
-              <Line type="monotone" dataKey="sales" stroke="#c2410c" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="sales" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

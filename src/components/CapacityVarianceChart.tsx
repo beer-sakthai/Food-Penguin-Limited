@@ -179,7 +179,7 @@ export default function CapacityVarianceChart({ weeklyLogs, isLight }: CapacityV
  {/* Soft glowing variance fill gradient */}
  <linearGradient id="varianceGradient" x1="0" y1="0" x2="0" y2="1">
  <stop offset="0%" stopColor="#f97316" stopOpacity="0.16" />
- <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.04" />
+ <stop offset="100%" stopColor="var(--warn)" stopOpacity="0.04" />
  </linearGradient>
  
  {/* Spark line mask or glowing filter for a super premium look */}

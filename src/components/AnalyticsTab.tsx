@@ -127,16 +127,16 @@ export default function AnalyticsTab({ theme }: { theme: "light" | "dark" | "met
               <AreaChart data={seriesComplete} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                 <defs>
                   <linearGradient id="evGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#c2410c" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#c2410c" stopOpacity={0.05} />
+                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="day" tick={{ fontSize: 10, fill: "var(--muted)" }} />
                 <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} />
                 <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} />
-                <Area type="monotone" dataKey="events" name="Events" stroke="#c2410c" fill="url(#evGrad)" strokeWidth={2} />
-                <Area type="monotone" dataKey="pageviews" name="Pageviews" stroke="#78716c" fill="transparent" strokeWidth={1.5} strokeDasharray="4 3" />
+                <Area type="monotone" dataKey="events" name="Events" stroke="var(--accent)" fill="url(#evGrad)" strokeWidth={2} />
+                <Area type="monotone" dataKey="pageviews" name="Pageviews" stroke="var(--muted)" fill="transparent" strokeWidth={1.5} strokeDasharray="4 3" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -167,7 +167,7 @@ export default function AnalyticsTab({ theme }: { theme: "light" | "dark" | "met
                   <XAxis dataKey="branch" tick={{ fontSize: 10, fill: "var(--muted)" }} interval={0} angle={-12} textAnchor="end" height={48} />
                   <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} />
                   <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} />
-                  <Bar dataKey="sessions" name="Sessions" fill="#c2410c" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="sessions" name="Sessions" fill="var(--accent)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

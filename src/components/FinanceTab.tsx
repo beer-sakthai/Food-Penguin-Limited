@@ -12,7 +12,7 @@ export default function FinanceTab({ theme }: { theme: string }) {
     { m: "Jun", revenue: 340000, cost: 235000 },
   ];
   const margin = monthly.map(m => ({ m: m.m, margin: m.revenue - m.cost }));
-  const COLORS = ["#c2410c", "#ea580c", "#f59e0b", "#65a30d", "#0891b2", "#7c3aed"];
+  const COLORS = ["var(--accent)", "var(--accent-hover)", "var(--warn)", "var(--ok)", "var(--accent)", "#6366f1"];
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
@@ -29,8 +29,8 @@ export default function FinanceTab({ theme }: { theme: string }) {
                 <XAxis dataKey="m" tick={{ fontSize: 11, fill: "var(--muted)" }} />
                 <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
                 <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} formatter={(v: any) => `€${Number(v).toLocaleString()}`} />
-                <Bar dataKey="revenue" name="Revenue" fill="#c2410c" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="cost" name="Cost" fill="#78716c" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="revenue" name="Revenue" fill="var(--accent)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="cost" name="Cost" fill="var(--muted)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
