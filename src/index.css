@@ -1,24 +1,47 @@
+/* Saksee · 2026-07-24 · feat/density-cut
+   Warm cream + terracotta palette, narrow sidebar, generous spacing. */
+
 @import "tailwindcss";
 
 :root {
   font-size: 100%;
-  --surface-canvas: #f8fafc;
-  --surface-raised: #ffffff;
-  --surface-subtle: #f1f5f9;
-  --border-subtle: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --accent: #18181b;
+
+  /* Surfaces */
+  --bg: #faf7f2;            /* warm cream canvas */
+  --surface: #fffdf9;        /* card / panel */
+  --panel: #f5efe5;          /* hover / inset */
+
+  /* Text */
+  --text: #1c1917;           /* navy ink */
+  --muted: #78716c;          /* stone-500 */
+
+  /* Lines */
+  --border: #e7e5e4;         /* stone-200 */
+
+  /* Accent */
+  --accent: #c2410c;         /* terracotta-700 */
+  --accent-soft: #fed7aa;    /* terracotta-200 surface tint */
+  --accent-hover: #9a3412;   /* terracotta-800 */
+
+  /* Status (kept quiet, no red pill) */
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #b91c1c;
 }
 
 .dark {
-  --surface-canvas: #09090b;
-  --surface-raised: #18181b;
-  --surface-subtle: #27272a;
-  --border-subtle: #27272a;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --accent: #fafafa;
+  --bg: #1c1917;
+  --surface: #292524;
+  --panel: #44403c;
+  --text: #fafaf9;
+  --muted: #a8a29e;
+  --border: #44403c;
+  --accent: #fb923c;          /* terracotta-400 on dark */
+  --accent-soft: #7c2d12;
+  --accent-hover: #fdba74;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --bad: #f87171;
 }
 
 html {
@@ -31,6 +54,8 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--text);
 }
 
 * {
@@ -38,6 +63,6 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
