@@ -2099,141 +2099,46 @@ export default function App() {
         <div
           className={`flex-col flex-1 overflow-y-auto md:overflow-visible ${isMobileMenuOpen ? "flex" : "hidden md:flex"}`}
         >
-          {/* Aesthetic & Theme Panel — compact */}
-          <div className={`mx-4 mt-4 p-2 surface-card transition-all ${isLight ? "bg-zinc-50" : "bg-zinc-950/40"}`}>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80 flex-1">
-                <button type="button" onClick={() => setTheme("light")} className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[10px] font-bold uppercase transition-all cursor-pointer ${isLight ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-zinc-500 hover:text-zinc-300"}`}>
-                  <Sun className="w-3 h-3 text-amber-500" />
-                </button>
-                <button type="button" onClick={() => setTheme("dark")} className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-[10px] font-bold uppercase transition-all cursor-pointer ${!isLight ? "bg-zinc-800 text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]" : "text-zinc-500 hover:text-zinc-700"}`}>
-                  <Moon className="w-3 h-3 text-zinc-400" />
-                </button>
-              </div>
-              <div className="flex rounded-lg p-0.5 bg-zinc-900/10 dark:bg-black/40 border border-zinc-200/50 dark:border-zinc-800/80">
-                {(["gold", "silver", "copper"] as const).map((metal) => (
-                  <button key={metal} type="button" onClick={() => changeMetallicTheme(metal)} className={`rounded px-1.5 py-1 text-[9px] font-bold capitalize transition-colors ${metallicTheme === metal ? (isLight ? "bg-zinc-200 text-zinc-900" : "bg-zinc-700 text-white") : (isLight ? "text-zinc-500 hover:text-zinc-700" : "text-zinc-500 hover:text-zinc-300")}`}>
-                    {metal[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-
-          {/* Global Branches — compact */}
-          <div className="mx-4 mt-3">
-            <div className="space-y-1 font-sans">
-              {(["Marks & Spencer - Cork City", "Tesco - Cork City", "Tesco - Mahon Point"] as const).map((branch) => {
-                const shortName = branch.replace("Marks & Spencer", "M&S").replace(" - Cork City", " Cork").replace(" - Mahon Point", " Mahon");
-                const isSelected = selectedBranch === branch;
-                return (
-                  <button key={branch} type="button" onClick={() => setSelectedBranch(branch)} aria-pressed={isSelected} className={`w-full flex justify-between items-center text-xs p-2 rounded-lg text-left transition-colors ${isSelected ? (isLight ? "bg-zinc-100 text-zinc-900 font-semibold" : "bg-zinc-900 text-white font-semibold") : (isLight ? "text-zinc-600 hover:bg-zinc-100" : "text-zinc-400 hover:bg-zinc-900")}`}>
-                    <span className="truncate mr-2">{shortName}</span>
-                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
 
 
 
-          {/* Grouped, role-aware navigation */}
-          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 p-4 mt-1 space-y-1 overflow-y-auto md:overflow-visible min-h-0">
-            <div className="space-y-1">
+
+
+
+
+          <nav id="primary-navigation" aria-label="Primary navigation" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto md:overflow-visible min-h-0">
+            <div className="space-y-0.5">
               {primaryTabs.map((tab) => renderNavigationButton(tab))}
             </div>
             {operationsTabs.length > 0 && (
-              <div className="pt-3 space-y-1">
-                <p className={`px-2 pb-1 text-[9px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-400" : "text-zinc-600"}`}>Operations</p>
+              <div className="pt-2 space-y-0.5">
                 {operationsTabs.map((tab) => renderNavigationButton(tab))}
               </div>
             )}
             {moreToolsTabs.length > 0 && (
-              <div className="pt-3 space-y-1">
-                <button type="button" aria-expanded={isMoreToolsOpen} onClick={() => setIsMoreToolsOpen((open) => !open)} className={`w-full py-2 px-3 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${isLight ? "text-zinc-600 hover:bg-zinc-100" : "text-zinc-400 hover:bg-zinc-900"}`}>
+              <div className="pt-2 space-y-0.5">
+                <button type="button" aria-expanded={isMoreToolsOpen} onClick={() => setIsMoreToolsOpen((open) => !open)} className={`w-full py-2 px-3 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${isLight ? "text-zinc-500 hover:bg-zinc-100" : "text-zinc-500 hover:bg-zinc-900"}`}>
                   <Boxes className="w-3.5 h-3.5" />
                   <span className="flex-1 text-left">More tools</span>
                   {isMoreToolsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
-                {isMoreToolsOpen && <div className="pl-2 space-y-1">{moreToolsTabs.map((tab) => renderNavigationButton(tab))}</div>}
+                {isMoreToolsOpen && <div className="pl-2 space-y-0.5">{moreToolsTabs.map((tab) => renderNavigationButton(tab))}</div>}
               </div>
             )}
           </nav>
 
 
-          {/* Sidebar Capacity Card — minimal */}
-          <div className="px-4 py-2 mt-auto mb-2 hidden md:block md:sticky md:bottom-0 bg-inherit z-10">
-            <button
-              type="button"
-              onClick={() => setIsCapacityExpanded(!isCapacityExpanded)}
-              className={`w-full p-3 rounded-xl border text-left transition-colors ${isLight ? "bg-zinc-50 border-zinc-200 text-zinc-900" : "bg-zinc-900 border-zinc-800 text-white"}`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-zinc-500">Weekly Capacity</span>
-                {isCapacityExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
-              </div>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs font-bold">{capacityPct}%</span>
-                <span className="text-[10px] text-zinc-500">current</span>
-                <span className="text-[10px] text-zinc-500">·</span>
-                <span className="text-xs font-bold">{projectedCapacityPct}%</span>
-                <span className="text-[10px] text-zinc-500">projected</span>
-              </div>
-            </button>
-          </div>
 
-          {/* Footer info links */}
-          <div
-            className={`p-4 border-t static transition-colors duration-200 ${isLight ? "border-zinc-200 bg-zinc-50/50" : "border-zinc-900 bg-black/40"}`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-8 h-8 rounded-full flex flex-col items-center justify-center text-zinc-300 relative shrink-0 border overflow-hidden ${
-                  isLight
-                    ? "bg-zinc-200 border-zinc-300 text-zinc-700"
-                    : "bg-zinc-900 border-zinc-800"
-                }`}
-              >
-                {currentUser?.photoURL ? (
-                  <img
-                    src={currentUser.photoURL}
-                    alt={currentUser.username}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-4 h-4" />
-                )}
-                <span
-                  className={`w-2 h-2 rounded-full ${isFirebaseSynced ? "bg-emerald-500 motion-safe:animate-pulse" : "bg-orange-500"} absolute -bottom-0.5 -right-0.5 border ${isLight ? "border-zinc-100" : "border-zinc-950"}`}
-                />
-              </div>
-              <div className="text-[11px] leading-tight flex-1 min-w-0">
-                <p
-                  className={`font-semibold truncate ${isLight ? "text-zinc-900 font-bold" : "text-white"}`}
-                  title={currentUser?.username || ""}
-                >
-                  {currentUser?.username || "Skipper Koala"}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <select
-                    value={userRole}
-                    onChange={(e) => setUserRole(e.target.value as any)}
-                    className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none transition-colors ${
-                      isLight
-                        ? "text-zinc-500  hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:text-zinc-800 font-bold"
-                        : "text-zinc-500 hover:text-zinc-300"
-                    }`}
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Staff">Staff</option>
-                    <option value="User">User</option>
-                  </select>
-                </div>
-              </div>
+
+          <div className={`p-3 border-t ${isLight ? "border-zinc-200" : "border-zinc-900"}`}>
+            <div className="flex items-center justify-between text-[11px]">
+              <span className={`font-semibold truncate ${isLight ? "text-zinc-900" : "text-white"}`}>{currentUser?.username || "Skipper Koala"}</span>
+              <select value={userRole} onChange={(e) => setUserRole(e.target.value as any)} className={`bg-transparent font-mono text-[10px] uppercase cursor-pointer focus:outline-none appearance-none ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Staff">Staff</option>
+                <option value="User">User</option>
+              </select>
             </div>
           </div>
         </div>
@@ -2243,81 +2148,26 @@ export default function App() {
         className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${isLight ? "bg-zinc-50" : "bg-black"}`}
       >
         {/* Global Toolbar */}
-        <header
-          className={`h-16 px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 border-b ${
-            isLight
-              ? "bg-white border-zinc-200 text-zinc-900 shadow-sm"
-              : "bg-zinc-950 border-zinc-900 text-white shadow-md"
-          }`}
+        <header className={`h-14 px-5 flex items-center justify-between sticky top-0 z-30 border-b ${isLight ? "bg-white border-zinc-200 text-zinc-900" : "bg-zinc-950 border-zinc-900 text-white"}`}
         >
-          <div className="flex items-center gap-2.5">
-            <h2
-              className={`text-xs sm:text-sm font-sans font-bold shrink-0 ${isLight ? "text-zinc-900" : "text-white"}`}
-            >
-              {tabMeta.find((t) => t.id === activeTab)?.label || activeTab} View
+          <div className="flex items-center gap-3">
+            <h2 className={`text-sm font-sans font-bold shrink-0 ${isLight ? "text-zinc-900" : "text-white"}`}>
+              {tabMeta.find((t) => t.id === activeTab)?.label || activeTab}
             </h2>
-            <span
-              className={`hidden lg:inline-block text-xs font-mono px-2 py-0.5 rounded uppercase tracking-wider font-bold border ${
-                isLight
-                  ? "bg-zinc-100 text-zinc-600 border-zinc-200"
-                  : "bg-zinc-900 text-zinc-400 border-zinc-800"
-              }`}
-            >
-              Food chain ops portal
-            </span>
 
-            {/* Global Branch Selector Dropdown */}
-            <div
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border shadow-inner transition-colors ${
-                isLight
-                  ? "bg-zinc-100 border-zinc-200"
-                  : "bg-zinc-900 border-zinc-800"
-              }`}
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value as any)}
+              className="bg-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-bold text-xs cursor-pointer focus:outline-none border-none py-0.5 pr-4 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_center] bg-no-repeat font-sans leading-none select-none"
             >
-              <span
-                className={`text-xs font-bold uppercase tracking-wider font-mono shrink-0 pl-1 ${isLight ? "text-zinc-500" : "text-zinc-500"}`}
-              >
-                Store:
-              </span>
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value as any)}
-                className="bg-transparent text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 font-bold text-[10px] sm:text-xs cursor-pointer focus:outline-none border-none py-0.5 pl-0.5 pr-4 transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%230ea5e9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:6px_6px] bg-[right_1px_center] bg-no-repeat font-sans font-bold leading-none select-none rounded focus:ring-0 active:ring-0 outline-none active:scale-[0.98] hover:-translate-y-0.5 hover:shadow transition-all duration-200"
-                style={{ outline: "none" }}
-              >
-                <option
-                  value="Marks & Spencer - Cork City"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Marks & Spencer Cork City
-                </option>
-                <option
-                  value="Tesco - Cork City"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Tesco Cork City
-                </option>
-                <option
-                  value="Tesco - Mahon Point"
-                  className={`${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} font-bold`}
-                >
-                  Tesco Mahon Point
-                </option>
-              </select>
-            </div>
+              <option value="Marks & Spencer - Cork City">M&S Cork</option>
+              <option value="Tesco - Cork City">Tesco Cork</option>
+              <option value="Tesco - Mahon Point">Tesco Mahon</option>
+            </select>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest block leading-none">
-                🇮🇪 Ireland Time (Dublin)
-              </span>
-              <span
-                className={`text-xs font-mono font-bold block mt-1 ${isLight ? "text-zinc-800" : "text-zinc-100"}`}
-              >
-                {irelandTime || "Updating live..."}
-              </span>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className={`hidden sm:block text-xs font-mono ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>{irelandTime || "—"}</span>
 
             <div className="relative">
               <button
@@ -2325,12 +2175,8 @@ export default function App() {
                 onClick={() => setIsSettingsMenuOpen((open) => !open)}
                 aria-expanded={isSettingsMenuOpen}
                 aria-haspopup="menu"
-                title="Open display settings"
-                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-                  isLight
-                    ? "bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200"
-                    : "bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-                }`}
+                title="Display settings"
+                className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${isLight ? "text-zinc-500 hover:bg-zinc-100" : "text-zinc-400 hover:bg-zinc-900"}`}
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>

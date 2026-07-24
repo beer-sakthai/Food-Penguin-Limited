@@ -21,16 +21,11 @@ const toneClasses = {
 
 export function KpiCard({ label, value, detail, icon: Icon, tone = "orange", isLight, onClick }: KpiCardProps) {
   const content = <>
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        <p className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>{label}</p>
-        <p className={`kpi-value mt-2 text-2xl font-black tracking-tight ${isLight ? "text-zinc-900" : "text-white"}`}>{value}</p>
-      </div>
-      <span className={`kpi-icon rounded-xl p-2.5 ${toneClasses[tone]}`}><Icon className="h-4 w-4" /></span>
-    </div>
-    <p className={`mt-4 text-xs ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>{detail}</p>
+    <p className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>{label}</p>
+    <p className={`mt-2 text-2xl font-black tracking-tight ${isLight ? "text-zinc-900" : "text-white"}`}>{value}</p>
+    <p className={`mt-2 text-xs ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>{detail}</p>
   </>;
 
-  const classes = `gold-liner-box kpi-card metal-accent metal-liner min-h-36 p-5 text-left ${isLight ? "bg-white text-zinc-900" : "bg-zinc-950 text-white"} ${onClick ? "cursor-pointer" : ""}`;
+  const classes = `kpi-card rounded-xl border p-4 text-left transition-colors ${isLight ? "bg-white border-zinc-200 text-zinc-900" : "bg-zinc-900 border-zinc-800 text-white"} ${onClick ? "cursor-pointer" : ""}`;
   return onClick ? <button type="button" onClick={onClick} className={classes}>{content}</button> : <div className={classes}>{content}</div>;
 }
