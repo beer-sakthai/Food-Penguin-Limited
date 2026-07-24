@@ -1958,13 +1958,13 @@ export default function App() {
         aria-selected={isActive}
         aria-current={isActive ? "page" : undefined}
         onClick={() => navigateToTab(tab.id)}
-        className={`w-full text-left rounded-lg text-xs flex items-center gap-3 transition-all ${
+        className={`w-full text-left rounded-xl text-xs flex items-center gap-3 transition-all ${
           isActive
-            ? "bg-[var(--accent-soft)] text-[var(--accent)] font-semibold"
+            ? "bg-[var(--accent-soft)] text-[var(--accent)] font-semibold ring-1 ring-[var(--accent)]/20"
             : "text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)]"
-        } py-2 px-2 lg:px-3`}
+        } py-2.5 px-2.5 lg:px-3.5`}
       >
-        <span className="w-5 h-5 shrink-0">{tab.icon}</span>
+        <span className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${isActive ? "bg-[var(--accent)]/15" : ""}`}>{tab.icon}</span>
         <span className="hidden lg:block truncate">{tab.label}</span>
       </button>
     );
@@ -1986,19 +1986,19 @@ export default function App() {
   return (
     <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)] font-sans antialiased">
       <aside className="w-16 lg:w-56 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)] transition-all duration-200">
-        <div className="h-14 px-4 flex items-center gap-3 border-b border-[var(--border)]">
-          <div className="w-8 h-8 rounded-lg bg-[var(--accent)] text-[var(--bg)] flex items-center justify-center text-sm font-bold shrink-0">FP</div>
+        <div className="h-16 px-4 flex items-center gap-3 border-b border-[var(--border)]">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-[var(--bg)] flex items-center justify-center text-sm font-bold shrink-0 shadow-lg shadow-[var(--accent-soft)]">FP</div>
           <div className="hidden lg:block min-w-0">
             <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>
             <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>
           </div>
         </div>
 
-        <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-2.5 py-4 space-y-1 overflow-y-auto">
           {tabMeta.map((tab) => renderNavigationButton(tab))}
         </nav>
 
-        <div className="p-3 border-t border-[var(--border)]">
+        <div className="p-3.5 border-t border-[var(--border)]">
           <div className="hidden lg:flex items-center gap-2 text-xs min-w-0">
             <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>
             <span className="text-[10px] text-[var(--muted)] uppercase">{userRole}</span>
@@ -2007,10 +2007,11 @@ export default function App() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 bg-[var(--bg)]">
-        <header className="h-14 px-4 lg:px-6 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur">
+        <header className="h-16 px-4 lg:px-8 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]/60 backdrop-blur">
           <div className="flex items-center gap-4 min-w-0">
             <h1 className="text-base font-semibold tracking-tight truncate">{tabMeta.find((t) => t.id === activeTab)?.label || activeTab}</h1>
             <div className="hidden sm:flex items-center gap-3 text-xs text-[var(--muted)]">
+              <span className="pill ok">Live</span>
               <span>{irelandTime || "—"}</span>
             </div>
           </div>
@@ -2019,7 +2020,7 @@ export default function App() {
             <select
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value as BusinessLocation)}
-              className="bg-[var(--panel)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+              className="bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
             >
               {BUSINESS_LOCATIONS.map((loc) => (
                 <option key={loc.id} value={loc.name}>
@@ -2031,7 +2032,7 @@ export default function App() {
             <select
               value={userRole}
               onChange={(e) => setUserRole(e.target.value as any)}
-              className="hidden sm:block bg-[var(--panel)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+              className="hidden sm:block bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
             >
               <option value="Admin">Admin</option>
               <option value="Manager">Manager</option>
@@ -2042,7 +2043,7 @@ export default function App() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-md text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)] transition-colors"
+              className="p-2.5 rounded-xl text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)] transition-colors"
               aria-label="Toggle theme"
             >
               {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}

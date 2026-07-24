@@ -132,7 +132,7 @@ export default function OverviewTab(props: OverviewProps) {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {cards.map((k, i) => (
+        {cards.map((k) => (
           <KpiCard
             key={k.label}
             label={k.label}

@@ -1,5 +1,5 @@
-/* Saksee · 2026-07-24 · feat/new-design-system
-   Dark-first dashboard design system. Charcoal surfaces, teal accent, crisp borders. */
+/* Saksee · 2026-07-24 · polished dashboard design system
+   Soft dark surfaces, teal accent, generous whitespace, rounded cards, status badges. */
 
 @import "tailwindcss";
 
@@ -7,19 +7,19 @@
   font-size: 100%;
 
   /* Surfaces */
-  --bg: #090b10;
-  --surface: #11131a;
-  --panel: #181b24;
-  --elevated: #222635;
-  --hover: #2a2e3d;
+  --bg: #0b0c0f;
+  --surface: #14161d;
+  --panel: #1b1e26;
+  --elevated: #242733;
+  --hover: #2c2f3b;
 
   /* Text */
-  --text: #f6f7f9;
-  --muted: #8e95a9;
-  --subtle: #5b6277;
+  --text: #f7f8fa;
+  --muted: #959bb0;
+  --subtle: #6b7280;
 
   /* Lines */
-  --border: #262a38;
+  --border: #2a2d39;
   --ring: var(--accent);
 
   /* Accent */
@@ -34,15 +34,15 @@
 }
 
 .light {
-  --bg: #f6f7f9;
+  --bg: #f8f9fb;
   --surface: #ffffff;
-  --panel: #f0f1f5;
-  --elevated: #e5e7ec;
-  --hover: #e0e3ea;
-  --text: #0f111a;
-  --muted: #60667a;
+  --panel: #f3f4f6;
+  --elevated: #e5e7eb;
+  --hover: #e8eaee;
+  --text: #111827;
+  --muted: #6b7280;
   --subtle: #9ca3af;
-  --border: #e0e3ea;
+  --border: #e5e7eb;
   --accent: #0d9488;
   --accent-soft: rgba(13, 148, 136, 0.10);
   --accent-hover: #0f766e;
@@ -82,42 +82,48 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .card-hover {
-  transition: background 0.15s, border-color 0.15s;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 .card-hover:hover {
   background: var(--panel);
   border-color: var(--elevated);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  transform: translateY(-1px);
 }
 
 .section-title {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .metric-value {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--text);
+  line-height: 1.1;
 }
 
 .metric-label {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
   color: var(--muted);
+  letter-spacing: 0.01em;
 }
 
 .metric-delta {
   font-size: 0.75rem;
   font-weight: 500;
-  padding: 2px 6px;
+  padding: 2px 8px;
   border-radius: 999px;
 }
 
@@ -140,10 +146,10 @@ body {
 
 .data-table th {
   text-align: left;
-  padding: 10px 12px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  padding: 12px 14px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
   border-bottom: 1px solid var(--border);
@@ -151,7 +157,7 @@ body {
 }
 
 .data-table td {
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border);
   color: var(--text);
 }
@@ -169,8 +175,8 @@ body {
 .select {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: 10px;
+  padding: 9px 12px;
   font-size: 0.8125rem;
   color: var(--text);
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -188,12 +194,16 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
   font-size: 0.8125rem;
   font-weight: 500;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
   cursor: pointer;
+}
+
+.btn:active {
+  transform: scale(0.98);
 }
 
 .btn-primary {
@@ -216,31 +226,57 @@ body {
 .btn-ghost:hover {
   background: var(--panel);
   color: var(--text);
+  border-color: var(--elevated);
 }
 
 /* Status pills */
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 999px;
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.02em;
 }
 
 .pill.ok {
   color: var(--ok);
-  background: rgba(52, 211, 153, 0.10);
+  background: rgba(52, 211, 153, 0.12);
 }
 
 .pill.warn {
   color: var(--warn);
-  background: rgba(251, 191, 36, 0.10);
+  background: rgba(251, 191, 36, 0.14);
 }
 
 .pill.bad {
   color: var(--bad);
-  background: rgba(248, 113, 113, 0.10);
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.status-ok {
+  color: var(--ok);
+  background: rgba(52, 211, 153, 0.12);
+}
+
+.status-warn {
+  color: var(--warn);
+  background: rgba(251, 191, 36, 0.14);
+}
+
+.status-bad {
+  color: var(--bad);
+  background: rgba(248, 113, 113, 0.12);
 }
