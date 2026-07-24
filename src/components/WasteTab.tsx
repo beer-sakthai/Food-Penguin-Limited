@@ -1,6 +1,6 @@
-// Saksee · 2026-07-24 · feat/new-design-system
+// Saksee · 2026-07-24 · waste: day + week view with target
 import React, { useState } from "react";
-import { Trash2, Plus, Search, AlertTriangle } from "lucide-react";
+import { Trash2, Plus, AlertTriangle, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import { WASTE_TARGET_PCT, wasteTargetFromProduction } from "../business";
 
@@ -8,6 +8,16 @@ interface Waste { id: string; item: string; category: string; weight: number; co
 
 const REASONS = ["Expired", "Overproduced", "Spill/Accident", "Quality Issue", "Damaged"];
 const CATS = ["Seafood", "Sushi Rolls", "Produce", "Condiments", "Wrapping"];
+
+const weekData = [
+  { d: "Mon", cost: 220, prod: 2200 },
+  { d: "Tue", cost: 195, prod: 2250 },
+  { d: "Wed", cost: 205, prod: 2180 },
+  { d: "Thu", cost: 180, prod: 2320 },
+  { d: "Fri", cost: 210, prod: 2400 },
+  { d: "Sat", cost: 250, prod: 2450 },
+  { d: "Sun", cost: 196, prod: 2200 },
+];
 
 export default function WasteTab(props: {
   wasteRecords: Waste[];
@@ -17,7 +27,7 @@ export default function WasteTab(props: {
   theme: "dark" | "light";
   productionValueToday?: number;
 }) {
-  const { wasteRecords, onAddWaste, totalCostToday, selectedBranch, productionValueToday = 11240 } = props;
+  const { wasteRecords, onAddWaste, totalCostToday, selectedBranch, productionValueToday = 2200 } = props;
   const [item, setItem] = useState("");
   const [cat, setCat] = useState(CATS[0]);
   const [w, setW] = useState(1);
@@ -43,12 +53,25 @@ export default function WasteTab(props: {
   const wastePct = productionValueToday ? (totalCostToday / productionValueToday) * 100 : 0;
   const overTarget = wastePct > WASTE_TARGET_PCT;
 
+  const weekCost = weekData.reduce((a, r) => a + r.cost, 0);
+  const weekProd = weekData.reduce((a, r) => a + r.prod, 0);
+  const weekPct = weekProd ? (weekCost / weekProd) * 100 : 0;
+  const weekTarget = weekProd * (WASTE_TARGET_PCT / 100);
+  const maxDay = weekData.reduce((m, r) => r.cost > m.cost ? r : m, weekData[0]);
+
+  const chartData = weekData.map((r) => ({
+    ...r,
+    target: weekTarget / 7,
+    pct: r.prod ? (r.cost / r.prod) * 100 : 0,
+  }));
+
   const cards = [
-    { label: "Total cost", value: `€${totalCostToday.toFixed(0)}`, sub: "all branches", warn: overTarget },
-    { label: "Waste %", value: `${wastePct.toFixed(1)}%`, sub: `target ${WASTE_TARGET_PCT}%`, warn: overTarget },
-    { label: "Total weight", value: `${totalWeight.toFixed(1)} kg`, sub: `${wasteRecords.length} records` },
-    { label: "Target budget", value: `€${wasteTarget.toFixed(0)}`, sub: `${WASTE_TARGET_PCT}% of prod` },
-    { label: "Top reason", value: topReason, sub: "by cost" },
+    { label: "Today cost", value: `€${totalCostToday.toFixed(0)}`, sub: `€${wasteTarget.toFixed(0)} budget`, warn: overTarget },
+    { label: "Today waste %", value: `${wastePct.toFixed(1)}%`, sub: `target ${WASTE_TARGET_PCT}%`, warn: overTarget },
+    { label: "Week cost", value: `€${weekCost.toLocaleString()}`, sub: `€${Math.round(weekTarget).toLocaleString()} budget`, warn: weekPct > WASTE_TARGET_PCT },
+    { label: "Week waste %", value: `${weekPct.toFixed(1)}%`, sub: `target ${WASTE_TARGET_PCT}%`, warn: weekPct > WASTE_TARGET_PCT },
+    { label: "Max day", value: maxDay.d, sub: `€${maxDay.cost} · ${(maxDay.cost / maxDay.prod * 100).toFixed(1)}%` },
+    { label: "Records", value: `${wasteRecords.length}`, sub: `${totalWeight.toFixed(1)} kg total` },
   ];
 
   const COLORS = ["var(--accent)", "var(--warn)", "var(--bad)", "var(--ok)", "var(--accent-hover)"];
@@ -62,12 +85,12 @@ export default function WasteTab(props: {
           </div>
           <div>
             <h1 className="text-lg font-semibold text-[var(--text)]">Waste</h1>
-            <p className="text-xs text-[var(--muted)]">{selectedBranch} · {wasteRecords.length} records · {totalWeight.toFixed(1)}kg · target {WASTE_TARGET_PCT}%</p>
+            <p className="text-xs text-[var(--muted)]">{selectedBranch} · target {WASTE_TARGET_PCT}% · today vs this week</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {cards.map((k, i) => (
           <div key={i} className="card card-hover">
             <div className="flex items-center gap-2">
@@ -80,25 +103,46 @@ export default function WasteTab(props: {
         ))}
       </div>
 
-      {byReason.length > 0 && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card">
-          <h2 className="section-title mb-4">Cost by reason</h2>
-          <div className="h-52">
+          <h2 className="section-title mb-4 flex items-center gap-2">
+            <Calendar className="w-4 h-4" /> This week · waste vs target
+          </h2>
+          <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={byReason} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+              <BarChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                 <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="reason" tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="d" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} formatter={(v: any) => `€${v}`} />
-                <ReferenceLine y={wasteTarget / byReason.length} stroke="var(--warn)" strokeDasharray="4 4" label={{ value: `${WASTE_TARGET_PCT}%`, fill: "var(--warn)", fontSize: 10 }} />
-                <Bar dataKey="cost" radius={[6, 6, 0, 0]} fontSize={12}>
-                  {byReason.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                <ReferenceLine y={weekTarget / 7} stroke="var(--warn)" strokeDasharray="4 4" label={{ value: "target", fill: "var(--warn)", fontSize: 10, position: "insideTopRight" }} />
+                <Bar dataKey="cost" radius={[6, 6, 0, 0]}>
+                  {chartData.map((d, i) => <Cell key={i} fill={d.pct > WASTE_TARGET_PCT ? "var(--bad)" : "var(--accent)"} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
-      )}
+
+        {byReason.length > 0 && (
+          <div className="card">
+            <h2 className="section-title mb-4">Cost by reason</h2>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={byReason} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+                  <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="reason" tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} formatter={(v: any) => `€${v}`} />
+                  <Bar dataKey="cost" radius={[6, 6, 0, 0]} fontSize={12}>
+                    {byReason.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="card">
         <h2 className="section-title mb-4 flex items-center gap-2">
@@ -119,34 +163,32 @@ export default function WasteTab(props: {
           <h2 className="section-title">Records</h2>
           <span className="text-[11px] text-[var(--muted)]">{wasteRecords.length} total</span>
         </div>
-        {wasteRecords.length === 0 ? (
-          <div className="py-10 text-center text-xs text-[var(--muted)]">no waste records</div>
-        ) : (
+        <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr>
                 <th>Item</th>
                 <th>Category</th>
+                <th>Reason</th>
                 <th className="text-right">Weight</th>
                 <th className="text-right">Cost</th>
-                <th>Reason</th>
-                <th>Date</th>
+                <th className="text-right">Date</th>
               </tr>
             </thead>
             <tbody>
-              {wasteRecords.map(w => (
+              {wasteRecords.slice().reverse().slice(0, 20).map((w) => (
                 <tr key={w.id}>
-                  <td className="font-medium">{w.item}</td>
-                  <td className="text-[var(--muted)]">{w.category}</td>
-                  <td className="text-right font-mono">{w.weight.toFixed(1)} kg</td>
-                  <td className="text-right font-mono">€{w.cost.toFixed(2)}</td>
-                  <td className="text-[var(--muted)]">{w.reason}</td>
-                  <td className="font-mono text-[var(--muted)]">{w.date}</td>
+                  <td>{w.item}</td>
+                  <td><span className="status-pill status-ok">{w.category}</span></td>
+                  <td>{w.reason}</td>
+                  <td className="text-right">{w.weight.toFixed(1)} kg</td>
+                  <td className="text-right">€{w.cost.toFixed(2)}</td>
+                  <td className="text-right">{w.date}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
+        </div>
       </div>
     </div>
   );
