@@ -1,10 +1,7 @@
-// Saksee · 2026-07-24 · feat/density-cut
-// Production tab — basic, sample, professional. 2 charts (volume + status), task list, add form.
-// Removed: AI Culinary Auditor, motion/react, hover-lift, mock dish base64 SVGs.
-
+// Saksee · 2026-07-24 · feat/new-design-system
 import React, { useState } from "react";
+import { ChefHat, Plus, CheckCircle2, Package } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LineChart, Line, Legend } from "recharts";
-import { ChefHat, Plus, CheckCircle2 } from "lucide-react";
 import { Recipe, ProductionTask } from "../types";
 
 interface ProductionTabProps {
@@ -15,9 +12,9 @@ interface ProductionTabProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  "In Queue": "#94a3b8",
+  "In Queue": "var(--muted)",
   "Cooking": "var(--warn)",
-  "Prepared": "#15803d",
+  "Prepared": "var(--ok)",
 };
 
 const CHEFS = ["Chef Skipper", "Chef Kowalski", "Chef Private", "Kitchen Aide Rico", "Alice Smith"];
@@ -28,7 +25,6 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
   const [qty, setQty] = useState(1);
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
 
-  // Volume by hour (sample data, kept simple)
   const volumeData = [
     { hour: "08", volume: 45, target: 50 },
     { hour: "10", volume: 85, target: 80 },
@@ -63,64 +59,66 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
     setQty(1);
   };
 
+  const cards = [
+    { label: "Made today", value: totalToday.toLocaleString(), sub: "items" },
+    { label: "Target", value: totalTarget.toLocaleString(), sub: "items" },
+    { label: "Completion", value: `${completion}%`, sub: completion >= 90 ? "on track" : "behind", tone: completion >= 90 ? "up" : "down" },
+    { label: "Active tasks", value: tasks.length, sub: "in queue + cooking" },
+  ];
+
   return (
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[var(--text)]">Production</h1>
-          <p className="text-xs font-mono text-[var(--muted)] mt-0.5">
-            {tasks.length} active tasks · {recipes.length} recipes · {completion}% of day target
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+            <ChefHat className="w-5 h-5 text-[var(--accent)]" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-[var(--text)]">Production</h1>
+            <p className="text-xs text-[var(--muted)]">{tasks.length} active tasks · {recipes.length} recipes · {completion}% of day target</p>
+          </div>
         </div>
       </div>
 
-      {/* KPI strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: "Made today", value: totalToday.toLocaleString(), sub: "items" },
-          { label: "Target", value: totalTarget.toLocaleString(), sub: "items" },
-          { label: "Completion", value: `${completion}%`, sub: completion >= 90 ? "on track" : "behind" },
-          { label: "Active tasks", value: tasks.length, sub: "in queue + cooking" },
-        ].map((k, i) => (
-          <div key={i} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-4">
-            <div className="text-[10px] font-mono uppercase tracking-wide text-[var(--muted)]">{k.label}</div>
-            <div className="text-2xl font-bold text-[var(--text)] mt-1">{k.value}</div>
-            <div className="text-[10px] font-mono text-[var(--muted)] mt-0.5">{k.sub}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {cards.map((k, i) => (
+          <div key={i} className="card card-hover">
+            <span className="metric-label">{k.label}</span>
+            <div className="mt-2 metric-value">{k.value}</div>
+            <div className="mt-1 text-[11px] text-[var(--muted)]">{k.sub}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* Volume by hour — line chart kept */}
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-[var(--text)] mb-3">Volume by hour</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="card">
+          <h2 className="section-title mb-4">Volume by hour</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={volumeData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                 <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="hour" tick={{ fontSize: 11, fill: "var(--muted)" }} />
-                <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
-                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} />
+                <XAxis dataKey="hour" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line type="monotone" dataKey="volume" name="Made" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="volume" name="Made" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 3, fill: "var(--accent)", strokeWidth: 0 }} activeDot={{ r: 5 }} />
                 <Line type="monotone" dataKey="target" name="Target" stroke="var(--muted)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Status breakdown — bar chart kept */}
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-[var(--text)] mb-3">Task status</h2>
+        <div className="card">
+          <h2 className="section-title mb-4">Task status</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={statusData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                 <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="status" tick={{ fontSize: 11, fill: "var(--muted)" }} />
-                <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
-                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }} />
-                <Bar dataKey="count" name="Items" radius={[4, 4, 0, 0]}>
-                  {statusData.map((d, i) => <Cell key={i} fill={STATUS_COLORS[d.status] || "#94a3b8"} />)}
+                <XAxis dataKey="status" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                <Bar dataKey="count" name="Items" radius={[6, 6, 0, 0]}>
+                  {statusData.map((d, i) => <Cell key={i} fill={STATUS_COLORS[d.status] || "var(--muted)"} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -128,25 +126,19 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
         </div>
       </div>
 
-      {/* Add task — flat form */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5">
-        <h2 className="text-sm font-semibold text-[var(--text)] mb-3 flex items-center gap-1.5">
-          <Plus className="w-4 h-4 text-[var(--accent)]" />
-          Add production task
+      <div className="card">
+        <h2 className="section-title mb-4 flex items-center gap-2">
+          <Plus className="w-4 h-4" /> Add production task
         </h2>
-        <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-5 gap-2">
+        <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <input
             type="text"
             value={item}
             onChange={e => setItem(e.target.value)}
             placeholder="Item (e.g. Tokyo Dragon Roll)"
-            className="md:col-span-2 px-3 py-2 text-sm rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
+            className="md:col-span-2 input"
           />
-          <select
-            value={assigned}
-            onChange={e => setAssigned(e.target.value)}
-            className="px-3 py-2 text-sm rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)]"
-          >
+          <select value={assigned} onChange={e => setAssigned(e.target.value)} className="select">
             {CHEFS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <input
@@ -154,73 +146,63 @@ export default function ProductionTab({ recipes, tasks, onAddTask, onUpdateTaskS
             min={1}
             value={qty}
             onChange={e => setQty(Math.max(1, parseInt(e.target.value) || 1))}
-            className="px-3 py-2 text-sm rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)]"
+            className="input"
           />
-          <select
-            value={priority}
-            onChange={e => setPriority(e.target.value as any)}
-            className="px-3 py-2 text-sm rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)]"
-          >
+          <select value={priority} onChange={e => setPriority(e.target.value as any)} className="select">
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
-          <button
-            type="submit"
-            className="md:col-span-5 mt-1 px-3 py-2 text-sm font-medium rounded-md bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]"
-          >
-            Add task
-          </button>
+          <button type="submit" className="md:col-span-5 btn btn-primary justify-center">Add task</button>
         </form>
       </div>
 
-      {/* Active tasks list */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2">
-          <ChefHat className="w-4 h-4 text-[var(--accent)]" />
-          <h2 className="text-sm font-semibold text-[var(--text)]">Active tasks</h2>
-          <span className="text-[10px] font-mono text-[var(--muted)] ml-auto">{tasks.length} total</span>
+      <div className="card overflow-hidden">
+        <div className="flex items-center gap-3 mb-4">
+          <Package className="w-4 h-4 text-[var(--accent)]" />
+          <h2 className="section-title">Active tasks</h2>
+          <span className="text-[11px] text-[var(--muted)] ml-auto">{tasks.length} total</span>
         </div>
         {tasks.length === 0 ? (
-          <div className="px-5 py-8 text-center text-xs text-[var(--muted)] font-mono">no tasks yet</div>
+          <div className="py-10 text-center text-xs text-[var(--muted)]">no tasks yet</div>
         ) : (
-          <table className="w-full text-xs">
-            <thead className="bg-[var(--panel)] text-[var(--muted)]">
+          <table className="data-table">
+            <thead>
               <tr>
-                <th className="text-left px-4 py-2 font-medium">Item</th>
-                <th className="text-left px-4 py-2 font-medium">Assigned</th>
-                <th className="text-right px-4 py-2 font-medium">Qty</th>
-                <th className="text-left px-4 py-2 font-medium">Status</th>
-                <th className="text-left px-4 py-2 font-medium">Priority</th>
-                <th className="text-right px-4 py-2 font-medium"></th>
+                <th>Item</th>
+                <th>Assigned</th>
+                <th className="text-right">Qty</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th className="text-right"></th>
               </tr>
             </thead>
             <tbody>
               {tasks.map((t) => (
-                <tr key={t.id} className="border-t border-[var(--border)] hover:bg-[var(--panel)]">
-                  <td className="px-4 py-2 font-medium text-[var(--text)]">{t.itemName}</td>
-                  <td className="px-4 py-2 text-[var(--muted)]">{t.assignedTo}</td>
-                  <td className="px-4 py-2 text-right font-mono">{t.quantity}</td>
-                  <td className="px-4 py-2">
+                <tr key={t.id}>
+                  <td className="font-medium">{t.itemName}</td>
+                  <td className="text-[var(--muted)]">{t.assignedTo}</td>
+                  <td className="text-right font-mono">{t.quantity}</td>
+                  <td>
                     <span
-                      className="px-2 py-0.5 rounded text-[10px] font-mono uppercase"
-                      style={{ color: STATUS_COLORS[t.status] || "#94a3b8", background: "var(--panel)" }}
+                      className="pill"
+                      style={{ color: STATUS_COLORS[t.status] || "var(--muted)", background: "var(--panel)" }}
                     >
                       {t.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-[var(--muted)] font-mono capitalize">{t.priority}</td>
-                  <td className="px-4 py-2 text-right">
+                  <td className="text-[var(--muted)] capitalize">{t.priority}</td>
+                  <td className="text-right">
                     {t.status !== "Prepared" && (
                       <button
                         type="button"
                         onClick={() => onUpdateTaskStatus(t.id, t.status === "In Queue" ? "Cooking" : "Prepared")}
-                        className="text-[10px] font-mono px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)]"
+                        className="btn btn-ghost text-[11px]"
                       >
                         Advance →
                       </button>
                     )}
-                    {t.status === "Prepared" && <CheckCircle2 className="w-3.5 h-3.5 text-[var(--ok)] inline" />}
+                    {t.status === "Prepared" && <CheckCircle2 className="w-4 h-4 text-[var(--ok)] inline" />}
                   </td>
                 </tr>
               ))}

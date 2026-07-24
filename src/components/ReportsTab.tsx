@@ -1,10 +1,7 @@
-// Saksee · 2026-07-24 · feat/density-cut
-// Reports tab — basic, sample, professional. 1 chart, top KPIs, 1 list, 1 export.
-// Detail data preserved, chrome cut 70%.
-
+// Saksee · 2026-07-24 · feat/new-design-system
 import React, { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
-import { FileSpreadsheet, Download } from "lucide-react";
+import { FileSpreadsheet, Download, FileText, BarChart3 } from "lucide-react";
 import { jsPDF } from "jspdf";
 
 type Order = { id: string; date: string; item: string; amount: number; branch: string };
@@ -15,13 +12,18 @@ type Alert = { status: string; message: string };
 const BRANCH_COLORS = ["var(--accent)", "var(--accent-hover)", "var(--warn)", "var(--ok)", "var(--accent)", "#6366f1"];
 
 export default function ReportsTab(props: {
-  orders: Order[]; targets: Target[]; tasks: any[]; wasteRecords: Waste[];
-  hoursData: any[]; inventory: any[]; weeklyLogs: any[]; alerts: Alert[]; theme: string;
+  orders: Order[];
+  targets: Target[];
+  tasks: any[];
+  wasteRecords: Waste[];
+  hoursData: any[];
+  inventory: any[];
+  weeklyLogs: any[];
+  alerts: Alert[];
+  theme: string;
 }) {
-  const { orders, targets, wasteRecords, alerts, weeklyLogs, theme } = props;
-  const isDark = theme === "dark";
+  const { orders, targets, wasteRecords, alerts, weeklyLogs } = props;
 
-  // Aggregations — keep all detail data
   const revenueByBranch = useMemo(() => {
     const m = new Map<string, number>();
     orders.forEach(o => m.set(o.branch, (m.get(o.branch) || 0) + (o.amount || 0)));
@@ -51,55 +53,59 @@ export default function ReportsTab(props: {
     doc.save(`fpl-report-${Date.now()}.pdf`);
   };
 
+  const cards = [
+    { label: "Revenue", value: `€${totalRevenue.toLocaleString()}`, sub: `${orders.length} orders` },
+    { label: "Waste cost", value: `€${totalWaste.toFixed(0)}`, sub: `${wasteRecords.length} records` },
+    { label: "On track", value: `${onTrack} / ${targets.length}`, sub: "≥85% target" },
+    { label: "Open alerts", value: openAlerts, sub: openAlerts ? "needs review" : "all clear" },
+  ];
+
   return (
     <div className="space-y-6 max-w-6xl">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[var(--text)]">Reports</h1>
-          <p className="text-xs font-mono text-[var(--muted)] mt-0.5">
-            {orders.length} orders · {wasteRecords.length} waste records · {targets.length} targets
-          </p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+            <FileText className="w-5 h-5 text-[var(--accent)]" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-[var(--text)]">Reports</h1>
+            <p className="text-xs text-[var(--muted)]">{orders.length} orders · {wasteRecords.length} waste records · {targets.length} targets</p>
+          </div>
         </div>
         <button
           type="button"
           onClick={exportPDF}
-          className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)] flex items-center gap-1.5"
+          className="btn btn-ghost"
         >
-          <Download className="w-3.5 h-3.5" />
-          Export PDF
+          <Download className="w-4 h-4" /> Export PDF
         </button>
       </div>
 
-      {/* KPI strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: "Revenue", value: `€${totalRevenue.toLocaleString()}`, sub: `${orders.length} orders` },
-          { label: "Waste cost", value: `€${totalWaste.toFixed(0)}`, sub: `${wasteRecords.length} records` },
-          { label: "On track", value: `${onTrack} / ${targets.length}`, sub: "≥85% target" },
-          { label: "Open alerts", value: openAlerts, sub: openAlerts ? "needs review" : "all clear" },
-        ].map((k, i) => (
-          <div key={i} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-4">
-            <div className="text-[10px] font-mono uppercase tracking-wide text-[var(--muted)]">{k.label}</div>
-            <div className="text-2xl font-bold text-[var(--text)] mt-1">{k.value}</div>
-            <div className="text-[10px] font-mono text-[var(--muted)] mt-0.5">{k.sub}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {cards.map((k, i) => (
+          <div key={i} className="card card-hover">
+            <span className="metric-label">{k.label}</span>
+            <div className="mt-2 metric-value">{k.value}</div>
+            <div className="mt-1 text-[11px] text-[var(--muted)]">{k.sub}</div>
           </div>
         ))}
       </div>
 
-      {/* Revenue by branch — keep chart */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5">
-        <h2 className="text-sm font-semibold text-[var(--text)] mb-3">Revenue by branch</h2>
+      <div className="card">
+        <h2 className="section-title mb-4 flex items-center gap-2">
+          <BarChart3 className="w-4 h-4" /> Revenue by branch
+        </h2>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={revenueByBranch} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="branch" tick={{ fontSize: 11, fill: "var(--muted)" }} />
-              <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} />
+              <XAxis dataKey="branch" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 }}
+                contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
                 formatter={(v: any) => `€${Number(v).toLocaleString()}`}
               />
-              <Bar dataKey="total" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="total" radius={[6, 6, 0, 0]} fontSize={12}>
                 {revenueByBranch.map((_, i) => <Cell key={i} fill={BRANCH_COLORS[i % BRANCH_COLORS.length]} />)}
               </Bar>
             </BarChart>
@@ -107,38 +113,37 @@ export default function ReportsTab(props: {
         </div>
       </div>
 
-      {/* Weekly logs table — full data, flat style */}
       {weeklyLogs && weeklyLogs.length > 0 && (
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg overflow-hidden">
-          <div className="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2">
+        <div className="card overflow-hidden">
+          <div className="flex items-center gap-3 mb-4">
             <FileSpreadsheet className="w-4 h-4 text-[var(--accent)]" />
-            <h2 className="text-sm font-semibold text-[var(--text)]">Weekly operational log</h2>
-            <span className="text-[10px] font-mono text-[var(--muted)] ml-auto">{weeklyLogs.length} days</span>
+            <h2 className="section-title">Weekly operational log</h2>
+            <span className="text-[11px] text-[var(--muted)] ml-auto">{weeklyLogs.length} days</span>
           </div>
-          <table className="w-full text-xs">
-            <thead className="bg-[var(--panel)] text-[var(--muted)]">
+          <table className="data-table">
+            <thead>
               <tr>
-                <th className="text-left px-4 py-2 font-medium">Day</th>
-                <th className="text-left px-4 py-2 font-medium">Date</th>
-                <th className="text-right px-4 py-2 font-medium">Sales</th>
-                <th className="text-right px-4 py-2 font-medium">Waste</th>
-                <th className="text-right px-4 py-2 font-medium">Hours</th>
-                <th className="text-right px-4 py-2 font-medium">Made / Target</th>
-                <th className="text-left px-4 py-2 font-medium">Supplier</th>
+                <th>Day</th>
+                <th>Date</th>
+                <th className="text-right">Sales</th>
+                <th className="text-right">Waste</th>
+                <th className="text-right">Hours</th>
+                <th className="text-right">Made / Target</th>
+                <th>Supplier</th>
               </tr>
             </thead>
             <tbody>
               {weeklyLogs.map((l: any, i: number) => (
-                <tr key={i} className="border-t border-[var(--border)] hover:bg-[var(--panel)]">
-                  <td className="px-4 py-2 font-mono">{l.day}</td>
-                  <td className="px-4 py-2 font-mono text-[var(--muted)]">{l.date}</td>
-                  <td className="px-4 py-2 text-right font-mono">€{Number(l.sales).toLocaleString()}</td>
-                  <td className="px-4 py-2 text-right font-mono">€{Number(l.waste).toFixed(0)}</td>
-                  <td className="px-4 py-2 text-right font-mono">{l.hours}</td>
-                  <td className="px-4 py-2 text-right font-mono">
+                <tr key={i}>
+                  <td className="font-mono">{l.day}</td>
+                  <td className="font-mono text-[var(--muted)]">{l.date}</td>
+                  <td className="text-right font-mono">€{Number(l.sales).toLocaleString()}</td>
+                  <td className="text-right font-mono">€{Number(l.waste).toFixed(0)}</td>
+                  <td className="text-right font-mono">{l.hours}</td>
+                  <td className="text-right font-mono">
                     {l.production_made?.toLocaleString() || 0} / {l.production_target?.toLocaleString() || 0}
                   </td>
-                  <td className="px-4 py-2 text-[var(--muted)]">{l.supplier_name}</td>
+                  <td className="text-[var(--muted)]">{l.supplier_name}</td>
                 </tr>
               ))}
             </tbody>

@@ -78,6 +78,7 @@ npm run start
 
 ## 📝 Changelog
 
+- **2026-07-25** — Full design recreation: rebuilt every tab with a shared dark-first design system (deep charcoal + teal), new icon-only sidebar, matching login screen, and updated overview components.
 - **2026-07-24** — New design: deep charcoal + teal palette, icon-only expanding sidebar, matching login screen.
 - **2026-07-24** — Rebuilt app shell: flat sidebar, compact nav, header controls, removed dead metallic theme state.
 - **2026-07-24** — Added self-hosted analytics layer (SQLite + REST + React tracker + Analytics tab).

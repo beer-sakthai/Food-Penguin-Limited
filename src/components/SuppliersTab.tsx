@@ -1,34 +1,74 @@
-// Saksee · 2026-07-24 · feat/density-cut
+// Saksee · 2026-07-24 · feat/new-design-system
 import React from "react";
-import { Package } from "lucide-react";
+import { Package, Mail, Phone, ShoppingBag } from "lucide-react";
+
 export default function SuppliersTab({ theme }: { theme: string }) {
   const suppliers = [
-    { name: "Tazaki", category: "Seafood", contact: "[email protected]", phone: "+353 21 555 0100", orders: 28 },
-    { name: "Sysco", category: "Produce", contact: "[email protected]", phone: "+353 21 555 0200", orders: 35 },
-    { name: "Bulza", category: "Grains", contact: "[email protected]", phone: "+353 21 555 0300", orders: 22 },
-    { name: "Sticker", category: "Packaging", contact: "[email protected]", phone: "+353 21 555 0400", orders: 18 },
+    { name: "Tazaki", category: "Seafood", contact: "tazaki@example.com", phone: "+353 21 555 0100", orders: 28 },
+    { name: "Sysco", category: "Produce", contact: "sysco@example.com", phone: "+353 21 555 0200", orders: 35 },
+    { name: "Bulza", category: "Grains", contact: "bulza@example.com", phone: "+353 21 555 0300", orders: 22 },
+    { name: "Sticker", category: "Packaging", contact: "sticker@example.com", phone: "+353 21 555 0400", orders: 18 },
     { name: "Others", category: "Mixed", contact: "—", phone: "—", orders: 12 },
   ];
+
+  const totalOrders = suppliers.reduce((a, s) => a + s.orders, 0);
+
   return (
     <div className="space-y-6 max-w-5xl">
-      <div>
-        <h1 className="text-xl font-bold text-[var(--text)] flex items-center gap-2"><Package className="w-5 h-5 text-[var(--accent)]" />Suppliers</h1>
-        <p className="text-xs font-mono text-[var(--muted)] mt-0.5">{suppliers.length} suppliers</p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+          <Package className="w-5 h-5 text-[var(--accent)]" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold text-[var(--text)]">Suppliers</h1>
+          <p className="text-xs text-[var(--muted)]">{suppliers.length} suppliers · {totalOrders} total orders</p>
+        </div>
       </div>
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg overflow-hidden">
-        <table className="w-full text-xs">
-          <thead className="bg-[var(--panel)] text-[var(--muted)]">
-            <tr><th className="text-left px-4 py-2 font-medium">Name</th><th className="text-left px-4 py-2 font-medium">Category</th><th className="text-left px-4 py-2 font-medium">Email</th><th className="text-left px-4 py-2 font-medium">Phone</th><th className="text-right px-4 py-2 font-medium">Orders</th></tr>
-          </thead>
-          <tbody>{suppliers.map(s => (
-            <tr key={s.name} className="border-t border-[var(--border)] hover:bg-[var(--panel)]">
-              <td className="px-4 py-2 font-medium text-[var(--text)]">{s.name}</td>
-              <td className="px-4 py-2 text-[var(--muted)]">{s.category}</td>
-              <td className="px-4 py-2 font-mono text-[var(--muted)]">{s.contact}</td>
-              <td className="px-4 py-2 font-mono text-[var(--muted)]">{s.phone}</td>
-              <td className="px-4 py-2 text-right font-mono">{s.orders}</td>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Seafood", value: suppliers.find(s => s.category === "Seafood")?.orders || 0, sub: "orders", icon: ShoppingBag },
+          { label: "Produce", value: suppliers.find(s => s.category === "Produce")?.orders || 0, sub: "orders", icon: ShoppingBag },
+          { label: "Grains", value: suppliers.find(s => s.category === "Grains")?.orders || 0, sub: "orders", icon: ShoppingBag },
+          { label: "Packaging", value: suppliers.find(s => s.category === "Packaging")?.orders || 0, sub: "orders", icon: ShoppingBag },
+        ].map((k, i) => (
+          <div key={i} className="card card-hover">
+            <div className="flex items-center justify-between">
+              <span className="metric-label">{k.label}</span>
+              <k.icon className="w-4 h-4 text-[var(--subtle)]" />
+            </div>
+            <div className="mt-2 metric-value">{k.value}</div>
+            <div className="mt-1 text-[11px] text-[var(--muted)]">{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card overflow-hidden">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th className="text-right">Orders</th>
             </tr>
-          ))}</tbody>
+          </thead>
+          <tbody>
+            {suppliers.map(s => (
+              <tr key={s.name}>
+                <td className="font-medium">{s.name}</td>
+                <td className="text-[var(--muted)]">{s.category}</td>
+                <td className="font-mono text-[var(--muted)] flex items-center gap-1.5">
+                  <Mail className="w-3 h-3" /> {s.contact}
+                </td>
+                <td className="font-mono text-[var(--muted)] flex items-center gap-1.5">
+                  <Phone className="w-3 h-3" /> {s.phone}
+                </td>
+                <td className="text-right font-mono">{s.orders}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </div>

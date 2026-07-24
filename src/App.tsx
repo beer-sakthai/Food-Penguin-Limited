@@ -51,6 +51,7 @@ import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
 import { MS_PRODUCTS, TESCO_PRODUCTS } from "./components/SellTab";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
+import { OperationalLogForm } from "./components/overview/OperationalLogForm";
 import { useAnalytics } from "./hooks/useAnalytics";
 
 // Main Icons
@@ -327,6 +328,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
@@ -1815,20 +1817,11 @@ export default function App() {
         return (
           <OverviewTab
             metrics={metrics}
-            onNavigateTab={navigateToTab}
-            targets={targets}
-            userRole={userRole}
-            availableTabIds={permittedTabIds}
-            onUpdateMetrics={handleUpdateMetrics}
-            irelandTime={irelandTime}
             weeklyLogs={weeklyLogs}
-            onAddOrUpdateLog={handleUpdateWeeklyLog}
-            selectedWeekRange={selectedWeekRange}
-            onSelectedWeekRangeChange={setSelectedWeekRange}
-            orders={orders}
-            selectedBranch={selectedBranch}
-            theme={theme}
-            lowStockItems={lowStockItems}
+            inventory={inventory}
+            onNavigateTab={navigateToTab}
+            onReviewAlerts={() => navigateToTab("Planning")}
+            onOpenLogForm={() => setIsLogFormOpen(true)}
           />
         );
       case "Advisor":
@@ -1884,8 +1877,6 @@ export default function App() {
             onAddWaste={handleAddWaste}
             totalCostToday={totalWasteCost}
             selectedBranch={selectedBranch}
-            weeklyLogs={weeklyLogs}
-            targets={targets}
             theme={theme}
           />
         );
@@ -1917,19 +1908,11 @@ export default function App() {
         return (
           <OverviewTab
             metrics={metrics}
-            onNavigateTab={navigateToTab}
-            targets={targets}
-            userRole={userRole}
-            availableTabIds={permittedTabIds}
-            onUpdateMetrics={handleUpdateMetrics}
-            irelandTime={irelandTime}
             weeklyLogs={weeklyLogs}
-            onAddOrUpdateLog={handleUpdateWeeklyLog}
-            selectedWeekRange={selectedWeekRange}
-            onSelectedWeekRangeChange={setSelectedWeekRange}
-            orders={orders}
-            selectedBranch={selectedBranch}
-            theme={theme}
+            inventory={inventory}
+            onNavigateTab={navigateToTab}
+            onReviewAlerts={() => navigateToTab("Planning")}
+            onOpenLogForm={() => setIsLogFormOpen(true)}
           />
         );
     }
@@ -2090,6 +2073,15 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      {isLogFormOpen && (
+        <OperationalLogForm
+          isOpen={isLogFormOpen}
+          onClose={() => setIsLogFormOpen(false)}
+          weeklyLogs={weeklyLogs}
+          onSave={handleUpdateWeeklyLog}
+        />
+      )}
     </div>
   );
 }

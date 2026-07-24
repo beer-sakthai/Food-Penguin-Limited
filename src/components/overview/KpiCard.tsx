@@ -1,31 +1,35 @@
+// Saksee · 2026-07-24 · feat/new-design-system
 import type { LucideIcon } from "lucide-react";
 
 interface KpiCardProps {
-  key?: string;
+  key?: string | number;
   label: string;
   value: string;
   detail: string;
   icon: LucideIcon;
-  tone?: "orange" | "emerald" | "rose" | "violet" | "amber";
-  isLight: boolean;
+  tone?: "accent" | "ok" | "bad" | "warn";
   onClick?: () => void;
 }
 
 const toneClasses = {
-  orange: "text-orange-500 bg-orange-500/10",
-  emerald: "text-emerald-500 bg-emerald-500/10",
-  rose: "text-rose-500 bg-rose-500/10",
-  violet: "text-violet-500 bg-violet-500/10",
-  amber: "text-amber-500 bg-amber-500/10",
+  accent: "text-[var(--accent)] bg-[var(--accent-soft)]",
+  ok: "text-[var(--ok)] bg-emerald-500/10",
+  bad: "text-[var(--bad)] bg-rose-500/10",
+  warn: "text-[var(--warn)] bg-amber-500/10",
 };
 
-export function KpiCard({ label, value, detail, icon: Icon, tone = "orange", isLight, onClick }: KpiCardProps) {
+export function KpiCard({ label, value, detail, icon: Icon, tone = "accent", onClick }: KpiCardProps) {
   const content = <>
-    <p className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>{label}</p>
-    <p className={`mt-2 text-2xl font-black tracking-tight ${isLight ? "text-zinc-900" : "text-white"}`}>{value}</p>
-    <p className={`mt-2 text-xs ${isLight ? "text-zinc-500" : "text-zinc-500"}`}>{detail}</p>
+    <div className="flex items-center justify-between">
+      <span className="metric-label">{label}</span>
+      <span className={`w-7 h-7 rounded-md ${toneClasses[tone]} flex items-center justify-center`}>
+        <Icon className="w-4 h-4" />
+      </span>
+    </div>
+    <div className="mt-2 metric-value">{value}</div>
+    <div className="mt-1 text-xs text-[var(--muted)]">{detail}</div>
   </>;
 
-  const classes = `kpi-card rounded-xl border p-4 text-left transition-colors ${isLight ? "bg-white border-zinc-200 text-zinc-900" : "bg-zinc-900 border-zinc-800 text-white"} ${onClick ? "cursor-pointer" : ""}`;
+  const classes = `card text-left transition-all hover:shadow-lg/20 ${onClick ? "cursor-pointer" : ""}`;
   return onClick ? <button type="button" onClick={onClick} className={classes}>{content}</button> : <div className={classes}>{content}</div>;
 }
