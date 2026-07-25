@@ -35,7 +35,7 @@ import {
 import OverviewTab from "./components/OverviewTab";
 import AdvisorTab from "./components/AdvisorTab";
 import SellTab from "./components/SellTab";
-import TargetTab from "./components/TargetTab";
+import TargetsProductionTab from "./components/TargetsProductionTab";
 import ProductionTab from "./components/ProductionTab";
 import WasteTab from "./components/WasteTab";
 import HoursTab from "./components/HoursTab";
@@ -108,8 +108,8 @@ const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",
   string[]
 > = {
-  Admin: ["Overview", "Advisor", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports", "Analytics"],
-  Manager: ["Overview", "Sell", "Target", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports"],
+  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports", "Analytics"],
+  Manager: ["Overview", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports"],
   Staff: ["Overview", "Production", "Waste", "Hours", "Planning", "Suppliers", "Realtime"],
   User: ["Overview"],
 };
@@ -1580,6 +1580,17 @@ export default function App() {
     }
   };
 
+  const handleUpdateTarget = async (targetId, updates) => {
+    const next = targets.map((t) => (t.id === targetId ? { ...t, ...updates } : t));
+    if (isFirebaseSynced) {
+      await updateDoc(doc(db, "targets", targetId), updates).catch((err) =>
+        handleFirestoreError(err, OperationType.UPDATE, `targets/${targetId}`),
+      );
+    } else {
+      setTargets(next);
+    }
+  };
+
   const handleAddTask = async (newTask) => {
     const taskId = `PT-${Math.floor(400 + Math.random() * 100)}`;
     const fullTask = { ...newTask, id: taskId };
@@ -1781,7 +1792,7 @@ export default function App() {
 
   const moreToolsTabMeta: TabMeta[] = [
     { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
-    { id: "Target", label: "Targets", icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: "Targets & Production", label: "Targets & Production", icon: <ShieldCheck className="w-4 h-4" /> },
     { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
     { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
   ];
@@ -1835,8 +1846,20 @@ export default function App() {
           />
         );
       }
-      case "Target":
-        return <TargetTab targets={targets} onAddTarget={handleAddTarget} />;
+      case "Targets & Production":
+        return (
+          <TargetsProductionTab
+            targets={targets}
+            onAddTarget={handleAddTarget}
+            onUpdateTarget={handleUpdateTarget}
+            recipes={recipes}
+            tasks={tasks}
+            onAddTask={handleAddTask}
+            onUpdateTaskStatus={handleUpdateTaskStatus}
+            weeklyLogs={weeklyLogs}
+            metrics={metrics}
+          />
+        );
       case "Reports":
         return (
           <ReportsTab
@@ -1849,17 +1872,6 @@ export default function App() {
             inventory={inventory}
             weeklyLogs={weeklyLogs}
             alerts={alerts}
-          />
-        );
-      case "Analytics":
-        return <AnalyticsTab theme={theme} />;
-      case "Production":
-        return (
-          <ProductionTab
-            recipes={recipes}
-            tasks={tasks}
-            onAddTask={handleAddTask}
-            onUpdateTaskStatus={handleUpdateTaskStatus}
           />
         );
       case "Waste":
