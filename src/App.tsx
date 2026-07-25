@@ -34,6 +34,7 @@ import {
 // Tab Views
 import OverviewTab from "./components/OverviewTab";
 import AdvisorTab from "./components/AdvisorTab";
+import RagAnalyzerTab from "./components/RagAnalyzerTab";
 import SellTab from "./components/SellTab";
 import TargetsProductionTab from "./components/TargetsProductionTab";
 import ProductionTab from "./components/ProductionTab";
@@ -1836,7 +1837,12 @@ export default function App() {
           />
         );
       case "Advisor":
-        return <AdvisorTab metrics={metrics} orders={orders} selectedBranch={selectedBranch} />;
+        return (
+          <div className="space-y-4">
+            <AdvisorTab metrics={metrics} orders={orders} selectedBranch={selectedBranch} />
+            <RagAnalyzerTab metrics={metrics} orders={orders} selectedBranch={selectedBranch} weeklyLogs={weeklyLogs} />
+          </div>
+        );
       case "Sell": {
         const filteredOrders = orders.filter(
           (o) => !o.branch || o.branch === selectedBranch,
