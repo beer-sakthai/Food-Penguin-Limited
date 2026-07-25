@@ -105,13 +105,13 @@ import {
 } from "./firebase";
 
 const rolePermissions: Record<
-  "Admin" | "Manager" | "Staff" | "User",
-  string[]
+"Admin" | "Manager" | "Staff" | "User",
+string[]
 > = {
-  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports", "Analytics"],
-  Manager: ["Overview", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Planning", "Suppliers", "Finance", "Realtime", "Reports"],
-  Staff: ["Overview", "Production", "Waste", "Hours", "Planning", "Suppliers", "Realtime"],
-  User: ["Overview"],
+Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Suppliers", "Finance", "Realtime", "Reports", "Analytics"],
+Manager: ["Overview", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Suppliers", "Finance", "Realtime", "Reports"],
+Staff: ["Overview", "Targets & Production", "Production", "Waste", "Hours", "Suppliers", "Realtime"],
+User: ["Overview"],
 };
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
@@ -1777,12 +1777,12 @@ export default function App() {
 
   const primaryTabMeta: TabMeta[] = [
     { id: "Overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: "Planning", label: "Planning", icon: <Boxes className="w-4 h-4" /> },
     { id: "Finance", label: "Finance", icon: <DollarSign className="w-4 h-4" /> },
     { id: "Reports", label: "Reports", icon: <FileSpreadsheet className="w-4 h-4" /> },
   ];
 
   const operationsTabMeta: TabMeta[] = [
+    { id: "Targets & Production", label: "Targets & Production", icon: <ShieldCheck className="w-4 h-4" /> },
     { id: "Production", label: "Production", icon: <ChefHat className="w-4 h-4" /> },
     { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
     { id: "Hours", label: "Hours", icon: <Clock className="w-4 h-4" /> },
@@ -1792,7 +1792,6 @@ export default function App() {
 
   const moreToolsTabMeta: TabMeta[] = [
     { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
-    { id: "Targets & Production", label: "Targets & Production", icon: <ShieldCheck className="w-4 h-4" /> },
     { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
     { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
   ];
