@@ -1,6 +1,6 @@
-// Saksee · 2026-07-25 · SakThai Operational Advisor tab
+// Saksee · 2026-07-25 · SakThai Operational Advisor tab (multi-engine)
 import React, { useEffect, useMemo, useState } from "react";
-import { MessageSquare, Sparkles, AlertTriangle, Send, Loader2 } from "lucide-react";
+import { MessageSquare, Sparkles, AlertTriangle, Send, Loader2, Cpu, Cloud, BookOpen } from "lucide-react";
 import type { SalesOrder } from "../types";
 
 interface AdvisorTabProps {
@@ -17,11 +17,21 @@ interface AdvisorTabProps {
   selectedBranch: string;
 }
 
+type Engine = "auto" | "local" | "hf" | "rules";
+
+const engineMeta: Record<Engine, { label: string; icon: React.ReactNode; note: string }> = {
+  auto: { label: "Auto", icon: <Sparkles className="w-3.5 h-3.5" />, note: "Local → HF → Rules" },
+  local: { label: "Local GGUF", icon: <Cpu className="w-3.5 h-3.5" />, note: "SakThai 1.5B on this machine" },
+  hf: { label: "Hugging Face", icon: <Cloud className="w-3.5 h-3.5" />, note: "HF Inference API (token optional)" },
+  rules: { label: "Rule engine", icon: <BookOpen className="w-3.5 h-3.5" />, note: "Built-in business rules" },
+};
+
 export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorTabProps) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [resp, setResp] = useState<string | null>(null);
-  const [engine, setEngine] = useState<string>("");
+  const [engine, setEngine] = useState<Engine>("auto");
+  const [usedEngine, setUsedEngine] = useState<string>("");
   const [err, setErr] = useState<string | null>(null);
 
   const snapshot = useMemo(() => {
@@ -31,8 +41,6 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
     const netSales = metrics.salesToday;
     const cogsPct = netSales > 0 ? metrics.cogsToday / netSales : 0;
     const wastePct = metrics.cogsToday > 0 ? metrics.wasteCost / metrics.cogsToday : 0;
-    const targetPct = metrics.productionTarget > 0 ? metrics.productionItems / metrics.productionTarget : 0;
-    const hoursPer100Sales = netSales > 0 ? (metrics.hoursScheduled / netSales) * 100 : 0;
     return {
       branch: selectedBranch,
       sales: netSales,
@@ -42,9 +50,8 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
       wastePct,
       productionItems: metrics.productionItems,
       productionTarget: metrics.productionTarget,
-      targetPct,
       hoursScheduled: metrics.hoursScheduled,
-      hoursPer100Sales,
+      hoursPer100Sales: netSales > 0 ? (metrics.hoursScheduled / netSales) * 100 : 0,
       healthScore: metrics.aiHealthScore,
       orders: branchOrders.length,
       target: netSales * 1.1,
@@ -59,15 +66,12 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
       const r = await fetch("/api/sakthai/advisor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          metrics: snapshot,
-          question,
-        }),
+        body: JSON.stringify({ metrics: snapshot, question, engine }),
       });
       if (!r.ok) throw new Error(`Server returned ${r.status}`);
       const d = await r.json();
       setResp(d.text || d.response || JSON.stringify(d));
-      setEngine(d.engine || "unknown");
+      setUsedEngine(d.engine || "unknown");
     } catch (e) {
       setErr("SakThai advisor unreachable.");
     } finally {
@@ -78,7 +82,7 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
   useEffect(() => {
     ask("Analyse current branch metrics and give 3 operational recommendations.");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snapshot.branch]);
+  }, [snapshot.branch, engine]);
 
   const quickPrompts = [
     "Why is COGS high today?",
@@ -95,9 +99,7 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
         </div>
         <div>
           <h1 className="text-lg font-semibold text-[var(--text)]">SakThai Operational Advisor</h1>
-          <p className="text-xs text-[var(--muted)]">
-            Powered by local SakThai 1.5B GGUF · fallback to rule engine
-          </p>
+          <p className="text-xs text-[var(--muted)]">Multi-engine advisor · Local SakThai · Hugging Face · Rule fallback</p>
         </div>
       </div>
 
@@ -106,6 +108,22 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
         <Metric label="COGS %" value={`${(snapshot.cogsPct * 100).toFixed(1)}%`} warn={snapshot.cogsPct > 0.32} />
         <Metric label="Waste %" value={`${(snapshot.wastePct * 100).toFixed(1)}%`} warn={snapshot.wastePct > 0.12} />
         <Metric label="Health" value={`${snapshot.healthScore}`} warn={snapshot.healthScore < 75} />
+      </div>
+
+      <div className="card flex flex-wrap gap-2 items-center">
+        <span className="text-xs text-[var(--muted)] mr-1">Engine:</span>
+        {(Object.keys(engineMeta) as Engine[]).map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => setEngine(k)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs border transition ${engine === k ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]" : "border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)]"}`}
+            title={engineMeta[k].note}
+          >
+            {engineMeta[k].icon}
+            {engineMeta[k].label}
+          </button>
+        ))}
       </div>
 
       {err && (
@@ -118,7 +136,7 @@ export default function AdvisorTab({ metrics, orders, selectedBranch }: AdvisorT
       {resp && (
         <div className="card text-sm text-[var(--text)] leading-relaxed whitespace-pre-line">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider">{engine}</span>
+            <span className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider">{usedEngine}</span>
             <MessageSquare className="w-4 h-4 text-[var(--muted)]" />
           </div>
           {resp}
