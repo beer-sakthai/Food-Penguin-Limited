@@ -105,13 +105,13 @@ import {
 } from "./firebase";
 
 const rolePermissions: Record<
-"Admin" | "Manager" | "Staff" | "User",
-string[]
+  "Admin" | "Manager" | "Staff" | "User",
+  string[]
 > = {
-Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Suppliers", "Finance", "Realtime", "Reports", "Analytics"],
-Manager: ["Overview", "Sell", "Targets & Production", "Production", "Waste", "Hours", "Suppliers", "Finance", "Realtime", "Reports"],
-Staff: ["Overview", "Targets & Production", "Production", "Waste", "Hours", "Suppliers", "Realtime"],
-User: ["Overview"],
+  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics"],
+  Manager: ["Overview", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports"],
+  Staff: ["Overview", "Targets & Production", "Waste", "Hours", "Suppliers"],
+  User: ["Overview"],
 };
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
@@ -498,7 +498,7 @@ export default function App() {
     };
   }, [currentUser]);
 
-  const [selectedBranch, setSelectedBranch] = useState<BusinessLocation>(BUSINESS_LOCATIONS[0].name);
+  const [selectedBranch, setSelectedBranch] = useState<"All branches" | BusinessLocation>("All branches");
   // Self-hosted analytics tracker (sends batches every 2s)
   useAnalytics({ userRole, selectedBranch, activeTab });
   const [metrics, setMetrics] = useState<CoreMetrics>(initialMetrics);
@@ -1777,17 +1777,15 @@ export default function App() {
 
   const primaryTabMeta: TabMeta[] = [
     { id: "Overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: "Finance", label: "Finance", icon: <DollarSign className="w-4 h-4" /> },
+    { id: "P&L", label: "P&L", icon: <DollarSign className="w-4 h-4" /> },
     { id: "Reports", label: "Reports", icon: <FileSpreadsheet className="w-4 h-4" /> },
   ];
 
   const operationsTabMeta: TabMeta[] = [
     { id: "Targets & Production", label: "Targets & Production", icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: "Production", label: "Production", icon: <ChefHat className="w-4 h-4" /> },
     { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
     { id: "Hours", label: "Hours", icon: <Clock className="w-4 h-4" /> },
     { id: "Suppliers", label: "Suppliers", icon: <Package className="w-4 h-4" /> },
-    { id: "Realtime", label: "Real-time", icon: <Activity className="w-4 h-4" /> },
   ];
 
   const moreToolsTabMeta: TabMeta[] = [
@@ -1904,7 +1902,7 @@ export default function App() {
         );
       case "Suppliers":
         return <SuppliersTab theme={theme} />;
-      case "Finance":
+      case "P&L":
         return <FinanceTab theme={theme} />;
       default:
         return (
@@ -1994,8 +1992,15 @@ export default function App() {
       />
     );
   }
+  const branchClass =
+    selectedBranch === "Tesco - Cork City"
+      ? "branch-cork"
+      : selectedBranch === "Tesco - Mahon Point"
+      ? "branch-mahon"
+      : "branch-ms";
+
   return (
-    <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)] font-sans antialiased">
+    <div className={`min-h-screen flex bg-[var(--bg)] text-[var(--text)] font-sans antialiased ${branchClass}`}>
       <aside className="w-16 lg:w-56 shrink-0 flex flex-col bg-[var(--surface)] border-r border-[var(--border)] transition-all duration-200">
         <div className="h-16 px-4 flex items-center gap-3 border-b border-[var(--border)]">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-[var(--bg)] flex items-center justify-center text-sm font-bold shrink-0 shadow-lg shadow-[var(--accent-soft)]">FP</div>
@@ -2033,6 +2038,7 @@ export default function App() {
               onChange={(e) => setSelectedBranch(e.target.value as BusinessLocation)}
               className="bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
             >
+              {<option value="All branches" disabled>All branches</option>}
               {BUSINESS_LOCATIONS.map((loc) => (
                 <option key={loc.id} value={loc.name}>
                   {loc.type === "Tesco" ? "Tesco" : "M&S"} {loc.name.split(" - ")[1]}

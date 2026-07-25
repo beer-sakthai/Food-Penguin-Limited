@@ -33,7 +33,16 @@
   --bad: #f87171;
 
   --violet: #8b5cf6;
+
+  /* Branch colours */
+  --branch-cork: #22c55e;
+  --branch-mahon: #3b82f6;
+  --branch-ms: #e8bf66;
 }
+
+.branch-cork { --accent: var(--branch-cork); --accent-soft: rgba(34, 197, 94, 0.12); --accent-hover: #4ade80; }
+.branch-mahon { --accent: var(--branch-mahon); --accent-soft: rgba(59, 130, 246, 0.12); --accent-hover: #60a5fa; }
+.branch-ms { --accent: var(--branch-ms); --accent-soft: rgba(232, 191, 102, 0.12); --accent-hover: #f3d58c; }
 
 .page-shell {
   max-width: 1200px;
