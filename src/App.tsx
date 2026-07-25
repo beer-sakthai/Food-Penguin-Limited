@@ -1918,6 +1918,15 @@ export default function App() {
         return <PriceImporterTab />;
       case "P&L":
         return <FinanceTab theme={theme} />;
+      case "Analytics":
+        return (
+          <AnalyticsTab
+            metrics={metrics}
+            orders={orders}
+            selectedBranch={selectedBranch}
+            weeklyLogs={weeklyLogs}
+          />
+        );
       default:
         return (
           <OverviewTab
