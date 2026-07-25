@@ -1,6 +1,7 @@
 export interface CoreMetrics {
   salesToday: number;
   salesGrowth: number;
+  cogsToday: number;
   productionItems: number;
   productionTarget: number;
   wasteCost: number;

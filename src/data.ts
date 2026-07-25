@@ -175,6 +175,7 @@ export const MS_PRODUCTS = [
 export const initialMetrics: CoreMetrics = {
   salesToday: 7500,
   salesGrowth: 8.2,
+  cogsToday: 2250,
   productionItems: 2200,
   productionTarget: 2500,
   wasteCost: 157.50,

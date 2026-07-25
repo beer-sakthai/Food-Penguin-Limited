@@ -870,6 +870,7 @@ export default function App() {
       setMetrics((prev) => ({
         ...prev,
         salesToday: sundayLog.sales,
+        cogsToday: sundayLog.sales * 0.3,
         wasteCost: sundayLog.waste,
         hoursScheduled: sundayLog.hours,
         productionTarget: sundayLog.productionTarget,
@@ -918,10 +919,12 @@ export default function App() {
             ),
           ),
         );
+        const newCogs = newSalesToday * 0.3;
 
         return {
           ...prev,
           salesToday: newSalesToday,
+          cogsToday: Number(newCogs.toFixed(2)),
           productionItems: newProductionItems,
           aiHealthScore: newHealth,
         };
@@ -1766,6 +1769,7 @@ export default function App() {
       setMetrics((prev) => ({
         ...prev,
         salesToday: updatedLog.sales,
+        cogsToday: updatedLog.sales * 0.3,
         wasteCost: updatedLog.waste,
         hoursScheduled: updatedLog.hours,
         productionTarget: updatedLog.productionTarget,
@@ -1832,7 +1836,7 @@ export default function App() {
           />
         );
       case "Advisor":
-        return <AdvisorTab />;
+        return <AdvisorTab metrics={metrics} orders={orders} selectedBranch={selectedBranch} />;
       case "Sell": {
         const filteredOrders = orders.filter(
           (o) => !o.branch || o.branch === selectedBranch,

@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import { spawn } from "child_process";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import dotenv from "dotenv";
@@ -849,5 +850,68 @@ app.listen(PORT, "0.0.0.0", () => {
     console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
   });
 };
+
+// --- SakThai local GGUF operational advisor ---
+let sakthaiProcess: ReturnType<typeof spawn> | null = null;
+
+function startSakThaiAdvisor() {
+  if (sakthaiProcess) return;
+  const scriptPath = path.resolve(__dirname, "advisor_server.py");
+  const venvPython = path.resolve(__dirname, ".venv/bin/python");
+  sakthaiProcess = spawn(venvPython, [scriptPath], {
+    env: { ...process.env, SAKTHAI_ADVISOR_PORT: "8123" },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  sakthaiProcess.stdout?.on("data", (d) => console.log("[SakThai]", d.toString().trim()));
+  sakthaiProcess.stderr?.on("data", (d) => console.error("[SakThai]", d.toString().trim()));
+  sakthaiProcess.on("exit", () => { sakthaiProcess = null; });
+}
+
+function askSakThai(metrics: any): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify({ metrics });
+    const req = require("http").request(
+      { hostname: "127.0.0.1", port: 8123, path: "/advise", method: "POST", headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) } },
+      (res: any) => {
+        let body = "";
+        res.on("data", (c: any) => (body += c));
+        res.on("end", () => {
+          try {
+            const d = JSON.parse(body);
+            resolve(d.text || d.error || "No advice returned.");
+          } catch { resolve(body); }
+        });
+      }
+    );
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
+  });
+}
+
+function ruleBasedAdvice(metrics: any) {
+  const recs: string[] = [];
+  if (metrics.cogsPct > 0.32) recs.push("COGS is high — renegotiate supplier prices or reduce portion sizes.");
+  if (metrics.wastePct > 0.12) recs.push("Waste is above target — lower tomorrow's production target by 10–15%.");
+  if (metrics.sales < metrics.target * 0.9) recs.push("Sales are below target — run a lunch promotion or push best sellers.");
+  if (metrics.hoursPer100Sales > 8) recs.push("Labor hours per sale are high — review staffing schedule.");
+  if (!recs.length) recs.push("Metrics look healthy. Maintain current targets and monitor end-of-day waste.");
+  return recs.map((r, i) => `${i + 1}. ${r}`).join("\n");
+}
+
+app.post("/api/sakthai/advisor", async (req, res) => {
+  const metrics = req.body?.metrics || {};
+  try {
+    startSakThaiAdvisor();
+    const text = await Promise.race([
+      askSakThai(metrics),
+      new Promise<string>((_, r) => setTimeout(() => r(new Error("timeout")), 25000)),
+    ]);
+    res.json({ text, engine: "sakthai-1.5b-gguf" });
+  } catch (e) {
+    console.warn("SakThai advisor unavailable, using rules:", e);
+    res.json({ text: ruleBasedAdvice(metrics), engine: "rule-based-fallback" });
+  }
+});
 
 startServer();
