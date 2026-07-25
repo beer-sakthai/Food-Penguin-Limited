@@ -22,14 +22,14 @@ export function KpiCard({ label, value, detail, icon: Icon, tone = "accent", onC
   const content = <>
     <div className="flex items-center justify-between">
       <span className="metric-label">{label}</span>
-      <span className={`w-8 h-8 rounded-xl ${toneClasses[tone]} flex items-center justify-center`}>
+      <span className={`w-8 h-8 rounded-xl ${toneClasses[tone]} flex items-center justify-center shrink-0`}>
         <Icon className="w-4 h-4" />
       </span>
     </div>
-    <div className="mt-3 metric-value">{value}</div>
-    <div className="mt-1.5 text-[11px] text-[var(--muted)] leading-relaxed">{detail}</div>
+    <div className="mt-4 metric-value">{value}</div>
+    <div className="mt-2 text-[11px] text-[var(--muted)] leading-snug">{detail}</div>
   </>;
 
-  const classes = "card card-hover text-left w-full";
+  const classes = "card card-hover text-left w-full h-full flex flex-col";
   return onClick ? <button type="button" onClick={onClick} className={classes}>{content}</button> : <div className={classes}>{content}</div>;
 }

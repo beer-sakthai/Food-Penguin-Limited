@@ -1,4 +1,4 @@
-// Saksee · 2026-07-24 · feat/new-design-system
+// Saksee · 2026-07-25 · improved dashboard overview
 import React, { useMemo } from "react";
 import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, ReferenceLine } from "recharts";
@@ -54,7 +54,7 @@ export default function OverviewTab(props: OverviewProps) {
   const weekCommission = weekSales * (1 - NET_SALES_FACTOR);
   const weekNet = weekSales - weekCommission;
 
-  const lowStockItems = useMemo(() => (inventory || []).filter(i => i.status === "Low"), [inventory]);
+  const lowStockItems = useMemo(() => (inventory || []).filter(i => i.status === "Low" || i.status === "Critical"), [inventory]);
 
   const salesToday = Number(metrics?.sales_today || metrics?.salesToday || 0);
   const productionToday = Number(metrics?.production_items || metrics?.productionItems || 0);
@@ -115,18 +115,18 @@ export default function OverviewTab(props: OverviewProps) {
   const avgSales = salesArr.length ? weekSales / salesArr.length : 0;
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div className="flex items-center justify-between">
+    <div className="page-shell space-y-6">
+      <div className="page-header">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center shrink-0">
             <LayoutDashboard className="w-5 h-5 text-[var(--accent)]" />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-[var(--text)]">Overview</h1>
-            <p className="text-xs text-[var(--muted)]">Today and this week · commission {COMMISSION_TARGET_PCT}% · waste target {WASTE_TARGET_PCT}%</p>
+            <p className="text-xs text-[var(--muted)]">Today and this week · commission {COMMISSION_TARGET_PCT}% · waste target {WASTE_TARGET_PCT}% · COGS {COGS_TARGET_PCT}%</p>
           </div>
         </div>
-        <button type="button" onClick={onOpenLogForm} className="btn btn-primary text-xs">
+        <button type="button" onClick={onOpenLogForm} className="btn btn-primary text-xs shrink-0">
           Log data
         </button>
       </div>
@@ -153,9 +153,9 @@ export default function OverviewTab(props: OverviewProps) {
               <h2 className="section-title">This week · sales vs target {avgSales > 0 ? `(avg €${Math.round(avgSales).toLocaleString()})` : ""}</h2>
             </div>
           </div>
-          <div className="h-60">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trend} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+              <LineChart data={trend} margin={{ top: 4, right: 16, bottom: 0, left: -16 }}>
                 <defs>
                   <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.25} />

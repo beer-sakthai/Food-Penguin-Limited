@@ -31,9 +31,37 @@
   --ok: #34d399;
   --warn: #fbbf24;
   --bad: #f87171;
+
+  --violet: #8b5cf6;
+}
+
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .page-shell {
+    padding: 16px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 .light {
+  --violet: #7c3aed;
   --bg: #f8f9fb;
   --surface: #ffffff;
   --panel: #f3f4f6;
