@@ -1949,9 +1949,7 @@ export default function App() {
   ).length;
 
   let healthLabel = "Healthy";
-  let healthColorClass = "status-healthy";
-  let healthTextClass = "status-healthy";
-  let healthBgClass = "bg-emerald-500/10 border-emerald-550/20";
+  let healthClass = "pill ok";
 
   if (
     metrics.aiHealthScore < 75 ||
@@ -1959,18 +1957,14 @@ export default function App() {
     targetDeficitCount >= 3
   ) {
     healthLabel = "Critical";
-    healthColorClass = "status-critical";
-    healthTextClass = "status-critical";
-    healthBgClass = "bg-rose-500/10 border-rose-550/20";
+    healthClass = "pill bad";
   } else if (
     metrics.aiHealthScore < 90 ||
     lowStockCount > 0 ||
     targetDeficitCount > 0
   ) {
     healthLabel = "Warning";
-    healthColorClass = "status-warning";
-    healthTextClass = "status-warning";
-    healthBgClass = "bg-amber-500/10 border-amber-550/20";
+    healthClass = "pill warn";
   }
 
   const healthTooltip = `System Health Status: ${healthLabel}\n• Operations Score: ${metrics.aiHealthScore}%\n• Low Stock Ingredients: ${lowStockCount}\n• Lagging Goals: ${targetDeficitCount}`;
@@ -2033,7 +2027,7 @@ export default function App() {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-[var(--bg)] flex items-center justify-center text-sm font-bold shrink-0 shadow-lg shadow-[var(--accent-soft)]">FP</div>
           <div className="hidden lg:block min-w-0">
             <p className="text-sm font-bold leading-tight truncate">Food Penguin</p>
-            <p className="text-[10px] text-[var(--muted)]">{healthLabel}</p>
+            <p className={`text-[10px] ${healthClass}`}>{healthLabel}</p>
           </div>
         </div>
 
