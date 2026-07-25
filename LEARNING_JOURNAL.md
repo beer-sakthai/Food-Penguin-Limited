@@ -19,6 +19,21 @@
 |
 | **Reference snippet:**
 | > PostHog: "All interactive elements flash PostHog Orange (#F54E00) on hover — it's the hidden brand signature" (parallel principle: brand colours must be *consistent* before they can be *expressive*).
+
+| ## 2026-07-25 — Branch-coloured chart gradient fills
+
+| **Source:** No external design reference file found at `/opt/data/profiles/saksee/skills/creative/popular-web-designs`; proposed from existing Food-Penguin-Limited dashboard knowledge (`src/index.css`, `src/components/AnalyticsTab.tsx`).
+
+| **Micro-improvement:**
+| Replace flat chart series in the Analytics tab with a subtle gradient fill that uses the current branch's accent colour fading to transparent. For line and area charts, render an `<Area>` (or `defs` linearGradient for bars) keyed off `branchPalette.main`, with the fill opacity set low enough (`0.08–0.15`) to keep the dark theme legible.
+
+| **Where to apply:**
+| - `src/components/AnalyticsTab.tsx`: use `branchPalette.main` / `branchPalette.glow` to generate a `linearGradient` inside each chart's `<defs>`.
+| - Apply the gradient to the sales-trend area, the COGS/waste area charts, and the forecast band. Keep the stroke as the solid branch accent so data points stay crisp.
+| - Add a tiny `fill-opacity` fallback matching `--accent-soft` so non-branch or aggregated views still look polished.
+
+| **Why it matters:**
+| Flat coloured strokes feel utilitarian; a branch-tinted gradient fill adds depth without adding clutter and reinforces the active branch identity across every chart. It is a single-file change that raises the perceived production value of the analytics view.
 |
 | ## 2026-07-25 — KPI card cursor-following glow
 
@@ -114,3 +129,41 @@ Generic black shadows feel like Bootstrap; branch-tinted layered shadows make th
 > Stripe: "multi-layer, blue-tinted shadows ... the signature `rgba(50,50,93,0.25)` combined with `rgba(0,0,0,0.1)` creates shadows with a cool, almost atmospheric depth"
 > Raycast: "multi-layer box-shadows with inset highlights that simulate physical depth, as if cards and buttons are actual pressed or raised glass elements on a dark desk"
 |
+## 2026-07-25 — PostHog hidden-hover accent colour for dashboard interactions
+
+**Source:** `popular-web-designs/templates/posthog.md` (Interactive colours and Component Stylings → Buttons hover pattern).
+
+**Micro-improvement:**
+Add a "hidden" brand accent that only appears on hover for key interactive dashboard elements. Pick one saturated accent (e.g. PostHog-style orange `#F54E00` or a Food-Penguin-Limited brand orange) and flash it on hover for KPI card chevrons, metric trend links, branch selector tabs, and chart legend toggles, while keeping the resting state neutral.
+
+**Where to apply:**
+- `src/pages/analytics/AnalyticsTab.tsx` and KPI card components: change chevron/arrow icons to the neutral text colour at rest and the hover accent on `:hover` / group-hover.
+- Branch selector tabs: use the branch colour at rest, but on hover add a subtle flash of the global hover accent (e.g. via a `transition-colors` overlay or underline).
+- Chart legend items: when a legend item is hovered, tint its text and the matching series line with the hover accent so the interaction has a single consistent "surprise" colour.
+- Keep primary CTA buttons on the brand branch colour; do not override them with the hidden accent.
+
+**Why it matters:**
+On a dark-themed dashboard with branch-tinted cards and charts, an additional static accent colour would create noise. A hover-only accent acts like a secret handshake: it tells Beer "this is interactive" the moment he touches it, without cluttering the calm dashboard surface. PostHog uses this exact trick to make a content-heavy developer UI feel playful and responsive.
+
+**Reference snippet:**
+> PostHog: "Hidden brand orange (`#F54E00`) — appears only on hover states, a vibrant orange that surprises"
+> PostHog: "All buttons flash PostHog Orange (`#F54E00`) or Amber Gold (`#F7A501`) text on hover — the brand's signature interaction surprise"
+
+## 2026-07-25 — Branch-tinted chart tooltip with dark anchor
+
+**Source:** No local design reference available this cycle; proposed from existing Food-Penguin-Limited dashboard knowledge (dark theme, Recharts-based analytics, branch theming).
+
+**Micro-improvement:**
+Replace the default Recharts tooltip (light background, no pointer) with a dark, branch-aware tooltip that matches the dashboard surface. Style the tooltip container with the current branch accent on its left border (`border-left: 3px solid var(--branch-primary)`) and a small downward arrow (CSS triangle) tinted with the same branch colour. Keep the tooltip background at `rgba(15,23,42,0.95)` with a soft `rgba(var(--branch-rgb),0.10)` border so it floats above the chart without clashing.
+
+**Where to apply:**
+- `src/pages/analytics/AnalyticsTab.tsx` or wherever the chart `Tooltip` component is configured (Recharts `<Tooltip content={...} />`).
+- Add a `CustomTooltip` component that receives `active`, `payload`, and `label`; renders a small card with a 3 px left border in `var(--branch-primary)`.
+- Add an `::after` pseudo-element arrow using `border-top: 6px solid var(--branch-primary)` so the tooltip visually anchors to the hovered data point.
+- Ensure text uses the dashboard's dark-theme token (`--text-primary`, `--text-secondary`) and values use `tabular-nums` for stability.
+
+**Why it matters:**
+Default chart tooltips often ship as bright white boxes that break the dark-theme immersion and give no hint about which branch is selected. A branch-tinted tooltip turns every chart hover into a subtle branding moment and keeps the information hierarchy consistent with the KPI cards. It is a small wrapper component with large perceived-polish payoff.
+
+**Reference snippet:**
+> Existing dashboard principle: "branch colour is the hero accent; use it as a contained signal, not a flood."
