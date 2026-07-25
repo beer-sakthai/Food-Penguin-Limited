@@ -28,13 +28,22 @@ def load_model():
     return llm
 
 
-def build_prompt(metrics):
-    return (
-        "You are SakThai, the operational AI advisor for Food Penguin Limited, a premium sushi business with three branches: Cork, Mahon, and Marks & Spencer.\n"
-        "Rules: COGS should be ~30% of net sales, waste ~10% of COGS, commission 30% of gross.\n"
-        "Given this dashboard snapshot, give 3-5 concise, actionable operational recommendations.\n\n"
-        f"Data: {json.dumps(metrics, indent=2)}\n\nAdvice:"
+def build_prompt(metrics, question=None):
+    q = question or "Give 3 operational recommendations for today"
+    base = (
+        "You are SakThai, an operational advisor for Food Penguin Limited, a sushi business in Cork, Ireland.\n"
+        "Rules: COGS ~30% of sales, waste ~10% of COGS, commission 30% of gross.\n"
+        "Give exactly 3 short, specific, actionable bullet points. No extra text. No numbering.\n\n"
+        f"Branch: {metrics.get('branch', 'All branches')}\n"
+        f"Sales: €{metrics.get('sales', 0):.2f}\n"
+        f"COGS: {metrics.get('cogsPct', 0)*100:.1f}% of sales\n"
+        f"Waste: {metrics.get('wastePct', 0)*100:.1f}% of COGS\n"
+        f"Production: {metrics.get('productionItems', 0)} / {metrics.get('productionTarget', 0)} items\n"
+        f"Health score: {metrics.get('healthScore', 0)} / 100\n"
+        f"Question: {q}\n\n"
+        "Answer (3 bullet points, each starts with '- '):"
     )
+    return base
 
 
 def _extract_text(response) -> str:
@@ -43,6 +52,22 @@ def _extract_text(response) -> str:
         if choices:
             return choices[0].get("text", "").strip()
     return ""
+
+
+def _clean(text: str, max_bullets: int = 5) -> str:
+    lines = [line.strip("-•* ").strip() for line in text.splitlines()]
+    seen = set()
+    cleaned = []
+    for line in lines:
+        if not line or line.lower().startswith("you are"):
+            continue
+        if line in seen:
+            continue
+        seen.add(line)
+        cleaned.append(f"- {line}")
+        if len(cleaned) >= max_bullets:
+            break
+    return "\n".join(cleaned) if cleaned else text
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -54,15 +79,16 @@ class Handler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", "0"))
             body = json.loads(self.rfile.read(length).decode("utf-8"))
             model = load_model()
-            prompt = build_prompt(body.get("metrics", {}))
+            prompt = build_prompt(body.get("metrics", {}), body.get("question"))
             response = model.create_completion(
                 prompt,
-                max_tokens=512,
-                temperature=0.6,
-                top_p=0.9,
-                stop=["\n\n"],
+                max_tokens=384,
+                temperature=0.4,
+                top_p=0.85,
+                repeat_penalty=1.15,
+                stop=["Answer:", "Question:", "Branch:", "Sales:", "COGS:", "Waste:", "Production:", "Health score:"],
             )
-            text = _extract_text(response)
+            text = _clean(_extract_text(response), max_bullets=3)
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()

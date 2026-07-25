@@ -867,9 +867,25 @@ function startSakThaiAdvisor() {
   sakthaiProcess.on("exit", () => { sakthaiProcess = null; });
 }
 
-function askSakThai(metrics: any): Promise<string> {
+app.post("/api/sakthai/advisor", async (req, res) => {
+  const metrics = req.body?.metrics || {};
+  const question = req.body?.question || "Analyse current branch metrics and give 3 operational recommendations.";
+  try {
+    startSakThaiAdvisor();
+    const text = await Promise.race([
+      askSakThai(metrics, question),
+      new Promise<string>((_, r) => setTimeout(() => r(new Error("timeout")), 25000)),
+    ]);
+    res.json({ text, engine: "sakthai-1.5b-gguf" });
+  } catch (e) {
+    console.warn("SakThai advisor unavailable, using rules:", e);
+    res.json({ text: ruleBasedAdvice(metrics), engine: "rule-based-fallback" });
+  }
+});
+
+function askSakThai(metrics: any, question: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const payload = JSON.stringify({ metrics });
+    const payload = JSON.stringify({ metrics, question });
     const req = require("http").request(
       { hostname: "127.0.0.1", port: 8123, path: "/advise", method: "POST", headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) } },
       (res: any) => {
@@ -898,20 +914,5 @@ function ruleBasedAdvice(metrics: any) {
   if (!recs.length) recs.push("Metrics look healthy. Maintain current targets and monitor end-of-day waste.");
   return recs.map((r, i) => `${i + 1}. ${r}`).join("\n");
 }
-
-app.post("/api/sakthai/advisor", async (req, res) => {
-  const metrics = req.body?.metrics || {};
-  try {
-    startSakThaiAdvisor();
-    const text = await Promise.race([
-      askSakThai(metrics),
-      new Promise<string>((_, r) => setTimeout(() => r(new Error("timeout")), 25000)),
-    ]);
-    res.json({ text, engine: "sakthai-1.5b-gguf" });
-  } catch (e) {
-    console.warn("SakThai advisor unavailable, using rules:", e);
-    res.json({ text: ruleBasedAdvice(metrics), engine: "rule-based-fallback" });
-  }
-});
 
 startServer();
