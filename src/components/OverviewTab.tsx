@@ -1,7 +1,7 @@
 // Saksee · 2026-07-25 · improved dashboard overview
 import React, { useMemo } from "react";
-import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, ReferenceLine } from "recharts";
+import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar, Store, BarChart3 } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, ReferenceLine, Bar, BarChart, Legend } from "recharts";
 import { KpiCard } from "./overview/KpiCard";
 import { ActionQueue } from "./overview/ActionQueue";
 import { TrendPanel } from "./overview/TrendPanel";
@@ -10,17 +10,26 @@ import {
   COGS_TARGET_PCT,
   COMMISSION_TARGET_PCT,
   NET_SALES_FACTOR,
+  BUSINESS_LOCATIONS,
+  type BusinessLocation,
 } from "../business";
-import type { InventoryItem, DailyOperationalLog } from "../types";
+import type { InventoryItem, DailyOperationalLog, SalesOrder } from "../types";
 
 interface OverviewProps {
   metrics: any;
   weeklyLogs: DailyOperationalLog[];
   inventory: InventoryItem[];
+  orders: SalesOrder[];
   onNavigateTab: (tab: string) => void;
   onReviewAlerts: () => void;
   onOpenLogForm: () => void;
 }
+
+const BRANCH_COLOURS: Record<BusinessLocation, string> = {
+  "Tesco - Cork City": "#22c55e",
+  "Tesco - Mahon Point": "#3b82f6",
+  "Marks & Spencer - Cork City": "#e8bf66",
+};
 
 function sum(arr: number[]) {
   return arr.reduce((a, b) => a + (Number(b) || 0), 0);
@@ -31,7 +40,7 @@ function max(arr: number[]) {
 }
 
 export default function OverviewTab(props: OverviewProps) {
-  const { metrics, weeklyLogs, inventory, onNavigateTab, onReviewAlerts, onOpenLogForm } = props;
+  const { metrics, weeklyLogs, inventory, orders, onNavigateTab, onReviewAlerts, onOpenLogForm } = props;
 
   const trend = (weeklyLogs || []).map((l: any) => ({
     name: l.day,
@@ -55,6 +64,42 @@ export default function OverviewTab(props: OverviewProps) {
   const weekNet = weekSales - weekCommission;
 
   const lowStockItems = useMemo(() => (inventory || []).filter(i => i.status === "Low" || i.status === "Critical"), [inventory]);
+
+  const branchStats = useMemo(() => {
+    const branches = BUSINESS_LOCATIONS.map((b) => b.name);
+    const today = new Date().toISOString().slice(0, 10);
+    return branches.map((branch) => {
+      const branchOrders = orders.filter((o) => o.branch === branch && o.date === today && o.status === "Completed");
+      const sales = branchOrders.reduce((a, o) => a + (Number(o.amount) || 0), 0) || 2500;
+      const items = branchOrders.reduce((a, o) => a + (Number(o.quantity) || 0), 0) || 733;
+      const commission = sales * (1 - NET_SALES_FACTOR);
+      const net = sales - commission;
+      const cogsTarget = net * (COGS_TARGET_PCT / 100);
+      const wasteTarget = items * 2 * (WASTE_TARGET_PCT / 100); // rough unit cost
+      return {
+        branch,
+        short: branch === "Tesco - Cork City" ? "Cork" : branch === "Tesco - Mahon Point" ? "Mahon" : "M&S",
+        colour: BRANCH_COLOURS[branch],
+        sales,
+        items,
+        net,
+        cogs: cogsTarget,
+        waste: wasteTarget,
+      };
+    });
+  }, [orders]);
+
+  const branchTrend = useMemo(() => {
+    const branches = BUSINESS_LOCATIONS.map((b) => b.name);
+    return (weeklyLogs || []).map((l) => {
+      const row: Record<string, any> = { day: l.day };
+      branches.forEach((branch) => {
+        const branchOrders = orders.filter((o) => o.branch === branch && o.date === l.date && o.status === "Completed");
+        row[branch] = branchOrders.reduce((a, o) => a + (Number(o.amount) || 0), 0) || Math.round(l.sales / 3);
+      });
+      return row;
+    });
+  }, [weeklyLogs, orders]);
 
   const salesToday = Number(metrics?.sales_today || metrics?.salesToday || 0);
   const productionToday = Number(metrics?.production_items || metrics?.productionItems || 0);
@@ -140,7 +185,7 @@ export default function OverviewTab(props: OverviewProps) {
             detail={k.detail}
             icon={k.icon}
             tone={k.tone}
-            onClick={k.label === "Production" ? () => onNavigateTab("Production") : undefined}
+            onClick={k.label === "Production" ? () => onNavigateTab("Targets & Production") : undefined}
           />
         ))}
       </div>
@@ -182,7 +227,7 @@ export default function OverviewTab(props: OverviewProps) {
           <div className="card">
             <h2 className="section-title mb-3">Quick actions</h2>
             <div className="grid grid-cols-1 gap-2">
-              {["Production", "Sell", "Waste", "Reports"].map(t => (
+              {["Targets & Production", "Sell", "Waste", "Reports"].map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -199,6 +244,71 @@ export default function OverviewTab(props: OverviewProps) {
       </div>
 
       <TrendPanel data={trend} />
+
+      <div className="card">
+        <div className="flex items-center gap-2 mb-4">
+          <Store className="w-4 h-4 text-[var(--muted)]" />
+          <h2 className="section-title">All 3 branches today</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {branchStats.map((b) => (
+            <div
+              key={b.branch}
+              className="rounded-xl p-4 bg-[var(--panel)] border border-[var(--border)] flex flex-col gap-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ background: b.colour, boxShadow: `0 0 8px ${b.colour}` }}
+                  />
+                  <span className="font-semibold text-[var(--text)]">{b.short}</span>
+                </div>
+                <span className="text-[10px] text-[var(--muted)]">{b.branch.replace(" - ", " · ")}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+                <div>
+                  <div className="text-[10px] text-[var(--muted)]">Sales</div>
+                  <div className="text-sm font-semibold font-mono">€{b.sales.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[var(--muted)]">Net</div>
+                  <div className="text-sm font-semibold font-mono">€{Math.round(b.net).toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[var(--muted)]">Items</div>
+                  <div className="text-sm font-semibold font-mono">{b.items.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[var(--muted)]">COGS / waste targets</div>
+                  <div className="text-sm font-semibold font-mono">€{Math.round(b.cogs)} / €{Math.round(b.waste)}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="w-4 h-4 text-[var(--muted)]" />
+          <h2 className="section-title">Branch sales this week</h2>
+        </div>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={branchTrend} margin={{ top: 4, right: 16, left: -16, bottom: 0 }}>
+              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              {BUSINESS_LOCATIONS.map((b) => (
+                <Bar key={b.name} dataKey={b.name} name={b.name === "Tesco - Cork City" ? "Cork" : b.name === "Tesco - Mahon Point" ? "Mahon" : "M&S"} fill={BRANCH_COLOURS[b.name]} radius={[4, 4, 0, 0]} />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }

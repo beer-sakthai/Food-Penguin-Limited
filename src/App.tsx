@@ -46,7 +46,7 @@ import RealtimeTab from "./components/RealtimeTab";
 import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
-import { TESCO_PRODUCTS, MS_PRODUCTS, BUSINESS_LOCATIONS, BusinessLocation } from "./business";
+import { BRANCH_META, BUSINESS_LOCATIONS, BusinessLocation } from "./business";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 import { OperationalLogForm } from "./components/overview/OperationalLogForm";
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -1822,6 +1822,7 @@ export default function App() {
             metrics={metrics}
             weeklyLogs={weeklyLogs}
             inventory={inventory}
+            orders={orders}
             onNavigateTab={navigateToTab}
             onReviewAlerts={() => navigateToTab("Planning")}
             onOpenLogForm={() => setIsLogFormOpen(true)}
@@ -1910,6 +1911,7 @@ export default function App() {
             metrics={metrics}
             weeklyLogs={weeklyLogs}
             inventory={inventory}
+            orders={orders}
             onNavigateTab={navigateToTab}
             onReviewAlerts={() => navigateToTab("Planning")}
             onOpenLogForm={() => setIsLogFormOpen(true)}
@@ -1993,7 +1995,9 @@ export default function App() {
     );
   }
   const branchClass =
-    selectedBranch === "Tesco - Cork City"
+    selectedBranch === "All branches"
+      ? ""
+      : selectedBranch === "Tesco - Cork City"
       ? "branch-cork"
       : selectedBranch === "Tesco - Mahon Point"
       ? "branch-mahon"

@@ -1,13 +1,16 @@
 // Saksee · 2026-07-24 · business rules for 3-kiosk sushi operator
 // 2 Tesco + 1 Marks & Spencer. Same cost structure, different products per location.
 
-export const BUSINESS_LOCATIONS = [
-  { id: "tesco-cork", name: "Tesco - Cork City", type: "Tesco" },
-  { id: "tesco-mahon", name: "Tesco - Mahon Point", type: "Tesco" },
-  { id: "ms-cork", name: "Marks & Spencer - Cork City", type: "M&S" },
+export const BRANCH_META = [
+  { id: "tesco-cork", name: "Tesco - Cork City", type: "Tesco", short: "Cork", colour: "#22c55e", css: "branch-cork" },
+  { id: "tesco-mahon", name: "Tesco - Mahon Point", type: "Tesco", short: "Mahon", colour: "#3b82f6", css: "branch-mahon" },
+  { id: "ms-cork", name: "Marks & Spencer - Cork City", type: "M&S", short: "M&S", colour: "#e8bf66", css: "branch-ms" },
 ] as const;
 
-export type BusinessLocation = (typeof BUSINESS_LOCATIONS)[number]["name"];
+export const BUSINESS_LOCATIONS = BRANCH_META.map((b) => ({ id: b.id, name: b.name, type: b.type }));
+
+export type BusinessLocation = (typeof BRANCH_META)[number]["name"];
+export type BranchId = (typeof BRANCH_META)[number]["id"];
 
 /** Target waste cost as % of production value/cost. */
 export const WASTE_TARGET_PCT = 10;
