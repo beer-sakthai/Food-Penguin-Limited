@@ -1,3 +1,5 @@
+import type { CoreMetrics, SalesOrder, CompanyTarget, Recipe, ProductionTask, WasteRecord, EmployeeHour, InventoryItem, RealtimeAlert, DailyOperationalLog } from "./types";
+
 const BASE = "";
 
 function snakeToCamel(s: string): string {
@@ -12,11 +14,11 @@ function mapRow(row: Record<string, any>): Record<string, any> {
   return out;
 }
 
-export async function fetchMetrics() {
+export async function fetchMetrics(): Promise<CoreMetrics> {
   const r = await fetch(`${BASE}/api/metrics`);
   if (!r.ok) throw new Error(`metrics: ${r.status}`);
   const data = await r.json();
-  return mapRow(data);
+  return mapRow(data) as CoreMetrics;
 }
 
 export async function updateMetrics(data: Record<string, number>) {
@@ -29,60 +31,60 @@ export async function updateMetrics(data: Record<string, number>) {
   return r.json();
 }
 
-export async function fetchOrders(branch?: string) {
+export async function fetchOrders(branch?: string): Promise<SalesOrder[]> {
   const url = branch ? `${BASE}/api/orders?branch=${encodeURIComponent(branch)}` : `${BASE}/api/orders`;
   const r = await fetch(url);
   if (!r.ok) throw new Error(`orders: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as SalesOrder[];
 }
 
-export async function fetchTargets() {
+export async function fetchTargets(): Promise<CompanyTarget[]> {
   const r = await fetch(`${BASE}/api/targets`);
   if (!r.ok) throw new Error(`targets: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as CompanyTarget[];
 }
 
-export async function fetchRecipes() {
+export async function fetchRecipes(): Promise<Recipe[]> {
   const r = await fetch(`${BASE}/api/recipes`);
   if (!r.ok) throw new Error(`recipes: ${r.status}`);
   const rows = await r.json();
   return rows.map((row: any) => Object.assign(mapRow(row), {
     ingredients: (row.ingredients || "").split("|"),
     allergens: (row.allergens || "").split("|"),
-  }));
+  })) as Recipe[];
 }
 
-export async function fetchTasks() {
+export async function fetchTasks(): Promise<ProductionTask[]> {
   const r = await fetch(`${BASE}/api/tasks`);
   if (!r.ok) throw new Error(`tasks: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as ProductionTask[];
 }
 
-export async function fetchWaste() {
+export async function fetchWaste(): Promise<WasteRecord[]> {
   const r = await fetch(`${BASE}/api/waste`);
   if (!r.ok) throw new Error(`waste: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as WasteRecord[];
 }
 
-export async function fetchHours() {
+export async function fetchHours(): Promise<EmployeeHour[]> {
   const r = await fetch(`${BASE}/api/hours`);
   if (!r.ok) throw new Error(`hours: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as EmployeeHour[];
 }
 
-export async function fetchInventory() {
+export async function fetchInventory(): Promise<InventoryItem[]> {
   const r = await fetch(`${BASE}/api/inventory`);
   if (!r.ok) throw new Error(`inventory: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as InventoryItem[];
 }
 
-export async function fetchLogs(week: string) {
+export async function fetchLogs(week: string): Promise<DailyOperationalLog[]> {
   const r = await fetch(`${BASE}/api/logs?week=${encodeURIComponent(week)}`);
   if (!r.ok) throw new Error(`logs: ${r.status}`);
   const rows = await r.json();
@@ -94,14 +96,14 @@ export async function fetchLogs(week: string) {
       sticker: row.cogs_sticker,
       others: row.cogs_others,
     },
-  }));
+  })) as DailyOperationalLog[];
 }
 
-export async function fetchAlerts() {
+export async function fetchAlerts(): Promise<RealtimeAlert[]> {
   const r = await fetch(`${BASE}/api/alerts`);
   if (!r.ok) throw new Error(`alerts: ${r.status}`);
   const rows = await r.json();
-  return rows.map(mapRow);
+  return rows.map(mapRow) as RealtimeAlert[];
 }
 
 // ==========================================
@@ -118,37 +120,21 @@ export async function fetchAnalyticsTimeseries(days = 30) {
   return r.json();
 }
 export async function fetchTopTabs(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/top-labels?days=${days}&event_type=tab_switch&limit=10`);
+  const r = await fetch(`${BASE}/api/analytics/top-tabs?days=${days}`);
   if (!r.ok) throw new Error(`analytics top tabs: ${r.status}`);
   return r.json();
 }
 export async function fetchTopActions(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/top-actions?days=${days}&limit=8`);
+  const r = await fetch(`${BASE}/api/analytics/top-actions?days=${days}`);
   if (!r.ok) throw new Error(`analytics top actions: ${r.status}`);
   return r.json();
 }
-export async function fetchTopErrors(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/top-errors?days=${days}`);
-  if (!r.ok) throw new Error(`analytics top errors: ${r.status}`);
-  return r.json();
-}
-export async function fetchTopBranches(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/top-branches?days=${days}`);
-  if (!r.ok) throw new Error(`analytics top branches: ${r.status}`);
-  return r.json();
-}
-export async function fetchRoleBreakdown(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/roles?days=${days}`);
-  if (!r.ok) throw new Error(`analytics roles: ${r.status}`);
-  return r.json();
-}
-export async function fetchFunnel(days = 30, steps = "Overview,Production,Sell,Waste,Hours,Reports") {
-  const r = await fetch(`${BASE}/api/analytics/funnel?days=${days}&steps=${encodeURIComponent(steps)}`);
-  if (!r.ok) throw new Error(`analytics funnel: ${r.status}`);
-  return r.json();
-}
-export async function fetchRecentEvents(limit = 15) {
-  const r = await fetch(`${BASE}/api/analytics/recent?limit=${limit}`);
-  if (!r.ok) throw new Error(`analytics recent: ${r.status}`);
+export async function trackEventBatch(events: any[]) {
+  const r = await fetch(`${BASE}/api/analytics/track-batch`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ events }),
+  });
+  if (!r.ok) throw new Error(`analytics batch: ${r.status}`);
   return r.json();
 }

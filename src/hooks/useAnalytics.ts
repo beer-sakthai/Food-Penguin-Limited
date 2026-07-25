@@ -32,7 +32,8 @@ type EventType =
   | "click"
   | "form_submit"
   | "action"
-  | "error";
+  | "error"
+  | "session_start";
 
 type AnalyticsEvent = {
   session_id: string;

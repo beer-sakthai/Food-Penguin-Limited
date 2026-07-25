@@ -1,6 +1,6 @@
 // Saksee · 2026-07-25 · improved dashboard overview
 import React, { useMemo } from "react";
-import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar, Store, BarChart3 } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar, Store, BarChart3, AlertTriangle, TrendingDown } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, ReferenceLine, Bar, BarChart, Legend } from "recharts";
 import { KpiCard } from "./overview/KpiCard";
 import { ActionQueue } from "./overview/ActionQueue";
@@ -68,14 +68,19 @@ export default function OverviewTab(props: OverviewProps) {
   const branchStats = useMemo(() => {
     const branches = BUSINESS_LOCATIONS.map((b) => b.name);
     const today = new Date().toISOString().slice(0, 10);
+    const todayLogs = weeklyLogs.find((l) => l.date === today);
     return branches.map((branch) => {
       const branchOrders = orders.filter((o) => o.branch === branch && o.date === today && o.status === "Completed");
       const sales = branchOrders.reduce((a, o) => a + (Number(o.amount) || 0), 0) || 2500;
       const items = branchOrders.reduce((a, o) => a + (Number(o.quantity) || 0), 0) || 733;
       const commission = sales * (1 - NET_SALES_FACTOR);
       const net = sales - commission;
-      const cogsTarget = net * (COGS_TARGET_PCT / 100);
-      const wasteTarget = items * 2 * (WASTE_TARGET_PCT / 100); // rough unit cost
+      const cogs = todayLogs
+        ? Number(Object.values(todayLogs.cogs || {}).reduce((a: number, b: any) => a + (Number(b) || 0), 0)) / 3
+        : net * (COGS_TARGET_PCT / 100);
+      const waste = todayLogs ? Number(todayLogs.waste || 0) / 3 : items * 2 * (WASTE_TARGET_PCT / 100);
+      const cogsPct = net > 0 ? (cogs / net) * 100 : 0;
+      const wastePct = items > 0 ? (waste / (items * 2)) * 100 : 0;
       return {
         branch,
         short: branch === "Tesco - Cork City" ? "Cork" : branch === "Tesco - Mahon Point" ? "Mahon" : "M&S",
@@ -83,11 +88,13 @@ export default function OverviewTab(props: OverviewProps) {
         sales,
         items,
         net,
-        cogs: cogsTarget,
-        waste: wasteTarget,
+        cogs,
+        waste,
+        cogsPct,
+        wastePct,
       };
     });
-  }, [orders]);
+  }, [orders, weeklyLogs]);
 
   const branchTrend = useMemo(() => {
     const branches = BUSINESS_LOCATIONS.map((b) => b.name);
@@ -111,6 +118,8 @@ export default function OverviewTab(props: OverviewProps) {
   const commissionToday = salesToday - netSalesToday;
   const cogsToday = trend.length ? trend[trend.length - 1].cogs : 0;
   const cogsPct = netSalesToday ? (cogsToday / netSalesToday) * 100 : 0;
+
+  const branchAlerts = branchStats.filter((b) => b.cogsPct > COGS_TARGET_PCT || b.wastePct > WASTE_TARGET_PCT);
 
   const cards = [
     {
@@ -224,6 +233,26 @@ export default function OverviewTab(props: OverviewProps) {
 
         <div className="space-y-4">
           <ActionQueue lowStockItems={lowStockItems} onReviewAlerts={onReviewAlerts} />
+          {branchAlerts.length > 0 && (
+            <div className="card border-l-4 border-l-[var(--bad)]">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="w-4 h-4 text-[var(--bad)]" />
+                <h2 className="section-title">Branch alerts</h2>
+              </div>
+              <div className="space-y-2">
+                {branchAlerts.map((b) => (
+                  <div key={b.branch} className="flex items-start gap-2 rounded-lg bg-[var(--panel)] p-3">
+                    <span className="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style={{ background: b.colour }} />
+                    <div className="text-xs">
+                      <span className="font-semibold">{b.short}</span>:{" "}
+                      {b.cogsPct > COGS_TARGET_PCT && <span>COGS {b.cogsPct.toFixed(1)}% over {COGS_TARGET_PCT}%</span>}
+                      {b.wastePct > WASTE_TARGET_PCT && <span>waste {b.wastePct.toFixed(1)}% over {WASTE_TARGET_PCT}%</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="card">
             <h2 className="section-title mb-3">Quick actions</h2>
             <div className="grid grid-cols-1 gap-2">
@@ -280,8 +309,10 @@ export default function OverviewTab(props: OverviewProps) {
                   <div className="text-sm font-semibold font-mono">{b.items.toLocaleString()}</div>
                 </div>
                 <div>
-                  <div className="text-[10px] text-[var(--muted)]">COGS / waste targets</div>
-                  <div className="text-sm font-semibold font-mono">€{Math.round(b.cogs)} / €{Math.round(b.waste)}</div>
+                  <div className="text-[10px] text-[var(--muted)]">COGS / waste</div>
+                  <div className={`text-sm font-semibold font-mono ${b.cogsPct > COGS_TARGET_PCT || b.wastePct > WASTE_TARGET_PCT ? "text-[var(--bad)]" : ""}`}>
+                    {b.cogsPct.toFixed(0)}% / {b.wastePct.toFixed(0)}%
+                  </div>
                 </div>
               </div>
             </div>

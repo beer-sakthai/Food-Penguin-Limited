@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { FileSpreadsheet, Download, FileText, BarChart3 } from "lucide-react";
 import { jsPDF } from "jspdf";
 
-type Order = { id: string; date: string; item: string; amount: number; branch: string };
+type Order = { id: string; date?: string; item: string; amount: number; branch?: string };
 type Target = { name: string; currentValue: number; targetValue: number; unit: string };
 type Waste = { date: string; cost: number; reason: string };
 type Alert = { status: string; message: string };

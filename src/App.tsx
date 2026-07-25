@@ -42,11 +42,11 @@ import HoursTab from "./components/HoursTab";
 import PlanningTab from "./components/PlanningTab";
 import SuppliersTab from "./components/SuppliersTab";
 import FinanceTab from "./components/FinanceTab";
-import RealtimeTab from "./components/RealtimeTab";
+import PriceImporterTab from "./components/PriceImporterTab";
 import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
-import { BRANCH_META, BUSINESS_LOCATIONS, BusinessLocation } from "./business";
+import { BRANCH_META, BUSINESS_LOCATIONS, BusinessLocation, TESCO_PRODUCTS, MS_PRODUCTS } from "./business";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 import { OperationalLogForm } from "./components/overview/OperationalLogForm";
 import { useAnalytics } from "./hooks/useAnalytics";
@@ -90,6 +90,7 @@ import {
   FileSpreadsheet,
   BarChart3,
   BrainCircuit,
+  Upload,
 } from "lucide-react";
 import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
 import {
@@ -108,9 +109,9 @@ const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",
   string[]
 > = {
-  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics"],
-  Manager: ["Overview", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports"],
-  Staff: ["Overview", "Targets & Production", "Waste", "Hours", "Suppliers"],
+  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics", "Price Import"],
+  Manager: ["Overview", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Price Import"],
+  Staff: ["Overview", "Targets & Production", "Waste", "Hours", "Suppliers", "Price Import"],
   User: ["Overview"],
 };
 
@@ -1732,7 +1733,7 @@ export default function App() {
     const item = inventory.find((i) => i.id === itemId);
     if (!item) return;
 
-    const updated = {
+    const updated: InventoryItem = {
       ...item,
       stockLevel: 100,
       currentQty: item.reorderLevel + 120,
@@ -1790,6 +1791,7 @@ export default function App() {
 
   const moreToolsTabMeta: TabMeta[] = [
     { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
+    { id: "Price Import", label: "Price Import", icon: <Upload className="w-4 h-4" /> },
     { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
     { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
   ];
@@ -1830,8 +1832,6 @@ export default function App() {
         );
       case "Advisor":
         return <AdvisorTab />;
-      case "Realtime":
-        return <RealtimeTab theme={theme} />;
       case "Sell": {
         const filteredOrders = orders.filter(
           (o) => !o.branch || o.branch === selectedBranch,
@@ -1903,6 +1903,8 @@ export default function App() {
         );
       case "Suppliers":
         return <SuppliersTab theme={theme} />;
+      case "Price Import":
+        return <PriceImporterTab />;
       case "P&L":
         return <FinanceTab theme={theme} />;
       default:
