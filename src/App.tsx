@@ -1825,8 +1825,9 @@ export default function App() {
             weeklyLogs={weeklyLogs}
             inventory={inventory}
             orders={orders}
+            selectedBranch={selectedBranch}
             onNavigateTab={navigateToTab}
-            onReviewAlerts={() => navigateToTab("Planning")}
+            onReviewAlerts={() => navigateToTab("Suppliers")}
             onOpenLogForm={() => setIsLogFormOpen(true)}
           />
         );
@@ -1914,8 +1915,9 @@ export default function App() {
             weeklyLogs={weeklyLogs}
             inventory={inventory}
             orders={orders}
+            selectedBranch={selectedBranch}
             onNavigateTab={navigateToTab}
-            onReviewAlerts={() => navigateToTab("Planning")}
+            onReviewAlerts={() => navigateToTab("Suppliers")}
             onOpenLogForm={() => setIsLogFormOpen(true)}
           />
         );

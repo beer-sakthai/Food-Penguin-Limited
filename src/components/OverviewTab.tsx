@@ -1,6 +1,6 @@
-// Saksee · 2026-07-25 · improved dashboard overview
+// Saksee · 2026-07-25 · improved dashboard overview (v2)
 import React, { useMemo } from "react";
-import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar, Store, BarChart3, AlertTriangle, TrendingDown } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Package, Trash2, Clock, ArrowRight, DollarSign, Wallet, Calendar, Store, BarChart3, AlertTriangle, TrendingDown, Sparkles, Info } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, ReferenceLine, Bar, BarChart, Legend } from "recharts";
 import { KpiCard } from "./overview/KpiCard";
 import { ActionQueue } from "./overview/ActionQueue";
@@ -20,6 +20,7 @@ interface OverviewProps {
   weeklyLogs: DailyOperationalLog[];
   inventory: InventoryItem[];
   orders: SalesOrder[];
+  selectedBranch: "All branches" | BusinessLocation;
   onNavigateTab: (tab: string) => void;
   onReviewAlerts: () => void;
   onOpenLogForm: () => void;
@@ -31,6 +32,13 @@ const BRANCH_COLOURS: Record<BusinessLocation, string> = {
   "Marks & Spencer - Cork City": "#e8bf66",
 };
 
+const BRANCH_NAMES: Record<BusinessLocation | "All branches", string> = {
+  "All branches": "All branches",
+  "Tesco - Cork City": "Cork",
+  "Tesco - Mahon Point": "Mahon",
+  "Marks & Spencer - Cork City": "M&S",
+};
+
 function sum(arr: number[]) {
   return arr.reduce((a, b) => a + (Number(b) || 0), 0);
 }
@@ -40,7 +48,7 @@ function max(arr: number[]) {
 }
 
 export default function OverviewTab(props: OverviewProps) {
-  const { metrics, weeklyLogs, inventory, orders, onNavigateTab, onReviewAlerts, onOpenLogForm } = props;
+  const { metrics, weeklyLogs, inventory, orders, selectedBranch, onNavigateTab, onReviewAlerts, onOpenLogForm } = props;
 
   const trend = (weeklyLogs || []).map((l: any) => ({
     name: l.day,
@@ -83,8 +91,9 @@ export default function OverviewTab(props: OverviewProps) {
       const wastePct = items > 0 ? (waste / (items * 2)) * 100 : 0;
       return {
         branch,
-        short: branch === "Tesco - Cork City" ? "Cork" : branch === "Tesco - Mahon Point" ? "Mahon" : "M&S",
+        short: BRANCH_NAMES[branch],
         colour: BRANCH_COLOURS[branch],
+        glow: `${BRANCH_COLOURS[branch]}33`,
         sales,
         items,
         net,
@@ -120,6 +129,7 @@ export default function OverviewTab(props: OverviewProps) {
   const cogsPct = netSalesToday ? (cogsToday / netSalesToday) * 100 : 0;
 
   const branchAlerts = branchStats.filter((b) => b.cogsPct > COGS_TARGET_PCT || b.wastePct > WASTE_TARGET_PCT);
+  const totalIssues = lowStockItems.length + branchAlerts.length;
 
   const cards = [
     {
@@ -169,23 +179,32 @@ export default function OverviewTab(props: OverviewProps) {
   const avgSales = salesArr.length ? weekSales / salesArr.length : 0;
 
   return (
-    <div className="page-shell space-y-6">
+    <div className="page-shell space-y-5">
       <div className="page-header">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center shrink-0">
-            <LayoutDashboard className="w-5 h-5 text-[var(--accent)]" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] flex items-center justify-center shrink-0 shadow-lg shadow-[var(--accent)]/10">
+            <LayoutDashboard className="w-5 h-5 text-[var(--text)]" />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-[var(--text)]">Overview</h1>
-            <p className="text-xs text-[var(--muted)]">Today and this week · commission {COMMISSION_TARGET_PCT}% · waste target {WASTE_TARGET_PCT}% · COGS {COGS_TARGET_PCT}%</p>
+            <p className="text-xs text-[var(--muted)]">
+              {BRANCH_NAMES[selectedBranch]} · commission {COMMISSION_TARGET_PCT}% · waste target {WASTE_TARGET_PCT}% · COGS {COGS_TARGET_PCT}%
+            </p>
           </div>
         </div>
-        <button type="button" onClick={onOpenLogForm} className="btn btn-primary text-xs shrink-0">
-          Log data
-        </button>
+        <div className="flex items-center gap-2">
+          {totalIssues > 0 && (
+            <div className="flex items-center gap-1.5 rounded-full bg-rose-500/10 text-[var(--bad)] border border-rose-500/20 px-3 py-1.5 text-xs font-medium">
+              <AlertTriangle className="w-3.5 h-3.5" /> {totalIssues} issue{totalIssues > 1 ? "s" : ""}
+            </div>
+          )}
+          <button type="button" onClick={onOpenLogForm} className="btn btn-primary text-xs shrink-0">
+            Log data
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {cards.map((k) => (
           <KpiCard
             key={k.label}
@@ -203,8 +222,12 @@ export default function OverviewTab(props: OverviewProps) {
         <div className="lg:col-span-2 card">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[var(--muted)]" />
+              <Calendar className="w-4 h-4 text-[var(--accent)]" />
               <h2 className="section-title">This week · sales vs target {avgSales > 0 ? `(avg €${Math.round(avgSales).toLocaleString()})` : ""}</h2>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-[var(--muted)]">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent)]" /> sales
+              <span className="w-2 h-2 rounded-full bg-[var(--muted)] ml-2" /> avg
             </div>
           </div>
           <div className="h-72">
@@ -212,7 +235,7 @@ export default function OverviewTab(props: OverviewProps) {
               <LineChart data={trend} margin={{ top: 4, right: 16, bottom: 0, left: -16 }}>
                 <defs>
                   <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.25} />
+                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
@@ -234,15 +257,18 @@ export default function OverviewTab(props: OverviewProps) {
         <div className="space-y-4">
           <ActionQueue lowStockItems={lowStockItems} onReviewAlerts={onReviewAlerts} />
           {branchAlerts.length > 0 && (
-            <div className="card border-l-4 border-l-[var(--bad)]">
+            <div className="card border-l-4 border-l-[var(--bad)] bg-gradient-to-r from-rose-500/[0.03] to-transparent">
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="w-4 h-4 text-[var(--bad)]" />
                 <h2 className="section-title">Branch alerts</h2>
               </div>
               <div className="space-y-2">
                 {branchAlerts.map((b) => (
-                  <div key={b.branch} className="flex items-start gap-2 rounded-lg bg-[var(--panel)] p-3">
-                    <span className="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style={{ background: b.colour }} />
+                  <div
+                    key={b.branch}
+                    className="flex items-start gap-2 rounded-lg bg-[var(--panel)] p-3 border border-[var(--border)]"
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style={{ background: b.colour, boxShadow: `0 0 8px ${b.colour}` }} />
                     <div className="text-xs">
                       <span className="font-semibold">{b.short}</span>:{" "}
                       {b.cogsPct > COGS_TARGET_PCT && <span>COGS {b.cogsPct.toFixed(1)}% over {COGS_TARGET_PCT}%</span>}
@@ -261,10 +287,10 @@ export default function OverviewTab(props: OverviewProps) {
                   key={t}
                   type="button"
                   onClick={() => onNavigateTab(t)}
-                  className="btn btn-ghost justify-between"
+                  className="btn btn-ghost justify-between group"
                 >
                   {t}
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                 </button>
               ))}
             </div>
@@ -275,27 +301,39 @@ export default function OverviewTab(props: OverviewProps) {
       <TrendPanel data={trend} />
 
       <div className="card">
-        <div className="flex items-center gap-2 mb-4">
-          <Store className="w-4 h-4 text-[var(--muted)]" />
-          <h2 className="section-title">All 3 branches today</h2>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <Store className="w-4 h-4 text-[var(--accent)]" />
+            <h2 className="section-title">All 3 branches today</h2>
+          </div>
+          <div className="flex items-center gap-3 text-[11px]">
+            {BUSINESS_LOCATIONS.map((b) => (
+              <div key={b.name} className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full" style={{ background: BRANCH_COLOURS[b.name] }} />
+                <span className="text-[var(--muted)]">{BRANCH_NAMES[b.name]}</span>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {branchStats.map((b) => (
             <div
               key={b.branch}
-              className="rounded-xl p-4 bg-[var(--panel)] border border-[var(--border)] flex flex-col gap-3"
+              className="relative overflow-hidden rounded-xl p-4 bg-[var(--panel)] border border-[var(--border)] flex flex-col gap-3 transition-transform hover:-translate-y-0.5"
+              style={{ boxShadow: `inset 0 2px 0 0 ${b.colour}` }}
             >
-              <div className="flex items-center justify-between">
+              <div className="absolute top-0 right-0 w-24 h-24 opacity-[0.06] blur-2xl rounded-full" style={{ background: b.colour }} />
+              <div className="flex items-center justify-between relative">
                 <div className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full"
-                    style={{ background: b.colour, boxShadow: `0 0 8px ${b.colour}` }}
+                    style={{ background: b.colour, boxShadow: `0 0 10px ${b.colour}` }}
                   />
                   <span className="font-semibold text-[var(--text)]">{b.short}</span>
                 </div>
                 <span className="text-[10px] text-[var(--muted)]">{b.branch.replace(" - ", " · ")}</span>
               </div>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+              <div className="grid grid-cols-2 gap-y-3 gap-x-2 relative">
                 <div>
                   <div className="text-[10px] text-[var(--muted)]">Sales</div>
                   <div className="text-sm font-semibold font-mono">€{b.sales.toLocaleString()}</div>
@@ -321,9 +359,14 @@ export default function OverviewTab(props: OverviewProps) {
       </div>
 
       <div className="card">
-        <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="w-4 h-4 text-[var(--muted)]" />
-          <h2 className="section-title">Branch sales this week</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
+            <h2 className="section-title">Branch sales this week</h2>
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px] text-[var(--muted)]">
+            <Info className="w-3 h-3" /> estimated when live orders unavailable
+          </div>
         </div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -331,10 +374,20 @@ export default function OverviewTab(props: OverviewProps) {
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+                formatter={(v: any, name: string) => [`€${Number(v).toLocaleString()}`, name]}
+              />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               {BUSINESS_LOCATIONS.map((b) => (
-                <Bar key={b.name} dataKey={b.name} name={b.name === "Tesco - Cork City" ? "Cork" : b.name === "Tesco - Mahon Point" ? "Mahon" : "M&S"} fill={BRANCH_COLOURS[b.name]} radius={[4, 4, 0, 0]} />
+                <Bar
+                  key={b.name}
+                  dataKey={b.name}
+                  name={BRANCH_NAMES[b.name]}
+                  stackId="a"
+                  fill={BRANCH_COLOURS[b.name]}
+                  radius={[4, 4, 0, 0]}
+                />
               ))}
             </BarChart>
           </ResponsiveContainer>
