@@ -15,62 +15,41 @@ def load_model():
 def extract_data(db_path):
     """Extract all relevant KPI data from Food-Penguin DB"""
     conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
     chunks = []
     
     # Metrics history
     try:
-        c.execute("SELECT rowid, * FROM metrics ORDER BY rowid DESC LIMIT 30")
-        rows = c.fetchall()
-        for r in rows:
-            text = f"Metric: Sales={r[1]}, COGS={r[2]}%, Waste={r[3]}%, Production={r[4]}/{r[5]}, Health={r[6]}/100, Branch={r[7]}"
-            chunks.append({"text": text, "source": "metrics", "id": f"metric_{r[0]}"})
-    except: pass
+        c.execute("SELECT * FROM metrics ORDER BY id DESC LIMIT 10")
+        for r in c.fetchall():
+            text = f"Metric: Sales=€{r['sales_today']:.0f}, Growth={r['sales_growth']:.1f}%, Production={r['production_items']}/{r['production_target']}, Waste=€{r['waste_cost']:.0f}, Reduction={r['waste_reduction']:.1f}%, Hours={r['hours_scheduled']:.0f}, Overtime={r['overtime_hours']:.1f}h, Health={r['ai_health_score']}/100"
+            chunks.append({"text": text, "source": "metrics", "id": f"metric_{r['id']}"})
+    except Exception as e: print(f"metrics err: {e}")
     
-    # Orders  
+    # Orders
     try:
-        c.execute("SELECT rowid, * FROM orders ORDER BY rowid DESC LIMIT 30")
-        rows = c.fetchall()
-        for r in rows:
-            text = f"Order: Item={r[1]}, Qty={r[2]}, Price={r[3]}, Total={r[4]}, Date={r[5]}"
-            chunks.append({"text": text, "source": "orders", "id": f"order_{r[0]}"})
+        c.execute("SELECT * FROM orders ORDER BY id DESC LIMIT 15")
+        for r in c.fetchall():
+            text = f"Order: {r['item']} (qty={r['quantity']}, €{r['amount']:.0f}) — {r['status']} at {r['branch']}"
+            chunks.append({"text": text, "source": "orders", "id": f"order_{r['id']}"})
     except: pass
     
     # Targets
     try:
-        c.execute("SELECT rowid, * FROM targets ORDER BY rowid DESC LIMIT 20")
-        rows = c.fetchall()
-        for r in rows:
-            text = f"Target: Metric={r[1]}, Target={r[2]}, Current={r[3]}, Period={r[4]}"
-            chunks.append({"text": text, "source": "targets", "id": f"target_{r[0]}"})
-    except: pass
+        c.execute("SELECT * FROM targets ORDER BY rowid DESC LIMIT 10")
+        for r in c.fetchall():
+            text = f"Target: {r['name']} — {r['metric']}: €{r['current_value']:.0f}/€{r['target_value']:.0f} ({r['category']})"
+            chunks.append({"text": text, "source": "targets", "id": f"target_{r['id']}"})
+    except Exception as e: print(f"targets err: {e}")
     
     # Waste records
     try:
-        c.execute("SELECT rowid, * FROM waste_records ORDER BY rowid DESC LIMIT 20")
-        rows = c.fetchall()
-        for r in rows:
-            text = f"Waste: Item={r[1]}, Qty={r[2]}, Reason={r[3]}, Cost={r[4]}, Date={r[5]}"
-            chunks.append({"text": text, "source": "waste", "id": f"waste_{r[0]}"})
-    except: pass
-    
-    # Production tasks
-    try:
-        c.execute("SELECT rowid, * FROM production_tasks ORDER BY rowid DESC LIMIT 20")
-        rows = c.fetchall()
-        for r in rows:
-            text = f"Production: Task={r[1]}, Status={r[2]}, Assigned={r[3]}, Due={r[4]}"
-            chunks.append({"text": text, "source": "production", "id": f"prod_{r[0]}"})
-    except: pass
-    
-    # Alerts
-    try:
-        c.execute("SELECT rowid, * FROM alerts ORDER BY rowid DESC LIMIT 10")
-        rows = c.fetchall()
-        for r in rows:
-            text = f"Alert: Type={r[1]}, Severity={r[2]}, Message={r[3]}, Date={r[4]}"
-            chunks.append({"text": text, "source": "alerts", "id": f"alert_{r[0]}"})
-    except: pass
+        c.execute("SELECT * FROM waste_records ORDER BY id DESC LIMIT 10")
+        for r in c.fetchall():
+            text = f"Waste: {r['item']} ({r['reason']}) — {r['weight']}g, €{r['cost']:.0f} loss"
+            chunks.append({"text": text, "source": "waste", "id": f"waste_{r['id']}"})
+    except Exception as e: print(f"waste err: {e}")
     
     conn.close()
     return chunks
