@@ -757,7 +757,12 @@ const startServer = async () => {
     });
   }
 
-  
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
+  });
+};
+
+startServer();
 
 // --- Energy/Sustainability Report API ---
 app.post("/api/gemini/sustainability-report", async (req, res) => {
@@ -846,11 +851,6 @@ As Jules, the AI Strategy Officer for Food Penguin Limited, provide a concise fi
     res.status(500).json({ error: "Failed to generate finance report." });
   }
 });
-
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Food Penguin Express Server running on HTTP port ${PORT}`);
-  });
-};
 
 // --- SakThai local GGUF operational advisor ---
 let sakthaiProcess: ReturnType<typeof spawn> | null = null;
@@ -1002,10 +1002,12 @@ function ruleBasedAdvice(metrics: any) {
   const recs: string[] = [];
   if (metrics.cogsPct > 0.32) recs.push("COGS is high — renegotiate supplier prices or reduce portion sizes.");
   if (metrics.wastePct > 0.12) recs.push("Waste is above target — lower tomorrow's production target by 10–15%.");
-  if (metrics.sales < metrics.target * 0.9) recs.push("Sales are below target — run a lunch promotion or push best sellers.");
+  if (metrics.sales < (metrics.target || 0) * 0.9) recs.push("Sales are below target — run a lunch promotion or push best sellers.");
   if (metrics.hoursPer100Sales > 8) recs.push("Labor hours per sale are high — review staffing schedule.");
   if (!recs.length) recs.push("Metrics look healthy. Maintain current targets and monitor end-of-day waste.");
-  return recs.map((r, i) => `${i + 1}. ${r}`).join("\n");
+  return recs.map((r) => `- ${r}`).join("\n");
 }
 
-startServer();
+if (process.env.VERCEL) {
+  app.get("/api/health", (_req, res) => res.json({ ok: true, vercel: true }));
+}
