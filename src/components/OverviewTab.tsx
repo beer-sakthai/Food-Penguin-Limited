@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { KpiCard } from "./overview/KpiCard";
 import { ActionQueue } from "./overview/ActionQueue";
 import { TrendPanel } from "./overview/TrendPanel";
+import ModelPanel from "./overview/ModelPanel";
 import {
   WASTE_TARGET_PCT,
   COGS_TARGET_PCT,
@@ -299,6 +300,7 @@ export default function OverviewTab(props: OverviewProps) {
       </div>
 
       <TrendPanel data={trend} />
+      <ModelPanel />
 
       <div className="card">
         <div className="flex items-center justify-between mb-5">
