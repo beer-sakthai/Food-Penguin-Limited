@@ -29,21 +29,20 @@ def load_model():
 
 
 def build_prompt(metrics, question=None):
-    q = question or "Give 3 operational recommendations for today"
-    base = (
+    q = question or "Give 3 operational recommendations"
+    return (
         "You are SakThai, an operational advisor for Food Penguin Limited, a sushi business in Cork, Ireland.\n"
-        "Rules: COGS ~30% of sales, waste ~10% of COGS, commission 30% of gross.\n"
-        "Give exactly 3 short, specific, actionable bullet points. No extra text. No numbering.\n\n"
+        "Answer with exactly 3 short bullet points. Each bullet must start with '- ' and be one sentence.\n"
+        "No numbering. No bold. No markdown. No repeated ideas. No extra text.\n\n"
         f"Branch: {metrics.get('branch', 'All branches')}\n"
         f"Sales: €{metrics.get('sales', 0):.2f}\n"
         f"COGS: {metrics.get('cogsPct', 0)*100:.1f}% of sales\n"
         f"Waste: {metrics.get('wastePct', 0)*100:.1f}% of COGS\n"
         f"Production: {metrics.get('productionItems', 0)} / {metrics.get('productionTarget', 0)} items\n"
-        f"Health score: {metrics.get('healthScore', 0)} / 100\n"
+        f"Health: {metrics.get('healthScore', 0)} / 100\n"
         f"Question: {q}\n\n"
-        "Answer (3 bullet points, each starts with '- '):"
+        "Answer:\n-"
     )
-    return base
 
 
 def _extract_text(response) -> str:
@@ -54,20 +53,22 @@ def _extract_text(response) -> str:
     return ""
 
 
-def _clean(text: str, max_bullets: int = 5) -> str:
-    lines = [line.strip("-•* ").strip() for line in text.splitlines()]
+def _clean(text: str) -> str:
+    text = text.replace('**', '').replace('*', '').replace('#', '').strip()
+    lines = [line.strip('-•* \t').strip() for line in text.splitlines()]
     seen = set()
     cleaned = []
     for line in lines:
-        if not line or line.lower().startswith("you are"):
+        if not line or len(line) < 10:
             continue
-        if line in seen:
+        key = line.lower()[:40]
+        if key in seen:
             continue
-        seen.add(line)
+        seen.add(key)
         cleaned.append(f"- {line}")
-        if len(cleaned) >= max_bullets:
+        if len(cleaned) >= 3:
             break
-    return "\n".join(cleaned) if cleaned else text
+    return "\n".join(cleaned) if cleaned else "- No specific recommendation generated."
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -82,13 +83,13 @@ class Handler(BaseHTTPRequestHandler):
             prompt = build_prompt(body.get("metrics", {}), body.get("question"))
             response = model.create_completion(
                 prompt,
-                max_tokens=384,
-                temperature=0.4,
-                top_p=0.85,
-                repeat_penalty=1.15,
-                stop=["Answer:", "Question:", "Branch:", "Sales:", "COGS:", "Waste:", "Production:", "Health score:"],
+                max_tokens=240,
+                temperature=0.35,
+                top_p=0.8,
+                repeat_penalty=1.25,
+                stop=["\n\n", "Answer:", "Question:", "Branch:", "Sales:", "COGS:", "Waste:", "Production:", "Health:"],
             )
-            text = _clean(_extract_text(response), max_bullets=3)
+            text = _clean(_extract_text(response))
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
