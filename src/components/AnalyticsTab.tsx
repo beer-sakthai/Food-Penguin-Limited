@@ -59,9 +59,9 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
 
   const branchPalette = useMemo(() => {
     const normalised = selectedBranch.toLowerCase();
+    if (normalised.includes("marks") || normalised.includes("m\u0026s") || normalised.includes("spencer")) return { main: "#e8bf66", dim: "#a16207", glow: "rgba(232,191,102,0.35)", name: "M\u0026S" };
     if (normalised.includes("mahon")) return { main: "#3b82f6", dim: "#1e40af", glow: "rgba(59,130,246,0.35)", name: "Mahon" };
-    if (normalised.includes("marks") || normalised.includes("m\u0026s") || normalised.includes("ms-")) return { main: "#e8bf66", dim: "#a16207", glow: "rgba(232,191,102,0.35)", name: "M\u0026S" };
-    if (normalised.includes("cork")) return { main: "#22c55e", dim: "#15803d", glow: "rgba(34,197,94,0.35)", name: "Cork" };
+    if (normalised.includes("cork city")) return { main: "#22c55e", dim: "#15803d", glow: "rgba(34,197,94,0.35)", name: "Cork" };
     return { main: "#3b82f6", dim: "#1e40af", glow: "rgba(59,130,246,0.35)", name: "All branches" };
   }, [selectedBranch]);
 
