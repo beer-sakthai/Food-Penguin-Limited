@@ -62,13 +62,31 @@ def run_gguf_advisor(model_path: str, port: int):
 
 def build_prompt(metrics, question):
     system = "You are SakThai, an operational advisor for Food Penguin Limited, a sushi business in Cork, Ireland. Answer with exactly 3 short bullet points. Each bullet must start with '- ' and be one sentence. No numbering, no bold, no markdown, no repeated ideas, no extra text."
+    
+    # Build context from RAG index
+    context = ""
+    try:
+        import json, numpy as np
+        idx_path = Path(__file__).parent / "rag_index.json"
+        if idx_path.exists():
+            with open(idx_path) as f:
+                idx = json.load(f)
+            query = f"sales {metrics.get('sales',0)} cost {metrics.get('cogsPct',0)} waste {metrics.get('wastePct',0)}"
+            sims = []
+            for item in idx:
+                if item["source"] in ("metrics", "waste", "production"):
+                    sims.append((1.0, item))  # Return all recent data as context
+            context = "\nRecent data:\n" + "\n".join(f"- {s[1]['text']}" for s in sims[:5]) + "\n"
+    except Exception:
+        pass
+    
     user = (
         f"Branch: {metrics.get('branch', 'All branches')}\n"
         f"Sales: €{metrics.get('sales', 0):.2f}\n"
         f"COGS: {metrics.get('cogsPct', 0) * 100:.1f}% of sales\n"
         f"Waste: {metrics.get('wastePct', 0) * 100:.1f}% of COGS\n"
         f"Production: {metrics.get('productionItems', 0)} / {metrics.get('productionTarget', 0)} items\n"
-        f"Health: {metrics.get('healthScore', 0)} / 100\n"
+        f"{context}"
         f"Question: {question}\n\nAnswer:\n-"
     )
     return f"<|im_start|>system\n{system}<|im_end|>\n<|im_start|>user\n{user}<|im_end|>\n<|im_start|>assistant\n-"
