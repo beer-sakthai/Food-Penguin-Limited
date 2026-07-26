@@ -127,22 +127,50 @@ body {
   outline-offset: 2px;
 }
 
+/* Branch-tinted layered shadows for elevated surfaces */
+.shadow-branch-light {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-branch {
+  box-shadow:
+    rgba(var(--accent-rgb, 45, 212, 191), 0.15) 0px 4px 12px,
+    rgba(0, 0, 0, 0.25) 0px 8px 24px,
+    rgba(255, 255, 255, 0.05) 0px 1px 0px 0px inset;
+}
+
+.shadow-branch-hover {
+  box-shadow:
+    rgba(var(--accent-rgb, 45, 212, 191), 0.20) 0px 8px 20px,
+    rgba(0, 0, 0, 0.30) 0px 12px 32px,
+    rgba(255, 255, 255, 0.08) 0px 1px 0px 0px inset;
+}
+
 /* Dashboard cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 18px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    rgba(var(--accent-rgb, 45, 212, 191), 0.10) 0px 2px 8px,
+    rgba(0, 0, 0, 0.12) 0px 4px 12px;
 }
 
 .card-hover {
   transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
 }
 .card-hover:hover {
   background: var(--panel);
   border-color: var(--elevated);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  box-shadow:
+    rgba(var(--accent-rgb, 45, 212, 191), 0.15) 0px 8px 16px,
+    rgba(0, 0, 0, 0.16) 0px 8px 24px,
+    rgba(255, 255, 255, 0.06) 0px 1px 0px 0px inset;
   transform: translateY(-1px);
 }
 
@@ -160,6 +188,12 @@ body {
   letter-spacing: -0.03em;
   color: var(--text);
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tabular numerals for stable metric display */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 .metric-label {
