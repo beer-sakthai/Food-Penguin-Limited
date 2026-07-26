@@ -90,11 +90,12 @@ export default function OverviewTab(props: OverviewProps) {
       const waste = todayLogs ? Number(todayLogs.waste || 0) / 3 : items * 2 * (WASTE_TARGET_PCT / 100);
       const cogsPct = net > 0 ? (cogs / net) * 100 : 0;
       const wastePct = items > 0 ? (waste / (items * 2)) * 100 : 0;
+      const branchMeta = BRANCH_META.find((b) => b.name === branch);
       return {
         branch,
         short: BRANCH_NAMES[branch],
         colour: getBranchColor(branch as BusinessLocation),
-        glow: `${BRANCH_COLOURS[branch]}33`,
+        glow: branchMeta?.glow || "rgba(99,102,241,0.35)",
         sales,
         items,
         net,

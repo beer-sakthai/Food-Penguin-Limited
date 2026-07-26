@@ -60,9 +60,9 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
   const branchPalette = useMemo(() => {
     const branch = BRANCH_META.find((b) => b.name === selectedBranch);
     if (branch) {
-      return { main: branch.colour, glow: branch.glow, name: branch.short };
+      return { main: branch.colour, glow: branch.glow, surface: branch.surface, name: branch.short };
     }
-    return { main: "#3b82f6", glow: "rgba(59,130,246,0.35)", name: "All branches" };
+    return { main: "#3b82f6", glow: "rgba(59,130,246,0.35)", surface: "rgba(59,130,246,0.08)", name: "All branches" };
   }, [selectedBranch]);
 
   const branchComparison = useMemo(() => {
@@ -259,7 +259,7 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
         <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: branchPalette.main }} />
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${branchPalette.main} 0%, ${branchPalette.dim} 100%)` }}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${branchPalette.main} 0%, ${branchPalette.surface} 100%)` }}>
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
