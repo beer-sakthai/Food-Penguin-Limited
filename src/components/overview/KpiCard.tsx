@@ -13,9 +13,9 @@ interface KpiCardProps {
 
 const toneClasses = {
   accent: "text-[var(--accent)] bg-[var(--accent-soft)] ring-1 ring-[var(--accent)]/20",
-  ok: "text-[var(--ok)] bg-emerald-500/10 ring-1 ring-emerald-500/20",
-  bad: "text-[var(--bad)] bg-rose-500/10 ring-1 ring-rose-500/20",
-  warn: "text-[var(--warn)] bg-amber-500/10 ring-1 ring-amber-500/20",
+  ok: "text-[var(--ok)] bg-[var(--ok-soft)] ring-1 ring-[var(--ok-ring)]",
+  bad: "text-[var(--bad)] bg-[var(--bad-soft)] ring-1 ring-[var(--bad-ring)]",
+  warn: "text-[var(--warn)] bg-[var(--warn-soft)] ring-1 ring-[var(--warn-ring)]",
 };
 
 export function KpiCard({ label, value, detail, icon: Icon, tone = "accent", onClick }: KpiCardProps) {

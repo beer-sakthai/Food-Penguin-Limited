@@ -2,9 +2,39 @@
 // 2 Tesco + 1 Marks & Spencer. Same cost structure, different products per location.
 
 export const BRANCH_META = [
-  { id: "tesco-cork", name: "Tesco - Cork City", type: "Tesco", short: "Cork", colour: "#22c55e", css: "branch-cork" },
-  { id: "tesco-mahon", name: "Tesco - Mahon Point", type: "Tesco", short: "Mahon", colour: "#3b82f6", css: "branch-mahon" },
-  { id: "ms-cork", name: "Marks & Spencer - Cork City", type: "M&S", short: "M&S", colour: "#e8bf66", css: "branch-ms" },
+  {
+    id: "tesco-cork",
+    name: "Tesco - Cork City",
+    type: "Tesco",
+    short: "Cork",
+    colour: "#22c55e",
+    css: "branch-cork",
+    glow: "rgba(34,197,94,0.35)",
+    surface: "rgba(34,197,94,0.08)",
+    textOnAccent: "#052e16",
+  },
+  {
+    id: "tesco-mahon",
+    name: "Tesco - Mahon Point",
+    type: "Tesco",
+    short: "Mahon",
+    colour: "#3b82f6",
+    css: "branch-mahon",
+    glow: "rgba(59,130,246,0.35)",
+    surface: "rgba(59,130,246,0.08)",
+    textOnAccent: "#082f49",
+  },
+  {
+    id: "ms-cork",
+    name: "Marks & Spencer - Cork City",
+    type: "M&S",
+    short: "M&S",
+    colour: "#e8bf66",
+    css: "branch-ms",
+    glow: "rgba(232,191,102,0.35)",
+    surface: "rgba(232,191,102,0.08)",
+    textOnAccent: "#451a03",
+  },
 ] as const;
 
 export const BUSINESS_LOCATIONS = BRANCH_META.map((b) => ({ id: b.id, name: b.name, type: b.type }));
