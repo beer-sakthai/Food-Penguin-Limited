@@ -12,6 +12,7 @@ import {
   COMMISSION_TARGET_PCT,
   NET_SALES_FACTOR,
   BUSINESS_LOCATIONS,
+  BRANCH_META,
   type BusinessLocation,
 } from "../business";
 import type { InventoryItem, DailyOperationalLog, SalesOrder } from "../types";
@@ -27,17 +28,16 @@ interface OverviewProps {
   onOpenLogForm: () => void;
 }
 
-const BRANCH_COLOURS: Record<BusinessLocation, string> = {
-  "Tesco - Cork City": "#22c55e",
-  "Tesco - Mahon Point": "#3b82f6",
-  "Marks & Spencer - Cork City": "#e8bf66",
-};
-
 const BRANCH_NAMES: Record<BusinessLocation | "All branches", string> = {
   "All branches": "All branches",
   "Tesco - Cork City": "Cork",
   "Tesco - Mahon Point": "Mahon",
   "Marks & Spencer - Cork City": "M&S",
+};
+
+const getBranchColor = (branchName: BusinessLocation): string => {
+  const branch = BRANCH_META.find((b) => b.name === branchName);
+  return branch?.colour || "#6366f1";
 };
 
 function sum(arr: number[]) {
@@ -93,7 +93,7 @@ export default function OverviewTab(props: OverviewProps) {
       return {
         branch,
         short: BRANCH_NAMES[branch],
-        colour: BRANCH_COLOURS[branch],
+        colour: getBranchColor(branch as BusinessLocation),
         glow: `${BRANCH_COLOURS[branch]}33`,
         sales,
         items,
@@ -311,7 +311,7 @@ export default function OverviewTab(props: OverviewProps) {
           <div className="flex items-center gap-3 text-[11px]">
             {BUSINESS_LOCATIONS.map((b) => (
               <div key={b.name} className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full" style={{ background: BRANCH_COLOURS[b.name] }} />
+                <span className="w-2 h-2 rounded-full" style={{ background: getBranchColor(b.name as BusinessLocation) }} />
                 <span className="text-[var(--muted)]">{BRANCH_NAMES[b.name]}</span>
               </div>
             ))}
@@ -387,7 +387,7 @@ export default function OverviewTab(props: OverviewProps) {
                   dataKey={b.name}
                   name={BRANCH_NAMES[b.name]}
                   stackId="a"
-                  fill={BRANCH_COLOURS[b.name]}
+                  fill={getBranchColor(b.name as BusinessLocation)}
                   radius={[4, 4, 0, 0]}
                 />
               ))}
