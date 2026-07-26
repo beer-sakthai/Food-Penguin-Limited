@@ -47,6 +47,8 @@ import PriceImporterTab from "./components/PriceImporterTab";
 import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import LoginScreen from "./components/LoginScreen";
+import SolutionView from "./components/SolutionView";
+import SplashScreen from "./components/SplashScreen";
 import { BRANCH_META, BUSINESS_LOCATIONS, BusinessLocation, TESCO_PRODUCTS, MS_PRODUCTS } from "./business";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 import { OperationalLogForm } from "./components/overview/OperationalLogForm";
@@ -92,6 +94,7 @@ import {
   BarChart3,
   BrainCircuit,
   Upload,
+  Lightbulb,
 } from "lucide-react";
 import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
 import {
@@ -110,8 +113,8 @@ const rolePermissions: Record<
   "Admin" | "Manager" | "Staff" | "User",
   string[]
 > = {
-  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics", "Price Import"],
-  Manager: ["Overview", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Price Import"],
+  Admin: ["Overview", "Solution", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics", "Price Import"],
+  Manager: ["Overview", "Solution", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Price Import"],
   Staff: ["Overview", "Targets & Production", "Waste", "Hours", "Suppliers", "Price Import"],
   User: ["Overview"],
 };
@@ -331,6 +334,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hasSeen = sessionStorage.getItem("fpl-splash-seen");
+    return !hasSeen;
+  });
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
@@ -1783,6 +1791,7 @@ export default function App() {
 
   const primaryTabMeta: TabMeta[] = [
     { id: "Overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: "Solution", label: "What to do", icon: <Lightbulb className="w-4 h-4" /> },
     { id: "P&L", label: "P&L", icon: <DollarSign className="w-4 h-4" /> },
     { id: "Reports", label: "Reports", icon: <FileSpreadsheet className="w-4 h-4" /> },
   ];
@@ -1927,6 +1936,16 @@ export default function App() {
             weeklyLogs={weeklyLogs}
           />
         );
+      case "Solution":
+        return (
+          <SolutionView
+            metrics={metrics}
+            weeklyLogs={weeklyLogs}
+            orders={orders}
+            selectedBranch={selectedBranch}
+            onNavigateTab={navigateToTab}
+          />
+        );
       default:
         return (
           <OverviewTab
@@ -2011,6 +2030,16 @@ export default function App() {
       />
     );
   }
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem("fpl-splash-seen", "true");
+    setShowSplash(false);
+  };
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} selectedBranch={selectedBranch} />;
+  }
+
   const branchClass =
     selectedBranch === "All branches"
       ? ""
