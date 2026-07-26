@@ -195,7 +195,7 @@ export default function OverviewTab(props: OverviewProps) {
         </div>
         <div className="flex items-center gap-2">
           {totalIssues > 0 && (
-            <div className="flex items-center gap-1.5 rounded-full bg-rose-500/10 text-[var(--bad)] border border-rose-500/20 px-3 py-1.5 text-xs font-medium">
+            <div className="flex items-center gap-1.5 rounded-full bg-[var(--bad-soft)] text-[var(--bad)] border border-[var(--bad-ring)] px-3 py-1.5 text-xs font-medium">
               <AlertTriangle className="w-3.5 h-3.5" /> {totalIssues} issue{totalIssues > 1 ? "s" : ""}
             </div>
           )}

@@ -29,8 +29,14 @@
 
   /* Status */
   --ok: #34d399;
+  --ok-soft: rgba(52, 211, 153, 0.12);
+  --ok-ring: rgba(52, 211, 153, 0.20);
   --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.12);
+  --warn-ring: rgba(251, 191, 36, 0.20);
   --bad: #f87171;
+  --bad-soft: rgba(248, 113, 113, 0.12);
+  --bad-ring: rgba(248, 113, 113, 0.20);
 
   --violet: #8b5cf6;
 
@@ -84,8 +90,14 @@
   --accent-soft: rgba(13, 148, 136, 0.10);
   --accent-hover: #0f766e;
   --ok: #16a34a;
+  --ok-soft: rgba(22, 163, 74, 0.12);
+  --ok-ring: rgba(22, 163, 74, 0.20);
   --warn: #d97706;
+  --warn-soft: rgba(217, 119, 6, 0.12);
+  --warn-ring: rgba(217, 119, 6, 0.20);
   --bad: #dc2626;
+  --bad-soft: rgba(220, 38, 38, 0.12);
+  --bad-ring: rgba(220, 38, 38, 0.20);
 }
 
 html {

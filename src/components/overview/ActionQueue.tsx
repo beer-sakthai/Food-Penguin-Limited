@@ -13,7 +13,7 @@ export function ActionQueue({ lowStockItems, onReviewAlerts }: ActionQueueProps)
     <section className="card">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${hasAlerts ? "bg-amber-500/10 text-[var(--warn)]" : "bg-emerald-500/10 text-[var(--ok)]"}`}>
+          <span className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${hasAlerts ? "bg-[var(--warn-soft)] text-[var(--warn)]" : "bg-[var(--ok-soft)] text-[var(--ok)]"}`}>
             {hasAlerts ? <AlertTriangle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
           </span>
           <div>
