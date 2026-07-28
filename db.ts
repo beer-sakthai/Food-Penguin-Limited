@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import path from "path";
+import { hashPassword } from "./auth";
 
 const DB_PATH = path.join(process.cwd(), "food-penguin.db");
 
@@ -12,6 +13,7 @@ export function getDb(): Database.Database {
     db.pragma("foreign_keys = ON");
     initSchema();
     seedIfEmpty();
+    seedUsersIfEmpty();
   }
   return db;
 }
@@ -173,6 +175,14 @@ function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_events_label ON analytics_events(label);
     CREATE INDEX IF NOT EXISTS idx_events_session ON analytics_events(session_id);
     CREATE INDEX IF NOT EXISTS idx_events_page ON analytics_events(page);
+
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 }
 
@@ -601,4 +611,38 @@ export function getRecentEvents(limit = 50) {
 export function getAnalyticsSeeded(): boolean {
   const row = getDb().prepare("SELECT COUNT(*) AS c FROM analytics_events").get() as { c: number };
   return row.c > 0;
+}
+
+// Demo credentials — change these (or wire up a real user-management flow)
+// before running this app anywhere beyond an internal demo.
+function seedUsersIfEmpty() {
+  const count = db.prepare("SELECT COUNT(*) as c FROM users").get() as { c: number };
+  if (count.c > 0) return;
+
+  const insertUser = db.prepare(
+    "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)"
+  );
+  const demoUsers: Array<[string, string, string]> = [
+    ["admin", "admin123", "Admin"],
+    ["manager", "manager123", "Manager"],
+    ["staff", "staff123", "Staff"],
+    ["user", "user123", "User"],
+  ];
+  for (const [username, password, role] of demoUsers) {
+    insertUser.run(username, hashPassword(password), role);
+  }
+}
+
+export interface UserRow {
+  id: number;
+  username: string;
+  password_hash: string;
+  role: string;
+  created_at: string;
+}
+
+export function getUserByUsername(username: string): UserRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM users WHERE username = ?")
+    .get(username) as UserRow | undefined;
 }

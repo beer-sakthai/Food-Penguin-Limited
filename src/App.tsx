@@ -17,6 +17,7 @@ import {
 import {
   fetchMetrics, fetchOrders, fetchTargets, fetchTasks,
   fetchWaste, fetchHours, fetchInventory, fetchLogs, fetchAlerts,
+  fetchCurrentUser, logout as apiLogout, AuthUser,
 } from "./api";
 import {
   CoreMetrics,
@@ -342,31 +343,31 @@ export default function App() {
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
-  const [currentUser, setCurrentUser] = useState<{
-    username: string;
-    role: string;
-    email?: string;
-    photoURL?: string;
-  } | null>({
-    username: "Administrator",
-    role: "Admin",
-    email: "admin@foodpenguin.com",
-  });
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
 
-  // Local session initialization on mount
+  // Ask the server who (if anyone) is authenticated — role is only ever
+  // trusted from this signed session, never from client-side state.
   useEffect(() => {
-    const storedUser = localStorage.getItem("localCurrentUser");
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setCurrentUser(parsed);
-        setUserRole(parsed.role);
-      } catch (_) {
-        // Keep the default state
+    let cancelled = false;
+    fetchCurrentUser().then((user) => {
+      if (cancelled) return;
+      if (user) {
+        setCurrentUser(user);
+        setUserRole(user.role);
       }
-    }
+      setSessionChecked(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const handleLogout = async () => {
+    await apiLogout();
+    setCurrentUser(null);
+  };
 
   // Load data from SQLite API (falls back to hardcoded data on failure)
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -407,11 +408,7 @@ export default function App() {
 
   // Firestore Sync Listener
   useEffect(() => {
-    if (
-      !currentUser ||
-      !currentUser.email ||
-      currentUser.email === "demo@foodpenguin.com"
-    ) {
+    if (!currentUser) {
       setIsFirebaseSynced(false);
       return;
     }
@@ -2017,15 +2014,17 @@ export default function App() {
     );
   };
 
+  if (!sessionChecked) {
+    return <div className="min-h-screen bg-[var(--bg)]" />;
+  }
+
   if (!currentUser) {
     return (
       <LoginScreen
         theme={theme}
-        onLogin={(username, role) => {
-          const userObj = { username, role, email: "demo@foodpenguin.com" };
-          localStorage.setItem("localCurrentUser", JSON.stringify(userObj));
-          setCurrentUser(userObj);
-          setUserRole(role as any);
+        onLogin={(user) => {
+          setCurrentUser(user);
+          setUserRole(user.role);
         }}
       />
     );
@@ -2096,16 +2095,12 @@ export default function App() {
               ))}
             </select>
 
-            <select
-              value={userRole}
-              onChange={(e) => setUserRole(e.target.value as any)}
-              className="hidden sm:block bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+            <span
+              title="Role is set by your login and can't be changed here"
+              className="hidden sm:inline-flex items-center bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] uppercase tracking-wide"
             >
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Staff">Staff</option>
-              <option value="User">User</option>
-            </select>
+              {userRole}
+            </span>
 
             <button
               type="button"
@@ -2114,6 +2109,16 @@ export default function App() {
               aria-label="Toggle theme"
             >
               {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="p-2.5 rounded-xl text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)] transition-colors"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </header>
