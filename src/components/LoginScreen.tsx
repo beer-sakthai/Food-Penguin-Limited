@@ -1,20 +1,31 @@
 // Saksee · 2026-07-24 · feat/new-design
 import React, { useState } from "react";
-import { User, Lock, ChevronRight, Store } from "lucide-react";
+import { User, Lock, ChevronRight, AlertCircle } from "lucide-react";
+import { login, AuthUser } from "../api";
 
 interface Props {
   theme: "light" | "dark";
-  onLogin: (username: string, role: "Admin" | "User") => void;
+  onLogin: (user: AuthUser) => void;
 }
 
 export default function LoginScreen({ onLogin }: Props) {
-  const [username, setUsername] = useState("Skipper");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"Admin" | "User">("Admin");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(username, role);
+    setError(null);
+    setSubmitting(true);
+    try {
+      const user = await login(username, password);
+      onLogin(user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -39,6 +50,7 @@ export default function LoginScreen({ onLogin }: Props) {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
+                autoComplete="username"
                 className="w-full pl-10 pr-3 py-2.5 text-sm rounded-lg border border-[var(--border)] bg-[var(--panel)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] transition-all"
               />
             </div>
@@ -49,29 +61,25 @@ export default function LoginScreen({ onLogin }: Props) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
+                autoComplete="current-password"
                 className="w-full pl-10 pr-3 py-2.5 text-sm rounded-lg border border-[var(--border)] bg-[var(--panel)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] transition-all"
               />
             </div>
-            <div className="relative">
-              <Store className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as any)}
-                className="w-full pl-10 pr-3 py-2.5 text-sm rounded-lg border border-[var(--border)] bg-[var(--panel)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] cursor-pointer appearance-none"
-              >
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="Staff">Staff</option>
-                <option value="User">User</option>
-              </select>
-            </div>
           </div>
+
+          {error && (
+            <div className="flex items-center gap-2 text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
 
           <button
             type="submit"
-            className="w-full px-4 py-2.5 text-sm font-semibold rounded-lg bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)] flex items-center justify-center gap-2 transition-colors"
+            disabled={submitting}
+            className="w-full px-4 py-2.5 text-sm font-semibold rounded-lg bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)] flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
           >
-            Sign in <ChevronRight className="w-4 h-4" />
+            {submitting ? "Signing in…" : "Sign in"} <ChevronRight className="w-4 h-4" />
           </button>
         </form>
 

@@ -22,7 +22,27 @@ npx vercel --token=<YOUR_TOKEN> --prod
 
 ## Environment variables to set in Vercel dashboard
 - `GEMINI_API_KEY` (optional, falls back to simulation mode)
+- `SESSION_SECRET` (required — signs login session cookies; the server logs a
+  warning and falls back to an insecure default if unset)
 - Any Firestore / database connection strings
+
+## Login
+
+Auth is a real server-verified session now (see `auth.ts`, `db.ts`'s `users`
+table, and the `/api/auth/*` routes in `server.ts`) — role is no longer a
+client-editable dropdown. Demo accounts are seeded on first run:
+
+| Username | Password    | Role    |
+|----------|-------------|---------|
+| admin    | admin123    | Admin   |
+| manager  | manager123  | Manager |
+| staff    | staff123    | Staff   |
+| user     | user123     | User    |
+
+**Change or remove these before running anywhere beyond an internal demo** —
+there's no user-management UI yet, so rotate passwords directly in the
+`users` table (`UPDATE users SET password_hash = ... WHERE username = ...`,
+using `hashPassword()` from `auth.ts`) until one exists.
 
 ## Files
 - `vercel.json` — routes API + static build output.
