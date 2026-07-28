@@ -58,16 +58,10 @@ import { useAnalytics } from "./hooks/useAnalytics";
 // Main Icons
 import {
   AlertTriangle,
-  LayoutDashboard,
   Camera,
   Menu,
   X,
-  Coins,
-  Package,
-  DollarSign,
-  ShieldCheck,
   ChefHat,
-  Trash2,
   CalendarDays,
   Boxes,
   Activity,
@@ -82,7 +76,6 @@ import {
   Moon,
   Sparkles,
   Mail,
-  Clock,
   TrendingUp,
   TrendingDown,
   MoreHorizontal,
@@ -91,12 +84,9 @@ import {
   Package as PackageIcon,
   InfoIcon,
   Settings,
-  FileSpreadsheet,
-  BarChart3,
-  BrainCircuit,
-  Upload,
-  Lightbulb,
 } from "lucide-react";
+import { rolePermissions } from "./auth/session";
+import { getPermittedTabs, TabMeta } from "./routing/tabs";
 import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
 import {
   db,
@@ -109,16 +99,6 @@ import {
   updateDoc,
   getDocs,
 } from "./firebase";
-
-const rolePermissions: Record<
-  "Admin" | "Manager" | "Staff" | "User",
-  string[]
-> = {
-  Admin: ["Overview", "Solution", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics", "Price Import"],
-  Manager: ["Overview", "Solution", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Price Import"],
-  Staff: ["Overview", "Targets & Production", "Waste", "Hours", "Suppliers", "Price Import"],
-  User: ["Overview"],
-};
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
   const totalUnits = Math.round(projectedLoad * 12);
@@ -1784,34 +1764,8 @@ export default function App() {
     }
   };
 
-  type TabMeta = { id: string; label: string; icon: React.ReactNode };
-
-  const primaryTabMeta: TabMeta[] = [
-    { id: "Overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: "Solution", label: "What to do", icon: <Lightbulb className="w-4 h-4" /> },
-    { id: "P&L", label: "P&L", icon: <DollarSign className="w-4 h-4" /> },
-    { id: "Reports", label: "Reports", icon: <FileSpreadsheet className="w-4 h-4" /> },
-  ];
-
-  const operationsTabMeta: TabMeta[] = [
-    { id: "Targets & Production", label: "Targets & Production", icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
-    { id: "Hours", label: "Hours", icon: <Clock className="w-4 h-4" /> },
-    { id: "Suppliers", label: "Suppliers", icon: <Package className="w-4 h-4" /> },
-  ];
-
-  const moreToolsTabMeta: TabMeta[] = [
-    { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
-    { id: "Price Import", label: "Price Import", icon: <Upload className="w-4 h-4" /> },
-    { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
-    { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
-  ];
-
   const permittedTabIds = rolePermissions[userRole];
-  const primaryTabs = primaryTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
-  const operationsTabs = operationsTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
-  const moreToolsTabs = moreToolsTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
-  const tabMeta = [...primaryTabs, ...operationsTabs, ...moreToolsTabs];
+  const tabMeta = getPermittedTabs(permittedTabIds);
 
   const navigateToTab = (tabId: string) => {
     if (permittedTabIds.includes(tabId)) {
