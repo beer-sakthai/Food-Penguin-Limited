@@ -10,6 +10,12 @@ export default defineConfig({
     },
   },
   test: {
+    // server.test.ts overrides this to 'node' via a `@vitest-environment`
+    // doc-comment — it needs esbuild/vite, which break under jsdom's
+    // polyfilled globals.
     environment: 'jsdom',
+    env: {
+      NODE_ENV: 'test',
+    },
   },
 });

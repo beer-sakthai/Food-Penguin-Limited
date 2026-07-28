@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import path from "path";
 import { hashPassword } from "./auth";
 
-const DB_PATH = path.join(process.cwd(), "food-penguin.db");
+const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "food-penguin.db");
 
 let db: Database.Database;
 

@@ -70,8 +70,14 @@ const startServer = async () => {
   });
 };
 
-startServer();
+// Skipped under the test runner — tests import `app` directly via
+// supertest instead of binding a real port or booting the Vite middleware.
+if (process.env.NODE_ENV !== "test") {
+  startServer();
+}
 
 if (process.env.VERCEL) {
   app.get("/api/health", (_req, res) => res.json({ ok: true, vercel: true }));
 }
+
+export { app };
