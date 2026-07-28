@@ -331,14 +331,20 @@ export default function App() {
   // trusted from this signed session, never from client-side state.
   useEffect(() => {
     let cancelled = false;
-    fetchCurrentUser().then((user) => {
-      if (cancelled) return;
-      if (user) {
-        setCurrentUser(user);
-        setUserRole(user.role);
-      }
-      setSessionChecked(true);
-    });
+    fetchCurrentUser()
+      .then((user) => {
+        if (cancelled) return;
+        if (user) {
+          setCurrentUser(user);
+          setUserRole(user.role);
+        }
+      })
+      .catch((err) => {
+        console.warn("Session check failed, falling back to login screen:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setSessionChecked(true);
+      });
     return () => {
       cancelled = true;
     };

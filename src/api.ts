@@ -40,7 +40,13 @@ export async function logout(): Promise<void> {
 export async function fetchCurrentUser(): Promise<AuthUser | null> {
   const r = await fetch(`${BASE}/api/auth/me`);
   if (!r.ok) return null;
-  return r.json();
+  try {
+    return await r.json();
+  } catch {
+    // Non-JSON response (misconfigured backend, proxy error page, etc.) —
+    // treat as "not authenticated" rather than blocking the whole app.
+    return null;
+  }
 }
 
 export async function fetchMetrics(): Promise<CoreMetrics> {
