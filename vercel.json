@@ -2,6 +2,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "functions": {
+    "server.cjs": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
     { "source": "/api/sakthai/advisor", "destination": "/api/sakthai/advisor.mjs" },
     { "source": "/api/:path*", "destination": "/server.cjs" },
