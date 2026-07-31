@@ -33,6 +33,8 @@ import {
   Activity,
   Zap,
   PieChart as PieIcon,
+  Calculator,
+  ChevronDown,
 } from "lucide-react";
 import type { DailyOperationalLog, SalesOrder } from "../types";
 import { BRANCH_META, COGS_TARGET_PCT, WASTE_TARGET_PCT } from "../business";
@@ -56,6 +58,8 @@ const DAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orders }: AnalyticsTabProps) {
   const [focusMetric, setFocusMetric] = useState("all");
+  const [simProduction, setSimProduction] = useState(metrics.productionItems || 0);
+  const [simHours, setSimHours] = useState(metrics.hoursScheduled || 0);
 
   const branchPalette = useMemo(() => {
     const normalised = selectedBranch.toLowerCase();
@@ -203,6 +207,41 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
     return list;
   }, [currentSnapshot, metrics.wasteCost]);
 
+  // What-if simulator calculations (all local, no API calls)
+  const simCogsPct = useMemo(() => {
+    const productionRatio = currentSnapshot.productionTarget > 0
+      ? simProduction / currentSnapshot.productionTarget
+      : 1;
+    const clamped = Math.max(0.95, Math.min(1.15, productionRatio));
+    // Return as percentage for display
+    return (currentSnapshot.cogsPct * clamped) * 100;
+  }, [simProduction, currentSnapshot]);
+
+  const simWastePct = useMemo(() => {
+    const productionRatio = currentSnapshot.productionTarget > 0
+      ? simProduction / currentSnapshot.productionTarget
+      : 1;
+    const clamped = Math.max(0.95, Math.min(1.15, productionRatio));
+    // More production = more waste, less production = less waste
+    const wasteMultiplier = 2 - clamped;
+    // Return as percentage for display
+    return (currentSnapshot.wastePct * Math.max(0.7, Math.min(1.3, wasteMultiplier))) * 100;
+  }, [simProduction, currentSnapshot]);
+
+  const simHoursPer100 = useMemo(() => {
+    const sales = metrics.salesToday;
+    return sales > 0 ? (simHours / sales) * 100 : 0;
+  }, [simHours, metrics.salesToday]);
+
+  const simProfitImpact = useMemo(() => {
+    const currentProfit = metrics.salesToday * (1 - currentSnapshot.cogsPct) - metrics.wasteCost - metrics.hoursScheduled * 15;
+    // Projected waste as cost: COGS * simWastePct (convert percentage back to fraction)
+    const projectedCogs = metrics.salesToday * (simCogsPct / 100);
+    const projectedWasteCost = projectedCogs * (simWastePct / 100);
+    const projectedProfit = metrics.salesToday * (1 - simCogsPct / 100) - projectedWasteCost - simHours * 15;
+    return projectedProfit - currentProfit;
+  }, [simCogsPct, simWastePct, simHours, currentSnapshot, metrics]);
+
   const topOrders = useMemo(() => {
     const counts: Record<string, { item: string; qty: number; amount: number }> = {};
     for (const o of orders) {
@@ -349,6 +388,102 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
           <div>
             <div className="text-xs text-slate-500 uppercase tracking-wider">Health score</div>
             <div className="text-white font-semibold">{metrics.aiHealthScore}/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-slate-900/60 rounded-3xl p-5 border border-slate-800/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between cursor-pointer" onClick={() => {
+          const el = document.getElementById("whatif-simulator");
+          if (el) el.classList.toggle("hidden");
+        }}>
+          <div className="flex items-center gap-2 text-sm font-semibold text-white">
+            <Calculator className="w-4 h-4" style={{ color: branchPalette.main }} /> What-If Simulator
+          </div>
+          <ChevronDown className="w-4 h-4 text-slate-500 transition-transform" />
+        </div>
+        <div id="whatif-simulator" className="hidden mt-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Production items</span>
+                <span className="font-semibold" style={{ color: branchPalette.main }}>{simProduction}</span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="3000"
+                step="50"
+                value={simProduction}
+                onChange={(e) => setSimProduction(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-full accent-emerald-400"
+              />
+              <div className="grid grid-cols-3 text-[10px] text-slate-500 mt-1">
+                <span>0</span>
+                <span className="text-center">1500</span>
+                <span className="text-right">3000</span>
+              </div>
+            </div>
+            <div>
+              <label className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Staff hours scheduled</span>
+                <span className="font-semibold" style={{ color: branchPalette.main }}>{simHours.toFixed(1)}h</span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="16"
+                step="0.5"
+                value={simHours}
+                onChange={(e) => setSimHours(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-full accent-amber-400"
+              />
+              <div className="grid grid-cols-3 text-[10px] text-slate-500 mt-1">
+                <span>0</span>
+                <span className="text-center">8</span>
+                <span className="text-right">16</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <SimulatorKpi
+              label="Projected COGS %"
+              value={`${simCogsPct.toFixed(1)}%`}
+              target={COGS_TARGET_PCT}
+              status={simCogsPct > COGS_TARGET_PCT + 2 ? "critical" : simCogsPct > COGS_TARGET_PCT ? "warn" : "ok"}
+            />
+            <SimulatorKpi
+              label="Projected waste %"
+              value={`${simWastePct.toFixed(1)}%`}
+              target={WASTE_TARGET_PCT}
+              status={simWastePct > WASTE_TARGET_PCT + 2 ? "critical" : simWastePct > WASTE_TARGET_PCT ? "warn" : "ok"}
+            />
+            <SimulatorKpi
+              label="Labor efficiency"
+              value={`${simHoursPer100.toFixed(1)}h`}
+              target={8}
+              unit="h"
+              status={simHoursPer100 > 8.5 ? "critical" : simHoursPer100 > 8 ? "warn" : "ok"}
+            />
+            <SimulatorKpi
+              label="Profit impact"
+              value={`€${simProfitImpact >= 0 ? "+" : ""}${simProfitImpact.toFixed(0)}`}
+              status={simProfitImpact > 0 ? "ok" : simProfitImpact < -50 ? "critical" : "warn"}
+            />
+          </div>
+
+          <div
+            className="text-xs p-3 rounded-xl"
+            style={{
+              background: branchPalette.glow.replace("0.35", "0.12"),
+              border: `1px solid ${branchPalette.glow.replace("0.35", "0.25")}`,
+              color: branchPalette.dim,
+            }}
+          >
+            <strong>Scenario:</strong> Adjusting production to {simProduction} and staff hours to {simHours.toFixed(1)}
+            adjusts COGS via production efficiency, waste via surplus/shortfall, and labor cost directly.
+            Base sales: €{metrics.salesToday.toLocaleString()} · Base hours: {metrics.hoursScheduled}h
           </div>
         </div>
       </div>
@@ -576,6 +711,34 @@ function EfficiencyRow({ label, value, target, unit, lowerIsBetter, accent }: { 
         <span className="text-white font-semibold">{value.toFixed(1)}{unit}</span>
         {ok ? <Minus className="w-4 h-4 text-emerald-400" /> : bad ? <ArrowDownRight className="w-4 h-4 text-red-400" /> : <ArrowUpRight className="w-4 h-4 text-emerald-400" />}
         <span className="text-xs text-slate-500">Target {target}{unit}</span>
+      </div>
+    </div>
+  );
+}
+
+function SimulatorKpi({ label, value, target, unit, status }: {
+  label: string;
+  value: string;
+  target?: number;
+  unit?: string;
+  status: "ok" | "warn" | "critical";
+}) {
+  const statusConfig = {
+    ok: { bg: "bg-emerald-950/20", border: "border-emerald-900/30", text: "text-emerald-400", icon: <ArrowUpRight className="w-3 h-3" /> },
+    warn: { bg: "bg-amber-950/20", border: "border-amber-900/30", text: "text-amber-400", icon: <AlertTriangle className="w-3 h-3" /> },
+    critical: { bg: "bg-red-950/20", border: "border-red-900/30", text: "text-red-400", icon: <ArrowDownRight className="w-3 h-3" /> },
+  };
+  const cfg = statusConfig[status];
+  return (
+    <div className={`rounded-xl p-3 border text-center transition-transform hover:-translate-y-0.5 ${cfg.bg} ${cfg.border}`}>
+      <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">{label}</div>
+      <div className={`text-lg font-bold ${cfg.text}`}>{value}</div>
+      {target !== undefined && (
+        <div className="text-[10px] text-slate-500 mt-0.5">Target {target}{unit || ""}</div>
+      )}
+      <div className="mt-1 flex items-center justify-center gap-1 text-xs">
+        {cfg.icon}
+        <span className={cfg.text}>{status}</span>
       </div>
     </div>
   );
