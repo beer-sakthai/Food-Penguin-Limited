@@ -167,7 +167,7 @@ export default function PriceImporterTab({ onProductsImported }: PriceImporterTa
           </div>
 
           {message && (
-            <div className={`rounded-lg p-3 text-xs flex items-center gap-2 ${message.type === "ok" ? "bg-[var(--accent-soft)] text-[var(--ok)]" : "bg-rose-500/10 text-[var(--bad)]"}`}>
+            <div className={`rounded-lg p-3 text-xs flex items-center gap-2 ${message.type === "ok" ? "bg-[var(--accent-soft)] text-[var(--ok)]" : "bg-[var(--bad-soft)] text-[var(--bad)]"}`}>
               {message.type === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
               {message.text}
             </div>

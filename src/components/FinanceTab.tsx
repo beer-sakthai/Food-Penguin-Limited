@@ -64,7 +64,7 @@ export default function FinanceTab({ theme }: { theme: string }) {
 
   const maxWeekGross = Math.max(...weekly.map((w) => w.gross));
 
-  const COLORS = ["var(--accent)", "var(--warn)", "var(--ok)", "var(--bad)", "var(--muted)", "#6366f1"];
+  const COLORS = ["var(--accent)", "var(--warn)", "var(--ok)", "var(--bad)", "var(--muted)", "var(--violet)"];
 
   return (
     <div className="space-y-6 max-w-5xl">

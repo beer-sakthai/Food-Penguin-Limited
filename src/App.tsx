@@ -46,7 +46,8 @@ import FinanceTab from "./components/FinanceTab";
 import PriceImporterTab from "./components/PriceImporterTab";
 import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
-import LoginScreen from "./components/LoginScreen";
+import SolutionView from "./components/SolutionView";
+import SplashScreen from "./components/SplashScreen";
 import { BRANCH_META, BUSINESS_LOCATIONS, BusinessLocation, TESCO_PRODUCTS, MS_PRODUCTS } from "./business";
 import CapacityVarianceChart from "./components/CapacityVarianceChart";
 import { OperationalLogForm } from "./components/overview/OperationalLogForm";
@@ -55,16 +56,10 @@ import { useAnalytics } from "./hooks/useAnalytics";
 // Main Icons
 import {
   AlertTriangle,
-  LayoutDashboard,
   Camera,
   Menu,
   X,
-  Coins,
-  Package,
-  DollarSign,
-  ShieldCheck,
   ChefHat,
-  Trash2,
   CalendarDays,
   Boxes,
   Activity,
@@ -79,7 +74,6 @@ import {
   Moon,
   Sparkles,
   Mail,
-  Clock,
   TrendingUp,
   TrendingDown,
   MoreHorizontal,
@@ -88,12 +82,10 @@ import {
   Package as PackageIcon,
   InfoIcon,
   Settings,
-  FileSpreadsheet,
-  BarChart3,
-  BrainCircuit,
-  Upload,
 } from "lucide-react";
-import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
+import { rolePermissions } from "./auth/session";
+import { getPermittedTabs, TabMeta } from "./routing/tabs";
+import { RotateCcw, Info, GitCompare } from "lucide-react";
 import {
   db,
   handleFirestoreError,
@@ -105,16 +97,6 @@ import {
   updateDoc,
   getDocs,
 } from "./firebase";
-
-const rolePermissions: Record<
-  "Admin" | "Manager" | "Staff" | "User",
-  string[]
-> = {
-  Admin: ["Overview", "Advisor", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Analytics", "Price Import"],
-  Manager: ["Overview", "Sell", "Targets & Production", "Waste", "Hours", "Suppliers", "P&L", "Reports", "Price Import"],
-  Staff: ["Overview", "Targets & Production", "Waste", "Hours", "Suppliers", "Price Import"],
-  User: ["Overview"],
-};
 
 const getDayContributingItems = (day: string, projectedLoad: number) => {
   const totalUnits = Math.round(projectedLoad * 12);
@@ -331,34 +313,15 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hasSeen = sessionStorage.getItem("fpl-splash-seen");
+    return !hasSeen;
+  });
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
-  const [currentUser, setCurrentUser] = useState<{
-    username: string;
-    role: string;
-    email?: string;
-    photoURL?: string;
-  } | null>({
-    username: "Administrator",
-    role: "Admin",
-    email: "admin@foodpenguin.com",
-  });
   const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
-
-  // Local session initialization on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem("localCurrentUser");
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setCurrentUser(parsed);
-        setUserRole(parsed.role);
-      } catch (_) {
-        // Keep the default state
-      }
-    }
-  }, []);
 
   // Load data from SQLite API (falls back to hardcoded data on failure)
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -399,15 +362,6 @@ export default function App() {
 
   // Firestore Sync Listener
   useEffect(() => {
-    if (
-      !currentUser ||
-      !currentUser.email ||
-      currentUser.email === "demo@foodpenguin.com"
-    ) {
-      setIsFirebaseSynced(false);
-      return;
-    }
-
     const unsubscribeList: (() => void)[] = [];
 
     const syncCollection = async <T extends { id: string }>(
@@ -498,7 +452,7 @@ export default function App() {
     return () => {
       unsubscribeList.forEach((unsub) => unsub());
     };
-  }, [currentUser]);
+  }, []);
 
   const [selectedBranch, setSelectedBranch] = useState<"All branches" | BusinessLocation>("All branches");
   // Self-hosted analytics tracker (sends batches every 2s)
@@ -1779,33 +1733,8 @@ export default function App() {
     }
   };
 
-  type TabMeta = { id: string; label: string; icon: React.ReactNode };
-
-  const primaryTabMeta: TabMeta[] = [
-    { id: "Overview", label: "Overview", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: "P&L", label: "P&L", icon: <DollarSign className="w-4 h-4" /> },
-    { id: "Reports", label: "Reports", icon: <FileSpreadsheet className="w-4 h-4" /> },
-  ];
-
-  const operationsTabMeta: TabMeta[] = [
-    { id: "Targets & Production", label: "Targets & Production", icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: "Waste", label: "Waste", icon: <Trash2 className="w-4 h-4" /> },
-    { id: "Hours", label: "Hours", icon: <Clock className="w-4 h-4" /> },
-    { id: "Suppliers", label: "Suppliers", icon: <Package className="w-4 h-4" /> },
-  ];
-
-  const moreToolsTabMeta: TabMeta[] = [
-    { id: "Sell", label: "Sales", icon: <Coins className="w-4 h-4" /> },
-    { id: "Price Import", label: "Price Import", icon: <Upload className="w-4 h-4" /> },
-    { id: "Advisor", label: "Advisor", icon: <BrainCircuit className="w-4 h-4" /> },
-    { id: "Analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
-  ];
-
   const permittedTabIds = rolePermissions[userRole];
-  const primaryTabs = primaryTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
-  const operationsTabs = operationsTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
-  const moreToolsTabs = moreToolsTabMeta.filter((tab) => permittedTabIds.includes(tab.id));
-  const tabMeta = [...primaryTabs, ...operationsTabs, ...moreToolsTabs];
+  const tabMeta = getPermittedTabs(permittedTabIds);
 
   const navigateToTab = (tabId: string) => {
     if (permittedTabIds.includes(tabId)) {
@@ -1927,6 +1856,16 @@ export default function App() {
             weeklyLogs={weeklyLogs}
           />
         );
+      case "Solution":
+        return (
+          <SolutionView
+            metrics={metrics}
+            weeklyLogs={weeklyLogs}
+            orders={orders}
+            selectedBranch={selectedBranch}
+            onNavigateTab={navigateToTab}
+          />
+        );
       default:
         return (
           <OverviewTab
@@ -1998,19 +1937,15 @@ export default function App() {
     );
   };
 
-  if (!currentUser) {
-    return (
-      <LoginScreen
-        theme={theme}
-        onLogin={(username, role) => {
-          const userObj = { username, role, email: "demo@foodpenguin.com" };
-          localStorage.setItem("localCurrentUser", JSON.stringify(userObj));
-          setCurrentUser(userObj);
-          setUserRole(role as any);
-        }}
-      />
-    );
+  const handleSplashComplete = () => {
+    sessionStorage.setItem("fpl-splash-seen", "true");
+    setShowSplash(false);
+  };
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} selectedBranch={selectedBranch} />;
   }
+
   const branchClass =
     selectedBranch === "All branches"
       ? ""
@@ -2037,7 +1972,7 @@ export default function App() {
 
         <div className="p-3.5 border-t border-[var(--border)]">
           <div className="hidden lg:flex items-center gap-2 text-xs min-w-0">
-            <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>
+            <span className="font-medium text-[var(--text)] truncate">Skipper Koala</span>
             <span className="text-[10px] text-[var(--muted)] uppercase">{userRole}</span>
           </div>
         </div>
@@ -2067,16 +2002,12 @@ export default function App() {
               ))}
             </select>
 
-            <select
-              value={userRole}
-              onChange={(e) => setUserRole(e.target.value as any)}
-              className="hidden sm:block bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--accent)] cursor-pointer"
+            <span
+              title="Role is set by your login and can't be changed here"
+              className="hidden sm:inline-flex items-center bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] uppercase tracking-wide"
             >
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Staff">Staff</option>
-              <option value="User">User</option>
-            </select>
+              {userRole}
+            </span>
 
             <button
               type="button"
