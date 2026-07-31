@@ -478,9 +478,8 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
             style={{
               background: branchPalette.glow.replace("0.35", "0.12"),
               border: `1px solid ${branchPalette.glow.replace("0.35", "0.25")}`,
-              color: branchPalette.dim,
-            }}
-          >
+              color: branchPalette.surface,
+            }}>
             <strong>Scenario:</strong> Adjusting production to {simProduction} and staff hours to {simHours.toFixed(1)}
             adjusts COGS via production efficiency, waste via surplus/shortfall, and labor cost directly.
             Base sales: €{metrics.salesToday.toLocaleString()} · Base hours: {metrics.hoursScheduled}h
