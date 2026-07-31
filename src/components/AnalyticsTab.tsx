@@ -471,6 +471,7 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
               value={`€${simProfitImpact >= 0 ? "+" : ""}${simProfitImpact.toFixed(0)}`}
               status={simProfitImpact > 0 ? "ok" : simProfitImpact < -50 ? "critical" : "warn"}
             />
+            <div className="text-[10px] text-slate-500 mt-1">(assumes €15/hr wage)</div>
           </div>
 
           <div
