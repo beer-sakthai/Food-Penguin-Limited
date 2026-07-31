@@ -4,8 +4,6 @@ import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import cookieParser from "cookie-parser";
-import { requireAuth, authRouter } from "./routes/auth";
 import { geminiRouter } from "./routes/gemini";
 import { sakthaiRouter } from "./routes/sakthai";
 import { metricsRouter } from "./routes/metrics";
@@ -25,7 +23,6 @@ app.use(helmet({ contentSecurityPolicy: false }));
 // Set up larger limits for uploading base64 images for food audits
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ extended: true, limit: '12mb' }));
-app.use(cookieParser());
 
 // The Gemini and SakThai routes proxy to paid/external inference APIs —
 // throttle them separately from the plain CRUD endpoints below.
@@ -37,12 +34,6 @@ const aiRouteLimiter = rateLimit({
   message: { error: "Too many AI requests, please slow down." },
 });
 app.use(["/api/gemini", "/api/sakthai"], aiRouteLimiter);
-
-// AUTH — session cookie is an HMAC-signed, httpOnly token (see ./auth.ts and
-// ./routes/auth.ts). requireAuth gates every /api/* route except the
-// login/logout/me/health paths it exempts internally.
-app.use("/api/auth", authRouter);
-app.use(requireAuth);
 
 app.use("/api/gemini", geminiRouter);
 app.use("/api/sakthai", sakthaiRouter);

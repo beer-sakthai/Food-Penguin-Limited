@@ -1,6 +1,5 @@
 import express from "express";
 import { GoogleGenAI } from "@google/genai";
-import { requireRole } from "./auth";
 
 export const geminiRouter = express.Router();
 
@@ -501,7 +500,7 @@ Please act as Jules, the Chief AI Strategy Officer for 'Food Penguin Limited'. P
 });
 
 // --- Finance P&L Analysis API ---
-geminiRouter.post("/finance-analysis", requireRole("Admin", "Manager"), async (req, res) => {
+geminiRouter.post("/finance-analysis", async (req, res) => {
   const ai = getAiClient();
   if (!ai) {
     return res.status(500).json({ error: "Gemini client not initialized" });

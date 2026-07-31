@@ -17,7 +17,6 @@ import {
 import {
   fetchMetrics, fetchOrders, fetchTargets, fetchTasks,
   fetchWaste, fetchHours, fetchInventory, fetchLogs, fetchAlerts,
-  fetchCurrentUser, logout as apiLogout, AuthUser,
 } from "./api";
 import {
   CoreMetrics,
@@ -47,7 +46,6 @@ import FinanceTab from "./components/FinanceTab";
 import PriceImporterTab from "./components/PriceImporterTab";
 import ReportsTab from "./components/ReportsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
-import LoginScreen from "./components/LoginScreen";
 import SolutionView from "./components/SolutionView";
 import SplashScreen from "./components/SplashScreen";
 import { BRANCH_META, BUSINESS_LOCATIONS, BusinessLocation, TESCO_PRODUCTS, MS_PRODUCTS } from "./business";
@@ -87,7 +85,7 @@ import {
 } from "lucide-react";
 import { rolePermissions } from "./auth/session";
 import { getPermittedTabs, TabMeta } from "./routing/tabs";
-import { RotateCcw, Info, LogOut, GitCompare } from "lucide-react";
+import { RotateCcw, Info, GitCompare } from "lucide-react";
 import {
   db,
   handleFirestoreError,
@@ -323,37 +321,7 @@ export default function App() {
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
   >("Admin");
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  const [sessionChecked, setSessionChecked] = useState(false);
   const [isFirebaseSynced, setIsFirebaseSynced] = useState(false);
-
-  // Ask the server who (if anyone) is authenticated — role is only ever
-  // trusted from this signed session, never from client-side state.
-  useEffect(() => {
-    let cancelled = false;
-    fetchCurrentUser()
-      .then((user) => {
-        if (cancelled) return;
-        if (user) {
-          setCurrentUser(user);
-          setUserRole(user.role);
-        }
-      })
-      .catch((err) => {
-        console.warn("Session check failed, falling back to login screen:", err);
-      })
-      .finally(() => {
-        if (!cancelled) setSessionChecked(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const handleLogout = async () => {
-    await apiLogout();
-    setCurrentUser(null);
-  };
 
   // Load data from SQLite API (falls back to hardcoded data on failure)
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -394,11 +362,6 @@ export default function App() {
 
   // Firestore Sync Listener
   useEffect(() => {
-    if (!currentUser) {
-      setIsFirebaseSynced(false);
-      return;
-    }
-
     const unsubscribeList: (() => void)[] = [];
 
     const syncCollection = async <T extends { id: string }>(
@@ -489,7 +452,7 @@ export default function App() {
     return () => {
       unsubscribeList.forEach((unsub) => unsub());
     };
-  }, [currentUser]);
+  }, []);
 
   const [selectedBranch, setSelectedBranch] = useState<"All branches" | BusinessLocation>("All branches");
   // Self-hosted analytics tracker (sends batches every 2s)
@@ -1974,22 +1937,6 @@ export default function App() {
     );
   };
 
-  if (!sessionChecked) {
-    return <div className="min-h-screen bg-[var(--bg)]" />;
-  }
-
-  if (!currentUser) {
-    return (
-      <LoginScreen
-        theme={theme}
-        onLogin={(user) => {
-          setCurrentUser(user);
-          setUserRole(user.role);
-        }}
-      />
-    );
-  }
-
   const handleSplashComplete = () => {
     sessionStorage.setItem("fpl-splash-seen", "true");
     setShowSplash(false);
@@ -2025,7 +1972,7 @@ export default function App() {
 
         <div className="p-3.5 border-t border-[var(--border)]">
           <div className="hidden lg:flex items-center gap-2 text-xs min-w-0">
-            <span className="font-medium text-[var(--text)] truncate">{currentUser?.username || "Skipper Koala"}</span>
+            <span className="font-medium text-[var(--text)] truncate">Skipper Koala</span>
             <span className="text-[10px] text-[var(--muted)] uppercase">{userRole}</span>
           </div>
         </div>
@@ -2069,16 +2016,6 @@ export default function App() {
               aria-label="Toggle theme"
             >
               {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="p-2.5 rounded-xl text-[var(--muted)] hover:bg-[var(--panel)] hover:text-[var(--text)] transition-colors"
-              aria-label="Log out"
-              title="Log out"
-            >
-              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </header>

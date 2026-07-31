@@ -4,7 +4,6 @@ import {
   getWasteRecords, getEmployeeHours, getInventory, getDailyLogs, getAlerts,
   updateMetrics, addOrder, addWasteRecord, addDailyLog,
 } from "../db";
-import { requireRole } from "./auth";
 
 export const metricsRouter = express.Router();
 
@@ -17,7 +16,7 @@ metricsRouter.get("/metrics", (_req, res) => {
   }
 });
 
-metricsRouter.put("/metrics", requireRole("Admin"), (req, res) => {
+metricsRouter.put("/metrics", (req, res) => {
   try {
     updateMetrics(req.body);
     res.json({ ok: true });

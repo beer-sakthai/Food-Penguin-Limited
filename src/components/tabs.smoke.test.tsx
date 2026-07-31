@@ -15,7 +15,6 @@ import SolutionView from "./SolutionView";
 import SuppliersTab from "./SuppliersTab";
 import FinanceTab from "./FinanceTab";
 import PriceImporterTab from "./PriceImporterTab";
-import LoginScreen from "./LoginScreen";
 import SplashScreen from "./SplashScreen";
 
 import {
@@ -180,10 +179,6 @@ describe("tab smoke tests", () => {
 
   it("PriceImporterTab renders without crashing", () => {
     expect(() => render(<PriceImporterTab onProductsImported={noop} />)).not.toThrow();
-  });
-
-  it("LoginScreen renders without crashing", () => {
-    expect(() => render(<LoginScreen theme="dark" onLogin={noop} />)).not.toThrow();
   });
 
   it("SplashScreen renders without crashing", () => {
