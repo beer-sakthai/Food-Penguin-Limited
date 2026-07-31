@@ -25,111 +25,31 @@ afterAll(() => {
   }
 });
 
-async function loginAs(username: string, password: string) {
-  const res = await request(app)
-    .post("/api/auth/login")
-    .send({ username, password });
-  const cookie = res.headers["set-cookie"]?.[0];
-  return { res, cookie };
-}
-
-describe("auth", () => {
-  it("rejects unauthenticated requests to a data route", async () => {
+describe("data routes", () => {
+  it("reads metrics", async () => {
     const res = await request(app).get("/api/metrics");
-    expect(res.status).toBe(401);
-  });
-
-  it("rejects an invalid login", async () => {
-    const res = await request(app)
-      .post("/api/auth/login")
-      .send({ username: "admin", password: "wrong-password" });
-    expect(res.status).toBe(401);
-  });
-
-  it("rejects a login for a nonexistent user", async () => {
-    const res = await request(app)
-      .post("/api/auth/login")
-      .send({ username: "nobody", password: "whatever" });
-    expect(res.status).toBe(401);
-  });
-
-  it("requires both username and password", async () => {
-    const res = await request(app).post("/api/auth/login").send({ username: "admin" });
-    expect(res.status).toBe(400);
-  });
-
-  it("logs in a seeded demo user and sets a session cookie", async () => {
-    const { res, cookie } = await loginAs("admin", "admin123");
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ username: "admin", role: "Admin" });
-    expect(cookie).toMatch(/^fp_session=/);
-    expect(cookie).toMatch(/HttpOnly/i);
-  });
-
-  it("reports the authenticated identity via /api/auth/me", async () => {
-    const { cookie } = await loginAs("staff", "staff123");
-    const res = await request(app).get("/api/auth/me").set("Cookie", cookie!);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ username: "staff", role: "Staff" });
-  });
-
-  it("/api/auth/me is 401 without a session", async () => {
-    const res = await request(app).get("/api/auth/me");
-    expect(res.status).toBe(401);
-  });
-
-  it("logout clears the session so a subsequent request is unauthenticated", async () => {
-    const { cookie } = await loginAs("user", "user123");
-    const logoutRes = await request(app).post("/api/auth/logout").set("Cookie", cookie!);
-    expect(logoutRes.status).toBe(200);
-
-    const clearedCookie = logoutRes.headers["set-cookie"]?.[0];
-    const meRes = await request(app).get("/api/auth/me").set("Cookie", clearedCookie!);
-    expect(meRes.status).toBe(401);
-  });
-});
-
-describe("role-gated routes", () => {
-  it("allows an authenticated user to read metrics", async () => {
-    const { cookie } = await loginAs("staff", "staff123");
-    const res = await request(app).get("/api/metrics").set("Cookie", cookie!);
     expect(res.status).toBe(200);
   });
 
-  it("blocks a non-Admin from writing metrics", async () => {
-    const { cookie } = await loginAs("staff", "staff123");
-    const res = await request(app)
-      .put("/api/metrics")
-      .set("Cookie", cookie!)
-      .send({ sales_today: 999 });
-    expect(res.status).toBe(403);
-  });
-
-  it("allows Admin to write metrics", async () => {
-    const { cookie } = await loginAs("admin", "admin123");
-    const res = await request(app)
-      .put("/api/metrics")
-      .set("Cookie", cookie!)
-      .send({ sales_today: 999 });
+  it("writes metrics", async () => {
+    const res = await request(app).put("/api/metrics").send({ sales_today: 999 });
     expect(res.status).toBe(200);
 
-    const check = await request(app).get("/api/metrics").set("Cookie", cookie!);
+    const check = await request(app).get("/api/metrics");
     expect(check.body.sales_today).toBe(999);
   });
 
-  it("blocks Staff from the finance-analysis route", async () => {
-    const { cookie } = await loginAs("staff", "staff123");
+  it("allows the finance-analysis route through", async () => {
     const res = await request(app)
       .post("/api/gemini/finance-analysis")
-      .set("Cookie", cookie!)
       .send({ plan: [], actual: [] });
-    expect(res.status).toBe(403);
+    expect(res.status).not.toBe(401);
+    expect(res.status).not.toBe(403);
   });
 });
 
 describe("CRUD data routes", () => {
   it("adds and lists an order", async () => {
-    const { cookie } = await loginAs("admin", "admin123");
     const order = {
       id: "TEST-ORDER-1",
       timestamp: "12:00",
@@ -141,19 +61,17 @@ describe("CRUD data routes", () => {
       status: "Completed",
       branch: "Tesco - Cork City",
     };
-    const addRes = await request(app).post("/api/orders").set("Cookie", cookie!).send(order);
+    const addRes = await request(app).post("/api/orders").send(order);
     expect(addRes.status).toBe(200);
 
-    const listRes = await request(app).get("/api/orders").set("Cookie", cookie!);
+    const listRes = await request(app).get("/api/orders");
     expect(listRes.status).toBe(200);
     expect(listRes.body.some((o: any) => o.id === "TEST-ORDER-1")).toBe(true);
   });
 
   it("adds a waste record", async () => {
-    const { cookie } = await loginAs("admin", "admin123");
     const res = await request(app)
       .post("/api/waste")
-      .set("Cookie", cookie!)
       .send({ item: "Test Item", category: "Test", weight: 1, cost: 1, reason: "Test", date: "2026-01-01" });
     expect(res.status).toBe(200);
   });
@@ -161,17 +79,14 @@ describe("CRUD data routes", () => {
 
 describe("analytics routes", () => {
   it("reports seeded status", async () => {
-    const { cookie } = await loginAs("admin", "admin123");
-    const res = await request(app).get("/api/analytics/status").set("Cookie", cookie!);
+    const res = await request(app).get("/api/analytics/status");
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("seeded");
   });
 
   it("tracks an event and reflects it in the summary", async () => {
-    const { cookie } = await loginAs("admin", "admin123");
     const trackRes = await request(app)
       .post("/api/analytics/track")
-      .set("Cookie", cookie!)
       .send({
         session_id: "test-session-1",
         event_type: "pageview",
@@ -182,7 +97,7 @@ describe("analytics routes", () => {
       });
     expect(trackRes.status).toBe(200);
 
-    const summaryRes = await request(app).get("/api/analytics/summary?days=1").set("Cookie", cookie!);
+    const summaryRes = await request(app).get("/api/analytics/summary?days=1");
     expect(summaryRes.status).toBe(200);
   });
 });

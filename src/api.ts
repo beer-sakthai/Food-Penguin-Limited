@@ -14,41 +14,6 @@ function mapRow(row: Record<string, any>): Record<string, any> {
   return out;
 }
 
-// ==========================================
-// Auth
-// ==========================================
-export interface AuthUser {
-  username: string;
-  role: "Admin" | "Manager" | "Staff" | "User";
-}
-
-export async function login(username: string, password: string): Promise<AuthUser> {
-  const r = await fetch(`${BASE}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  const data = await r.json();
-  if (!r.ok) throw new Error(data?.error || `login: ${r.status}`);
-  return data as AuthUser;
-}
-
-export async function logout(): Promise<void> {
-  await fetch(`${BASE}/api/auth/logout`, { method: "POST" });
-}
-
-export async function fetchCurrentUser(): Promise<AuthUser | null> {
-  const r = await fetch(`${BASE}/api/auth/me`);
-  if (!r.ok) return null;
-  try {
-    return await r.json();
-  } catch {
-    // Non-JSON response (misconfigured backend, proxy error page, etc.) —
-    // treat as "not authenticated" rather than blocking the whole app.
-    return null;
-  }
-}
-
 export async function fetchMetrics(): Promise<CoreMetrics> {
   const r = await fetch(`${BASE}/api/metrics`);
   if (!r.ok) throw new Error(`metrics: ${r.status}`);
