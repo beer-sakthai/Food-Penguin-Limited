@@ -27,4 +27,4 @@ npm audit
 npm ls protobufjs --all
 ```
 
-Expected: `protobufjs@7.6.5 overridden` at every location and `0 vulnerabilities` reported.
+Expected: `protobufjs@7.6.5` (or newer 7.x) marked `overridden` at every location, and `0 vulnerabilities` reported. The override is `^7.6.5`, so higher patch/minor 7.x releases are accepted.
