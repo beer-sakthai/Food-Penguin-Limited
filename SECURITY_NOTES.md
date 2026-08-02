@@ -2,23 +2,29 @@
 
 ## Current Status
 
-| Severity | Count | Packages | Can fix? |
-|----------|:-----:|----------|:--------:|
-| Critical | 1 | protobufjs (via @google/genai + onnxruntime-web) | ❌ Upstream pinned |
-| High | 3 | protobufjs | ❌ Upstream pinned |
+`npm audit` reports **0 vulnerabilities** across production and dev dependencies.
 
-## Fixed (from 12 reported by Dependabot)
+Automated dependency hygiene:
+- `.github/workflows/ci.yml` runs `npm audit --omit=dev --audit-level=high` on every push and PR.
+- `.github/dependabot.yml` schedules weekly npm and GitHub Actions update PRs.
+
+## Fixed
 
 | Vulnerability | Fix |
 |-------------|-----|
-| sharp (4 CVEs) | Override to 0.35.0 ✅ |
-| onnxruntime-web | Override to 1.21.0+ ✅ |
-| @xenova/transformers | Pinned via package.json ✅ |
+| sharp (4 CVEs) | `overrides.sharp` pinned to `0.35.0` |
+| onnxruntime-web (via @xenova/transformers) | `overrides.onnxruntime-web` set to `^1.27.0` |
+| protobufjs (1 critical, 3 high) | `overrides.protobufjs` set to `^7.6.5` |
+| onnx-proto | `overrides.onnx-proto` set to `>=1.16.0` |
 
-## Remaining Risk
+The `overrides` block in `package.json` forces the fixed versions transitively even though `@google/genai` and `onnxruntime-web` had older pins upstream.
 
-The 4 remaining vulnerabilities are in `protobufjs`, pinned by:
-- `@google/genai` (Gemini API) — needs their release
-- `onnxruntime-web` (via `@xenova/transformers`) — needs their release
+## Re-verification
 
-**Acceptable risk:** These are server-side dependencies not directly exposed to users. No action until upstream releases fixes.
+```
+npm ci
+npm audit
+npm ls protobufjs --all
+```
+
+Expected: `protobufjs@7.6.5 overridden` at every location and `0 vulnerabilities` reported.
