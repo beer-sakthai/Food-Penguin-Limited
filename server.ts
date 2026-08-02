@@ -14,11 +14,31 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// contentSecurityPolicy is left off: the bundle relies on the Vite dev
-// server's inline scripts and a Tailwind/inline-style pipeline that a
-// default CSP would break. The rest of helmet's headers (frameguard,
-// nosniff, HSTS, etc.) still apply.
-app.use(helmet({ contentSecurityPolicy: false }));
+const isProd = process.env.NODE_ENV === "production";
+
+// Configure a secure Content Security Policy (CSP) tailored for Vite and Tailwind CSS.
+// In development, we allow unsafe-inline and unsafe-eval for Vite's HMR and dev server script injection.
+// In production, we restrict script-src to 'self' for strong protection against XSS.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: isProd
+          ? ["'self'"]
+          : ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:"],
+        connectSrc: isProd
+          ? ["'self'"]
+          : ["'self'", "ws:", "wss:"],
+        fontSrc: ["'self'", "data:"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: isProd ? [] : null,
+      },
+    },
+  })
+);
 
 // Set up larger limits for uploading base64 images for food audits
 app.use(express.json({ limit: '12mb' }));
