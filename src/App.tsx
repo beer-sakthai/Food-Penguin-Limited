@@ -748,6 +748,8 @@ export default function App() {
     setQuickFixRecommendation(null);
     setQuickFixAdjustment(null);
     setQuickFixDay(null);
+    setQuickFixError(null);
+    setQuickFixLoading(false);
   };
 
   // Email report schedule states
@@ -799,6 +801,12 @@ export default function App() {
   const handleResetOverrides = () => {
     setCapacityOverrides({});
     setBulkSelectedDays([]);
+    // Reset quick fix display and error states
+    setQuickFixRecommendation(null);
+    setQuickFixAdjustment(null);
+    setQuickFixDay(null);
+    setQuickFixError(null);
+    setQuickFixLoading(false);
   };
 
   const handleGlobalOverride = () => {
@@ -843,6 +851,15 @@ export default function App() {
       }));
     }
   }, [selectedWeekRange, weeklyLogsMap]);
+
+  // Reset quick fix states when branch or week range changes to prevent stale states
+  useEffect(() => {
+    setQuickFixRecommendation(null);
+    setQuickFixAdjustment(null);
+    setQuickFixDay(null);
+    setQuickFixError(null);
+    setQuickFixLoading(false);
+  }, [selectedBranch, selectedWeekRange]);
 
   // Polling mechanism to simulate real-time operational database updates every 60 seconds
   useEffect(() => {
