@@ -397,10 +397,22 @@ geminiRouter.post("/capacity-quickfix", async (req, res) => {
     const totalWasteWeight = records.reduce((sum: number, r: any) => sum + (r.weight || 0), 0);
 
     // Most common reason
-    const reasons = records.map((r: any) => r.reason);
-    const topReason = reasons.length > 0
-      ? reasons.sort((a,b) => reasons.filter(v => v===a).length - reasons.filter(v => v===b).length).pop()
-      : "Overproduced";
+    let topReason = "Overproduced";
+    if (records.length > 0) {
+      const frequencies = new Map<string, number>();
+      let maxCount = 0;
+      for (const r of records) {
+        const reason = r.reason;
+        if (reason) {
+          const count = (frequencies.get(reason) || 0) + 1;
+          frequencies.set(reason, count);
+          if (count > maxCount) {
+            maxCount = count;
+            topReason = reason;
+          }
+        }
+      }
+    }
 
     if (!isRealGeminiKey(process.env.GEMINI_API_KEY)) {
       return res.json({
