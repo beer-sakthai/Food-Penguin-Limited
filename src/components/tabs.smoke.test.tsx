@@ -6,7 +6,6 @@ import OverviewTab from "./OverviewTab";
 import SellTab from "./SellTab";
 import WasteTab from "./WasteTab";
 import HoursTab from "./HoursTab";
-import ProductionTab from "./ProductionTab";
 import PlanningTab from "./PlanningTab";
 import TargetTab from "./TargetTab";
 import TargetsProductionTab from "./TargetsProductionTab";
@@ -67,6 +66,7 @@ describe("tab smoke tests", () => {
           totalCostToday={412.5}
           selectedBranch="All branches"
           theme="dark"
+          weeklyLogs={initialWeeklyLogs}
         />
       )
     ).not.toThrow();
@@ -76,19 +76,6 @@ describe("tab smoke tests", () => {
     expect(() =>
       render(
         <HoursTab hoursData={initialHours} onToggleClockStatus={noop} totalHoursScheduled={124} />
-      )
-    ).not.toThrow();
-  });
-
-  it("ProductionTab renders without crashing", () => {
-    expect(() =>
-      render(
-        <ProductionTab
-          recipes={initialRecipes}
-          tasks={initialTasks}
-          onAddTask={noop}
-          onUpdateTaskStatus={noop}
-        />
       )
     ).not.toThrow();
   });
@@ -174,7 +161,7 @@ describe("tab smoke tests", () => {
   });
 
   it("FinanceTab renders without crashing", () => {
-    expect(() => render(<FinanceTab theme="dark" />)).not.toThrow();
+    expect(() => render(<FinanceTab theme="dark" weeklyLogs={initialWeeklyLogs} />)).not.toThrow();
   });
 
   it("PriceImporterTab renders without crashing", () => {

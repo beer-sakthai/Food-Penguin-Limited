@@ -1,6 +1,6 @@
-// Saksee · 2026-07-25 · Hours tab: only 4 cards (schedule, use, goal, hour)
+// Saksee · 2026-07-25 · Hours tab: 4 cards (schedule, use, goal, hour) + per-staff table
 import React from "react";
-import { Clock, CalendarDays, Target, Hourglass } from "lucide-react";
+import { Clock, CalendarDays, Target, Hourglass, LogIn, LogOut, Users } from "lucide-react";
 
 interface Emp {
   id: string;
@@ -19,11 +19,12 @@ interface HoursTabProps {
   totalHoursScheduled: number;
 }
 
-export default function HoursTab({ hoursData, totalHoursScheduled }: HoursTabProps) {
+export default function HoursTab({ hoursData, onToggleClockStatus, totalHoursScheduled }: HoursTabProps) {
   const actual = hoursData.reduce((a, e) => a + e.actualHours, 0);
   const overtime = Math.max(0, actual - totalHoursScheduled);
   const goal = totalHoursScheduled;
   const remaining = Math.max(0, goal - actual);
+  const clockedIn = hoursData.filter((e) => e.status === "Clocked In").length;
 
   const cards = [
     {
@@ -52,9 +53,9 @@ export default function HoursTab({ hoursData, totalHoursScheduled }: HoursTabPro
     },
     {
       id: "hour",
-      label: "Hour",
-      value: `${hoursData.length}`,
-      sub: "staff rostered",
+      label: "Staff on shift",
+      value: `${clockedIn}/${hoursData.length}`,
+      sub: "currently clocked in",
       icon: Hourglass,
       tone: "ok",
     },
@@ -95,6 +96,72 @@ export default function HoursTab({ hoursData, totalHoursScheduled }: HoursTabPro
             </div>
           );
         })}
+      </div>
+
+      <div className="card p-0 overflow-hidden">
+        <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--border)]">
+          <Users className="w-4 h-4 text-[var(--accent)]" />
+          <h2 className="text-sm font-semibold text-[var(--text)]">Staff roster</h2>
+          <span className="ml-auto text-[11px] text-[var(--muted)]">
+            {hoursData.length} people · {clockedIn} clocked in
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[var(--panel)] text-[10px] uppercase tracking-wide text-[var(--muted)]">
+              <tr>
+                <th className="text-left px-4 py-2 font-medium">Name</th>
+                <th className="text-left px-4 py-2 font-medium">Role</th>
+                <th className="text-left px-4 py-2 font-medium">Shift</th>
+                <th className="text-right px-4 py-2 font-medium">Scheduled</th>
+                <th className="text-right px-4 py-2 font-medium">Actual</th>
+                <th className="text-left px-4 py-2 font-medium">Status</th>
+                <th className="text-right px-4 py-2 font-medium">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hoursData.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-6 text-center text-xs text-[var(--muted)]">
+                    No staff scheduled.
+                  </td>
+                </tr>
+              )}
+              {hoursData.map((emp) => {
+                const isIn = emp.status === "Clocked In";
+                const variance = emp.actualHours - emp.scheduledHours;
+                return (
+                  <tr key={emp.id} className="border-t border-[var(--border)] hover:bg-[var(--panel)]/50">
+                    <td className="px-4 py-3 text-[var(--text)] font-medium">{emp.name}</td>
+                    <td className="px-4 py-3 text-[var(--muted)]">{emp.role}</td>
+                    <td className="px-4 py-3 text-[var(--muted)] font-mono text-xs">
+                      {emp.shiftStart}–{emp.shiftEnd}
+                    </td>
+                    <td className="px-4 py-3 text-right text-[var(--text)] font-mono">{emp.scheduledHours}h</td>
+                    <td className="px-4 py-3 text-right font-mono">
+                      <span className={variance < -2 ? "text-[var(--warn)]" : variance > 2 ? "text-[var(--bad)]" : "text-[var(--text)]"}>
+                        {emp.actualHours}h
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`pill text-[10px] ${isIn ? "ok" : "warn"}`}>{emp.status}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => onToggleClockStatus(emp.id)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--panel)] hover:bg-[var(--accent-soft)] text-[var(--text)] transition-colors border border-[var(--border)]"
+                      >
+                        {isIn ? <LogOut className="w-3 h-3" /> : <LogIn className="w-3 h-3" />}
+                        {isIn ? "Clock out" : "Clock in"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

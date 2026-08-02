@@ -1,4 +1,4 @@
-// Saksee · 2026-07-24 · finance: day + week + month view
+// Saksee · 2026-07-24 · finance: day + week + month view, driven by weeklyLogs
 import React from "react";
 import { DollarSign, TrendingUp, Wallet, Percent, PieChart, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
@@ -8,40 +8,58 @@ import {
   NET_SALES_FACTOR,
   cogsTargetFromSales,
 } from "../business";
+import { DailyOperationalLog } from "../types";
 
-export default function FinanceTab({ theme }: { theme: string }) {
-  // Last 7 days (today + 6 prior)
-  const weekly = [
-    { d: "Mon", gross: 6400 },
-    { d: "Tue", gross: 6900 },
-    { d: "Wed", gross: 6600 },
-    { d: "Thu", gross: 7500 },
-    { d: "Fri", gross: 7800 },
-    { d: "Sat", gross: 8100 },
-    { d: "Sun", gross: 7500 },
-  ].map((m) => ({
-    ...m,
-    net: Math.round(m.gross * NET_SALES_FACTOR),
-    commission: Math.round(m.gross * (COMMISSION_TARGET_PCT / 100)),
-    cogs: Math.round(cogsTargetFromSales(m.gross)),
-    margin: Math.round(m.gross * NET_SALES_FACTOR - cogsTargetFromSales(m.gross)),
+const MONTH_LABEL = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const sumCogs = (c: DailyOperationalLog["cogs"]) =>
+  c.tazaki + c.sysco + c.bulza + c.sticker + c.others;
+
+const deriveRow = (gross: number, cogs: number) => {
+  const net = Math.round(gross * NET_SALES_FACTOR);
+  const commission = Math.round(gross * (COMMISSION_TARGET_PCT / 100));
+  const cogsRounded = Math.round(cogs);
+  return { gross, net, commission, cogs: cogsRounded, margin: net - cogsRounded };
+};
+
+export default function FinanceTab({
+  theme,
+  weeklyLogs = [],
+}: {
+  theme: string;
+  weeklyLogs?: DailyOperationalLog[];
+}) {
+  // Weekly: last 7 log entries. Fall back to a zeroed 7-day frame if empty.
+  const lastSeven = weeklyLogs.slice(-7);
+  const weekly = (lastSeven.length
+    ? lastSeven
+    : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => ({
+        day: d,
+        sales: 0,
+        cogs: { tazaki: 0, sysco: 0, bulza: 0, sticker: 0, others: 0 },
+      }))
+  ).map((log: any) => ({
+    d: log.day,
+    ...deriveRow(log.sales || 0, sumCogs(log.cogs) || cogsTargetFromSales(log.sales || 0)),
   }));
 
-  // Last 6 months
-  const monthly = [
-    { m: "Jan", gross: 205000 },
-    { m: "Feb", gross: 212000 },
-    { m: "Mar", gross: 220000 },
-    { m: "Apr", gross: 215000 },
-    { m: "May", gross: 228000 },
-    { m: "Jun", gross: 235000 },
-  ].map((m) => ({
-    ...m,
-    net: Math.round(m.gross * NET_SALES_FACTOR),
-    commission: Math.round(m.gross * (COMMISSION_TARGET_PCT / 100)),
-    cogs: Math.round(cogsTargetFromSales(m.gross)),
-    margin: Math.round(m.gross * NET_SALES_FACTOR - cogsTargetFromSales(m.gross)),
-  }));
+  // Monthly: group logs by YYYY-MM. Render whatever range we have (up to 6 latest).
+  const monthlyMap = new Map<string, { gross: number; cogs: number }>();
+  for (const log of weeklyLogs) {
+    if (!log.date) continue;
+    const key = log.date.slice(0, 7); // YYYY-MM
+    const bucket = monthlyMap.get(key) || { gross: 0, cogs: 0 };
+    bucket.gross += log.sales || 0;
+    bucket.cogs += sumCogs(log.cogs);
+    monthlyMap.set(key, bucket);
+  }
+  const monthly = Array.from(monthlyMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6)
+    .map(([key, agg]) => ({
+      m: MONTH_LABEL[Number(key.slice(5, 7)) - 1] || key,
+      ...deriveRow(agg.gross, agg.cogs),
+    }));
 
   const today = weekly[weekly.length - 1];
   const weekGross = weekly.reduce((a, m) => a + m.gross, 0);
