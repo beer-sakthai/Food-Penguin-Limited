@@ -184,7 +184,6 @@ function seedIfEmpty() {
     INSERT OR REPLACE INTO metrics (id, sales_today, sales_growth, production_items, production_target, waste_cost, waste_reduction, hours_scheduled, overtime_hours, ai_health_score)
     VALUES (1, 14820, 12.4, 11240, 11500, 412.50, 18.2, 124, 0, 94)
   `);
-  insert.run();
 
   const insertOrder = db.prepare(
     "INSERT OR REPLACE INTO orders (id, timestamp, date, item, category, quantity, amount, barcode, status, branch) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -201,7 +200,6 @@ function seedIfEmpty() {
     ["FP-3080", "13:20", "2026-06-15", "TokYO! party platter", "Party Platters", 1, 16.75, "5391548890549", "Completed", "Tesco - Mahon Point"],
     ["FP-3078", "12:30", "2026-06-28", "veggie tofu yakisoba noodles", "Noodles & Sides", 3, 23.85, "5391548890679", "Completed", "Tesco - Mahon Point"],
   ];
-  for (const o of orders) insertOrder.run(...o);
 
   const insertTarget = db.prepare(
     "INSERT OR REPLACE INTO targets (id, name, metric, target_value, current_value, unit, category, deadline, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -213,7 +211,6 @@ function seedIfEmpty() {
     ["T-4", "Hourly Roster Precision", "Overtime Margin", 2, 0, "hrs", "Hours", "End of Shift", "2026-06-28"],
     ["T-5", "Weekly Organic Reach", "Social Promos Run", 10, 8, "times", "Sell", "Sunday, 18:00", "2026-06-21"],
   ];
-  for (const t of targets) insertTarget.run(...t);
 
   const insertRecipe = db.prepare(
     "INSERT OR REPLACE INTO recipes (id, name, category, status, prep_time, ingredients, allergens) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -225,7 +222,6 @@ function seedIfEmpty() {
     ["R-4", "California Roll Classic", "Sushi Rolls", "active", 15, "Snow Crab Stick|Avocado slice|Fresh Cucumber|Premium Sushi Rice|Nori Sheets", "Crustaceans|Gluten"],
     ["R-5", "Volcano Baked Scallop Roll", "Specialty Rolls", "active", 6, "Spicy Crab Mix|Chopped Sea Scallops|Creamy Spicy Mayo|Sweet Soy Reduction|Masago Fish Roe", "Molluscs|Eggs|Fish|Soya"],
   ];
-  for (const r of recipes) insertRecipe.run(...r);
 
   const insertTask = db.prepare(
     "INSERT OR REPLACE INTO production_tasks (id, item_name, assigned_to, status, quantity, priority, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -236,7 +232,6 @@ function seedIfEmpty() {
     ["PT-303", "Spicy Bluefin Tuna Roll", "Kitchen Aide Rico", "In Queue", 1, "low", "2026-06-20"],
     ["PT-304", "California Roll Classic", "Chef Kowalski", "Prepared", 3, "high", "2026-06-19"],
   ];
-  for (const t of tasks) insertTask.run(...t);
 
   const insertWaste = db.prepare(
     "INSERT OR REPLACE INTO waste_records (id, item, category, weight, cost, reason, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -248,7 +243,6 @@ function seedIfEmpty() {
     ["W-904", "Damaged Nori Seaweed Sheets", "Wrapping", 6.0, 24.00, "Quality Issue", "2026-06-19"],
     ["W-905", "Soggy Cucumber Strips", "Produce", 5.0, 15.00, "Expired", "2026-06-18"],
   ];
-  for (const w of waste) insertWaste.run(...w);
 
   const insertHours = db.prepare(
     "INSERT OR REPLACE INTO employee_hours (id, name, role, status, scheduled_hours, actual_hours, shift_start, shift_end, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -261,7 +255,6 @@ function seedIfEmpty() {
     ["E-05", "Alice Smith", "Sushi Counter Manager", "Clocked Out", 32, 32.0, "08:00", "16:00", "2026-06-19"],
     ["E-06", "Bob Johnson", "Cold Logistics Lead", "Clocked Out", 30, 24.0, "12:00", "20:00", "2026-06-18"],
   ];
-  for (const h of hours) insertHours.run(...h);
 
   const insertInventory = db.prepare(
     "INSERT OR REPLACE INTO inventory (id, name, category, stock_level, current_qty, unit, reorder_level, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -274,7 +267,6 @@ function seedIfEmpty() {
     ["I-105", "Fresh Avocados", "Produce", 45, 90, "units", 120, "Low"],
     ["I-106", "Sushi Seasoning Vinegar", "Condiments", 95, 475, "L", 150, "Healthy"],
   ];
-  for (const i of inventory) insertInventory.run(...i);
 
   const insertLog = db.prepare(
     "INSERT OR REPLACE INTO daily_logs (day, date, sales, waste, hours, production_target, production_made, supplier_name, cogs_tazaki, cogs_sysco, cogs_bulza, cogs_sticker, cogs_others, week_range) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -302,7 +294,6 @@ function seedIfEmpty() {
     ["Sat", "2026-06-13", 13800, 420, 122, 11000, 11000, "Tazaki", 4600, 1050, 750, 200, 320, "2026-06-08 to 2026-06-14"],
     ["Sun", "2026-06-14", 14200, 430, 124, 11000, 11200, "Others", 4700, 1000, 780, 210, 340, "2026-06-08 to 2026-06-14"],
   ];
-  for (const l of logs) insertLog.run(...l);
 
   const insertAlert = db.prepare(
     "INSERT OR REPLACE INTO alerts (id, timestamp, date, sensor, value, status, message) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -313,7 +304,22 @@ function seedIfEmpty() {
     ["A-03", "13:55:00", "2026-06-27", "Seafood Deep Freezer", "-12.1°C", "warning", "Slight thermal climb detected during door cycle."],
     ["A-04", "13:10:45", "2026-06-19", "Dishwasher Rinse Tank", "82.5°C", "normal", "Sanitation high-temp rinse verified."],
   ];
-  for (const a of alerts) insertAlert.run(...a);
+
+  // Wrap inside a single atomic transaction for a massive speedup
+  const runSeeding = db.transaction(() => {
+    insert.run();
+    for (const o of orders) insertOrder.run(...o);
+    for (const t of targets) insertTarget.run(...t);
+    for (const r of recipes) insertRecipe.run(...r);
+    for (const t of tasks) insertTask.run(...t);
+    for (const w of waste) insertWaste.run(...w);
+    for (const h of hours) insertHours.run(...h);
+    for (const i of inventory) insertInventory.run(...i);
+    for (const l of logs) insertLog.run(...l);
+    for (const a of alerts) insertAlert.run(...a);
+  });
+
+  runSeeding();
 }
 
 // ---- Query helpers ----
