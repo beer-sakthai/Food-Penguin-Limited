@@ -101,3 +101,17 @@ describe("analytics routes", () => {
     expect(summaryRes.status).toBe(200);
   });
 });
+
+describe("security headers", () => {
+  it("implements robust Helmet and Content Security Policy headers", async () => {
+    const res = await request(app).get("/api/metrics");
+    expect(res.headers).toHaveProperty("content-security-policy");
+    const csp = res.headers["content-security-policy"];
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+    expect(csp).toContain("object-src 'none'");
+    expect(res.headers).toHaveProperty("x-content-type-options", "nosniff");
+    expect(res.headers).toHaveProperty("x-frame-options", "SAMEORIGIN");
+  });
+});
