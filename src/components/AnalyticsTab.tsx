@@ -471,6 +471,7 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
               value={`€${simProfitImpact >= 0 ? "+" : ""}${simProfitImpact.toFixed(0)}`}
               status={simProfitImpact > 0 ? "ok" : simProfitImpact < -50 ? "critical" : "warn"}
             />
+            <div className="text-[10px] text-slate-500 mt-1">(assumes €15/hr wage)</div>
           </div>
 
           <div
@@ -478,9 +479,6 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
             style={{
               background: branchPalette.glow.replace("0.35", "0.12"),
               border: `1px solid ${branchPalette.glow.replace("0.35", "0.25")}`,
-              color: branchPalette.dim,
-            }}
-          >
               color: branchPalette.surface,
             }}>
             <strong>Scenario:</strong> Adjusting production to {simProduction} and staff hours to {simHours.toFixed(1)}
