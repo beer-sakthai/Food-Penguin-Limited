@@ -37,7 +37,6 @@ import AdvisorTab from "./components/AdvisorTab";
 import RagAnalyzerTab from "./components/RagAnalyzerTab";
 import SellTab from "./components/SellTab";
 import TargetsProductionTab from "./components/TargetsProductionTab";
-import ProductionTab from "./components/ProductionTab";
 import WasteTab from "./components/WasteTab";
 import HoursTab from "./components/HoursTab";
 import PlanningTab from "./components/PlanningTab";
@@ -1821,6 +1820,7 @@ export default function App() {
             selectedBranch={selectedBranch}
             theme={theme}
             productionValueToday={metrics.productionItems}
+            weeklyLogs={weeklyLogs}
           />
         );
       case "Hours":
@@ -1846,7 +1846,7 @@ export default function App() {
       case "Price Import":
         return <PriceImporterTab />;
       case "P&L":
-        return <FinanceTab theme={theme} />;
+        return <FinanceTab theme={theme} weeklyLogs={weeklyLogs} />;
       case "Analytics":
         return (
           <AnalyticsTab
@@ -2003,7 +2003,7 @@ export default function App() {
             </select>
 
             <span
-              title="Role is set by your login and can't be changed here"
+              title="Current role"
               className="hidden sm:inline-flex items-center bg-[var(--panel)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs text-[var(--text)] uppercase tracking-wide"
             >
               {userRole}

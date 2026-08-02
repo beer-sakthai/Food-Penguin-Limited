@@ -1,23 +1,16 @@
-// Saksee · 2026-07-24 · waste: day + week view with target
+// Saksee · 2026-07-24 · waste: day + week view with target, driven by weeklyLogs
 import React, { useState } from "react";
 import { Trash2, Plus, AlertTriangle, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import { WASTE_TARGET_PCT, wasteTargetFromProduction } from "../business";
+import { DailyOperationalLog } from "../types";
 
 interface Waste { id: string; item: string; category: string; weight: number; cost: number; reason: string; date: string; }
 
 const REASONS = ["Expired", "Overproduced", "Spill/Accident", "Quality Issue", "Damaged"];
 const CATS = ["Seafood", "Sushi Rolls", "Produce", "Condiments", "Wrapping"];
 
-const weekData = [
-  { d: "Mon", cost: 220, prod: 2200 },
-  { d: "Tue", cost: 195, prod: 2250 },
-  { d: "Wed", cost: 205, prod: 2180 },
-  { d: "Thu", cost: 180, prod: 2320 },
-  { d: "Fri", cost: 210, prod: 2400 },
-  { d: "Sat", cost: 250, prod: 2450 },
-  { d: "Sun", cost: 196, prod: 2200 },
-];
+const EMPTY_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => ({ d, cost: 0, prod: 0 }));
 
 export default function WasteTab(props: {
   wasteRecords: Waste[];
@@ -26,8 +19,14 @@ export default function WasteTab(props: {
   selectedBranch: string;
   theme: "dark" | "light";
   productionValueToday?: number;
+  weeklyLogs?: DailyOperationalLog[];
 }) {
-  const { wasteRecords, onAddWaste, totalCostToday, selectedBranch, productionValueToday = 2200 } = props;
+  const { wasteRecords, onAddWaste, totalCostToday, selectedBranch, productionValueToday = 2200, weeklyLogs = [] } = props;
+
+  const lastSeven = weeklyLogs.slice(-7);
+  const weekData = lastSeven.length
+    ? lastSeven.map((log) => ({ d: log.day, cost: Math.round(log.waste || 0), prod: log.productionMade || 0 }))
+    : EMPTY_WEEK;
   const [item, setItem] = useState("");
   const [cat, setCat] = useState(CATS[0]);
   const [w, setW] = useState(1);
