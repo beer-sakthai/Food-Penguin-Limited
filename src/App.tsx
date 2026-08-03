@@ -5,12 +5,10 @@ import {
   initialMetrics,
   initialOrders,
   initialTargets,
-  initialRecipes,
   initialTasks,
   initialWaste,
   initialHours,
   initialInventory,
-  initialWeeklyLogs,
   alternativeWeeklyLogsMap,
   initialAlerts,
 } from "./data";
