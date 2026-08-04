@@ -39,6 +39,18 @@ describe("data routes", () => {
     expect(check.body.sales_today).toBe(999);
   });
 
+  it("prevents SQL injection in metrics keys", async () => {
+    // Attempt SQL injection via metric keys
+    const res = await request(app)
+      .put("/api/metrics")
+      .send({ "sales_today = 100 WHERE 1=1; --": 0 });
+    expect(res.status).toBe(200);
+
+    // Verify database was not compromised / updated unauthorized metrics
+    const check = await request(app).get("/api/metrics");
+    expect(check.body.sales_today).not.toBe(100);
+  });
+
   it("allows the finance-analysis route through", async () => {
     const res = await request(app)
       .post("/api/gemini/finance-analysis")

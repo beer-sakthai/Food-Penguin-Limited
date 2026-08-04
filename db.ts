@@ -365,9 +365,25 @@ export function getAlerts() {
   return getDb().prepare("SELECT * FROM alerts ORDER BY timestamp DESC").all();
 }
 
+const ALLOWED_METRIC_COLUMNS = new Set([
+  "sales_today",
+  "sales_growth",
+  "production_items",
+  "production_target",
+  "waste_cost",
+  "waste_reduction",
+  "hours_scheduled",
+  "overtime_hours",
+  "ai_health_score"
+]);
+
 export function updateMetrics(data: Record<string, number>) {
-  const fields = Object.keys(data).map(k => `${k} = ?`).join(", ");
-  const values = Object.values(data);
+  const keys = Object.keys(data).filter(k => ALLOWED_METRIC_COLUMNS.has(k));
+  if (keys.length === 0) {
+    return { changes: 0 };
+  }
+  const fields = keys.map(k => `${k} = ?`).join(", ");
+  const values = keys.map(k => data[k]);
   return getDb().prepare(`UPDATE metrics SET ${fields}, updated_at = datetime('now') WHERE id = 1`).run(...values);
 }
 
