@@ -3,7 +3,7 @@ import {
   upsertAnalyticsSession, recordAnalyticsEvent, endAnalyticsSession,
   getAnalyticsSummary, getAnalyticsTimeseries, getTopLabels, getTopActions,
   getTopErrors, getTopPages, getTopBranches, getRoleBreakdown, getFunnel,
-  getRecentEvents, getAnalyticsSeeded,
+  getRecentEvents, getAnalyticsSeeded, applyAnalyticsEventsBatch,
 } from "../db";
 
 export const analyticsRouter = express.Router();
@@ -55,12 +55,7 @@ analyticsRouter.post("/track", (req, res) => {
 analyticsRouter.post("/track-batch", (req, res) => {
   try {
     const events: any[] = Array.isArray(req.body?.events) ? req.body.events : [];
-    let count = 0;
-    for (const body of events) {
-      if (!body || !body.session_id || !body.event_type || !body.page) continue;
-      applyAnalyticsEvent(body);
-      count++;
-    }
+    const count = applyAnalyticsEventsBatch(events);
     res.json({ ok: true, count });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

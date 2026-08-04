@@ -100,6 +100,41 @@ describe("analytics routes", () => {
     const summaryRes = await request(app).get("/api/analytics/summary?days=1");
     expect(summaryRes.status).toBe(200);
   });
+
+  it("tracks a batch of events and reflects them in the summary", async () => {
+    const batchRes = await request(app)
+      .post("/api/analytics/track-batch")
+      .send({
+        events: [
+          {
+            session_id: "test-session-batch-1",
+            event_type: "session_start",
+            page: "Overview",
+            user_role: "Manager",
+            occurred_at: new Date().toISOString(),
+            day: new Date().toISOString().slice(0, 10),
+          },
+          {
+            session_id: "test-session-batch-1",
+            event_type: "pageview",
+            page: "Overview",
+            user_role: "Manager",
+            occurred_at: new Date().toISOString(),
+            day: new Date().toISOString().slice(0, 10),
+          },
+          {
+            session_id: "test-session-batch-1",
+            event_type: "session_end",
+            page: "Overview",
+            user_role: "Manager",
+            occurred_at: new Date().toISOString(),
+            day: new Date().toISOString().slice(0, 10),
+          }
+        ]
+      });
+    expect(batchRes.status).toBe(200);
+    expect(batchRes.body).toEqual({ ok: true, count: 3 });
+  });
 });
 
 describe("security headers", () => {

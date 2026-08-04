@@ -4,6 +4,16 @@ import path from "path";
 const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "food-penguin.db");
 
 let db: Database.Database;
+const stmtCache = new Map<string, Database.Statement>();
+
+export function getPreparedStatement(sql: string): Database.Statement {
+  let stmt = stmtCache.get(sql);
+  if (!stmt) {
+    stmt = getDb().prepare(sql);
+    stmtCache.set(sql, stmt);
+  }
+  return stmt;
+}
 
 export function getDb(): Database.Database {
   if (!db) {
@@ -12,6 +22,7 @@ export function getDb(): Database.Database {
     db.pragma("foreign_keys = ON");
     initSchema();
     seedIfEmpty();
+    stmtCache.clear();
   }
   return db;
 }
@@ -415,7 +426,7 @@ export function upsertAnalyticsSession(s: {
   last_seen_at: string;
   is_active: number;
 }) {
-  return getDb().prepare(`
+  return getPreparedStatement(`
     INSERT INTO analytics_sessions (session_id, user_role, branch, first_seen_at, last_seen_at, is_active)
     VALUES (@session_id, @user_role, @branch, @first_seen_at, @last_seen_at, @is_active)
     ON CONFLICT(session_id) DO UPDATE SET
@@ -431,45 +442,49 @@ export function upsertAnalyticsSession(s: {
   });
 }
 
+export function recordAnalyticsEventInternal(row: AnalyticsEventInput) {
+  getPreparedStatement(`
+    INSERT INTO analytics_events (session_id, event_type, category, label, value, props, page, user_role, branch, occurred_at, day)
+    VALUES (@session_id, @event_type, @category, @label, @value, @props, @page, @user_role, @branch, @occurred_at, @day)
+  `).run({
+    session_id: row.session_id,
+    event_type: row.event_type,
+    category: row.category ?? null,
+    label: row.label ?? null,
+    value: row.value ?? null,
+    props: row.props ? JSON.stringify(row.props) : null,
+    page: row.page,
+    user_role: row.user_role,
+    branch: row.branch ?? null,
+    occurred_at: row.occurred_at,
+    day: row.day,
+  });
+  // Bump session counters
+  const isPageview = row.event_type === "pageview" ? 1 : 0;
+  getPreparedStatement(`
+    UPDATE analytics_sessions
+    SET event_count = event_count + 1,
+        pageview_count = pageview_count + ?,
+        last_seen_at = ?
+    WHERE session_id = ?
+  `).run(isPageview, row.occurred_at, row.session_id);
+}
+
 export function recordAnalyticsEvent(e: AnalyticsEventInput) {
   const tx = getDb().transaction((row: AnalyticsEventInput) => {
-    getDb().prepare(`
-      INSERT INTO analytics_events (session_id, event_type, category, label, value, props, page, user_role, branch, occurred_at, day)
-      VALUES (@session_id, @event_type, @category, @label, @value, @props, @page, @user_role, @branch, @occurred_at, @day)
-    `).run({
-      session_id: row.session_id,
-      event_type: row.event_type,
-      category: row.category ?? null,
-      label: row.label ?? null,
-      value: row.value ?? null,
-      props: row.props ? JSON.stringify(row.props) : null,
-      page: row.page,
-      user_role: row.user_role,
-      branch: row.branch ?? null,
-      occurred_at: row.occurred_at,
-      day: row.day,
-    });
-    // Bump session counters
-    const isPageview = row.event_type === "pageview" ? 1 : 0;
-    getDb().prepare(`
-      UPDATE analytics_sessions
-      SET event_count = event_count + 1,
-          pageview_count = pageview_count + ?,
-          last_seen_at = ?
-      WHERE session_id = ?
-    `).run(isPageview, row.occurred_at, row.session_id);
+    recordAnalyticsEventInternal(row);
   });
   tx(e);
 }
 
 export function endAnalyticsSession(session_id: string, last_seen_at: string) {
   // Compute duration from first_seen_at
-  const s = getDb().prepare("SELECT first_seen_at FROM analytics_sessions WHERE session_id = ?").get(session_id) as { first_seen_at: string } | undefined;
+  const s = getPreparedStatement("SELECT first_seen_at FROM analytics_sessions WHERE session_id = ?").get(session_id) as { first_seen_at: string } | undefined;
   if (!s) return;
   const start = new Date(s.first_seen_at).getTime();
   const end = new Date(last_seen_at).getTime();
   const dur = Math.max(0, Math.round((end - start) / 1000));
-  getDb().prepare("UPDATE analytics_sessions SET is_active = 0, duration_seconds = ? WHERE session_id = ?").run(dur, session_id);
+  getPreparedStatement("UPDATE analytics_sessions SET is_active = 0, duration_seconds = ? WHERE session_id = ?").run(dur, session_id);
 }
 
 export function getAnalyticsSummary(days = 30) {
@@ -607,4 +622,46 @@ export function getRecentEvents(limit = 50) {
 export function getAnalyticsSeeded(): boolean {
   const row = getDb().prepare("SELECT COUNT(*) AS c FROM analytics_events").get() as { c: number };
   return row.c > 0;
+}
+
+export function applyAnalyticsEventsBatch(events: any[]): number {
+  const db = getDb();
+
+  const runBatch = db.transaction((batchEvents: any[]) => {
+    let count = 0;
+    for (const body of batchEvents) {
+      if (!body || !body.session_id || !body.event_type || !body.page) continue;
+
+      if (body.event_type === "session_start") {
+        upsertAnalyticsSession({
+          session_id: body.session_id,
+          user_role: body.user_role || "unknown",
+          branch: body.branch,
+          first_seen_at: body.occurred_at,
+          last_seen_at: body.occurred_at,
+          is_active: 1,
+        });
+      } else if (body.event_type === "session_end") {
+        endAnalyticsSession(body.session_id, body.occurred_at);
+      } else {
+        recordAnalyticsEventInternal({
+          session_id: body.session_id,
+          event_type: body.event_type,
+          category: body.category,
+          label: body.label,
+          value: body.value,
+          props: body.props,
+          page: body.page,
+          user_role: body.user_role || "unknown",
+          branch: body.branch,
+          occurred_at: body.occurred_at,
+          day: body.day,
+        });
+      }
+      count++;
+    }
+    return count;
+  });
+
+  return runBatch(events);
 }
