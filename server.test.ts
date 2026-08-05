@@ -39,6 +39,23 @@ describe("data routes", () => {
     expect(check.body.sales_today).toBe(999);
   });
 
+  it("fails to write metrics if keys are not in the allowlist", async () => {
+    const res1 = await request(app)
+      .put("/api/metrics")
+      .send({ "sales_today = 1; DROP TABLE metrics; --": 999 });
+    expect(res1.status).toBe(500);
+
+    const res2 = await request(app)
+      .put("/api/metrics")
+      .send({ invalid_column: 123 });
+    expect(res2.status).toBe(500);
+
+    const res3 = await request(app)
+      .put("/api/metrics")
+      .send({});
+    expect(res3.status).toBe(500);
+  });
+
   it("allows the finance-analysis route through", async () => {
     const res = await request(app)
       .post("/api/gemini/finance-analysis")
@@ -130,4 +147,5 @@ describe("rate limiting", () => {
     expect(res.headers).toHaveProperty("ratelimit-limit");
     expect(res.headers["ratelimit-limit"]).toBe("20");
   });
+});
 });
