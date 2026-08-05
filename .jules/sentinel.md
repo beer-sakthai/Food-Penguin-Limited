@@ -20,3 +20,11 @@ Rather than completely disabling the CSP, we must implement an **environment-awa
 Always assert that:
 - The `Content-Security-Policy` header is properly populated with secure fallback directives.
 - Frame guarding (`X-Frame-Options: SAMEORIGIN`) and mime sniffing protection (`X-Content-Type-Options: nosniff`) are successfully applied in parallel.
+
+## 2026-08-04 - Dynamic SQL Key Interpolation Injection
+
+**Vulnerability:** Untrusted user input keys from \`req.body\` were mapped directly into a raw SQL query string in the \`updateMetrics\` helper (\`Object.keys(data).map(k => \`\${k} = ?\`)\`). Because SQLite (and many SQL engines) do not support query parameters (\`?\`) for column names or identifiers, developers often resort to string interpolation, opening up severe SQL injection vectors when keys are not strictly validated.
+
+**Learning:** Database libraries parameterize values but cannot parameterize structural elements like identifiers (table/column names). Any time a query's structure is dynamically generated based on client payloads, standard parameterization of values is insufficient.
+
+**Prevention:** Enforce a strict allowlist (whitelist) of valid database column names as a Set or Array before constructing the SQL command dynamically, discarding any unrecognized key identifiers.
