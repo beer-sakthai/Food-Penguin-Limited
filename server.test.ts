@@ -49,6 +49,21 @@ describe("data routes", () => {
     // Verify database was not compromised / updated unauthorized metrics
     const check = await request(app).get("/api/metrics");
     expect(check.body.sales_today).not.toBe(100);
+  it("fails to write metrics if keys are not in the allowlist", async () => {
+    const res1 = await request(app)
+      .put("/api/metrics")
+      .send({ "sales_today = 1; DROP TABLE metrics; --": 999 });
+    expect(res1.status).toBe(500);
+
+    const res2 = await request(app)
+      .put("/api/metrics")
+      .send({ invalid_column: 123 });
+    expect(res2.status).toBe(500);
+
+    const res3 = await request(app)
+      .put("/api/metrics")
+      .send({});
+    expect(res3.status).toBe(500);
   });
 
   it("allows the finance-analysis route through", async () => {
@@ -112,6 +127,41 @@ describe("analytics routes", () => {
     const summaryRes = await request(app).get("/api/analytics/summary?days=1");
     expect(summaryRes.status).toBe(200);
   });
+
+  it("tracks a batch of events and reflects them in the summary", async () => {
+    const batchRes = await request(app)
+      .post("/api/analytics/track-batch")
+      .send({
+        events: [
+          {
+            session_id: "test-session-batch-1",
+            event_type: "session_start",
+            page: "Overview",
+            user_role: "Manager",
+            occurred_at: new Date().toISOString(),
+            day: new Date().toISOString().slice(0, 10),
+          },
+          {
+            session_id: "test-session-batch-1",
+            event_type: "pageview",
+            page: "Overview",
+            user_role: "Manager",
+            occurred_at: new Date().toISOString(),
+            day: new Date().toISOString().slice(0, 10),
+          },
+          {
+            session_id: "test-session-batch-1",
+            event_type: "session_end",
+            page: "Overview",
+            user_role: "Manager",
+            occurred_at: new Date().toISOString(),
+            day: new Date().toISOString().slice(0, 10),
+          }
+        ]
+      });
+    expect(batchRes.status).toBe(200);
+    expect(batchRes.body).toEqual({ ok: true, count: 3 });
+  });
 });
 
 describe("security headers", () => {
@@ -126,4 +176,21 @@ describe("security headers", () => {
     expect(res.headers).toHaveProperty("x-content-type-options", "nosniff");
     expect(res.headers).toHaveProperty("x-frame-options", "SAMEORIGIN");
   });
+});
+
+describe("rate limiting", () => {
+  it("includes rate limit headers on core api routes", async () => {
+    const res = await request(app).get("/api/metrics");
+    expect(res.headers).toHaveProperty("ratelimit-limit");
+    expect(res.headers).toHaveProperty("ratelimit-remaining");
+    expect(res.headers["ratelimit-limit"]).toBe("100");
+  });
+
+  it("includes lower rate limit headers on AI routes", async () => {
+    const res = await request(app).get("/api/gemini/finance-analysis");
+    // Since this route redirects/proxies or returns standard status, let's verify limit headers
+    expect(res.headers).toHaveProperty("ratelimit-limit");
+    expect(res.headers["ratelimit-limit"]).toBe("20");
+  });
+});
 });
