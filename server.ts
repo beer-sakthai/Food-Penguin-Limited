@@ -55,6 +55,24 @@ const aiRouteLimiter = rateLimit({
 });
 app.use(["/api/gemini", "/api/sakthai"], aiRouteLimiter);
 
+// Configure and apply a rate limit middleware to the core API routes
+const apiRouteLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  limit: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests to core API routes, please slow down." },
+});
+// Apply to metrics and analytics routes, but let aiRouteLimiter handle /api/gemini and /api/sakthai
+app.use("/api/analytics", apiRouteLimiter);
+app.use("/api", (req, res, next) => {
+  // If request is for /api/gemini or /api/sakthai, skip this rate limiter
+  if (req.path.startsWith("/gemini") || req.path.startsWith("/sakthai")) {
+    return next();
+  }
+  return apiRouteLimiter(req, res, next);
+});
+
 app.use("/api/gemini", geminiRouter);
 app.use("/api/sakthai", sakthaiRouter);
 app.use("/api", metricsRouter);

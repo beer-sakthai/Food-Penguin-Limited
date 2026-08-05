@@ -132,3 +132,20 @@ describe("security headers", () => {
     expect(res.headers).toHaveProperty("x-frame-options", "SAMEORIGIN");
   });
 });
+
+describe("rate limiting", () => {
+  it("includes rate limit headers on core api routes", async () => {
+    const res = await request(app).get("/api/metrics");
+    expect(res.headers).toHaveProperty("ratelimit-limit");
+    expect(res.headers).toHaveProperty("ratelimit-remaining");
+    expect(res.headers["ratelimit-limit"]).toBe("100");
+  });
+
+  it("includes lower rate limit headers on AI routes", async () => {
+    const res = await request(app).get("/api/gemini/finance-analysis");
+    // Since this route redirects/proxies or returns standard status, let's verify limit headers
+    expect(res.headers).toHaveProperty("ratelimit-limit");
+    expect(res.headers["ratelimit-limit"]).toBe("20");
+  });
+});
+});
