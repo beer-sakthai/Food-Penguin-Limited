@@ -8,7 +8,7 @@ import {
 
 export const analyticsRouter = express.Router();
 
-function applyAnalyticsEvent(body: any) {
+export function applyAnalyticsEvent(body: any) {
   if (body.event_type === "session_start") {
     upsertAnalyticsSession({
       session_id: body.session_id,
