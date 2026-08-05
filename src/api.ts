@@ -6,7 +6,7 @@ function snakeToCamel(s: string): string {
   return s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-function mapRow(row: Record<string, any>): Record<string, any> {
+export function mapRow(row: Record<string, any>): Record<string, any> {
   const out: Record<string, any> = {};
   for (const [k, v] of Object.entries(row)) {
     out[snakeToCamel(k)] = v;
