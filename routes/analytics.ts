@@ -55,7 +55,12 @@ analyticsRouter.post("/track", (req, res) => {
 analyticsRouter.post("/track-batch", (req, res) => {
   try {
     const events: any[] = Array.isArray(req.body?.events) ? req.body.events : [];
-    const count = applyAnalyticsEventsBatch(events);
+    let count = 0;
+    for (const ev of events) {
+      if (!ev || !ev.session_id || !ev.event_type || !ev.page) continue;
+      applyAnalyticsEvent(ev);
+      count++;
+    }
     res.json({ ok: true, count });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

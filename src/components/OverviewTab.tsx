@@ -379,7 +379,7 @@ export default function OverviewTab(props: OverviewProps) {
               <YAxis tick={{ fontSize: 11, fill: "var(--muted)" }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
-                formatter={(v: any, name: string) => [`€${Number(v).toLocaleString()}`, name]}
+                formatter={(v: any, name: any) => [`€${Number(v).toLocaleString()}`, String(name)]}
               />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               {BUSINESS_LOCATIONS.map((b) => (

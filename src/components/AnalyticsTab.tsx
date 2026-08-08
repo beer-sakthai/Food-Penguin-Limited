@@ -562,7 +562,7 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
                 <CartesianGrid stroke="rgba(148,163,184,0.12)" strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, fontSize: 12 }} itemStyle={{ color: "#e2e8f0" }} formatter={(v: number) => [`€${v.toFixed(0)}`, ""]} />
+                <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, fontSize: 12 }} itemStyle={{ color: "#e2e8f0" }} formatter={(v: any) => [`€${Number(v).toFixed(0)}`, ""]} />
                 <Area type="monotone" dataKey="sales" name="Forecast sales" stroke={branchPalette.main} fill="url(#forecastSales)" strokeWidth={2} />
                 <Area type="monotone" dataKey="target" name="Sales target" stroke="#10b981" fill="url(#forecastTarget)" strokeWidth={2} />
               </AreaChart>
@@ -654,7 +654,7 @@ export default function AnalyticsTab({ weeklyLogs, metrics, selectedBranch, orde
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, fontSize: 12 }} itemStyle={{ color: "#e2e8f0" }} formatter={(v: number, n: string) => [`€${v.toFixed(0)}`, n]} />
+                <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10, fontSize: 12 }} itemStyle={{ color: "#e2e8f0" }} formatter={(v: any, n: any) => [`€${Number(v).toFixed(0)}`, String(n)]} />
                 <Pie data={lastWeek.map((l) => ({ name: l.day, value: l.sales }))} dataKey="value" nameKey="name" innerRadius={50} outerRadius={70} paddingAngle={3} stroke="none">
                   {lastWeek.map((_, i) => (
                     <Cell key={i} fill={i === lastWeek.length - 1 ? branchPalette.main : `hsl(${210 + i * 25}, 70%, ${55 + i * 3}%)`} />

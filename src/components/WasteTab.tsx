@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { Trash2, Plus, AlertTriangle, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import { WASTE_TARGET_PCT, wasteTargetFromProduction } from "../business";
-import { DailyOperationalLog } from "../types";
+import { DailyOperationalLog, WasteRecord } from "../types";
 
-interface Waste { id: string; item: string; category: string; weight: number; cost: number; reason: string; date: string; }
+interface Waste { id: string; item: string; category: string; weight: number; cost: number; reason: WasteRecord["reason"]; date: string; }
 
-const REASONS = ["Expired", "Overproduced", "Spill/Accident", "Quality Issue", "Damaged"];
+const REASONS = ["Expired", "Overproduced", "Spill/Accident", "Quality Issue", "Damaged"] as const;
 const CATS = ["Seafood", "Sushi Rolls", "Produce", "Condiments", "Wrapping"];
 
 const EMPTY_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => ({ d, cost: 0, prod: 0 }));
@@ -31,7 +31,7 @@ export default function WasteTab(props: {
   const [cat, setCat] = useState(CATS[0]);
   const [w, setW] = useState(1);
   const [c, setC] = useState(0);
-  const [r, setR] = useState(REASONS[0]);
+  const [r, setR] = useState<WasteRecord["reason"]>(REASONS[0]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,7 +152,7 @@ export default function WasteTab(props: {
           <select value={cat} onChange={e => setCat(e.target.value)} className="select">{CATS.map(c => <option key={c} value={c}>{c}</option>)}</select>
           <input type="number" min={0} step="0.1" value={w} onChange={e => setW(parseFloat(e.target.value) || 0)} placeholder="kg" className="input" />
           <input type="number" min={0} step="0.01" value={c} onChange={e => setC(parseFloat(e.target.value) || 0)} placeholder="€ cost" className="input" />
-          <select value={r} onChange={e => setR(e.target.value)} className="select">{REASONS.map(x => <option key={x} value={x}>{x}</option>)}</select>
+          <select value={r} onChange={e => setR(e.target.value as WasteRecord["reason"])} className="select">{REASONS.map(x => <option key={x} value={x}>{x}</option>)}</select>
           <button type="submit" className="md:col-span-6 btn btn-primary justify-center">Log</button>
         </form>
       </div>

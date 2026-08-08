@@ -163,7 +163,7 @@ geminiRouter.post("/generate-marketing-image", async (req, res) => {
 
       let base64Image = "";
       if (response.generatedImages && response.generatedImages.length > 0) {
-        base64Image = response.generatedImages[0].image.imageBytes;
+        base64Image = response.generatedImages[0].image?.imageBytes ?? "";
       }
 
       if (base64Image) {
@@ -491,7 +491,7 @@ Total Volume: ${totalVolume} units
 Average Energy per Unit: ${avgWhPerUnit} Wh
 
 Data points (Hour - Energy - Volume - Wh/Unit):
-${data.map(d => `${d.time}: ${d.energy}kWh for ${d.volume} units (${d.efficiency} Wh/unit)`).join('\n')}
+${data.map((d: { time: string; energy: number; volume: number; efficiency: number }) => `${d.time}: ${d.energy}kWh for ${d.volume} units (${d.efficiency} Wh/unit)`).join('\n')}
 
 Please act as Jules, the Chief AI Strategy Officer for 'Food Penguin Limited'. Provide a highly concise, executive-level ESG and sustainability overview. Propose immediate, actionable operational tweaks to lower energy consumption during low-production hours, ensure minimum energy waste, and maintain our premium green standards. Limit to 3 bullet points. Formatting: bold headers, very crisp.`
             }
@@ -531,10 +531,10 @@ geminiRouter.post("/finance-analysis", async (req, res) => {
               text: `Analyze the structural variance between our Target Plan and Actual Use percentages.
 
 Plan Structure:
-${plan.map(p => `${p.name}: ${p.value}%`).join(', ')}
+${plan.map((p: { name: string; value: number }) => `${p.name}: ${p.value}%`).join(', ')}
 
 Actual Use Structure:
-${actual.map(a => `${a.name}: ${a.value}%`).join(', ')}
+${actual.map((a: { name: string; value: number }) => `${a.name}: ${a.value}%`).join(', ')}
 
 As Jules, the AI Strategy Officer for Food Penguin Limited, provide a concise financial insights brief explaining the margin erosion. Suggest 2 operational tweaks to get 'Actual Use' back aligned with 'Plan Structure'. Use bold headings, bullet points, and maintain an executive tone.`
             }

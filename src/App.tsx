@@ -390,7 +390,7 @@ export default function App() {
           ref,
           (snapshot) => {
             const list: T[] = [];
-            snapshot.forEach((doc) => {
+            snapshot.forEach((doc: { data: () => T }) => {
               list.push(doc.data() as T);
             });
             setList(list);
@@ -1489,7 +1489,7 @@ export default function App() {
   };
 
   // Reactive State Handlers
-  const handleAddOrder = async (newOrder) => {
+  const handleAddOrder = async (newOrder: Omit<SalesOrder, "id" | "timestamp" | "status">) => {
     const timestampStr = new Date().toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -1500,6 +1500,7 @@ export default function App() {
       ...newOrder,
       id: orderId,
       timestamp: timestampStr,
+      status: "Completed" as const,
       branch: selectedBranch,
     };
 
@@ -1540,7 +1541,7 @@ export default function App() {
     );
   };
 
-  const handleAddTarget = async (newTarget) => {
+  const handleAddTarget = async (newTarget: Omit<CompanyTarget, "id">) => {
     const targetId = `T-${targets.length + 1}`;
     const fullTarget = { ...newTarget, id: targetId };
 
@@ -1553,7 +1554,7 @@ export default function App() {
     }
   };
 
-  const handleUpdateTarget = async (targetId, updates) => {
+  const handleUpdateTarget = async (targetId: string, updates: Partial<CompanyTarget>) => {
     const next = targets.map((t) => (t.id === targetId ? { ...t, ...updates } : t));
     if (isFirebaseSynced) {
       await updateDoc(doc(db, "targets", targetId), updates).catch((err) =>
@@ -1564,7 +1565,7 @@ export default function App() {
     }
   };
 
-  const handleAddTask = async (newTask) => {
+  const handleAddTask = async (newTask: Omit<ProductionTask, "id">) => {
     const taskId = `PT-${Math.floor(400 + Math.random() * 100)}`;
     const fullTask = { ...newTask, id: taskId };
 
@@ -1577,7 +1578,7 @@ export default function App() {
     }
   };
 
-  const handleUpdateTaskStatus = async (taskId, newStatus) => {
+  const handleUpdateTaskStatus = async (taskId: string, newStatus: ProductionTask["status"]) => {
     const targetTask = tasks.find((t) => t.id === taskId);
     if (!targetTask) return;
 
@@ -1631,7 +1632,7 @@ export default function App() {
     }
   };
 
-  const handleAddWaste = async (newWaste) => {
+  const handleAddWaste = async (newWaste: Omit<WasteRecord, "id">) => {
     const wasteId = `W-${Math.floor(920 + Math.random() * 80)}`;
     const fullWaste = {
       ...newWaste,
@@ -1673,7 +1674,7 @@ export default function App() {
     );
   };
 
-  const handleToggleClockStatus = async (employeeId) => {
+  const handleToggleClockStatus = async (employeeId: string) => {
     const emp = hoursData.find((e) => e.id === employeeId);
     if (!emp) return;
 
@@ -1701,7 +1702,7 @@ export default function App() {
     }
   };
 
-  const handleOrderRestock = async (itemId) => {
+  const handleOrderRestock = async (itemId: string) => {
     const item = inventory.find((i) => i.id === itemId);
     if (!item) return;
 

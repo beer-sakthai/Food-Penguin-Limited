@@ -26,7 +26,7 @@ export default function ReportsTab(props: {
 
   const revenueByBranch = useMemo(() => {
     const m = new Map<string, number>();
-    orders.forEach(o => m.set(o.branch, (m.get(o.branch) || 0) + (o.amount || 0)));
+    orders.forEach(o => m.set(o.branch || "", (m.get(o.branch || "") || 0) + (o.amount || 0)));
     return Array.from(m, ([branch, total]) => ({ branch: branch.split(" - ")[0], total: Math.round(total) }));
   }, [orders]);
 

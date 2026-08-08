@@ -62,7 +62,7 @@ export interface WasteRecord {
   category: string;
   weight: number; // in kg
   cost: number;
-  reason: 'Expired' | 'Overproduced' | 'Quality Issue' | 'Spill/Accident';
+  reason: 'Expired' | 'Overproduced' | 'Quality Issue' | 'Spill/Accident' | 'Damaged';
   date: string;
 }
 

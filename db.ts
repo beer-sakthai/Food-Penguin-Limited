@@ -389,12 +389,6 @@ const ALLOWED_METRIC_COLUMNS = new Set([
 ]);
 
 export function updateMetrics(data: Record<string, number>) {
-  const keys = Object.keys(data).filter(k => ALLOWED_METRIC_COLUMNS.has(k));
-  if (keys.length === 0) {
-    return { changes: 0 };
-  }
-  const fields = keys.map(k => `${k} = ?`).join(", ");
-  const values = keys.map(k => data[k]);
   const keys = Object.keys(data);
   if (keys.length === 0) {
     throw new Error("No fields provided for update");
@@ -691,5 +685,4 @@ export function applyAnalyticsEventsBatch(events: any[]): number {
   });
 
   return runBatch(events);
-}
 }
