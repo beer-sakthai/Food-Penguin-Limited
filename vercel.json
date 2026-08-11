@@ -4,7 +4,6 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/sakthai/advisor", "destination": "/api/sakthai/advisor.mjs" },
-    { "source": "/api/:path*", "destination": "/server.cjs" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

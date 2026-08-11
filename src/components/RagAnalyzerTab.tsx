@@ -128,6 +128,7 @@ function cosineSimilarity(a: number[], b: number[]) {
 export default function RagAnalyzerTab({ metrics, orders, selectedBranch, weeklyLogs }: RagAnalyzerProps) {
   const [query, setQuery] = useState("");
   const [embeddingsReady, setEmbeddingsReady] = useState(false);
+  const [embeddingsError, setEmbeddingsError] = useState<string | null>(null);
   const [simProd, setSimProd] = useState(100);
   const [simStaff, setSimStaff] = useState(100);
   const [matches, setMatches] = useState<KnowledgeDoc[]>([]);
@@ -137,8 +138,13 @@ export default function RagAnalyzerTab({ metrics, orders, selectedBranch, weekly
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
-      const { pipeline } = await import("@xenova/transformers");
+      const { pipeline, env } = await import("@xenova/transformers");
       if (cancelled) return;
+      // Load weights from the Hugging Face CDN only. With local models enabled
+      // (the default) the library first probes same-origin `/models/...`, and a
+      // SPA host answers every unknown path with index.html — the HTML then
+      // fails to parse as JSON and rejects before the CDN is ever tried.
+      env.allowLocalModels = false;
       pipelineRef.current = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", {
         quantized: true,
         revision: "main",
@@ -156,7 +162,13 @@ export default function RagAnalyzerTab({ metrics, orders, selectedBranch, weekly
       KNOWLEDGE_BASE.forEach((d, i) => (d.embedding = vectors[i]));
       setEmbeddingsReady(true);
     };
-    init();
+    init().catch((err) => {
+      if (cancelled) return;
+      // Offline, blocked CDN or a corrupt cache: fall back to the priority
+      // ranking below instead of leaving an unhandled rejection in the console.
+      console.warn("RAG embeddings unavailable, using priority ranking:", err);
+      setEmbeddingsError(err instanceof Error ? err.message : String(err));
+    });
     return () => {
       cancelled = true;
     };
@@ -186,6 +198,19 @@ export default function RagAnalyzerTab({ metrics, orders, selectedBranch, weekly
 
   // Semantic search against knowledge base
   useEffect(() => {
+    if (embeddingsError) {
+      // No embeddings: rank on keyword overlap + authored priority.
+      const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const scored = KNOWLEDGE_BASE.map((d) => {
+        const text = d.text.toLowerCase();
+        const hits = terms.filter((t) => text.includes(t)).length;
+        return { ...d, score: hits * 0.2 + d.priority * 0.05 };
+      })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4);
+      setMatches(scored);
+      return;
+    }
     if (!embeddingsReady || !pipelineRef.current) return;
     const run = async () => {
       const q = query.trim() || "what should I fix today";
@@ -204,8 +229,11 @@ export default function RagAnalyzerTab({ metrics, orders, selectedBranch, weekly
         .slice(0, 4);
       setMatches(scored);
     };
-    run();
-  }, [query, snapshot, embeddingsReady]);
+    run().catch((err) => {
+      console.warn("RAG query failed:", err);
+      setEmbeddingsError(err instanceof Error ? err.message : String(err));
+    });
+  }, [query, snapshot, embeddingsReady, embeddingsError]);
 
   const insights = useMemo(() => {
     const list: { type: "warning" | "ok"; icon: typeof AlertTriangle; text: string }[] = [];
@@ -245,8 +273,16 @@ export default function RagAnalyzerTab({ metrics, orders, selectedBranch, weekly
           SakThai RAG Analysis
         </div>
         <div className="flex items-center gap-2 text-xs text-slate-400">
-          <span className={`w-2 h-2 rounded-full ${embeddingsReady ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
-          {embeddingsReady ? "RAG engine ready" : "Loading embeddings..."}
+          <span
+            className={`w-2 h-2 rounded-full ${
+              embeddingsError ? "bg-slate-500" : embeddingsReady ? "bg-emerald-500" : "bg-amber-500 animate-pulse"
+            }`}
+          />
+          {embeddingsError
+            ? "Keyword mode — embeddings offline"
+            : embeddingsReady
+            ? "RAG engine ready"
+            : "Loading embeddings..."}
         </div>
       </div>
 
