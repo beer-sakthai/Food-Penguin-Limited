@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 
 interface SplashScreenProps {
@@ -9,14 +9,27 @@ interface SplashScreenProps {
 export default function SplashScreen({ onComplete, selectedBranch }: SplashScreenProps) {
   const [isExiting, setIsExiting] = useState(false);
 
+  // Hold onComplete in a ref so the countdown below runs exactly once on mount.
+  // The parent re-renders every second (Dublin clock), which gives onComplete a
+  // new identity each time; depending on it here would reset the timer forever
+  // and leave the app stuck on this screen.
+  const onCompleteRef = useRef(onComplete);
   useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
+    let exitTimer: ReturnType<typeof setTimeout>;
     const timer = setTimeout(() => {
       setIsExiting(true);
-      setTimeout(onComplete, 600);
+      exitTimer = setTimeout(() => onCompleteRef.current(), 600);
     }, 2400);
 
-    return () => clearTimeout(timer);
-  }, [onComplete]);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(exitTimer);
+    };
+  }, []);
 
   const getBranchColor = () => {
     const normalized = selectedBranch.toLowerCase();

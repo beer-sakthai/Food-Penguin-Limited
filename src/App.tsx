@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
 import {
@@ -312,8 +312,11 @@ export default function App() {
   const [isLogFormOpen, setIsLogFormOpen] = useState(false);
   const [showSplash, setShowSplash] = useState(() => {
     if (typeof window === "undefined") return false;
-    const hasSeen = sessionStorage.getItem("fpl-splash-seen");
-    return !hasSeen;
+    try {
+      return !sessionStorage.getItem("fpl-splash-seen");
+    } catch {
+      return true;
+    }
   });
   const [userRole, setUserRole] = useState<
     "Admin" | "Manager" | "Staff" | "User"
@@ -1953,10 +1956,12 @@ export default function App() {
     );
   };
 
-  const handleSplashComplete = () => {
-    sessionStorage.setItem("fpl-splash-seen", "true");
+  const handleSplashComplete = useCallback(() => {
+    try {
+      sessionStorage.setItem("fpl-splash-seen", "true");
+    } catch (_) {}
     setShowSplash(false);
-  };
+  }, []);
 
   if (showSplash) {
     return <SplashScreen onComplete={handleSplashComplete} selectedBranch={selectedBranch} />;

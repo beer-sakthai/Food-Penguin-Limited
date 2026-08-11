@@ -14,42 +14,77 @@ export function mapRow(row: Record<string, any>): Record<string, any> {
   return out;
 }
 
+/**
+ * Thrown when the API is not reachable — either it answered with an error
+ * status, or something that is not JSON came back.
+ *
+ * The latter is the normal case on a static-only deployment (e.g. Vercel):
+ * the Express backend is not running, so `/api/*` falls through to the SPA
+ * rewrite and returns `index.html` with a 200. Callers treat this as "no
+ * backend" and fall back to the bundled data set.
+ */
+export class ApiUnavailableError extends Error {
+  constructor(label: string, detail: string) {
+    super(`${label}: ${detail}`);
+    this.name = "ApiUnavailableError";
+  }
+}
+
+async function requestJson(url: string, label: string, init?: RequestInit): Promise<any> {
+  let r: Response;
+  try {
+    r = await fetch(url, init);
+  } catch (err) {
+    throw new ApiUnavailableError(label, `network error (${err instanceof Error ? err.message : String(err)})`);
+  }
+
+  if (!r.ok) throw new ApiUnavailableError(label, String(r.status));
+
+  // A static host answers /api/* with the SPA shell (HTML, status 200).
+  // Detect that here so callers see "no API backend" rather than an opaque
+  // "Unexpected token '<'" JSON parse error.
+  const contentType = r.headers.get("content-type") || "";
+  if (!contentType.includes("json")) {
+    throw new ApiUnavailableError(label, `no API backend (expected JSON, got "${contentType || "unknown"}")`);
+  }
+
+  try {
+    return await r.json();
+  } catch (err) {
+    throw new ApiUnavailableError(label, `malformed JSON (${err instanceof Error ? err.message : String(err)})`);
+  }
+}
+
+function postJson(url: string, label: string, body: unknown, method: "POST" | "PUT" = "POST") {
+  return requestJson(url, label, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 export async function fetchMetrics(): Promise<CoreMetrics> {
-  const r = await fetch(`${BASE}/api/metrics`);
-  if (!r.ok) throw new Error(`metrics: ${r.status}`);
-  const data = await r.json();
+  const data = await requestJson(`${BASE}/api/metrics`, "metrics");
   return mapRow(data) as CoreMetrics;
 }
 
 export async function updateMetrics(data: Record<string, number>) {
-  const r = await fetch(`${BASE}/api/metrics`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!r.ok) throw new Error(`metrics update: ${r.status}`);
-  return r.json();
+  return postJson(`${BASE}/api/metrics`, "metrics update", data, "PUT");
 }
 
 export async function fetchOrders(branch?: string): Promise<SalesOrder[]> {
   const url = branch ? `${BASE}/api/orders?branch=${encodeURIComponent(branch)}` : `${BASE}/api/orders`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`orders: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(url, "orders");
   return rows.map(mapRow) as SalesOrder[];
 }
 
 export async function fetchTargets(): Promise<CompanyTarget[]> {
-  const r = await fetch(`${BASE}/api/targets`);
-  if (!r.ok) throw new Error(`targets: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/targets`, "targets");
   return rows.map(mapRow) as CompanyTarget[];
 }
 
 export async function fetchRecipes(): Promise<Recipe[]> {
-  const r = await fetch(`${BASE}/api/recipes`);
-  if (!r.ok) throw new Error(`recipes: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/recipes`, "recipes");
   return rows.map((row: any) => Object.assign(mapRow(row), {
     ingredients: (row.ingredients || "").split("|"),
     allergens: (row.allergens || "").split("|"),
@@ -57,37 +92,27 @@ export async function fetchRecipes(): Promise<Recipe[]> {
 }
 
 export async function fetchTasks(): Promise<ProductionTask[]> {
-  const r = await fetch(`${BASE}/api/tasks`);
-  if (!r.ok) throw new Error(`tasks: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/tasks`, "tasks");
   return rows.map(mapRow) as ProductionTask[];
 }
 
 export async function fetchWaste(): Promise<WasteRecord[]> {
-  const r = await fetch(`${BASE}/api/waste`);
-  if (!r.ok) throw new Error(`waste: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/waste`, "waste");
   return rows.map(mapRow) as WasteRecord[];
 }
 
 export async function fetchHours(): Promise<EmployeeHour[]> {
-  const r = await fetch(`${BASE}/api/hours`);
-  if (!r.ok) throw new Error(`hours: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/hours`, "hours");
   return rows.map(mapRow) as EmployeeHour[];
 }
 
 export async function fetchInventory(): Promise<InventoryItem[]> {
-  const r = await fetch(`${BASE}/api/inventory`);
-  if (!r.ok) throw new Error(`inventory: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/inventory`, "inventory");
   return rows.map(mapRow) as InventoryItem[];
 }
 
 export async function fetchLogs(week: string): Promise<DailyOperationalLog[]> {
-  const r = await fetch(`${BASE}/api/logs?week=${encodeURIComponent(week)}`);
-  if (!r.ok) throw new Error(`logs: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/logs?week=${encodeURIComponent(week)}`, "logs");
   return rows.map((row: any) => Object.assign(mapRow(row), {
     cogs: {
       tazaki: row.cogs_tazaki,
@@ -100,9 +125,7 @@ export async function fetchLogs(week: string): Promise<DailyOperationalLog[]> {
 }
 
 export async function fetchAlerts(): Promise<RealtimeAlert[]> {
-  const r = await fetch(`${BASE}/api/alerts`);
-  if (!r.ok) throw new Error(`alerts: ${r.status}`);
-  const rows = await r.json();
+  const rows = await requestJson(`${BASE}/api/alerts`, "alerts");
   return rows.map(mapRow) as RealtimeAlert[];
 }
 
@@ -110,31 +133,17 @@ export async function fetchAlerts(): Promise<RealtimeAlert[]> {
 // Analytics API (self-hosted)
 // ==========================================
 export async function fetchAnalyticsSummary(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/summary?days=${days}`);
-  if (!r.ok) throw new Error(`analytics summary: ${r.status}`);
-  return r.json();
+  return requestJson(`${BASE}/api/analytics/summary?days=${days}`, "analytics summary");
 }
 export async function fetchAnalyticsTimeseries(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/timeseries?days=${days}`);
-  if (!r.ok) throw new Error(`analytics timeseries: ${r.status}`);
-  return r.json();
+  return requestJson(`${BASE}/api/analytics/timeseries?days=${days}`, "analytics timeseries");
 }
 export async function fetchTopTabs(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/top-tabs?days=${days}`);
-  if (!r.ok) throw new Error(`analytics top tabs: ${r.status}`);
-  return r.json();
+  return requestJson(`${BASE}/api/analytics/top-tabs?days=${days}`, "analytics top tabs");
 }
 export async function fetchTopActions(days = 30) {
-  const r = await fetch(`${BASE}/api/analytics/top-actions?days=${days}`);
-  if (!r.ok) throw new Error(`analytics top actions: ${r.status}`);
-  return r.json();
+  return requestJson(`${BASE}/api/analytics/top-actions?days=${days}`, "analytics top actions");
 }
 export async function trackEventBatch(events: any[]) {
-  const r = await fetch(`${BASE}/api/analytics/track-batch`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ events }),
-  });
-  if (!r.ok) throw new Error(`analytics batch: ${r.status}`);
-  return r.json();
+  return postJson(`${BASE}/api/analytics/track-batch`, "analytics batch", { events });
 }
