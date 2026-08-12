@@ -4,6 +4,76 @@
 // while preserving 100% of its data persistence and tab synchronizations.
 // ============================================================================
 
+const STORAGE_CRYPTO_VERSION = "v1";
+const STORAGE_CRYPTO_PASSPHRASE = "foodpenguin-local-emulator-key";
+
+async function getCryptoKey(): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const passphraseKey = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(STORAGE_CRYPTO_PASSPHRASE),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: encoder.encode("foodpenguin-local-storage-salt"),
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    passphraseKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+async function encryptForStorage(plainText: string): Promise<string> {
+  const key = await getCryptoKey();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(plainText);
+  const cipherBuffer = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
+  const ivBase64 = btoa(String.fromCharCode(...iv));
+  const cipherBase64 = btoa(String.fromCharCode(...new Uint8Array(cipherBuffer)));
+  return `${STORAGE_CRYPTO_VERSION}:${ivBase64}:${cipherBase64}`;
+}
+
+async function decryptFromStorage(payload: string): Promise<string | null> {
+  try {
+    const [version, ivBase64, cipherBase64] = payload.split(":");
+    if (version !== STORAGE_CRYPTO_VERSION || !ivBase64 || !cipherBase64) {
+      return null;
+    }
+
+    const key = await getCryptoKey();
+    const iv = Uint8Array.from(atob(ivBase64), (c) => c.charCodeAt(0));
+    const cipherBytes = Uint8Array.from(atob(cipherBase64), (c) => c.charCodeAt(0));
+    const plainBuffer = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      key,
+      cipherBytes
+    );
+    return new TextDecoder().decode(plainBuffer);
+  } catch (_) {
+    return null;
+  }
+}
+
+async function loadCollectionItems(colName: string): Promise<any[]> {
+  const localData = localStorage.getItem(`fs_${colName}`);
+  if (!localData) return [];
+
+  const decrypted = await decryptFromStorage(localData);
+  if (decrypted) {
+    return JSON.parse(decrypted);
+  }
+
+  // Backward compatibility for previously stored plaintext JSON.
+  return JSON.parse(localData);
+}
+
 export enum OperationType {
   CREATE = 'create',
   UPDATE = 'update',
@@ -38,41 +108,37 @@ export function doc(dbObj: any, colPath: string, docId?: string) {
 
 export async function getDocs(collectionRef: any) {
   const colName = collectionRef.path;
-  const localData = localStorage.getItem(`fs_${colName}`);
-  if (localData) {
-    const items = JSON.parse(localData);
-    return {
-      empty: items.length === 0,
-      forEach: (cb: (doc: any) => void) => {
-        items.forEach((item: any) => {
-          cb({ data: () => item });
-        });
-      }
-    };
-  }
+  const items = await loadCollectionItems(colName);
   return {
-    empty: true,
-    forEach: () => {}
+    empty: items.length === 0,
+    forEach: (cb: (doc: any) => void) => {
+      items.forEach((item: any) => {
+        cb({ data: () => item });
+      });
+    }
   };
 }
 
 export function onSnapshot(collectionRef: any, onNext: (snapshot: any) => void, onError?: (err: any) => void) {
   const colName = collectionRef.path;
-  const update = () => {
-    const localData = localStorage.getItem(`fs_${colName}`);
-    const items = localData ? JSON.parse(localData) : [];
-    onNext({
-      empty: items.length === 0,
-      forEach: (cb: (doc: any) => void) => {
-        items.forEach((item: any) => {
-          cb({ data: () => item });
-        });
-      }
-    });
+  const update = async () => {
+    try {
+      const items = await loadCollectionItems(colName);
+      onNext({
+        empty: items.length === 0,
+        forEach: (cb: (doc: any) => void) => {
+          items.forEach((item: any) => {
+            cb({ data: () => item });
+          });
+        }
+      });
+    } catch (err) {
+      if (onError) onError(err);
+    }
   };
 
   // Run initially
-  update();
+  void update();
 
   const handler = (e: StorageEvent) => {
     if (e.key === `fs_${colName}`) {
@@ -89,8 +155,7 @@ export function onSnapshot(collectionRef: any, onNext: (snapshot: any) => void, 
 export async function setDoc(docRef: any, data: any) {
   const colName = docRef.colPath;
   const docId = docRef.docId;
-  const localData = localStorage.getItem(`fs_${colName}`);
-  let items = localData ? JSON.parse(localData) : [];
+  let items = await loadCollectionItems(colName);
   
   const idx = items.findIndex((i: any) => i.id === docId);
   if (idx !== -1) {
@@ -99,7 +164,8 @@ export async function setDoc(docRef: any, data: any) {
     items.push({ id: docId, ...data });
   }
   
-  localStorage.setItem(`fs_${colName}`, JSON.stringify(items));
+  const encryptedPayload = await encryptForStorage(JSON.stringify(items));
+  localStorage.setItem(`fs_${colName}`, encryptedPayload);
   window.dispatchEvent(new StorageEvent('storage', { key: `fs_${colName}` }));
 }
 
