@@ -11,8 +11,10 @@ const BRANCH_KEY = "fpl_analytics_branch";
 function getOrCreateSessionId(): string {
   let id = localStorage.getItem(SESSION_KEY);
   if (!id) {
-    // RFC4122-ish random UUID (no crypto dep)
-    id = "s-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    const randomSuffix = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("").slice(0, 8);
+    id = "s-" + Date.now().toString(36) + "-" + randomSuffix;
     localStorage.setItem(SESSION_KEY, id);
   }
   return id;
