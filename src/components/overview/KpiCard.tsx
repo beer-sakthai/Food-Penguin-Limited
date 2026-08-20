@@ -30,6 +30,17 @@ export function KpiCard({ label, value, detail, icon: Icon, tone = "accent", onC
     <div className="mt-2 text-[11px] text-[var(--muted)] leading-snug">{detail}</div>
   </>;
 
-  const classes = "card card-hover text-left w-full h-full flex flex-col";
-  return onClick ? <button type="button" onClick={onClick} className={classes}>{content}</button> : <div className={classes}>{content}</div>;
+  const classes = "card card-hover text-left w-full h-full flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] transition-all";
+  return onClick ? (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`${label}: ${value}, ${detail}`}
+      className={classes}
+    >
+      {content}
+    </button>
+  ) : (
+    <div className={classes}>{content}</div>
+  );
 }
