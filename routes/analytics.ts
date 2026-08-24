@@ -8,6 +8,17 @@ import {
 
 export const analyticsRouter = express.Router();
 
+const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const token = req.headers.authorization?.split(" ")[1] || req.query.token;
+  const expectedToken = process.env.ANALYTICS_API_KEY || "fp-analytics-secret-key";
+  if (token === expectedToken) {
+    return next();
+  }
+  return res.status(401).json({ error: "Unauthorized" });
+};
+
+analyticsRouter.use(requireAuth);
+
 export function applyAnalyticsEvent(body: any) {
   if (body.event_type === "session_start") {
     upsertAnalyticsSession({
