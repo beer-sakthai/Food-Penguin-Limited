@@ -1,0 +1,11 @@
+🔒 [security fix description]
+Fixes a SQL Injection vulnerability in updateMetrics
+
+🎯 What: The vulnerability fixed
+The `updateMetrics` function in `db.ts` iterated over user-supplied `Object.keys(data)` and dynamically interpolated them into a raw SQL query. While it checked against an allowlist and threw an error, it was risky because string interpolation was used for identifiers, which cannot be parameterized.
+
+⚠️ Risk: The potential impact if left unfixed
+Untrusted keys from `req.body` were used to construct SQL query strings dynamically. SQL engines do not support parameterized column names, and if the allowlist check had any gaps (or was bypassed due to type coercion/prototype pollution), an attacker could execute arbitrary SQL commands. This could lead to a complete database compromise, arbitrary data modification, or unauthorized access.
+
+🛡️ Solution: How the fix addresses the vulnerability
+The function now iteratively checks the user's input against the strict `ALLOWED_METRIC_COLUMNS` set. It only pushes keys and their corresponding values to valid arrays if the key exists in the allowlist set. This completely eliminates dynamic key extraction from untrusted input and prevents any injection by ensuring only strictly whitelisted identifiers are used in the SQL string construction. Unrecognized keys are simply ignored, adhering to secure coding patterns and discarding untrusted identifiers safely.
