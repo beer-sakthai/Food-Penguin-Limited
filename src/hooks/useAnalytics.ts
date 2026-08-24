@@ -155,12 +155,19 @@ export function useAnalytics(opts: {
       }
       const blob = new Blob([JSON.stringify(body)], { type: "application/json" });
       try {
+        const token = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ANALYTICS_API_KEY
+          ? import.meta.env.VITE_ANALYTICS_API_KEY
+          : "fp-analytics-secret-key";
+
         if (navigator.sendBeacon) {
-          navigator.sendBeacon("/api/analytics/track-batch", blob);
+          navigator.sendBeacon(`/api/analytics/track-batch?token=${token}`, blob);
         } else {
           fetch("/api/analytics/track-batch", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify(body),
             keepalive: true,
           }).catch(() => {});
