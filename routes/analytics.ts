@@ -85,7 +85,7 @@ analyticsRouter.get("/top-labels", (req, res) => {
   try {
     const days = Number(req.query.days) || 30;
     const event_type = (req.query.event_type as string) || "tab_switch";
-    const limit = Number(req.query.limit) || 10;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopLabels(days, event_type, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -93,7 +93,7 @@ analyticsRouter.get("/top-labels", (req, res) => {
 analyticsRouter.get("/top-actions", (req, res) => {
   try {
     const days = Number(req.query.days) || 30;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopActions(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -101,7 +101,7 @@ analyticsRouter.get("/top-actions", (req, res) => {
 analyticsRouter.get("/top-errors", (req, res) => {
   try {
     const days = Number(req.query.days) || 30;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopErrors(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -109,7 +109,7 @@ analyticsRouter.get("/top-errors", (req, res) => {
 analyticsRouter.get("/top-pages", (req, res) => {
   try {
     const days = Number(req.query.days) || 30;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopPages(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -117,7 +117,7 @@ analyticsRouter.get("/top-pages", (req, res) => {
 analyticsRouter.get("/top-branches", (req, res) => {
   try {
     const days = Number(req.query.days) || 30;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopBranches(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -140,7 +140,7 @@ analyticsRouter.get("/funnel", (req, res) => {
 
 analyticsRouter.get("/recent", (req, res) => {
   try {
-    const limit = Number(req.query.limit) || 50;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 100);
     res.json(getRecentEvents(limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
