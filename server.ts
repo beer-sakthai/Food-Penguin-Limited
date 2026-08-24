@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-const isProd = process.env.NODE_ENV === "production";
+const isDev = process.env.NODE_ENV === "development";
 
 // Configure a secure Content Security Policy (CSP) tailored for Vite and Tailwind CSS.
 // In development, we allow unsafe-inline and unsafe-eval for Vite's HMR and dev server script injection.
@@ -24,17 +24,17 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: isProd
+        scriptSrc: !isDev
           ? ["'self'"]
           : ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:", "blob:"],
-        connectSrc: isProd
+        connectSrc: !isDev
           ? ["'self'"]
           : ["'self'", "ws:", "wss:"],
         fontSrc: ["'self'", "data:"],
         objectSrc: ["'none'"],
-        upgradeInsecureRequests: isProd ? [] : null,
+        upgradeInsecureRequests: !isDev ? [] : null,
       },
     },
   })
