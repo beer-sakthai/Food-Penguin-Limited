@@ -178,7 +178,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track")
         .send(body);
 
       expect(res.status).toBe(200);
@@ -193,7 +193,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track")
         .send(body);
 
       expect(res.status).toBe(400);
@@ -207,7 +207,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track")
         .send(body);
 
       expect(res.status).toBe(400);
@@ -221,7 +221,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track")
         .send(body);
 
       expect(res.status).toBe(400);
@@ -240,7 +240,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track")
         .send(body);
 
       expect(res.status).toBe(500);
@@ -260,7 +260,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track-batch").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track-batch")
         .send(body);
 
       expect(res.status).toBe(200);
@@ -270,7 +270,7 @@ describe("analytics routes and helper unit tests", () => {
 
     it("handles empty or missing events array gracefully", async () => {
       const res = await request(app)
-        .post("/api/analytics/track-batch").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track-batch")
         .send({});
 
       expect(res.status).toBe(200);
@@ -289,7 +289,7 @@ describe("analytics routes and helper unit tests", () => {
       };
 
       const res = await request(app)
-        .post("/api/analytics/track-batch").set("Authorization", "Bearer fp-analytics-secret-key")
+        .post("/api/analytics/track-batch")
         .send(body);
 
       expect(res.status).toBe(500);
@@ -302,7 +302,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockSummary = { sessions: 10, events: 50 };
       vi.mocked(getAnalyticsSummary).mockReturnValue(mockSummary as any);
 
-      const res = await request(app).get("/api/analytics/summary?days=14").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/summary?days=14");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockSummary);
@@ -313,7 +313,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockTimeseries = [{ day: "2026-01-01", events: 5 }];
       vi.mocked(getAnalyticsTimeseries).mockReturnValue(mockTimeseries as any);
 
-      const res = await request(app).get("/api/analytics/timeseries?days=15").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/timeseries?days=15");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockTimeseries);
@@ -324,7 +324,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockLabels = [{ label: "tab-1", hits: 5 }];
       vi.mocked(getTopLabels).mockReturnValue(mockLabels as any);
 
-      const res = await request(app).get("/api/analytics/top-labels?days=10&event_type=click&limit=5").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/top-labels?days=10&event_type=click&limit=5");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockLabels);
@@ -335,7 +335,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockActions = [{ label: "act-1", hits: 12 }];
       vi.mocked(getTopActions).mockReturnValue(mockActions as any);
 
-      const res = await request(app).get("/api/analytics/top-actions?days=12&limit=8").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/top-actions?days=12&limit=8");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockActions);
@@ -346,7 +346,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockErrors = [{ label: "err-1", hits: 2 }];
       vi.mocked(getTopErrors).mockReturnValue(mockErrors as any);
 
-      const res = await request(app).get("/api/analytics/top-errors?days=5&limit=3").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/top-errors?days=5&limit=3");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockErrors);
@@ -357,7 +357,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockPages = [{ page: "Overview", views: 20 }];
       vi.mocked(getTopPages).mockReturnValue(mockPages as any);
 
-      const res = await request(app).get("/api/analytics/top-pages?days=6&limit=4").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/top-pages?days=6&limit=4");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockPages);
@@ -368,7 +368,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockBranches = [{ branch: "Cork", sessions: 5 }];
       vi.mocked(getTopBranches).mockReturnValue(mockBranches as any);
 
-      const res = await request(app).get("/api/analytics/top-branches?days=4&limit=2").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/top-branches?days=4&limit=2");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockBranches);
@@ -379,7 +379,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockRoles = [{ user_role: "Admin", sessions: 10 }];
       vi.mocked(getRoleBreakdown).mockReturnValue(mockRoles as any);
 
-      const res = await request(app).get("/api/analytics/roles?days=9").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/roles?days=9");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockRoles);
@@ -390,7 +390,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockFunnel = [{ step: "Overview", users: 5 }];
       vi.mocked(getFunnel).mockReturnValue(mockFunnel as any);
 
-      const res = await request(app).get("/api/analytics/funnel?days=8&steps=Overview,Production").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/funnel?days=8&steps=Overview,Production");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockFunnel);
@@ -401,7 +401,7 @@ describe("analytics routes and helper unit tests", () => {
       const mockRecent = [{ id: 1, event_type: "click" }];
       vi.mocked(getRecentEvents).mockReturnValue(mockRecent as any);
 
-      const res = await request(app).get("/api/analytics/recent?limit=25").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/recent?limit=25");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockRecent);
@@ -411,7 +411,7 @@ describe("analytics routes and helper unit tests", () => {
     it("GET /status", async () => {
       vi.mocked(getAnalyticsSeeded).mockReturnValue(true);
 
-      const res = await request(app).get("/api/analytics/status").set("Authorization", "Bearer fp-analytics-secret-key").set("Authorization", "Bearer fp-analytics-secret-key");
+      const res = await request(app).get("/api/analytics/status");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ seeded: true });
