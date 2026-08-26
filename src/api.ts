@@ -32,8 +32,22 @@ export class ApiUnavailableError extends Error {
 
 async function requestJson(url: string, label: string, init?: RequestInit): Promise<any> {
   let r: Response;
+
+  // Inject Authorization for analytics routes
+  const myInit = init || {};
+  if (url.includes("/api/analytics")) {
+    const token = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ANALYTICS_API_KEY
+      ? import.meta.env.VITE_ANALYTICS_API_KEY
+      : "fp-analytics-secret-key";
+
+    myInit.headers = {
+      ...myInit.headers,
+      "Authorization": `Bearer ${token}`
+    };
+  }
+
   try {
-    r = await fetch(url, init);
+    r = await fetch(url, myInit);
   } catch (err) {
     throw new ApiUnavailableError(label, `network error (${err instanceof Error ? err.message : String(err)})`);
   }

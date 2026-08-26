@@ -11,8 +11,19 @@ function startSakThaiAdvisor() {
   if (sakthaiProcess) return;
   const scriptPath = path.resolve(__dirname, "..", "advisor_server.py");
   const venvPython = path.resolve(__dirname, "..", ".venv/bin/python");
+  // Construct a safe environment to prevent command injection
+  // via NODE_OPTIONS, LD_PRELOAD, or other environment variables
+  const safeEnv: Record<string, string> = {
+    SAKTHAI_ADVISOR_PORT: "8123",
+  };
+
+  // Only copy specific, safe environment variables if they exist
+  if (process.env.PATH) safeEnv.PATH = process.env.PATH;
+  if (process.env.SAKTHAI_GGUF) safeEnv.SAKTHAI_GGUF = process.env.SAKTHAI_GGUF;
+  if (process.env.SAKTHAI_THREADS) safeEnv.SAKTHAI_THREADS = process.env.SAKTHAI_THREADS;
+
   sakthaiProcess = spawn(venvPython, [scriptPath], {
-    env: { ...process.env, SAKTHAI_ADVISOR_PORT: "8123" },
+    env: safeEnv,
     stdio: ["ignore", "pipe", "pipe"],
   });
   sakthaiProcess.stdout?.on("data", (d) => console.log("[SakThai]", d.toString().trim()));

@@ -108,14 +108,14 @@ describe("CRUD data routes", () => {
 
 describe("analytics routes", () => {
   it("reports seeded status", async () => {
-    const res = await request(app).get("/api/analytics/status");
+    const res = await request(app).get("/api/analytics/status").set("Authorization", "Bearer fp-analytics-secret-key");
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("seeded");
   });
 
   it("tracks an event and reflects it in the summary", async () => {
     const trackRes = await request(app)
-      .post("/api/analytics/track")
+      .post("/api/analytics/track").set("Authorization", "Bearer fp-analytics-secret-key")
       .send({
         session_id: "test-session-1",
         event_type: "pageview",
@@ -126,13 +126,13 @@ describe("analytics routes", () => {
       });
     expect(trackRes.status).toBe(200);
 
-    const summaryRes = await request(app).get("/api/analytics/summary?days=1");
+    const summaryRes = await request(app).get("/api/analytics/summary?days=1").set("Authorization", "Bearer fp-analytics-secret-key");
     expect(summaryRes.status).toBe(200);
   });
 
   it("tracks a batch of events and reflects them in the summary", async () => {
     const batchRes = await request(app)
-      .post("/api/analytics/track-batch")
+      .post("/api/analytics/track-batch").set("Authorization", "Bearer fp-analytics-secret-key")
       .send({
         events: [
           {
@@ -172,7 +172,7 @@ describe("security headers", () => {
     expect(res.headers).toHaveProperty("content-security-policy");
     const csp = res.headers["content-security-policy"];
     expect(csp).toContain("default-src 'self'");
-    expect(csp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
+    expect(csp).toContain("script-src 'self'");
     expect(csp).toContain("style-src 'self' 'unsafe-inline'");
     expect(csp).toContain("object-src 'none'");
     expect(res.headers).toHaveProperty("x-content-type-options", "nosniff");

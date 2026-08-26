@@ -389,17 +389,21 @@ const ALLOWED_METRIC_COLUMNS = new Set([
 ]);
 
 export function updateMetrics(data: Record<string, number>) {
-  const keys = Object.keys(data);
+  const keys: string[] = [];
+  const values: number[] = [];
+
+  for (const key of ALLOWED_METRIC_COLUMNS) {
+    if (key in data) {
+      keys.push(key);
+      values.push(data[key]);
+    }
+  }
+
   if (keys.length === 0) {
     throw new Error("No fields provided for update");
   }
-  for (const key of keys) {
-    if (!ALLOWED_METRIC_COLUMNS.has(key)) {
-      throw new Error(`Invalid metric column: ${key}`);
-    }
-  }
+
   const fields = keys.map(k => `${k} = ?`).join(", ");
-  const values = Object.values(data);
   return getDb().prepare(`UPDATE metrics SET ${fields}, updated_at = datetime('now') WHERE id = 1`).run(...values);
 }
 

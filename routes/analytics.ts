@@ -20,6 +20,16 @@ function parseLimit(queryVal: any, defaultLimit = 10, maxLimit = 100) {
   return Math.min(val, maxLimit);
 }
 
+const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const token = req.headers.authorization?.split(" ")[1] || req.query.token;
+  const expectedToken = process.env.ANALYTICS_API_KEY || "fp-analytics-secret-key";
+  if (token === expectedToken) {
+    return next();
+  }
+  return res.status(401).json({ error: "Unauthorized" });
+};
+
+analyticsRouter.use(requireAuth);
 
 export function applyAnalyticsEvent(body: any) {
   if (body.event_type === "session_start") {
@@ -99,6 +109,7 @@ analyticsRouter.get("/top-labels", (req, res) => {
     const days = parseDays(req.query.days, 30);
     const event_type = (req.query.event_type as string) || "tab_switch";
     const limit = parseLimit(req.query.limit, 10);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopLabels(days, event_type, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -107,6 +118,8 @@ analyticsRouter.get("/top-actions", (req, res) => {
   try {
     const days = parseDays(req.query.days, 30);
     const limit = parseLimit(req.query.limit, 10);
+    const days = Number(req.query.days) || 30;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopActions(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -115,6 +128,8 @@ analyticsRouter.get("/top-errors", (req, res) => {
   try {
     const days = parseDays(req.query.days, 30);
     const limit = parseLimit(req.query.limit, 10);
+    const days = Number(req.query.days) || 30;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopErrors(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -123,6 +138,8 @@ analyticsRouter.get("/top-pages", (req, res) => {
   try {
     const days = parseDays(req.query.days, 30);
     const limit = parseLimit(req.query.limit, 10);
+    const days = Number(req.query.days) || 30;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopPages(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -131,6 +148,8 @@ analyticsRouter.get("/top-branches", (req, res) => {
   try {
     const days = parseDays(req.query.days, 30);
     const limit = parseLimit(req.query.limit, 10);
+    const days = Number(req.query.days) || 30;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
     res.json(getTopBranches(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
@@ -154,6 +173,7 @@ analyticsRouter.get("/funnel", (req, res) => {
 analyticsRouter.get("/recent", (req, res) => {
   try {
     const limit = parseLimit(req.query.limit, 50);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 100);
     res.json(getRecentEvents(limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
