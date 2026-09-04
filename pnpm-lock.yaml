@@ -60,7 +60,7 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1)
       vite:
-        specifier: ^8.2.0
+        specifier: ^8.2.2
         version: 8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)
     devDependencies:
       '@testing-library/dom':
