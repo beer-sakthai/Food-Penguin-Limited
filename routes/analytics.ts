@@ -8,16 +8,18 @@ import {
 
 export const analyticsRouter = express.Router();
 
-const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const token = req.headers.authorization?.split(" ")[1] || req.query.token;
-  const expectedToken = process.env.ANALYTICS_API_KEY || "fp-analytics-secret-key";
-  if (token === expectedToken) {
-    return next();
-  }
-  return res.status(401).json({ error: "Unauthorized" });
-};
+function parseDays(queryVal: any, defaultDays = 30, maxDays = 365) {
+  const val = Number(queryVal);
+  if (isNaN(val) || val <= 0) return defaultDays;
+  return Math.min(val, maxDays);
+}
 
-analyticsRouter.use(requireAuth);
+function parseLimit(queryVal: any, defaultLimit = 10, maxLimit = 100) {
+  const val = Number(queryVal);
+  if (isNaN(val) || val <= 0) return defaultLimit;
+  return Math.min(val, maxLimit);
+}
+
 
 export function applyAnalyticsEvent(body: any) {
   if (body.event_type === "session_start") {
@@ -80,69 +82,69 @@ analyticsRouter.post("/track-batch", (req, res) => {
 
 analyticsRouter.get("/summary", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
+    const days = parseDays(req.query.days, 30);
     res.json(getAnalyticsSummary(days));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/timeseries", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
+    const days = parseDays(req.query.days, 30);
     res.json(getAnalyticsTimeseries(days));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/top-labels", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
+    const days = parseDays(req.query.days, 30);
     const event_type = (req.query.event_type as string) || "tab_switch";
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+    const limit = parseLimit(req.query.limit, 10);
     res.json(getTopLabels(days, event_type, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/top-actions", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+    const days = parseDays(req.query.days, 30);
+    const limit = parseLimit(req.query.limit, 10);
     res.json(getTopActions(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/top-errors", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+    const days = parseDays(req.query.days, 30);
+    const limit = parseLimit(req.query.limit, 10);
     res.json(getTopErrors(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/top-pages", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+    const days = parseDays(req.query.days, 30);
+    const limit = parseLimit(req.query.limit, 10);
     res.json(getTopPages(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/top-branches", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+    const days = parseDays(req.query.days, 30);
+    const limit = parseLimit(req.query.limit, 10);
     res.json(getTopBranches(days, limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/roles", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
+    const days = parseDays(req.query.days, 30);
     res.json(getRoleBreakdown(days));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
 
 analyticsRouter.get("/funnel", (req, res) => {
   try {
-    const days = Number(req.query.days) || 30;
+    const days = parseDays(req.query.days, 30);
     const stepsParam = (req.query.steps as string) || "Overview,Production,Waste,Sell,Reports";
     const steps = stepsParam.split(",").map(s => s.trim()).filter(Boolean);
     res.json(getFunnel(steps, days));
@@ -151,7 +153,7 @@ analyticsRouter.get("/funnel", (req, res) => {
 
 analyticsRouter.get("/recent", (req, res) => {
   try {
-    const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 100);
+    const limit = parseLimit(req.query.limit, 50);
     res.json(getRecentEvents(limit));
   } catch (err: any) { res.status(500).json({ error: err.message }); }
 });
