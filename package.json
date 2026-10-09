@@ -54,7 +54,7 @@
   },
   "overrides": {
     "protobufjs": "^7.6.5",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
     "onnxruntime-web": "^1.27.0",
     "onnx-proto": ">=1.16.0"
   }
