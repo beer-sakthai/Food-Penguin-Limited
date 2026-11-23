@@ -735,7 +735,7 @@ export default function App() {
 
     // Apply manual override to the day: target value is projected + suggested adjustment
     const targetValue = Math.max(10, Math.min(110, Math.round(maxProjectedItem.projected + quickFixAdjustment)));
-    
+
     setCapacityOverrides((prev) => ({
       ...prev,
       [quickFixDay]: {
@@ -744,7 +744,7 @@ export default function App() {
       },
     }));
     setQuickAdjustEnabled(true);
-    
+
     // Reset quick fix display state
     setQuickFixRecommendation(null);
     setQuickFixAdjustment(null);

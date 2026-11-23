@@ -62,7 +62,7 @@ def run_gguf_advisor(model_path: str, port: int):
 
 def build_prompt(metrics, question):
     system = "You are SakThai, an operational advisor for Food Penguin Limited, a sushi business in Cork, Ireland. Answer with exactly 3 short bullet points. Each bullet must start with '- ' and be one sentence. No numbering, no bold, no markdown, no repeated ideas, no extra text."
-    
+
     # Build context from RAG index
     context = ""
     try:
@@ -79,7 +79,7 @@ def build_prompt(metrics, question):
             context = "\nRecent data:\n" + "\n".join(f"- {s[1]['text']}" for s in sims[:5]) + "\n"
     except Exception:
         pass
-    
+
     user = (
         f"Branch: {metrics.get('branch', 'All branches')}\n"
         f"Sales: €{metrics.get('sales', 0):.2f}\n"

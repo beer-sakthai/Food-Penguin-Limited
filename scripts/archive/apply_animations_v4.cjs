@@ -7,10 +7,10 @@ function addHoverToListsAndRows(content) {
   // Find basically anything with onClick OR cursor-pointer without active:scale
   newContent = newContent.replace(/<(div|li|tr|button)([^>]*)className=(['"])(.*?)\3/g, (match, tag, before, quote, classNames) => {
     let classes = classNames;
-    
+
     // Only if it has cursor-pointer or is a button OR if before contains onClick
     let hasInteractivity = classes.includes('cursor-pointer') || tag === 'button' || before.includes('onClick');
-    
+
     if (hasInteractivity) {
       if (!classes.includes('active:scale')) {
         classes += ' active:scale-[0.98]';
@@ -19,7 +19,7 @@ function addHoverToListsAndRows(content) {
         classes += ' hover:-translate-y-0.5 hover:shadow-md transition-all duration-200';
       }
     }
-    
+
     classes = classes.replace(/\s+/g, ' ').trim();
     return `<${tag}${before}className=${quote}${classes}${quote}`;
   });

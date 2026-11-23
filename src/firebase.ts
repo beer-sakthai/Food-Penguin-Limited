@@ -156,14 +156,14 @@ export async function setDoc(docRef: any, data: any) {
   const colName = docRef.colPath;
   const docId = docRef.docId;
   let items = await loadCollectionItems(colName);
-  
+
   const idx = items.findIndex((i: any) => i.id === docId);
   if (idx !== -1) {
     items[idx] = { ...items[idx], ...data };
   } else {
     items.push({ id: docId, ...data });
   }
-  
+
   const encryptedPayload = await encryptForStorage(JSON.stringify(items));
   localStorage.setItem(`fs_${colName}`, encryptedPayload);
   window.dispatchEvent(new StorageEvent('storage', { key: `fs_${colName}` }));
@@ -176,7 +176,7 @@ export async function updateDoc(docRef: any, data: any) {
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): never {
   let userId: string | undefined = undefined;
   let email: string | undefined = undefined;
-  
+
   try {
     const local = localStorage.getItem("localCurrentUser");
     if (local) {
