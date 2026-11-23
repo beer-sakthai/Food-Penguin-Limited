@@ -1,0 +1,80 @@
+name: Actions policy (SHA-pin lockfile)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: actions-policy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-sha-pins:
+    name: Enforce SHA pins on every `uses:`
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          use-policy-store: true
+          api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate `uses:` pins
+        run: |
+          set -eu
+
+          # Collect every `uses:` entry across workflows and composite actions.
+          # Strip the leading key, trim surrounding whitespace, drop empty lines.
+          mapfile -t uses_lines < <(
+            grep -hE '^[[:space:]]*(-[[:space:]]+)?uses:[[:space:]]*' \
+              -r .github/workflows .github/actions \
+              --include='*.yml' --include='*.yaml' \
+            | sed -E 's/^[[:space:]]*(-[[:space:]]+)?uses:[[:space:]]*//' \
+            | sed -E 's/[[:space:]]*(#.*)?$//' \
+            | sed -E 's/^"(.*)"$/\1/' \
+            | sed -E "s/^'(.*)'\$/\\1/" \
+            | awk 'NF'
+          )
+
+          fail=0
+          for ref in "${uses_lines[@]}"; do
+            # Local composite action or reusable workflow: must start with ./
+            if [[ "$ref" == ./* ]]; then
+              continue
+            fi
+            # External: must be <owner>/<repo>[/<subpath>]@<40-hex-sha>
+            if [[ "$ref" =~ ^[[:alnum:]_.-]+/[[:alnum:]_./-]+@[0-9a-f]{40}$ ]]; then
+              continue
+            fi
+            echo "::error::Unpinned action reference: $ref"
+            fail=1
+          done
+
+          if [ "$fail" -ne 0 ]; then
+            echo ""
+            echo "Every \`uses:\` must be either:"
+            echo "  * a local reference starting with ./"
+            echo "  * pinned to a 40-character commit SHA, optionally"
+            echo "    followed by a '# vX.Y.Z' comment that Dependabot can bump."
+            exit 1
+          fi
+
+          echo "All ${#uses_lines[@]} \`uses:\` references are SHA-pinned or local."

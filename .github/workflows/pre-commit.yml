@@ -1,0 +1,50 @@
+name: pre-commit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pre-commit-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# The repo's .pre-commit-config.yaml declares gitleaks, eslint, and two
+# whitespace hooks. In CI we currently enforce only `gitleaks` because the
+# other hooks either require config that is not committed (eslint) or would
+# touch many unrelated files on first run (end-of-file-fixer,
+# trailing-whitespace). Those are tracked for a follow-up cleanup.
+jobs:
+  gitleaks:
+    name: gitleaks (pre-commit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          use-policy-store: true
+          api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
+      - name: Checkout repository (full history for gitleaks)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.11'
+
+      - name: Install pre-commit
+        run: python -m pip install --upgrade pip && python -m pip install pre-commit==4.0.1
+
+      - name: Run gitleaks via pre-commit
+        run: pre-commit run gitleaks --all-files --show-diff-on-failure
