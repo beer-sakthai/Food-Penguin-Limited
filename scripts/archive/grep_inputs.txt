@@ -15,7 +15,7 @@ src/components/TargetTab.tsx:267:              <input
 src/components/TargetTab.tsx:277:              <input
 src/components/TargetTab.tsx:304:              <input
 src/components/SellTab.tsx:395:                <input
-src/components/SellTab.tsx:522:                    <input 
+src/components/SellTab.tsx:522:                    <input
 src/components/SellTab.tsx:696:              <input
 src/components/SellTab.tsx:730:                <input
 src/App.tsx:1272:                          <input

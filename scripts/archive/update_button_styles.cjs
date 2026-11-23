@@ -18,7 +18,7 @@ filesToUpdate.forEach(file => {
     // Add button micro-animations
     // Find generic standard button hover styles
     c = c.replace(/className=\{\`([^`]*?)hover:([^`]*?)\`\}/g, (match, p1, p2) => {
-        // Exclude rows (tr) or main containers if they are definitely not buttons, but the prompt says 
+        // Exclude rows (tr) or main containers if they are definitely not buttons, but the prompt says
         // "Buttons, cards, and interactive rows include distinct micro-animations". So applying globally to hover: items is fine.
         if (!p1.includes('hover:-translate-y-0.5') && !p2.includes('hover:-translate-y-0.5')) {
            return `className={\`${p1} hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] hover:${p2}\`}`;

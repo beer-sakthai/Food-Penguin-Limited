@@ -15,8 +15,8 @@ const reconstructedMainCharts = `
               <div className="flex items-center gap-2">
                 <h3 className={\`text-lg font-sans font-bold \${isLight ? 'text-zinc-900' : 'text-3d-gold drop-shadow-md'}\`}>Performance Index</h3>
                 <span className={\`text-[10px] border font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider \${
-                  isLight 
-                    ? 'bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200' 
+                  isLight
+                    ? 'bg-emerald-50 text-emerald-750 text-emerald-700 border-emerald-250 border-emerald-200'
                     : 'bg-emerald-950/40 text-emerald-400 border-emerald-900/40'
                 }\`}>
                   {chartView === 'weekly' ? 'Week Overview' : 'Today Overview'}
@@ -85,7 +85,7 @@ const reconstructedMainCharts = `
               Branch Compare
             </h3>
             <p className="text-xs text-zinc-500 mt-2">Measure relative performance between individual stores and benchmarks.</p>
-            
+
             <div className="mt-6 space-y-4">
               <div>
                 <label className="text-xs font-bold uppercase text-zinc-500 mb-1.5 block">Branch A</label>
@@ -138,7 +138,7 @@ const reconstructedMainCharts = `
           </button>
         </div>
       </div>
-      
+
       <div className="mt-10">
       `;
 

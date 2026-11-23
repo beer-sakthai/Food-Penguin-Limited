@@ -1,7 +1,7 @@
 const fs = require('fs');
 let c = fs.readFileSync('src/App.tsx', 'utf8');
 
-c = c.replace(/<div className="max-h-56 overflow-y-auto pr-1 space-y-2\.5 custom-scrollbar">\s*\{sortedDailyCapacityBreakdown\.map\(\(item, index\) => \{/, 
+c = c.replace(/<div className="max-h-56 overflow-y-auto pr-1 space-y-2\.5 custom-scrollbar">\s*\{sortedDailyCapacityBreakdown\.map\(\(item, index\) => \{/,
 `<div className="max-h-56 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar">
             {(() => {
               const avgWeeklyProjected = Math.round(dailyCapacityBreakdown.reduce((sum, d) => sum + d.projected, 0) / (dailyCapacityBreakdown.length || 1));

@@ -25,18 +25,18 @@ const sidebarAddition = `
               const shortName = branch.replace('Marks & Spencer', 'M&S').replace(' - Cork City', ' Cork').replace(' - Mahon Point', ' Mahon');
               const isSelected = selectedBranch === branch;
               return (
-                <div 
-                  key={branch} 
+                <div
+                  key={branch}
                   onClick={() => setSelectedBranch(branch)}
                   className={\`flex justify-between items-center text-[10px] p-2 rounded-lg border cursor-pointer transition-colors \${
-                    isSelected 
+                    isSelected
                       ? isLight ? 'bg-orange-50 border-orange-200' : 'bg-orange-500/10 border-orange-500/30'
                       : isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100' : 'bg-zinc-950/50 border-zinc-800/80 hover:bg-zinc-900'
                   }\`}
                 >
                   <span className={\`truncate mr-2 \${
-                    isSelected 
-                      ? isLight ? 'text-orange-700 font-bold' : 'text-orange-400 font-bold' 
+                    isSelected
+                      ? isLight ? 'text-orange-700 font-bold' : 'text-orange-400 font-bold'
                       : isLight ? 'text-zinc-700 font-medium' : 'text-zinc-300 font-medium'
                   }\`}>
                     {shortName}

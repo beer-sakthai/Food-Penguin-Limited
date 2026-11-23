@@ -18,7 +18,7 @@ def extract_data(db_path):
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     chunks = []
-    
+
     # Metrics history
     try:
         c.execute("SELECT * FROM metrics ORDER BY id DESC LIMIT 10")
@@ -26,7 +26,7 @@ def extract_data(db_path):
             text = f"Metric: Sales=€{r['sales_today']:.0f}, Growth={r['sales_growth']:.1f}%, Production={r['production_items']}/{r['production_target']}, Waste=€{r['waste_cost']:.0f}, Reduction={r['waste_reduction']:.1f}%, Hours={r['hours_scheduled']:.0f}, Overtime={r['overtime_hours']:.1f}h, Health={r['ai_health_score']}/100"
             chunks.append({"text": text, "source": "metrics", "id": f"metric_{r['id']}"})
     except Exception as e: print(f"metrics err: {e}")
-    
+
     # Orders
     try:
         c.execute("SELECT * FROM orders ORDER BY id DESC LIMIT 15")
@@ -34,7 +34,7 @@ def extract_data(db_path):
             text = f"Order: {r['item']} (qty={r['quantity']}, €{r['amount']:.0f}) — {r['status']} at {r['branch']}"
             chunks.append({"text": text, "source": "orders", "id": f"order_{r['id']}"})
     except: pass
-    
+
     # Targets
     try:
         c.execute("SELECT * FROM targets ORDER BY rowid DESC LIMIT 10")
@@ -42,7 +42,7 @@ def extract_data(db_path):
             text = f"Target: {r['name']} — {r['metric']}: €{r['current_value']:.0f}/€{r['target_value']:.0f} ({r['category']})"
             chunks.append({"text": text, "source": "targets", "id": f"target_{r['id']}"})
     except Exception as e: print(f"targets err: {e}")
-    
+
     # Waste records
     try:
         c.execute("SELECT * FROM waste_records ORDER BY id DESC LIMIT 10")
@@ -50,7 +50,7 @@ def extract_data(db_path):
             text = f"Waste: {r['item']} ({r['reason']}) — {r['weight']}g, €{r['cost']:.0f} loss"
             chunks.append({"text": text, "source": "waste", "id": f"waste_{r['id']}"})
     except Exception as e: print(f"waste err: {e}")
-    
+
     conn.close()
     return chunks
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8125)
     parser.add_argument("--rebuild", action="store_true", help="Rebuild index from DB")
     args = parser.parse_args()
-    
+
     # Load or build index
     if args.rebuild or not os.path.exists(INDEX_PATH):
         model = load_model()
@@ -96,9 +96,9 @@ if __name__ == "__main__":
         with open(INDEX_PATH) as f:
             index = json.load(f)
         model = load_model()
-    
+
     print(f"Index has {len(index)} vectors. Starting RAG server...")
-    
+
     class RAGHandler(BaseHTTPRequestHandler):
         def do_GET(self):
             if self.path == "/":
@@ -111,15 +111,15 @@ if __name__ == "__main__":
                 self.send_json({"results": [{"text": r[1]["text"], "source": r[1]["source"], "score": round(float(r[0]), 3)} for r in results]})
                 return
             self.send_error(404)
-        
+
         def send_json(self, data):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(data).encode())
-        
+
         def log_message(self, *a): pass
-    
+
     server = HTTPServer(("0.0.0.0", args.port), RAGHandler)
     print(f"Food-Penguin RAG server on port {args.port}")
     server.serve_forever()
