@@ -23,7 +23,7 @@ jobs:
       attestations: write
     with:
       job-name: Lint, Test, Build
-      lint-cmd: npm run lint
+      lint-cmd: npm run typecheck && npm run lint
       test-cmd: npm test
       build-cmd: npm run build
       attest-build: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

@@ -62,6 +62,14 @@ npm run build
 npm run start
 ```
 
+### Linting & Type-checking
+
+```bash
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm run lint:fix    # eslint --fix
+```
+
 ## 📂 Project Structure
 
 * `/src/components/` - Tab view components (`OverviewTab.tsx`, `SellTab.tsx`, etc.).
