@@ -1,0 +1,41 @@
+name: Node CI setup
+description: >-
+  Harden the runner, check out the repository, set up Node.js (from
+  .nvmrc by default), and install npm dependencies. Encapsulates the
+  prefix that was duplicated across every Node job.
+
+inputs:
+  step-security-api-key:
+    description: API key for step-security/harden-runner policy store.
+    required: true
+  node-version-file:
+    description: Path to the file holding the Node version.
+    required: false
+    default: .nvmrc
+  egress-policy:
+    description: Harden-runner egress policy mode (audit or block).
+    required: false
+    default: audit
+
+runs:
+  using: composite
+  steps:
+    - name: Harden the runner
+      uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+      with:
+        use-policy-store: true
+        api-key: ${{ inputs.step-security-api-key }}
+        egress-policy: ${{ inputs.egress-policy }}
+
+    - name: Checkout repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Set up Node.js
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: ${{ inputs.node-version-file }}
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci

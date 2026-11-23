@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Lightweight local SakThai GGUF advisor server."""
+import glob
+import json
 import os
 import sys
-import json
-import glob
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from llama_cpp import Llama
 
 MODEL_DIR = "/opt/data/models/sakthai-1.5b/gguf"

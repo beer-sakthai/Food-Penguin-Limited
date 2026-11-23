@@ -9,6 +9,8 @@ on:
   schedule:
   - cron: '27 10 * * *'
 
+permissions: {}
+
 jobs:
   stale:
 

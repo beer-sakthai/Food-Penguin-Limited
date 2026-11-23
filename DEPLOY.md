@@ -30,4 +30,6 @@ npx vercel --token=<YOUR_TOKEN> --prod
 - `server.ts` — Express API backend.
 
 ## Watchdog
-A daily cron job runs `npm run lint` + `npm run build` at 08:00 and reports failures.
+`.github/workflows/watchdog.yml` runs `npm run lint` + `npm run build` daily at
+08:00 UTC (and on `workflow_dispatch`). On a scheduled failure it opens or
+updates a tracking issue titled "Watchdog failed: daily lint/build broke".

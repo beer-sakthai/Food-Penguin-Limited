@@ -1,0 +1,97 @@
+name: Reusable Node CI
+
+on:
+  workflow_call:
+    inputs:
+      lint-cmd:
+        description: Command to run for typecheck/lint. Empty to skip.
+        type: string
+        default: ''
+      test-cmd:
+        description: Command to run for tests. Empty to skip.
+        type: string
+        default: ''
+      build-cmd:
+        description: Command to run for build. Empty to skip.
+        type: string
+        default: ''
+      audit-cmd:
+        description: Command to run for dependency audit. Empty to skip.
+        type: string
+        default: ''
+      runs-on:
+        description: Runner label.
+        type: string
+        default: ubuntu-latest
+      timeout-minutes:
+        description: Job timeout.
+        type: number
+        default: 15
+      job-name:
+        description: Display name for the job.
+        type: string
+        default: Node CI
+      attest-build:
+        description: >-
+          When true, sign and attest provenance for files produced
+          under the path given by `attest-subject-path` after the
+          build step. Requires id-token:write and attestations:write
+          from the caller.
+        type: boolean
+        default: false
+      attest-subject-path:
+        description: Glob passed to attest-build-provenance.
+        type: string
+        default: 'dist/**/*'
+    secrets:
+      step-security-api-key:
+        description: API key for step-security/harden-runner.
+        required: true
+
+permissions: {}
+
+jobs:
+  node-ci:
+    name: ${{ inputs.job-name }}
+    runs-on: ${{ inputs.runs-on }}
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Node CI setup
+        uses: ./.github/actions/node-ci-setup
+        with:
+          step-security-api-key: ${{ secrets.step-security-api-key }}
+
+      - name: Type-check
+        if: inputs.lint-cmd != ''
+        env:
+          LINT_CMD: ${{ inputs.lint-cmd }}
+        run: $LINT_CMD
+
+      - name: Run tests
+        if: inputs.test-cmd != ''
+        env:
+          TEST_CMD: ${{ inputs.test-cmd }}
+        run: $TEST_CMD
+
+      - name: Build
+        if: inputs.build-cmd != ''
+        env:
+          BUILD_CMD: ${{ inputs.build-cmd }}
+        run: $BUILD_CMD
+
+      - name: Audit
+        if: inputs.audit-cmd != ''
+        env:
+          AUDIT_CMD: ${{ inputs.audit-cmd }}
+        run: $AUDIT_CMD
+
+      - name: Attest build provenance
+        if: inputs.attest-build && inputs.build-cmd != ''
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ inputs.attest-subject-path }}

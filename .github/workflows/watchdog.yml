@@ -1,0 +1,66 @@
+name: Watchdog (daily lint + build)
+
+on:
+  schedule:
+    # Daily at 08:00 UTC — matches the schedule documented in DEPLOY.md.
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: watchdog-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Watchdog build
+    uses: ./.github/workflows/_node-ci.yml
+    permissions:
+      contents: read
+    with:
+      job-name: Watchdog build
+      lint-cmd: npm run lint
+      build-cmd: npm run build
+      timeout-minutes: 15
+    secrets:
+      step-security-api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
+  report-failure:
+    name: Report failure
+    needs: [build]
+    if: ${{ failure() && github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          use-policy-store: true
+          api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
+      - name: Open or update tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TITLE: 'Watchdog failed: daily lint/build broke'
+        run: |
+          set -eu
+          existing="$(gh issue list --repo "$REPO" --state open \
+            --search "in:title $TITLE" --json number --jq '.[0].number // empty')"
+          body="The daily watchdog workflow failed. See: $RUN_URL"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$body"
+          else
+            gh issue create --repo "$REPO" \
+              --title "$TITLE" \
+              --body "$body" \
+              --label "watchdog" || \
+            gh issue create --repo "$REPO" \
+              --title "$TITLE" \
+              --body "$body"
+          fi

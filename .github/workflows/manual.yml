@@ -18,6 +18,8 @@ on:
         # The data type of the input
         type: string
 
+permissions: {}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
@@ -37,4 +39,6 @@ jobs:
         api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
 
     - name: Send greeting
-      run: echo "Hello ${{ inputs.name }}"
+      env:
+        INPUT_NAME: ${{ inputs.name }}
+      run: echo "Hello $INPUT_NAME"

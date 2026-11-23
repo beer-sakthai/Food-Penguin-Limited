@@ -19,6 +19,12 @@ on:
   schedule:
     - cron: '25 22 * * 6'
 
+permissions: {}
+
+concurrency:
+  group: codeql-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
@@ -61,6 +67,8 @@ jobs:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
       with:
+        use-policy-store: true
+        api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
         egress-policy: audit
 
     - name: Checkout repository

@@ -35,7 +35,7 @@ A comprehensive, unified corporate dashboard built for Food Penguin Limited. Thi
 
 ### Prerequisites
 
-* Node.js (v20+ recommended)
+* Node.js (v22+ required — see `.nvmrc`)
 * npm or uv
 
 ### Installation
